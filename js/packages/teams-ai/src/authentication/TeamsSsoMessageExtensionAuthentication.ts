@@ -16,8 +16,8 @@ import { MessageExtensionsInvokeNames } from '../MessageExtensions';
 export class TeamsSsoMessageExtensionAuthentication extends MessageExtensionAuthenticationBase {
     /**
      * Creates a new instance of TeamsSsoMessageExtensionAuthentication.
-     * @param settings The Teams SSO settings.
-     * @param msal The MSAL (Microsoft Authentication Library) instance.
+     * @param {TeamsSsoSettings} settings The Teams SSO settings.
+     * @param {ConfidentialClientApplication} msal The MSAL (Microsoft Authentication Library) instance.
      */
     public constructor(
         private readonly settings: TeamsSsoSettings,
@@ -28,8 +28,8 @@ export class TeamsSsoMessageExtensionAuthentication extends MessageExtensionAuth
 
     /**
      * Checks if the activity is a valid Message Extension activity that supports SSO
-     * @param context The turn context.
-     * @returns A boolean indicating if the activity is valid.
+     * @param {TurnContext} context The turn context.
+     * @returns {boolean} A boolean indicating if the activity is valid.
      */
     public override isValidActivity(context: TurnContext): boolean {
         // Currently only search based message extensions has SSO
@@ -38,8 +38,8 @@ export class TeamsSsoMessageExtensionAuthentication extends MessageExtensionAuth
 
     /**
      * Handles the SSO token exchange.
-     * @param context The turn context.
-     * @returns A promise that resolves to the token response or undefined if token exchange failed.
+     * @param {TurnContext} context The turn context.
+     * @returns {Promise<TokenResponse | undefined>} A promise that resolves to the token response or undefined if token exchange failed.
      */
     public async handleSsoTokenExchange(context: TurnContext): Promise<TokenResponse | undefined> {
         const tokenExchangeRequest = context.activity.value.authentication;
@@ -64,9 +64,9 @@ export class TeamsSsoMessageExtensionAuthentication extends MessageExtensionAuth
 
     /**
      * Handles the signin/verifyState activity.
-     * @param context The turn context.
-     * @param magicCode The magic code from sign-in.
-     * @returns A promise that resolves to undefined. The parent class will trigger silentAuth again.
+     * @param {TurnContext} context The turn context.
+     * @param {string} magicCode The magic code from sign-in.
+     * @returns {Promise<TokenResponse|undefined>} A promise that resolves to undefined. The parent class will trigger silentAuth again.
      */
     public async handleUserSignIn(context: TurnContext, magicCode: string): Promise<TokenResponse | undefined> {
         return undefined; // Let parent class trigger silentAuth again
@@ -74,8 +74,8 @@ export class TeamsSsoMessageExtensionAuthentication extends MessageExtensionAuth
 
     /**
      * Gets the sign-in link for the user.
-     * @param context The turn context.
-     * @returns A promise that resolves to the sign-in link.
+     * @param {TurnContext} context The turn context.
+     * @returns {Promise<string>} A promise that resolves to the sign-in link.
      */
     public async getSignInLink(context: TurnContext): Promise<string> {
         const clientId = this.settings.msalConfig.auth.clientId;

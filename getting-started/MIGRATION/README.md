@@ -4,6 +4,7 @@ _**Navigation**_
 - [**00.OVERVIEW**](./README.md)
 - [01.JS](./JS.md)
 - [02.DOTNET](./DOTNET.md)
+- [03.PYTHON](./PYTHON.md)
 ___
 
 ### Why you should migrate to the Teams AI library
@@ -27,3 +28,4 @@ Here are the guides on how to migrate from the BotFramework SDK:
 
 1. [JS Migration](JS.md)
 2. [C# Migration](DOTNET.md)
+3. [Python Migration](PYTHON.md)

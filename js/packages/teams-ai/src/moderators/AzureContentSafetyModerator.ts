@@ -1,6 +1,3 @@
-// TODO: Remove these lines once the linting issues are resolved:
-/* eslint-disable jsdoc/require-returns */
-/* eslint-disable security/detect-object-injection */
 /**
  * @module teams-ai
  */

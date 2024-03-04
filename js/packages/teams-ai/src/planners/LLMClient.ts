@@ -12,7 +12,7 @@ import { Validation, PromptResponseValidator, DefaultResponseValidator } from '.
 import { Memory, MemoryFork } from '../MemoryFork';
 import { Colorize } from '../internals';
 import { TurnContext } from 'botbuilder';
-import { GPT3Tokenizer, Tokenizer } from '../tokenizers';
+import { GPTTokenizer, Tokenizer } from '../tokenizers';
 
 /**
  * Options for an LLMClient instance.
@@ -63,7 +63,7 @@ export interface LLMClientOptions<TContent = any> {
     /**
      * Optional. Tokenizer to use when rendering the prompt or counting tokens.
      * @remarks
-     * If not specified a new instance of `GPT3Tokenizer` will be created.
+     * If not specified, a new instance of `GPTTokenizer` will be created. GPT3Tokenizer can be passed in for gpt-3 models.
      */
     tokenizer?: Tokenizer;
 
@@ -179,6 +179,11 @@ export interface ConfiguredLLMClientOptions<TContent = any> {
  * instead.
  * @template TContent Optional. Type of message content returned for a 'success' response. The `response.message.content` field will be of type TContent. Defaults to `any`.
  */
+/**
+ * Represents an LLM (Language Learning Model) client.
+ * This class provides methods for configuring and interacting with the LLM model.
+ * @template TContent The type of message content returned for a 'success' response.
+ */
 export class LLMClient<TContent = any> {
     /**
      * Configured options for this LLMClient instance.
@@ -187,7 +192,7 @@ export class LLMClient<TContent = any> {
 
     /**
      * Creates a new `LLMClient` instance.
-     * @param options Options to configure the instance with.
+     * @param {LLMClientOptions<TContent>} options - Options to configure the instance with.
      */
     public constructor(options: LLMClientOptions<TContent>) {
         this.options = Object.assign(
@@ -208,15 +213,15 @@ export class LLMClient<TContent = any> {
 
         // Create tokenizer to use
         if (!this.options.tokenizer) {
-            this.options.tokenizer = new GPT3Tokenizer();
+            this.options.tokenizer = new GPTTokenizer();
         }
     }
 
     /**
      * Adds a result from a `function_call` to the history.
-     * @param memory An interface for accessing state values.
-     * @param name Name of the function that was called.
-     * @param results Results returned by the function.
+     * @param {Memory} memory - An interface for accessing state values.
+     * @param {string} name - Name of the function that was called.
+     * @param {any} results - Results returned by the function.
      */
     public addFunctionResultToHistory(memory: Memory, name: string, results: any): void {
         // Convert content to string
@@ -270,10 +275,10 @@ export class LLMClient<TContent = any> {
      * the validator feedback message.  There are other status codes for various errors and in all
      * cases except `success` the `response.message` will be of type `string`.
      * @template TContent Optional. Type of message content returned for a 'success' response. The `response.message.content` field will be of type TContent. Defaults to `any`.
-     * @param context Current turn context.
-     * @param memory An interface for accessing state values.
-     * @param functions Functions to use when rendering the prompt.
-     * @returns A `PromptResponse` with the status and message.
+     * @param {TurnContext} context - Current turn context.
+     * @param {Memory} memory - An interface for accessing state values.
+     * @param {PromptFunctions} functions - Functions to use when rendering the prompt.
+     * @returns {Promise<PromptResponse<TContent>>} A `PromptResponse` with the status and message.
      */
     public async completePrompt(
         context: TurnContext,
@@ -314,7 +319,7 @@ export class LLMClient<TContent = any> {
             );
             if (validation.valid) {
                 // Update content
-                if (validation.hasOwnProperty('value')) {
+                if (Object.prototype.hasOwnProperty.call(validation, 'value')) {
                     response.message!.content = validation.value;
                 }
 
@@ -377,9 +382,9 @@ export class LLMClient<TContent = any> {
     }
 
     /**
-     * @param memory
-     * @param variable
-     * @param input
+     * @param {Memory} memory - Current memory.
+     * @param {string} variable - Variable to fetch from memory.
+     * @param {Message<any>} input - The current input.
      * @private
      */
     private addInputToHistory(memory: Memory, variable: string, input: Message<any>): void {
@@ -394,9 +399,9 @@ export class LLMClient<TContent = any> {
     }
 
     /**
-     * @param memory
-     * @param variable
-     * @param message
+     * @param {Memory} memory - Current memory.
+     * @param {string} variable - Variable to fetch value from memory.
+     * @param {Message<TContent>} message - The Message to be added to history.
      * @private
      */
     private addResponseToHistory(memory: Memory, variable: string, message: Message<TContent>): void {
@@ -411,12 +416,13 @@ export class LLMClient<TContent = any> {
     }
 
     /**
-     * @param context
-     * @param fork
-     * @param functions
-     * @param response
-     * @param validation
-     * @param remaining_attempts
+     * @param {TurnContext} context - The current TurnContext
+     * @param {MemoryFork} fork - The current fork of memory to be repaired.
+     * @param {PromptFunctions} functions - Functions to use.
+     * @param {PromptResponse<TContent>} response - The response that needs repairing.
+     * @param {Validation} validation - The Validation object to be used during repair.
+     * @param {number} remaining_attempts - The number of remaining attempts.
+     * @returns {Promise<PromptResponse<TContent>>} - The repaired response.
      * @private
      */
     private async repairResponse(
@@ -466,7 +472,7 @@ export class LLMClient<TContent = any> {
         );
         if (validation.valid) {
             // Update content
-            if (validation.hasOwnProperty('value')) {
+            if (Object.prototype.hasOwnProperty.call(validation, 'value')) {
                 repairResponse.message!.content = validation.value;
             }
 

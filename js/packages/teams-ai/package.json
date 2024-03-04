@@ -12,6 +12,9 @@
         "teams",
         "ai"
     ],
+    "engines": {
+        "node": "^16 || ^18"
+    },
     "bugs": {
         "url": "https://github.com/microsoft/teams-ai/issues"
     },
@@ -22,29 +25,31 @@
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
     "dependencies": {
-        "@azure/msal-node": "^2.6.2",
+        "@azure/msal-node": "^2.6.4",
         "axios": "^1.6.7",
         "botbuilder": "^4.22.1",
         "botbuilder-dialogs": "^4.22.1",
-        "gpt-3-encoder": "^1.1.4",
+        "gpt-tokenizer": "^2.1.2",
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
-        "openai": "^4.26.1",
+        "openai": "^4.28.4",
         "uuid": "^9.0.1",
-        "yaml": "^2.3.4"
+        "yaml": "^2.4.0"
     },
     "resolutions": {
         "follow-redirects": "^1.15.0"
     },
     "devDependencies": {
         "@types/assert": "^1.5.10",
+        "@types/express": "^4.17.21",
         "@types/jsonwebtoken": "^9.0.4",
         "@types/mocha": "^10.0.6",
-        "@types/node": "^20.11.16",
+        "@types/node": "^20.11.24",
         "@types/uuid": "^9.0.8",
-        "eslint": "^8.56.0",
+        "eslint": "^8.57.0",
+        "express": "^4.18.3",
         "jsonwebtoken": "^9.0.2",
-        "mocha": "10.2.0",
+        "mocha": "10.3.0",
         "nyc": "^15.1.0",
         "rimraf": "5.0.5",
         "shx": "^0.3.4",
@@ -53,8 +58,8 @@
     },
     "scripts": {
         "build": "tsc -b",
-        "build:rollup": "yarn clean && yarn build && npx api-extractor run --verbose --local",
-        "clean": "rimraf _ts3.4 lib tsconfig.tsbuildinfo node_modules",
+        "build:rollup": "npx api-extractor run --verbose --local",
+        "clean": "npx rimraf _ts3.4 lib tsconfig.tsbuildinfo node_modules",
         "depcheck": "depcheck --config ../../.depcheckrc",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "test": "npx mocha -r ts-node/register src/**/*.spec.ts",

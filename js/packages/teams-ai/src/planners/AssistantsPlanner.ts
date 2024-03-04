@@ -72,7 +72,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
 
     /**
      * Creates a new `AssistantsPlanner` instance.
-     * @param options Options for configuring the AssistantsPlanner.
+     * @param {AssistantsPlannerOptions} options - Options for configuring the AssistantsPlanner.
      */
     public constructor(options: AssistantsPlannerOptions) {
         this._options = Object.assign(
@@ -89,6 +89,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
 
     /**
      * Gets the OpenAI SDK instance being used.
+     * @returns {OpenAI} The OpenAI instance
      */
     public get openai(): OpenAI {
         return this._openai;
@@ -102,10 +103,10 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
      * there is no work to be performed.
      *
      * The planner should take the users input from `state.temp.input`.
-     * @param context Context for the current turn of conversation.
-     * @param state Application state for the current turn of conversation.
-     * @param ai The AI system that is generating the plan.
-     * @returns The plan that was generated.
+     * @param {TurnContext} context - Context for the current turn of conversation.
+     * @param {TState} state - Application state for the current turn of conversation.
+     * @param {AI<TState>} ai - The AI system that is generating the plan.
+     * @returns {Promise<Plan>} The plan that was generated.
      */
     public beginTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan> {
         return this.continueTask(context, state, ai);
@@ -120,10 +121,10 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
      * to be performed.
      *
      * The output from the last plan step that was executed is passed to the planner via `state.temp.input`.
-     * @param context Context for the current turn of conversation.
-     * @param state Application state for the current turn of conversation.
-     * @param ai The AI system that is generating the plan.
-     * @returns The plan that was generated.
+     * @param {TurnContext} context - Context for the current turn of conversation.
+     * @param {TState} state - Application state for the current turn of conversation.
+     * @param {AI<TState>} ai - The AI system that is generating the plan.
+     * @returns {Promise<Plan>} The plan that was generated.
      */
     public async continueTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan> {
         // Create a new thread if we don't have one already
@@ -145,9 +146,9 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
 
     /**
      * Static helper method for programmatically creating an assistant.
-     * @param apiKey OpenAI API key.
-     * @param request Definition of the assistant to create.
-     * @returns The created assistant.
+     * @param {string} apiKey - OpenAI API key.
+     * @param {OpenAI.Beta.Assistants.AssistantCreateParams} request - Definition of the assistant to create.
+     * @returns {Promise<OpenAI.Beta.Assistants.Assistant>} The created assistant.
      */
     public static async createAssistant(
         apiKey: string,
@@ -163,6 +164,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     /**
      * @private
      * Exposed for unit testing.
+     @returns {Promise<OpenAI.Beta.Assistants.Assistant>} - The assistant.
      */
     protected async retrieveAssistant(): Promise<OpenAI.Beta.Assistants.Assistant> {
         // Retrieve the assistant on first request
@@ -174,10 +176,11 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
-     * @param thread_id
-     * @param body
      * @private
      * Exposed for unit testing.
+     * @param {string} thread_id - The thread id
+     * @param {OpenAI.Beta.Threads.Messages.MessageCreateParams} body - Message body.
+     @returns {Promise<OpenAI.Beta.Threads.Messages.ThreadMessage>} The thread message.
      */
     protected async createMessage(
         thread_id: string,
@@ -187,27 +190,30 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
-     * @param request
      * @private
      * Exposed for unit testing.
+     * @param {OpenAI.Beta.Threads.ThreadCreateParams} request The Threads request.
+     * @returns {Promise<OpenAI.Beta.Threads.Thread>} The Thread.
      */
     protected async createThread(request: OpenAI.Beta.Threads.ThreadCreateParams): Promise<OpenAI.Beta.Threads.Thread> {
         return await this.openai.beta.threads.create(request);
     }
 
     /**
-     * @param thread_id
      * @private
      * Exposed for unit testing.
+     * @param {string} thread_id - The current thread id
+     * @returns {Promise<OpenAI.Beta.Threads.Messages.ThreadMessagesPage>} The list of messages.
      */
     protected async listMessages(thread_id: string): Promise<OpenAI.Beta.Threads.Messages.ThreadMessagesPage> {
         return await this.openai.beta.threads.messages.list(thread_id);
     }
 
     /**
-     * @param thread_id
      * @private
      * Exposed for unit testing.
+     * @param {string} thread_id - The thread id to create Run.
+     * @returns {Promise<OpenAI.Beta.Threads.Runs.Run>} The created run.
      */
     protected async createRun(thread_id: string): Promise<OpenAI.Beta.Threads.Runs.Run> {
         return await this.openai.beta.threads.runs.create(thread_id, {
@@ -216,19 +222,21 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
-     * @param thread_id
-     * @param run_id
      * @private
      * Exposed for unit testing.
+     * @param {string} thread_id - The thread id to retrieve the run.
+     * @param {string} run_id - The run id to retrieve.
+     * @returns {OpenAI.Beta.Threads.Runs.Run} The retrieved run.
      */
     protected async retrieveRun(thread_id: string, run_id: string): Promise<OpenAI.Beta.Threads.Runs.Run> {
         return await this.openai.beta.threads.runs.retrieve(thread_id, run_id);
     }
 
     /**
-     * @param thread_id
      * @private
      * Exposed for unit testing.
+     * @param {string} thread_id The thread id to retrieve the run.
+     * @returns {Promise<OpenAI.Beta.Threads.Runs.Run>} The retrieved run.
      */
     protected async retrieveLastRun(thread_id: string): Promise<OpenAI.Beta.Threads.Runs.Run | null> {
         const list = await this.openai.beta.threads.runs.list(thread_id, { limit: 1 });
@@ -240,11 +248,12 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
-     * @param thread_id
-     * @param run_id
-     * @param tool_outputs
      * @private
      * Exposed for unit testing.
+     * @param {string} thread_id - The current thread id.
+     * @param {string} run_id - The current run id.
+     * @param {OpenAI.Beta.Threads.Runs.RunSubmitToolOutputsParams} tool_outputs - The run's tool output parameters.
+     * @returns {Promise<OpenAI.Beta.Threads.Run.Run>} The tool outputs.
      */
     protected async submitToolOutputs(
         thread_id: string,
@@ -255,8 +264,9 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
-     * @param run
      * @private
+     * @param {OpenAI.Beta.Threads.Runs.Run} run - The run to be checked for completion.
+     * @returns {boolean} True if completed, otherwise false.
      */
     private isRunCompleted(run: OpenAI.Beta.Threads.Runs.Run): boolean {
         switch (run.status) {
@@ -271,10 +281,11 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
-     * @param thread_id
-     * @param run_id
-     * @param handleActions
      * @private
+     * @param {string} thread_id - The current thread id.
+     * @param {string} run_id - The run id.
+     * @param {boolean} handleActions - Whether to handle actions. False by default.
+     * @returns {Promise<OpenAI.Beta.Threads.Runs.Run>} The current Run.
      */
     private async waitForRun(
         thread_id: string,
@@ -302,10 +313,11 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
-     * @param context
-     * @param state
-     * @param ai
      * @private
+     * @param {TurnContext} context - The application Turn Context.
+     * @param {TState} state - The application Turn State.
+     * @param {AI<TState>} ai - The AI instance.
+     * @returns {Promise<Plan>} The action results as Plan.
      */
     private async submitActionResults(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan> {
         // Get the current assistant state
@@ -353,10 +365,11 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
-     * @param context
-     * @param state
-     * @param ai
      * @private
+     * @param {TurnContext} context - The application Turn Context.
+     * @param {TurnState} state - The application Turn State.
+     * @param {AI<TState>} ai - The AI instance.
+     * @returns {Promise<Plan>} - The user's input as Plan.
      */
     private async submitUserInput(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan> {
         // Get the current thread_id
@@ -396,9 +409,10 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
-     * @param state
-     * @param required_action
      * @private
+     * @param {TurnState} state - The application Turn State.
+     * @param {OpenAI.Beta.Threads.Runs.Run.RequiredAction} required_action - The required action.
+     * @returns {Plan} - The generated Plan.
      */
     private generatePlanFromTools(state: TState, required_action: OpenAI.Beta.Threads.Runs.Run.RequiredAction): Plan {
         const plan: Plan = { type: 'plan', commands: [] };
@@ -416,9 +430,10 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
-     * @param thread_id
-     * @param last_message_id
      * @private
+     * @param {string} thread_id - The current thread's ID.
+     * @param {string} last_message_id - ID of the last message.
+     * @returns {Promise<Plan>} The generated Plan from messages.
      */
     private async generatePlanFromMessages(thread_id: string, last_message_id: string): Promise<Plan> {
         // Find the new messages
@@ -452,8 +467,9 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
-     * @param state
      * @private
+     * @param {TurnState} state - The application Turn State.
+     * @returns {AssistantsState} - The current Assistant's State.
      */
     private ensureAssistantsState(state: TState): AssistantsState {
         if (!state.hasValue(this._options.assistants_state_variable!)) {
@@ -468,8 +484,8 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
-     * @param state
-     * @param assistants_state
+     * @param {TurnState} state - The application Turn State.
+     * @param {AssistantsState} assistants_state - The Assistant's State.
      * @private
      */
     private updateAssistantsState(state: TState, assistants_state: AssistantsState): void {
@@ -477,9 +493,10 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
-     * @param state
-     * @param input
      * @private
+     * @param {TurnState} state - The application Turn State.
+     * @param {string} input - The thread input.
+     * @returns {Promise<string>} The created thread.
      */
     private async ensureThreadCreated(state: TState, input: string): Promise<string> {
         const assistants_state = this.ensureAssistantsState(state);
@@ -493,8 +510,9 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
-     * @param thread_id
      * @private
+     * @param {string} thread_id - The id of the thread.
+     * @returns {Promise<void>} A Promise.
      */
     private async blockOnInProgressRuns(thread_id: string): Promise<void> {
         // We loop until we're told the last run is completed

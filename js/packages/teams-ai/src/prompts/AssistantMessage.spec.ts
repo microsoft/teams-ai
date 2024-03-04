@@ -1,6 +1,6 @@
 import { strict as assert } from 'assert';
 import { TestAdapter } from 'botbuilder';
-import { GPT3Tokenizer } from '../tokenizers';
+import { GPTTokenizer } from '../tokenizers';
 import { AssistantMessage } from './AssistantMessage';
 import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { TestTurnState } from '../internals/testing/TestTurnState';
@@ -8,7 +8,7 @@ import { TestTurnState } from '../internals/testing/TestTurnState';
 describe('AssistantMessage', () => {
     const adapter = new TestAdapter();
     const functions = new TestPromptManager();
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
 
     describe('constructor', () => {
         it('should create a AssistantMessage', () => {
@@ -42,7 +42,7 @@ describe('AssistantMessage', () => {
                 const section = new AssistantMessage('Hello World');
                 const rendered = await section.renderAsText(context, state, functions, tokenizer, 100);
                 assert.equal(rendered.output, 'assistant: Hello World');
-                assert.equal(rendered.length, 6);
+                assert.equal(rendered.length, 5);
                 assert.equal(rendered.tooLong, false);
             });
         });

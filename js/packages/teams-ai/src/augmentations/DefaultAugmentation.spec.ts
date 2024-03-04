@@ -3,12 +3,12 @@ import { TestAdapter } from 'botbuilder';
 
 import { TestTurnState } from '../internals/testing/TestTurnState';
 import { PromptResponse } from '../models';
-import { GPT3Tokenizer } from '../tokenizers';
+import { GPTTokenizer } from '../tokenizers';
 import { DefaultAugmentation } from './DefaultAugmentation';
 
 describe('DefaultAugmentation', () => {
     const adapter = new TestAdapter();
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
     const valid_content = JSON.stringify({
         type: 'plan',
         commands: [

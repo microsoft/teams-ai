@@ -1,0 +1,5 @@
+The following is a conversation with an AI assistant.
+The assistant can turn a light on or off.
+
+context:
+The lights are currently {{get_light_status}}.

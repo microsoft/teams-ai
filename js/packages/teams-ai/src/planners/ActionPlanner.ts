@@ -67,7 +67,7 @@ export interface ActionPlannerOptions<TState extends TurnState = TurnState> {
     /**
      * Optional tokenizer to use.
      * @remarks
-     * If not specified, a new `GPT3Tokenizer` instance will be created.
+     * If not specified, a new `GPTTokenizer` instance will be created.
      */
     tokenizer?: Tokenizer;
 
@@ -106,7 +106,7 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
 
     /**
      * Creates a new `ActionPlanner` instance.
-     * @param options Options used to configure the planner.
+     * @param {ActionPlannerOptions<TState>} options Options used to configure the planner.
      */
     public constructor(options: ActionPlannerOptions<TState>) {
         this._options = Object.assign(
@@ -144,10 +144,10 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
      * there is no work to be performed.
      *
      * The planner should take the users input from `state.temp.input`.
-     * @param context Context for the current turn of conversation.
-     * @param state Application state for the current turn of conversation.
-     * @param ai The AI system that is generating the plan.
-     * @returns The plan that was generated.
+     * @param {TurnContext} context Context for the current turn of conversation.
+     * @param {TState} state Application state for the current turn of conversation.
+     * @param {AI<TState>} ai The AI system that is generating the plan.
+     * @returns {Promise<Plan>} The plan that was generated.
      */
     public async beginTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan> {
         return await this.continueTask(context, state, ai);

@@ -7,7 +7,7 @@
  */
 
 import { Tokenizer } from './Tokenizer';
-import { encode, decode } from 'gpt-3-encoder';
+import { encode, decode } from 'gpt-tokenizer/cjs/model/text-davinci-003';
 
 /**
  * Tokenizer that uses GPT-3's encoder.

@@ -43,9 +43,9 @@
     <PackageReference Include="Microsoft.Bot.Builder" Version="4.21.1" />
     <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.21.1" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.21.1" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.57.0" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.59.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="SharpToken" Version="1.2.15" />
+    <PackageReference Include="SharpToken" Version="1.2.17" />
     <PackageReference Include="System.Text.Json" Version="7.0.4" />
   </ItemGroup>
 
