@@ -40,6 +40,7 @@ class TestConversationState(IsolatedAsyncioTestCase):
         self.assertEqual(state["hello"], "world")
         self.assertTrue("message" in state)
         self.assertEqual(state["message"], "hello world")
+        self.assertEqual(str(state), '{"hello": "world", "message": "hello world"}')
 
     async def test_should_save(self):
         context = self.create_mock_context()
@@ -60,6 +61,7 @@ class TestConversationState(IsolatedAsyncioTestCase):
         self.assertEqual(state["hello"], "world")
         self.assertTrue("message" in state)
         self.assertEqual(state["message"], "hello world")
+        self.assertEqual(str(state), '{"hello": "world", "message": "hello world"}')
 
     async def test_should_not_load_when_channel_missing(self):
         context = MagicMock()
