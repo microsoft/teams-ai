@@ -33,29 +33,28 @@ if config.OPENAI_KEY is None and config.AZURE_OPENAI_KEY is None:
     )
 
 # Create AI components
-model_options: Union[OpenAIModelOptions, AzureOpenAIModelOptions]
-if config.AZURE_OPENAI_KEY is not None and config.AZURE_OPENAI_ENDPOINT is not None:
-    # Azure OpenAI Support
-    model_options = AzureOpenAIModelOptions(
-        api_key=config.AZURE_OPENAI_KEY,
-        default_model="gpt-3.5-turbo",
-        endpoint=config.AZURE_OPENAI_ENDPOINT,
+model: OpenAIModel
+
+if config.OPENAI_KEY:
+    model = OpenAIModel(
+        OpenAIModelOptions(api_key=config.OPENAI_KEY, default_model="gpt-3.5-turbo")
     )
-elif config.OPENAI_KEY is not None:
-    # OpenAI Support
-    model_options = OpenAIModelOptions(api_key=config.OPENAI_KEY, default_model="gpt-3.5-turbo")
-else:
-    raise Exception(
-        "Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set."
+elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
+    model = OpenAIModel(
+        AzureOpenAIModelOptions(
+            api_key=config.AZURE_OPENAI_KEY,
+            default_model="gpt-3.5-turbo",
+            api_version="2023-03-15-preview",
+            endpoint=config.AZURE_OPENAI_ENDPOINT,
+        )
     )
 
-model = OpenAIModel(model_options)
-
-prompts = PromptManager(PromptManagerOptions(prompts_folder=f"{os.getcwd()}/src/prompts"))
+prompts = PromptManager(PromptManagerOptions(prompts_folder=f"{os.getcwd()}/prompts"))
 
 planner = ActionPlanner(ActionPlannerOptions(model, prompts, "generate"))
 
 # Define storage and application
+# Note that we're not passing AI options as we won't be chatting with the app.
 storage = MemoryStorage()
 
 app = Application[AppTurnState](
@@ -63,7 +62,6 @@ app = Application[AppTurnState](
         bot_app_id=config.APP_ID,
         adapter=TeamsAdapter(config),
         storage=storage,
-        ai=AIOptions(planner=planner),
         long_running_messages=True,
     )
 )
