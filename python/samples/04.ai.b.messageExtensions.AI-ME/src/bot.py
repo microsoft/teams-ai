@@ -81,7 +81,7 @@ async def create_post(context: TurnContext, _state: AppTurnState) -> TaskModuleT
 @app.message_extensions.submit_action("CreatePost")
 async def submit_create_post(
     context: TurnContext, state: AppTurnState, data: dict
-) -> MessagingExtensionResult:
+) -> Union[MessagingExtensionResult, TaskModuleTaskInfo]:
     try:
         if data["verb"] == "generate":
             # Call GPT and return response view
@@ -95,6 +95,7 @@ async def submit_create_post(
             return MessagingExtensionResult(
                 type="result", attachment_layout="list", attachments=attachments
             )
+        raise RuntimeError("Invalid verb was used.")
     except Exception as err:
         raise RuntimeError(f"Something went wrong: {str(err)}")
 
