@@ -5,6 +5,9 @@
     "author": "Microsoft",
     "license": "MIT",
     "main": "./lib/index.js",
+    "engines": {
+        "node": ">=18.0.0"
+    },
     "scripts": {
         "dev:teamsfx": "env-cmd --silent -f .env npm run dev",
         "dev:teamsfx:testtool": "env-cmd --silent -f .env npm run dev",
