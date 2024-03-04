@@ -2,6 +2,8 @@
 
 This sample shows how to incorporate Content Safety control into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
 
+NOTE: Support is only available for OAI at the moment.
+
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
@@ -28,7 +30,7 @@ You can interact with the bot by messaging it.
 
 2. Duplicate the `sample.env` in the `teams-ai/python/samples/05.chatModeration` folder. Rename the file to `.env`. 
 
-3. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT`, `AZURE_CONTENT_SAFETY_KEY`, and `AZURE_CONTENT_SAFETY_ENDPOINT` variables and fill them in appropriately. If you are using a previously deployed bot, fill in `BOT_ID` and `BOT_PASSWORD`.
+3. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT`, `AZURE_CONTENT_SAFETY_KEY`, and `AZURE_CONTENT_SAFETY_ENDPOINT` variables and fill them in appropriately.
 
 4. Update `config.json` and `bot.py` with your model deployment name.
 
