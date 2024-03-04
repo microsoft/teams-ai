@@ -2,8 +2,6 @@
 
 This sample shows how to incorporate Content Safety control into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
 
-NOTE: Support is only available for OAI at the moment.
-
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
