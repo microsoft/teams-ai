@@ -32,7 +32,7 @@
         "gpt-tokenizer": "^2.1.2",
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
-        "openai": "^4.28.0",
+        "openai": "^4.28.4",
         "uuid": "^9.0.1",
         "yaml": "^2.4.0"
     },
