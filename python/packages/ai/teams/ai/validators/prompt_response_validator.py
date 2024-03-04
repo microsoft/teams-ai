@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 
 from botbuilder.core import TurnContext
 
-from ...state import Memory
+from ...state import MemoryBase
 from ..models.prompt_response import PromptResponse
 from ..tokenizers import Tokenizer
 from .validation import Validation
@@ -24,7 +24,7 @@ class PromptResponseValidator(ABC):
     async def validate_response(
         self,
         context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         tokenizer: Tokenizer,
         response: PromptResponse,
         remaining_attempts: int,
@@ -34,7 +34,7 @@ class PromptResponseValidator(ABC):
 
         Args:
             context (TurnContext): Context for the current turn of conversation with the user.
-            memory (Memory): An interface for accessing state values.
+            memory (MemoryBase): An interface for accessing state values.
             tokenizer (Tokenizer): Tokenizer to use when rendering the section.
             response (PromptResponse): response Response to validate.
             remaining_attempts (int): Number of remaining attempts to validate the response.

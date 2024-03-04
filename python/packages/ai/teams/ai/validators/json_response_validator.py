@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional
 from botbuilder.core import TurnContext
 from jsonschema import ValidationError, validate
 
-from ...state import Memory
+from ...state import MemoryBase
 from ...utils.json import parse
 from ..models.prompt_response import PromptResponse
 from ..tokenizers import Tokenizer
@@ -76,7 +76,7 @@ class JSONResponseValidator(PromptResponseValidator):
     async def validate_response(
         self,
         context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         tokenizer: Tokenizer,
         response: PromptResponse[str],
         remaining_attempts: int,

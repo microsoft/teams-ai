@@ -11,7 +11,7 @@ from typing import Any, List
 from botbuilder.core import TurnContext
 
 from ...input_file import InputFile
-from ...state import Memory
+from ...state import MemoryBase
 from ..tokenizers import Tokenizer
 from .message import (
     ImageContentPart,
@@ -53,7 +53,7 @@ class UserInputMessage(PromptSectionBase):
     async def render_as_messages(
         self,
         context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         functions: PromptFunctions,
         tokenizer: Tokenizer,
         max_tokens: int,
@@ -63,7 +63,7 @@ class UserInputMessage(PromptSectionBase):
 
         Args:
             context (TurnContext): Context for the current turn of conversation with the user.
-            memory (Memory): An interface for accessing state values.
+            memory (MemoryBase): An interface for accessing state values.
             functions (PromptFunctions): Registry of functions that can be used by the section.
             tokenizer (Tokenizer): Tokenizer to use when rendering the section.
             max_tokens (int): Maximum number of tokens allowed to be rendered.
@@ -71,8 +71,8 @@ class UserInputMessage(PromptSectionBase):
         Returns:
             RenderedPromptSection[List[Message]]: The rendered prompt section as a list of messages.
         """
-        input_text: str = memory.get_value(self._input_variable) or ""
-        input_files: List[InputFile] = memory.get_value(self._files_variable) or []
+        input_text: str = memory.get(self._input_variable) or ""
+        input_files: List[InputFile] = memory.get(self._files_variable) or []
 
         message: Message[List[MessageContentParts]] = Message("user", [])
 

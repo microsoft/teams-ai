@@ -12,7 +12,7 @@ from botbuilder.core import TurnContext
 from teams.ai.data_sources.data_source import DataSource
 from teams.ai.prompts.rendered_prompt_section import RenderedPromptSection
 from teams.ai.tokenizers import Tokenizer
-from teams.state.memory import Memory
+from teams.state.memory import MemoryBase
 
 
 class TextDataSource(DataSource):
@@ -49,7 +49,7 @@ class TextDataSource(DataSource):
     async def render_data(
         self,
         turn_context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         tokenizer: Tokenizer,
         max_tokens: int,
     ) -> RenderedPromptSection[str]:
@@ -58,7 +58,7 @@ class TextDataSource(DataSource):
 
         Args:
             turn_context (TurnContext): The turn context for current turn of conversation.
-            memory (Memory): An interface for accessing state values.
+            memory (MemoryBase): An interface for accessing state values.
             tokenizer (Tokenizer): Tokenizer to use when rendering the data source.
             max_tokens (int): Maximum number of tokens allowed to be rendered.
 
