@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 
 from botbuilder.core import TurnContext
 
-from ...state import Memory
+from ...state import MemoryBase
 from ...user_agent import _UserAgent
 from ..prompts.prompt_functions import PromptFunctions
 from ..prompts.prompt_template import PromptTemplate
@@ -26,7 +26,7 @@ class PromptCompletionModel(ABC, _UserAgent):
     async def complete_prompt(
         self,
         context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         functions: PromptFunctions,
         tokenizer: Tokenizer,
         template: PromptTemplate,
@@ -36,7 +36,7 @@ class PromptCompletionModel(ABC, _UserAgent):
 
         Args:
             context (TurnContext): turn context.
-            memory (Memory): the turn state.
+            memory (MemoryBase): the turn state.
             functions (PromptFunctions): to use when rendering the prompt.
             tokenizer (Tokenizer): to use when rendering the prompt.
             template (PromptTemplate): template to complete.

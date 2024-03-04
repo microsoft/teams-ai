@@ -11,7 +11,7 @@ from botbuilder.core import MemoryStorage, TurnContext
 from teams.ai.prompts import PromptFunctions, TemplateSection
 from teams.ai.tokenizers import GPTTokenizer
 from teams.app_error import ApplicationError
-from teams.state import TurnState
+from teams.state import ConversationState, TempState, TurnState, UserState
 
 
 class TestTemplateSection(IsolatedAsyncioTestCase):
@@ -23,10 +23,11 @@ class TestTemplateSection(IsolatedAsyncioTestCase):
         self.context.activity.from_property.id = "user_id"
 
         memory_storage = MemoryStorage()
-        self.memory = TurnState()
-        await self.memory.load(self.context, memory_storage)
-        self.memory.conversation.get_dict()["test_property"] = "conversation_test_value"
-        self.memory.user.get_dict()["test_property"] = "user_test_value"
+        self.memory = await TurnState[ConversationState, UserState, TempState].load(
+            self.context, memory_storage
+        )
+        self.memory.conversation["test_property"] = "conversation_test_value"
+        self.memory.user["test_property"] = "user_test_value"
         self.memory.temp.input = "temp_input"
 
         self.functions = MagicMock(spec=PromptFunctions)

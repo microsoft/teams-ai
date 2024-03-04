@@ -11,7 +11,7 @@ from typing import Awaitable, Callable, List
 from botbuilder.core import TurnContext
 
 from ....app_error import ApplicationError
-from ....state import Memory
+from ....state import MemoryBase
 from ...tokenizers import Tokenizer
 from ...utilities import to_string
 from ..message import Message
@@ -28,7 +28,7 @@ class _ParseState(Enum):
 
 
 # private
-_PartRenderer = Callable[[TurnContext, Memory, PromptFunctions, Tokenizer, int], Awaitable[str]]
+_PartRenderer = Callable[[TurnContext, MemoryBase, PromptFunctions, Tokenizer, int], Awaitable[str]]
 
 
 class TemplateSection(PromptSectionBase):
@@ -99,7 +99,7 @@ class TemplateSection(PromptSectionBase):
     async def render_as_messages(
         self,
         context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         functions: PromptFunctions,
         tokenizer: Tokenizer,
         max_tokens: int,
@@ -109,7 +109,7 @@ class TemplateSection(PromptSectionBase):
 
         Args:
             context (TurnContext): Context for the current turn of conversation with the user.
-            memory (Memory): An interface for accessing state values.
+            memory (MemoryBase): An interface for accessing state values.
             functions (PromptFunctions): Registry of functions that can be used by the section.
             tokenizer (Tokenizer): Tokenizer to use when rendering the section.
             max_tokens (int): Maximum number of tokens allowed to be rendered.
@@ -185,7 +185,7 @@ class TemplateSection(PromptSectionBase):
     def _create_text_renderer(self, text: str) -> _PartRenderer:
         async def renderer(
             _context: TurnContext,
-            _memory: Memory,
+            _memory: MemoryBase,
             _functions: PromptFunctions,
             _tokenizer: Tokenizer,
             _max_tokens: int,
@@ -197,12 +197,12 @@ class TemplateSection(PromptSectionBase):
     def _create_variable_renderer(self, name: str) -> _PartRenderer:
         async def renderer(
             _context: TurnContext,
-            memory: Memory,
+            memory: MemoryBase,
             _functions: PromptFunctions,
             tokenizer: Tokenizer,
             _max_tokens: int,
         ) -> str:
-            return to_string(tokenizer, memory.get_value(name))
+            return to_string(tokenizer, memory.get(name))
 
         return renderer
 
@@ -255,7 +255,7 @@ class TemplateSection(PromptSectionBase):
 
         async def renderer(
             context: TurnContext,
-            memory: Memory,
+            memory: MemoryBase,
             functions: PromptFunctions,
             tokenizer: Tokenizer,
             _max_tokens: int,

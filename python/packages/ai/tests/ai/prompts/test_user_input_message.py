@@ -18,13 +18,13 @@ from teams.ai.prompts import (
     UserInputMessage,
 )
 from teams.ai.tokenizers import GPTTokenizer
-from teams.state import TurnState
+from teams.state import ConversationState, TempState, TurnState, UserState
 
 
 class TestUserInputMessage(IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         self.context = MagicMock(spec=TurnContext)
-        self.memory = TurnState()
+        self.memory = await TurnState[ConversationState, UserState, TempState].load(self.context)
         self.functions = MagicMock(spec=PromptFunctions)
         self.tokenizer = GPTTokenizer()
         await self.memory.load(self.context)
@@ -42,7 +42,7 @@ class TestUserInputMessage(IsolatedAsyncioTestCase):
 
     async def test_render_as_messages_no_input(self):
         message = UserInputMessage()
-        self.memory.delete_temp_state()
+        del self.memory.temp
         result = await message.render_as_messages(
             self.context, self.memory, self.functions, self.tokenizer, 100
         )

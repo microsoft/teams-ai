@@ -10,7 +10,7 @@ from typing import Any, Dict, List
 
 from botbuilder.core import TurnContext
 
-from ...state import Memory
+from ...state import MemoryBase
 from ..models.chat_completion_action import ChatCompletionAction
 from ..models.prompt_response import PromptResponse
 from ..prompts.message import Message
@@ -80,7 +80,7 @@ class ActionResponseValidator(PromptResponseValidator):
     async def validate_response(
         self,
         context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         tokenizer: Tokenizer,
         response: PromptResponse[str],
         remaining_attempts: int,

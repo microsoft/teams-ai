@@ -10,16 +10,17 @@ from botbuilder.core import TurnContext
 
 from teams.ai.prompts import ConversationHistorySection, Message, PromptFunctions
 from teams.ai.tokenizers import GPTTokenizer
-from teams.state import TurnState
+from teams.state import ConversationState, TempState, TurnState, UserState
 
 
 class TestConversationHistory(IsolatedAsyncioTestCase):
     async def asyncSetUp(self) -> None:
-        self.memory = TurnState()
         self.prompt_functions = MagicMock(spec=PromptFunctions)
         self.turn_context = MagicMock(spec=TurnContext)
-        await self.memory.load(self.turn_context)
-        self.memory.conversation.get_dict()["history"] = [
+        self.memory = await TurnState[ConversationState, UserState, TempState].load(
+            self.turn_context
+        )
+        self.memory.conversation["history"] = [
             Message("user", "Hello"),
             Message("assistant", "Hi! How can I help you?"),
             Message("user", "I'd like to book a flight"),
