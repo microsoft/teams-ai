@@ -13,12 +13,19 @@ config({ path: ENV_FILE });
 import { app } from './app';
 import { TeamsAdapter } from '@microsoft/teams-ai';
 
+const log = debug('azureaisearch:server');
+log.log = console.log.bind(console);
+
 // Create HTTP server.
-const log = debug('ai-search:server');
 const server = restify.createServer();
 const port = process.env.port || process.env.PORT || 3978;
 
 server.use(restify.plugins.bodyParser());
+
+server.listen(port, () => {
+    log(`listening on ${port} 🚀`);
+    log('To test your bot in Teams, sideload the app manifest.json within Teams Apps.');
+});
 
 server.post('/api/messages', async (req, res) => {
     // Route received a request to adapter for processing
@@ -26,9 +33,4 @@ server.post('/api/messages', async (req, res) => {
         // Dispatch to application for routing
         await app.run(context);
     });
-});
-
-server.listen(port, () => {
-    log(`listening on ${port} 🚀`);
-    log('To test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });

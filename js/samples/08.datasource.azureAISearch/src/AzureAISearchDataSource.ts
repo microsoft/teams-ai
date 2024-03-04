@@ -108,7 +108,7 @@ export class AzureAISearchDataSource implements DataSource {
      * @returns {Promise<RenderedPromptSection<string>>} A promise that resolves to the rendered data source.
      */
     public async renderData(
-        context: TurnContext,
+        _context: TurnContext,
         memory: Memory,
         tokenizer: Tokenizer,
         maxTokens: number
@@ -197,8 +197,6 @@ export class AzureAISearchDataSource implements DataSource {
             doc += formattedResult;
             usedTokens += tokens;
         }
-
-        context.sendActivity(`This following context was added to the system prompt: ${JSON.stringify(doc)}`);
 
         return { output: doc, length: usedTokens, tooLong: usedTokens > maxTokens };
     }

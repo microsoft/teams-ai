@@ -6,6 +6,8 @@ The following is a conversational bot that is hooked on to GPT models but with c
 
 - [Chat with Azure AI Search Data](#chat-with-azure-ai-search-data)
   - [Summary](#summary)
+    - [Example Interaction](#example-interaction)
+    - [Observing the added context in the terminal](#observing-the-added-context-in-the-terminal)
   - [Setting up the sample](#setting-up-the-sample)
   - [Testing the sample](#testing-the-sample)
     - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
@@ -13,7 +15,17 @@ The following is a conversational bot that is hooked on to GPT models but with c
 <!-- /code_chunk_output -->
 
 ## Summary
-This sample shows how to integrate your Azure AI Search index as a data source into prompt templates.
+This sample shows how to integrate your Azure AI Search index as a data source into prompt templates. For this sample we're using dummy restaurant data indexed using Azure AI Search. The sample provides scripts to create and delete the dummy index.
+
+### Example Interaction
+
+![example interaction](assets/example.png)
+
+### Observing the added context in the terminal
+
+![The chat prompt and response](assets/prompt-response.png)
+
+The object between the `<context></context>` tags is an entry from the restaurants index.
 
 ## Setting up the sample
 
@@ -42,7 +54,7 @@ This sample shows how to integrate your Azure AI Search index as a data source i
 
 6. Update `config.json` and `index.ts` with your gpt model deployment name and embedding deployment name.
 
-7. Do `yarn indexer:create` to create the restaurant index. Once you're done using the sample it's good practice to delete the index. Can you do so with the `yarn indexer:delete` command.
+7. Do `yarn indexer:create` to create the restaurant index. Once you're done using the sample it's good practice to delete the index. You can do so with the `yarn indexer:delete` command.
 
 ## Testing the sample
 

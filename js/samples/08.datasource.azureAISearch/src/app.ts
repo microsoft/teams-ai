@@ -3,6 +3,10 @@ import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext
 import path from "path";
 import { AzureAISearchDataSource } from "./AzureAISearchDataSource";
 import { addResponseFormatter } from "./responseFormatter";
+import debug from "debug";
+
+const error = debug('azureaisearch:app:error');
+error.log = console.log.bind(console);
 
 interface ConversationState {}
 type ApplicationTurnState = TurnState<ConversationState>;
@@ -53,8 +57,8 @@ export const app = new Application<ApplicationTurnState>({
     adapter: new TeamsAdapter(
         {},
         new ConfigurationServiceClientCredentialFactory({
-            MicrosoftAppId: process.env.BOT_ID,
-            MicrosoftAppPassword: process.env.BOT_PASSWORD,
+            MicrosoftAppId: process.env.BOT_ID, // Set to "" if using the Teams Test Tool
+            MicrosoftAppPassword: process.env.BOT_PASSWORD, // Set to "" if using the Teams Test Tool 
             MicrosoftAppType: 'MultiTenant'
         })
     ),
@@ -66,6 +70,25 @@ export const app = new Application<ApplicationTurnState>({
 // Add a custom response formatter to convert markdown code blocks to <pre> tags
 addResponseFormatter(app);
 
+app.error(async (context: TurnContext, err: any) => {
+    // This check writes out errors to console log .vs. app insights.
+    // NOTE: In production environment, you should consider logging this to Azure
+    //       application insights.
+    error(`[onTurnError] unhandled error: ${err}`);
+    error(err);
+
+    // Send a trace activity, which will be displayed in Bot Framework Emulator
+    await context.sendTraceActivity(
+        'OnTurnError Trace',
+        `${err}`,
+        'https://www.botframework.com/schemas/error',
+        'TurnError'
+    );
+
+    // Send a message to the user
+    await context.sendActivity('The bot encountered an error or bug.');
+    await context.sendActivity('To continue to run this bot, please fix the bot source code.');
+});
 
 // Register other AI actions
 app.ai.action(
