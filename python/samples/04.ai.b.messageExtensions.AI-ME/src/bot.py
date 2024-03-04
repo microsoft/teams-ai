@@ -5,6 +5,7 @@ Licensed under the MIT License.
 Description: initialize the app and listen for `message` activitys
 """
 
+import os
 import sys
 import traceback
 from typing import Union
@@ -13,6 +14,7 @@ from botbuilder.core import MemoryStorage, TurnContext
 from botbuilder.schema import Attachment
 from botbuilder.schema.teams import MessagingExtensionResult, TaskModuleTaskInfo
 from teams import Application, ApplicationOptions, TeamsAdapter
+from teams.ai import AIOptions
 from teams.ai.models import AzureOpenAIModelOptions, OpenAIModel, OpenAIModelOptions
 from teams.ai.planners import ActionPlanner, ActionPlannerOptions
 from teams.ai.prompts import PromptManager, PromptManagerOptions
@@ -49,7 +51,7 @@ else:
 
 model = OpenAIModel(model_options)
 
-prompts = PromptManager(PromptManagerOptions("prompts"))
+prompts = PromptManager(PromptManagerOptions(prompts_folder=f"{os.getcwd()}/src/prompts"))
 
 planner = ActionPlanner(ActionPlannerOptions(model, prompts, "generate"))
 
@@ -61,6 +63,7 @@ app = Application[AppTurnState](
         bot_app_id=config.APP_ID,
         adapter=TeamsAdapter(config),
         storage=storage,
+        ai=AIOptions(planner=planner),
         long_running_messages=True,
     )
 )
