@@ -16,7 +16,7 @@ from botbuilder.core import TurnContext
 import teams.ai.augmentations
 
 from ...app_error import ApplicationError
-from ...state import Memory
+from ...state import MemoryBase
 from ..data_sources import DataSource
 from ..models.chat_completion_action import ChatCompletionAction
 from ..tokenizers import Tokenizer
@@ -188,7 +188,12 @@ class PromptManager(PromptFunctions):
         return name in self._functions
 
     async def invoke_function(
-        self, name: str, context: TurnContext, memory: Memory, tokenizer: Tokenizer, args: List[str]
+        self,
+        name: str,
+        context: TurnContext,
+        memory: MemoryBase,
+        tokenizer: Tokenizer,
+        args: List[str],
     ) -> Any:
         """
         Invokes a prompt template function by name.
@@ -196,7 +201,7 @@ class PromptManager(PromptFunctions):
         Args:
             name (str): Name of the function to invoke.
             context (TurnContext): Turn context for the current turn of conversation with the user.
-            memory (Memory): An interface for accessing state values.
+            memory (MemoryBase): An interface for accessing state values.
             tokenizer (Tokenizer): Tokenizer to use when rendering the prompt.
             args (List[str]): Arguments to pass to the function.
 

@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Union, cast
 
 from botbuilder.core import TurnContext
 
-from ...state import Memory
+from ...state import MemoryBase
 from ..models.chat_completion_action import ChatCompletionAction
 from ..models.prompt_response import PromptResponse
 from ..planners.plan import Plan, PredictedDoCommand, PredictedSayCommand
@@ -85,7 +85,7 @@ class SequenceAugmentation(Augmentation[Plan]):
     async def validate_response(
         self,
         context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         tokenizer: Tokenizer,
         response: PromptResponse[str],
         remaining_attempts: int,
@@ -95,7 +95,7 @@ class SequenceAugmentation(Augmentation[Plan]):
 
         Args:
             turn_context (TurnContext): Context for the current turn of conversation.
-            memory (Memory): Interface for accessing state variables.
+            memory (MemoryBase): Interface for accessing state variables.
             tokenizer (Tokenizer): Tokenizer to use for encoding/decoding text.
             response (PromptResponse[str]): Response to validate.
             remaining_attempts (int): Nubmer of remaining attempts to validate the response.
@@ -114,10 +114,8 @@ class SequenceAugmentation(Augmentation[Plan]):
 
         # Validate that the plan is structurally correct
         if validation_result.value:
-            print(validation_result.value)
             plan = Plan.from_dict(validation_result.value)
             validation_result.value = plan
-            print(plan)
 
             for index, command in enumerate(plan.commands):
                 if isinstance(command, PredictedDoCommand):
@@ -167,14 +165,14 @@ class SequenceAugmentation(Augmentation[Plan]):
         return validation_result
 
     async def create_plan_from_response(
-        self, turn_context: TurnContext, memory: Memory, response: PromptResponse[Plan]
+        self, turn_context: TurnContext, memory: MemoryBase, response: PromptResponse[Plan]
     ) -> Plan:
         """
         Create a plan given validated response value.
 
         Args:
             turn_context (TurnContext): Context for the current turn of conversation.
-            memory (Memory): Interface for accessing state variables.
+            memory (MemoryBase): Interface for accessing state variables.
             response (PromptResponse): Validated, transformed response for the prompt.
 
         Returns:

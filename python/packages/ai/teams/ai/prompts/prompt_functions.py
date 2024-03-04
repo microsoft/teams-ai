@@ -10,18 +10,18 @@ from typing import Any, Awaitable, Callable, List
 
 from botbuilder.core import TurnContext
 
-from ...state import Memory
+from ...state import MemoryBase
 from ..tokenizers import Tokenizer
 
 PromptFunction = Callable[
-    [TurnContext, Memory, "PromptFunctions", Tokenizer, List[str]], Awaitable[Any]
+    [TurnContext, MemoryBase, "PromptFunctions", Tokenizer, List[str]], Awaitable[Any]
 ]
 """
 A function that can be called from a prompt template string.
 
 Parameters:
     context (TurnContext): Context for the current turn of conversation.
-    memory (Memory): Interface used to access state variables.
+    memory (MemoryBase): Interface used to access state variables.
     functions (PromptFunctions): Collection of functions that can be called
       from a prompt template string.
     tokenizer (Tokenizer): Tokenizer used to encode/decode strings.
@@ -64,7 +64,12 @@ class PromptFunctions(ABC):
 
     @abstractmethod
     async def invoke_function(
-        self, name: str, context: TurnContext, memory: Memory, tokenizer: Tokenizer, args: List[str]
+        self,
+        name: str,
+        context: TurnContext,
+        memory: MemoryBase,
+        tokenizer: Tokenizer,
+        args: List[str],
     ):
         """
         Calls the given function.
@@ -72,7 +77,7 @@ class PromptFunctions(ABC):
         Args:
             name (str): Name of the function to invoke.
             context (TurnContext): Context for the current turn of conversation.
-            memory (Memory): Interface used to access state variables.
+            memory (MemoryBase): Interface used to access state variables.
             tokenizer (Tokenizer): Tokenizer used to encode/decode strings.
             args (List[str]): Arguments to pass to the function as an array of strings.
 

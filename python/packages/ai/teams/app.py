@@ -71,7 +71,7 @@ class Application(Bot, Generic[StateT]):
     _after_turn: List[RouteHandler[StateT]] = []
     _routes: List[Route[StateT]] = []
     _error: Optional[Callable[[TurnContext, Exception], Awaitable[None]]] = None
-    _turn_state_factory: Optional[Callable[[], Awaitable[StateT]]] = None
+    _turn_state_factory: Optional[Callable[[TurnContext], Awaitable[StateT]]] = None
     _message_extensions: MessageExtensions[StateT]
     _task_modules: TaskModules[StateT]
     _meetings: Meetings[StateT]
@@ -579,7 +579,7 @@ class Application(Bot, Generic[StateT]):
 
         return func
 
-    def turn_state_factory(self, func: Callable[[], Awaitable[StateT]]):
+    def turn_state_factory(self, func: Callable[[TurnContext], Awaitable[StateT]]):
         """
         Custom Turn State Factory
         """
@@ -612,24 +612,24 @@ class Application(Bot, Generic[StateT]):
                 if context.activity.type == ActivityTypes.message:
                     context.activity.text = context.remove_recipient_mention(context.activity)
 
-            state = TurnState()
+            state: StateT = cast(StateT, await TurnState.load(context, self._options.storage))
 
             if self._turn_state_factory:
-                state = await self._turn_state_factory()
+                state = await self._turn_state_factory(context)
 
             await state.load(context, self._options.storage)
             state.temp.input = context.activity.text
 
             # run before turn middleware
             for before_turn in self._before_turn:
-                is_ok = await before_turn(context, cast(StateT, state))
+                is_ok = await before_turn(context, state)
 
                 if not is_ok:
                     await state.save(context, self._options.storage)
                     return
 
             # run activity handlers
-            is_ok, matches = await self._on_activity(context, cast(StateT, state))
+            is_ok, matches = await self._on_activity(context, state)
 
             if not is_ok:
                 await state.save(context, self._options.storage)
@@ -643,7 +643,7 @@ class Application(Bot, Generic[StateT]):
                 and context.activity.type == ActivityTypes.message
                 and context.activity.text
             ):
-                is_ok = await self._ai.run(context, cast(StateT, state))
+                is_ok = await self._ai.run(context, state)
 
                 if not is_ok:
                     await state.save(context, self._options.storage)
@@ -651,7 +651,7 @@ class Application(Bot, Generic[StateT]):
 
             # run after turn middleware
             for after_turn in self._after_turn:
-                is_ok = await after_turn(context, cast(StateT, state))
+                is_ok = await after_turn(context, state)
 
                 if not is_ok:
                     await state.save(context, self._options.storage)

@@ -13,7 +13,7 @@ from botbuilder.core import TurnContext
 from teams.ai.actions import ActionTypes
 from teams.ai.moderators import OpenAIModerator, OpenAIModeratorOptions
 from teams.ai.planners import Plan, PredictedDoCommand, PredictedSayCommand
-from teams.state import TurnState
+from teams.state import ConversationState, TempState, TurnState, UserState
 
 
 class MockAsyncModerations:
@@ -153,8 +153,7 @@ class TestOpenAIModerator(IsolatedAsyncioTestCase):
     async def test_should_review_input_and_flag(self, mock_async_openai):
         moderator = OpenAIModerator(options=OpenAIModeratorOptions(api_key="", moderate="input"))
         context = self.create_mock_context()
-        state = TurnState()
-        await state.load(context)
+        state = await TurnState[ConversationState, UserState, TempState].load(context)
         plan = await moderator.review_input(context=context, state=state)
         self.assertTrue(mock_async_openai.called)
         assert plan is not None
@@ -167,8 +166,7 @@ class TestOpenAIModerator(IsolatedAsyncioTestCase):
     async def test_should_review_input_and_error(self, mock_async_openai):
         moderator = OpenAIModerator(options=OpenAIModeratorOptions(api_key="", moderate="both"))
         context = self.create_mock_context()
-        state = TurnState()
-        await state.load(context)
+        state = await TurnState[ConversationState, UserState, TempState].load(context)
         plan = await moderator.review_input(context=context, state=state)
         self.assertTrue(mock_async_openai.called)
         assert plan is not None
@@ -191,9 +189,8 @@ class TestOpenAIModerator(IsolatedAsyncioTestCase):
     async def test_should_review_output_and_flag(self, mock_async_openai):
         moderator = OpenAIModerator(options=OpenAIModeratorOptions(api_key="", moderate="output"))
         context = self.create_mock_context()
-        state = TurnState()
+        state = await TurnState[ConversationState, UserState, TempState].load(context)
         plan = Plan(commands=[PredictedSayCommand(response="test")])
-        await state.load(context)
         output = await moderator.review_output(context=context, state=state, plan=plan)
         self.assertTrue(mock_async_openai.called)
         assert output is not None
@@ -206,9 +203,8 @@ class TestOpenAIModerator(IsolatedAsyncioTestCase):
     async def test_should_review_output_and_error(self, mock_async_openai):
         moderator = OpenAIModerator(options=OpenAIModeratorOptions(api_key="", moderate="both"))
         context = self.create_mock_context()
-        state = TurnState()
+        state = await TurnState[ConversationState, UserState, TempState].load(context)
         plan = Plan(commands=[PredictedSayCommand(response="test")])
-        await state.load(context)
         output = await moderator.review_output(context=context, state=state, plan=plan)
         self.assertTrue(mock_async_openai.called)
         assert output is not None

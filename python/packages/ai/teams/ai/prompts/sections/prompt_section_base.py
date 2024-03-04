@@ -12,7 +12,7 @@ from typing import Any, List, Union
 
 from botbuilder.core import TurnContext
 
-from ....state import Memory
+from ....state import MemoryBase
 from ...tokenizers import Tokenizer
 from ..message import Message, MessageContentParts, TextContentPart
 from ..prompt_functions import PromptFunctions
@@ -91,7 +91,7 @@ class PromptSectionBase(PromptSection):
     async def render_as_messages(
         self,
         context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         functions: PromptFunctions,
         tokenizer: Tokenizer,
         max_tokens: int,
@@ -101,7 +101,7 @@ class PromptSectionBase(PromptSection):
 
         Args:
             context (TurnContext): Context for the current turn of conversation with the user.
-            memory (Memory): An interface for accessing state values.
+            memory (MemoryBase): An interface for accessing state values.
             functions (PromptFunctions): Registry of functions that can be used by the section.
             tokenizer (Tokenizer): Tokenizer to use when rendering the section.
             max_tokens (int): Maximum number of tokens allowed to be rendered.
@@ -113,7 +113,7 @@ class PromptSectionBase(PromptSection):
     async def render_as_text(
         self,
         context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         functions: PromptFunctions,
         tokenizer: Tokenizer,
         max_tokens: int,
@@ -123,7 +123,7 @@ class PromptSectionBase(PromptSection):
 
         Args:
             context (TurnContext): Context for the current turn of conversation with the user.
-            memory (Memory): An interface for accessing state values.
+            memory (MemoryBase): An interface for accessing state values.
             functions (PromptFunctions): Registry of functions that can be used by the section.
             tokenizer (Tokenizer): Tokenizer to use when rendering the section.
             max_tokens (int): Maximum number of tokens allowed to be rendered.

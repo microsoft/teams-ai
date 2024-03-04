@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from botbuilder.core import TurnContext
 
-from ...state import Memory
+from ...state import MemoryBase
 from ..models.prompt_response import PromptResponse
 from ..tokenizers import Tokenizer
 from .prompt_response_validator import PromptResponseValidator
@@ -22,7 +22,7 @@ class DefaultResponseValidator(PromptResponseValidator):
     async def validate_response(
         self,
         context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         tokenizer: Tokenizer,
         response: PromptResponse,
         remaining_attempts: int,

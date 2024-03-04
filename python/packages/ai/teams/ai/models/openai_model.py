@@ -14,7 +14,7 @@ import openai
 from botbuilder.core import TurnContext
 from openai.types import chat
 
-from ...state import Memory
+from ...state import MemoryBase
 from ..prompts.message import Message
 from ..prompts.prompt_functions import PromptFunctions
 from ..prompts.prompt_template import PromptTemplate
@@ -112,7 +112,7 @@ class OpenAIModel(PromptCompletionModel):
     async def complete_prompt(
         self,
         context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         functions: PromptFunctions,
         tokenizer: Tokenizer,
         template: PromptTemplate,

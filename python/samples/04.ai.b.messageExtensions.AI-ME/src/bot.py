@@ -17,7 +17,7 @@ from teams.ai.models import AzureOpenAIModelOptions, OpenAIModel, OpenAIModelOpt
 from teams.ai.planners import ActionPlanner, ActionPlannerOptions
 from teams.ai.prompts import PromptManager, PromptManagerOptions
 
-from application_turn_state import ApplicationTurnState
+from state import AppTurnState
 from cards.edit_view import create_edit_view
 from cards.initial_view import create_initial_view
 from cards.post_card import create_post_card
@@ -56,7 +56,7 @@ planner = ActionPlanner(ActionPlannerOptions(model, prompts, "generate"))
 # Define storage and application
 storage = MemoryStorage()
 
-app = Application[ApplicationTurnState](
+app = Application[AppTurnState](
     ApplicationOptions(
         bot_app_id=config.APP_ID,
         adapter=TeamsAdapter(config),
@@ -65,10 +65,14 @@ app = Application[ApplicationTurnState](
     )
 )
 
+@app.turn_state_factory
+async def turn_state_factory(context: TurnContext) -> AppTurnState:
+    return await AppTurnState.load(context, storage)
+
 
 # Implement Message Extension logic
 @app.message_extensions.fetch_task("CreatePost")
-async def create_post(context: TurnContext, _state: ApplicationTurnState) -> TaskModuleTaskInfo:
+async def create_post(context: TurnContext, _state: AppTurnState) -> TaskModuleTaskInfo:
     # Return card as a TaskInfo object
     card = create_initial_view()
     return create_task_info(card)
@@ -76,7 +80,7 @@ async def create_post(context: TurnContext, _state: ApplicationTurnState) -> Tas
 
 @app.message_extensions.submit_action("CreatePost")
 async def submit_create_post(
-    context: TurnContext, state: ApplicationTurnState, data: dict
+    context: TurnContext, state: AppTurnState, data: dict
 ) -> MessagingExtensionResult:
     try:
         if data["verb"] == "generate":
@@ -92,7 +96,7 @@ async def submit_create_post(
                 type="result", attachment_layout="list", attachments=attachments
             )
     except Exception as err:
-        return f"Something went wrong: {str(err)}"
+        raise RuntimeError(f"Something went wrong: {str(err)}")
 
 
 # Creates a task module task info object with the given card.
@@ -102,7 +106,7 @@ def create_task_info(card: Attachment) -> TaskModuleTaskInfo:
 
 # Updates a post with the given data and returns a task module task info object with the updated post.
 async def update_post(
-    context: TurnContext, state: ApplicationTurnState, prompt: str, data: dict
+    context: TurnContext, state: AppTurnState, prompt: str, data: dict
 ) -> TaskModuleTaskInfo:
     # Create new or updated post
     state.temp.post = data.get("post", "")
