@@ -9,7 +9,6 @@ from typing import Any, Generic, Optional, TypeVar, cast
 
 from botbuilder.core import Storage, TurnContext
 
-from ..app_error import ApplicationError
 from .conversation_state import ConversationState
 from .memory import MemoryBase
 from .state import State, state
@@ -54,7 +53,7 @@ class TurnState(MemoryBase, State[State[Any]], Generic[ConversationStateT, UserS
         scope, name = self._get_scope_and_name(path)
 
         if not scope in self:
-            raise ApplicationError(f"[{self.__class__.__name__}.set]: '{scope}' is not defined")
+            raise KeyError(f"[{self.__class__.__name__}.set]: '{scope}' is not defined")
 
         self[scope][name] = value
 

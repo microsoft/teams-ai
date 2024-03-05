@@ -18,6 +18,8 @@ This sample illustrates how to use [Retrieval Augmented Generation (RAG)](https:
 
 The sample uses a local Vector Database, called [Vectra](https://github.com/Stevenic/vectra), and [Semantic Search](https://en.wikipedia.org/wiki/Semantic_search) to find the most relevant information to include in the prompt for the users input. The index can be found in `./index/teams-ai` and includes all of the projects Getting Started docs and the source code for the Teams AI Library. This means you can ask the Teams Chef Bot anything about the library and it can answer it. You can even ask it to write sample code for you!
 
+![Teams Chef Bot](./assets/TeamsChef003.png)
+
 ## Setting up the sample
 
 1. Clone the repository
