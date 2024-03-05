@@ -63,15 +63,6 @@ provision:
       appPackagePath: ./appPackage/build/appPackage.${{TEAMSFX_ENV}}.zip
 
 deploy:
-  # prerequisite: pip install
-  - uses: script
-    with:
-      run: pip install poetry
-
-  - uses: script
-    with:
-      run: poetry install
-
   # Defines what the `deploy` lifecycle step does with Teams Toolkit.
   # Runs after `provision` during Start Debugging (F5) or run manually using `teamsfx deploy --env local`.
   # Provides the Teams Toolkit .env file values to the apps runtime so they can be accessed with `process.env`.
