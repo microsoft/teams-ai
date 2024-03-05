@@ -79,6 +79,7 @@ class AzureContentSafetyModerator(Generic[StateT], Moderator[StateT]):
         self._options = options
         self._client = azure.ai.contentsafety.ContentSafetyClient(
             endpoint=options.endpoint,
+            api_version=options.api_version,
             credential=AzureKeyCredential(options.api_key),
         )
 
