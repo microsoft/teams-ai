@@ -42,7 +42,7 @@ elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
     model = OpenAIModel(
         AzureOpenAIModelOptions(
             api_key=config.AZURE_OPENAI_KEY,
-            default_model="gpt-3.5-turbo",
+            default_model="gpt-35-turbo",
             api_version="2023-03-15-preview",
             endpoint=config.AZURE_OPENAI_ENDPOINT,
         )
