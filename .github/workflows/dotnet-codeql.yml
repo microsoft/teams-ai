@@ -39,7 +39,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@47b3d888fe66b639e431abf22ebca059152f1eea # v3.24.5
+        uses: github/codeql-action/init@8a470fddafa5cbb6266ee11b37ef4d8aae19c571 # v3.24.6
         with:
           languages: csharp
       - name: Setup .NET
@@ -50,6 +50,6 @@ jobs:
         working-directory: dotnet/packages/Microsoft.TeamsAI/
         run: dotnet build Microsoft.Teams.AI.sln --configuration Release
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@47b3d888fe66b639e431abf22ebca059152f1eea # v3.24.5
+        uses: github/codeql-action/analyze@8a470fddafa5cbb6266ee11b37ef4d8aae19c571 # v3.24.6
         with:
           category: "/language:csharp"
