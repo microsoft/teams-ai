@@ -6,18 +6,17 @@ Welcome to the 20 Questions Bot: The Ultimate Guessing Game! This developer samp
 
 <!-- code_chunk_output -->
 
-- [AI in Microsoft Teams: Twenty Qestions](#ai-in-microsoft-teams-twenty-qestions)
-      - [skprompt.txt](#skprompttxt)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Multiple ways to test](#multiple-ways-to-test)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
-    - [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
-    - [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
-  - [Limitations](#limitations)
-  - [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
-    - [Directions](#directions)
-  - [Deploy the bot to Azure](#deploy-the-bot-to-azure)
-  - [Further reading](#further-reading)
+-   [AI in Microsoft Teams: Twenty Qestions](#ai-in-microsoft-teams-twenty-qestions) - [skprompt.txt](#skprompttxt)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Multiple ways to test](#multiple-ways-to-test)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+        -   [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
+        -   [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
+    -   [Limitations](#limitations)
+    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
+        -   [Directions](#directions)
+    -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
+    -   [Further reading](#further-reading)
 
 <!-- /code_chunk_output -->
 
@@ -116,7 +115,7 @@ app.activity(ActivityTypes.Message, async (context: TurnContext, state: Applicat
 
 3. Duplicate the `sample.env` in the `teams-ai/js/samples/04.e.twentyQuestions` folder. Rename the file to `.env`.
 
-4. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
+4. Add your bot credentials to the `.env` file. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
 
 5. Update `config.json` and `index.ts` with your model deployment name.
 
@@ -127,7 +126,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 

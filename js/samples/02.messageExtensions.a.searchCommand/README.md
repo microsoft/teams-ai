@@ -6,20 +6,20 @@ This sample shows how to incorporate a basic Message Extension app into a Micros
 
 <!-- code_chunk_output -->
 
-- [Teams Search Command Message Extension](#teams-search-command-message-extension)
-  - [Interacting with the message extension](#interacting-with-the-message-extension)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+-   [Teams Search Command Message Extension](#teams-search-command-message-extension)
+    -   [Interacting with the message extension](#interacting-with-the-message-extension)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
 ## Interacting with the message extension
-- Message Extensions are convenient ways to add functionality to Teams.
-- This sample adds a search command to the compose area of a chat.
+
+-   Message Extensions are convenient ways to add functionality to Teams.
+-   This sample adds a search command to the compose area of a chat.
 
 > Note: this is not a chat bot and therefore the bot does not respond if you talk to it. Once it is installed in Teams, you can interact with it by selecting it's app icon in the chat compose area.
-
 
 ## Setting up the sample
 
@@ -49,6 +49,8 @@ This sample shows how to incorporate a basic Message Extension app into a Micros
     cd samples/<this-sample-folder>/
     ```
 
+1. Duplicate the `sample.env` file in this folder. Rename the file to `.env`. Add your bot's credentials and any other related credentials to that file.
+
 ## Testing the sample
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
@@ -56,7 +58,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 

@@ -6,19 +6,19 @@ This sample shows how to incorporate Adaptive Cards into a Microsoft Teams appli
 
 <!-- code_chunk_output -->
 
-- [Type-Ahead Search](#type-ahead-search)
-  - [Interacting with the bot](#interacting-with-the-bot)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+-   [Type-Ahead Search](#type-ahead-search)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
 ## Interacting with the bot
 
-- You can interact by sending 'dynamic' or 'static' to the app. The app will respond with an Adaptive Card.
-- Typing into the search box will filter the list of options. Selecting an option and submitting will send a message to the bot with the selected option(s).
-- The Adaptive Cards used are `json` files located under `/src/cards`. You can use the Teams developer portal to design and host your Adaptive Cards.
+-   You can interact by sending 'dynamic' or 'static' to the app. The app will respond with an Adaptive Card.
+-   Typing into the search box will filter the list of options. Selecting an option and submitting will send a message to the bot with the selected option(s).
+-   The Adaptive Cards used are `json` files located under `/src/cards`. You can use the Teams developer portal to design and host your Adaptive Cards.
 
 ## Setting up the sample
 
@@ -48,6 +48,10 @@ This sample shows how to incorporate Adaptive Cards into a Microsoft Teams appli
     cd samples/<this-sample-folder>/
     ```
 
+1. Duplicate the `sample.env` file in this folder. Rename the file to `.env`.
+
+1. Add your bot's credentials and any other variables to that file.
+
 ## Testing the sample
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
@@ -55,7 +59,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 

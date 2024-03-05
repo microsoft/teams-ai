@@ -6,11 +6,11 @@ ListBot: Your Ultimate List Management Companion. Powered by advanced AI capabil
 
 <!-- code_chunk_output -->
 
-- [AI in Microsoft Teams: List Bot](#ai-in-microsoft-teams-list-bot)
-  - [Interacting with the bot](#interacting-with-the-bot)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+-   [AI in Microsoft Teams: List Bot](#ai-in-microsoft-teams-list-bot)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
@@ -117,9 +117,9 @@ You can interact with the bot by asking for a summary of the list, adding new it
     cd samples/04.ai.d.chainedActions.listBot
     ```
 
-3. Duplicate the `sample.env` in the `teams-ai/js/samples/04.ai.d.chainedActions.listBot` folder. Rename the file to `.env`.
+3. Duplicate the `sample.env` in the this folder. Rename the file to `.env`.
 
-4. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
+4. Fill in the variables with your credentials. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
 
 5. Update `config.json` and `index.ts` with your model deployment name.
 
@@ -131,7 +131,7 @@ Otherwise, if you only want to run the bot locally and build manually, please ju
 
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 

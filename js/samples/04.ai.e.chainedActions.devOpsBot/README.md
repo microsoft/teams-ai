@@ -6,11 +6,11 @@ This is a conversational bot for Microsoft Teams that demonstrates how you could
 
 <!-- code_chunk_output -->
 
-- [Microsoft Teams Conversational Bot: DevOps Bot](#microsoft-teams-conversational-bot-devops-bot)
-  - [Interacting with the bot](#interacting-with-the-bot)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+-   [Microsoft Teams Conversational Bot: DevOps Bot](#microsoft-teams-conversational-bot-devops-bot)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
@@ -64,7 +64,7 @@ You can select an option from the command list by typing `@TeamsConversationBot`
 
 1. Duplicate the `sample.env` in the `teams-ai/js/samples/04.ai.e.chainedActions.devOpsBot` folder. Rename the file to `.env`.
 
-1. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
+1. Fill in the `.env` variables with your credentials. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
 
 1. Update `config.json` and `index.ts` with your model deployment name.
 
@@ -75,7 +75,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 

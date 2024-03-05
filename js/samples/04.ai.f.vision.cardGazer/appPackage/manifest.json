@@ -2,7 +2,7 @@
     "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
     "version": "1.1.0",
     "manifestVersion": "1.15",
-    "id": "b1df5988-0cda-4c1f-a7f3-db5b71ff6cb2",
+    "id": "${{TEAMS_APP_ID}}",
     "packageName": "com.package.name",
     "name": {
         "short": "CardGazer-${{TEAMSFX_ENV}}",
@@ -36,7 +36,7 @@
     ],
     "bots": [
         {
-            "botId": "b1df5988-0cda-4c1f-a7f3-db5b71ff6cb2",
+            "botId": "${{BOT_ID}}",
             "scopes": ["personal", "team", "groupChat"],
             "isNotificationOnly": false,
             "supportsCalling": false,

@@ -4,23 +4,23 @@ This bot can tell you about your personal work-related information, who your man
 
 Note that this bot will only work in tenants where the following graph scopes are permitted:
 
-- `User.Read`
-- `User.ReadBasic.All`
-- `People.Read`
-- `Mail.Read`
-- `Calendar.Read.Shared`
+-   `User.Read`
+-   `User.ReadBasic.All`
+-   `People.Read`
+-   `Mail.Read`
+-   `Calendar.Read.Shared`
 
-*Table of contents*
+_Table of contents_
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [Who Bot](#who-bot)
-  - [Interacting with the bot](#interacting-with-the-bot)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+-   [Who Bot](#who-bot)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
@@ -50,9 +50,9 @@ You can interact with this bot by sending it a message and ask it about your per
     cd teams-ai/js/samples/07.whoBot/
     ```
 
-4. Duplicate the `sample.env` in the `teams-ai/js/samples/07.whoBot` folder. Rename the file to `.env`. 
+4. Duplicate the `sample.env` in the `teams-ai/js/samples/07.whoBot` folder. Rename the file to `.env`.
 
-5. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
+5. Fill in the `.env` variables with your keys. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
 
 6. Update `config.json` and `bot.ts` with your model deployment name.
 
@@ -63,7 +63,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 
