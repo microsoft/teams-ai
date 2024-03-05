@@ -95,7 +95,17 @@ async def on_reset(context: TurnContext, state: TurnState):
 
 @app.ai.action(ActionTypes.FLAGGED_INPUT)
 async def on_flagged_input(context: ActionTurnContext, state: TurnState):
-    message = f'<strong>{context.data["category"]}</strong> detected. Severify: {context.data["severity"]}'
+    message = ""
+    if context.data:
+        data = context.data
+        if data["categories"]["hate"]:
+            message += f"<strong>Hate speech</strong> detected. Severity: {data['category_scores']['hate']}. "
+        if data["categories"]["sexual"]:
+            message += f"<strong>Sexual content</strong> detected. Severity: {data['category_scores']['sexual']}. "
+        if data["categories"]["self_harm"]:
+            message += f"<strong>Self harm</strong> detected. Severity: {data['category_scores']['self_harm']}. "
+        if data["categories"]["violence"]:
+            message += f"<strong>Violence</strong> detected. Severity: {data['category_scores']['violence']}. "
     await context.send_activity(f"I'm sorry your message was flagged due to triggering OpenAI’s content management policy. Reason: {message}")
     return ActionTypes.STOP
 
