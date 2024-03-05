@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Generic, List, Optional, TypeVar, Union
+from typing import Dict, Generic, List, Optional, TypeVar, Union
 
 import azure.ai.contentsafety
 from azure.ai.contentsafety import models
@@ -97,17 +97,32 @@ class AzureContentSafetyModerator(Generic[StateT], Moderator[StateT]):
                 )
             )
 
+            flagged: bool = False
+            categories: Dict[str, bool] = {}
+            category_scores: Dict[str, int] = {}
+
             for result in res.categories_analysis:
+                categories[result.category] = result.severity is not None and result.severity > 0
+                category_scores[result.category] = 0 if result.severity is None else result.severity
                 if result.severity is not None and result.severity > 0:
-                    return Plan(
-                        commands=[
-                            PredictedDoCommand(
-                                action=ActionTypes.FLAGGED_INPUT,
-                                parameters=result.as_dict(),
-                            )
-                        ]
-                    )
-            return None
+                    flagged = True
+
+            return (
+                None
+                if not flagged
+                else Plan(
+                    commands=[
+                        PredictedDoCommand(
+                            action=ActionTypes.FLAGGED_INPUT,
+                            parameters={
+                                "flagged": flagged,
+                                "categories": categories,
+                                "category_scores": category_scores,
+                            },
+                        )
+                    ]
+                )
+            )
         except HttpResponseError as err:
             return Plan(
                 commands=[
@@ -130,16 +145,33 @@ class AzureContentSafetyModerator(Generic[StateT], Moderator[StateT]):
                         )
                     )
 
+                    flagged: bool = False
+                    categories: Dict[str, bool] = {}
+                    category_scores: Dict[str, int] = {}
+
                     for result in res.categories_analysis:
+                        categories[result.category] = (
+                            result.severity is not None and result.severity > 0
+                        )
+                        category_scores[result.category] = (
+                            0 if result.severity is None else result.severity
+                        )
                         if result.severity is not None and result.severity > 0:
-                            return Plan(
-                                commands=[
-                                    PredictedDoCommand(
-                                        action=ActionTypes.FLAGGED_OUTPUT,
-                                        parameters=result.as_dict(),
-                                    )
-                                ]
-                            )
+                            flagged = True
+
+                    if flagged:
+                        return Plan(
+                            commands=[
+                                PredictedDoCommand(
+                                    action=ActionTypes.FLAGGED_OUTPUT,
+                                    parameters={
+                                        "flagged": flagged,
+                                        "categories": categories,
+                                        "category_scores": category_scores,
+                                    },
+                                )
+                            ]
+                        )
                 except HttpResponseError as err:
                     return Plan(
                         commands=[
