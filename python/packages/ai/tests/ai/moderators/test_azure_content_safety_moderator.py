@@ -3,11 +3,11 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import List, Literal, Optional, Union, cast
+from typing import Any, cast
 from unittest import IsolatedAsyncioTestCase, mock
 
-import httpx
-import openai
+from azure.ai.contentsafety import models
+from azure.core.exceptions import HttpResponseError
 from botbuilder.core import TurnContext
 
 from teams import ApplicationError
@@ -20,119 +20,26 @@ from teams.ai.planners import Plan, PredictedDoCommand, PredictedSayCommand
 from teams.state import ConversationState, TempState, TurnState, UserState
 
 
-class MockAsyncModerations:
-    async def create(
-        self,
-        *,
-        input: Union[str, List[str]],
-        model: Union[
-            str, Literal["text-moderation-latest", "text-moderation-stable"]
-        ] = "text-moderation-latest",
-        extra_headers: Optional[openai._types.Headers] = None,
-        extra_query: Optional[openai._types.Query] = None,
-        extra_body: Optional[openai._types.Body] = None,
-        timeout: Union[
-            float, httpx.Timeout, None, openai._types.NotGiven
-        ] = openai._types.NOT_GIVEN,
-    ) -> openai.types.ModerationCreateResponse:
-        # pylint: disable=unused-argument
-        return openai.types.ModerationCreateResponse(id="", model=model, results=[])
+class MockContentSafetyClient:
+    def analyze_text(self, *_args, **_kwargs: Any):
+        return models.AnalyzeTextResult(categories_analysis=[])
 
 
-class MockAsyncModerationsWithResults:
-    async def create(
-        self,
-        *,
-        input: Union[str, List[str]],
-        model: Union[
-            str, Literal["text-moderation-latest", "text-moderation-stable"]
-        ] = "text-moderation-latest",
-        extra_headers: Optional[openai._types.Headers] = None,
-        extra_query: Optional[openai._types.Query] = None,
-        extra_body: Optional[openai._types.Body] = None,
-        timeout: Union[
-            float, httpx.Timeout, None, openai._types.NotGiven
-        ] = openai._types.NOT_GIVEN,
-    ) -> openai.types.ModerationCreateResponse:
-        # pylint: disable=unused-argument
-        return openai.types.ModerationCreateResponse(
-            id="",
-            model=model,
-            results=[
-                openai.types.Moderation(
-                    categories=cast(
-                        openai.types.moderation.Categories,
-                        {
-                            "harassment": True,
-                            "harassment/threatening": False,
-                            "hate": False,
-                            "hate/threatening": False,
-                            "self-harm": False,
-                            "self-harm/instructions": False,
-                            "self-harm/intent": False,
-                            "sexual": False,
-                            "sexual/minors": False,
-                            "violence": False,
-                            "violence/graphic": False,
-                        },
-                    ),
-                    category_scores=cast(
-                        openai.types.moderation.CategoryScores,
-                        {
-                            "harassment": 0,
-                            "harassment/threatening": 0,
-                            "hate": 0,
-                            "hate/threatening": 0,
-                            "self-harm": 0,
-                            "self-harm/instructions": 0,
-                            "self-harm/intent": 0,
-                            "sexual": 0,
-                            "sexual/minors": 0,
-                            "violence": 0,
-                            "violence/graphic": 0,
-                        },
-                    ),
-                    flagged=True,
+class MockContentSafetyClientWithResults:
+    def analyze_text(self, *_args, **_kwargs: Any):
+        return models.AnalyzeTextResult(
+            categories_analysis=[
+                models.TextCategoriesAnalysis(
+                    category=models.TextCategory.HATE,
+                    severity=6,
                 )
-            ],
+            ]
         )
 
 
-class MockAsyncModerationsRateLimited:
-    async def create(
-        self,
-        *,
-        input: Union[str, List[str]],
-        model: Union[
-            str, Literal["text-moderation-latest", "text-moderation-stable"]
-        ] = "text-moderation-latest",
-        extra_headers: Optional[openai._types.Headers] = None,
-        extra_query: Optional[openai._types.Query] = None,
-        extra_body: Optional[openai._types.Body] = None,
-        timeout: Union[
-            float, httpx.Timeout, None, openai._types.NotGiven
-        ] = openai._types.NOT_GIVEN,
-    ) -> openai.types.ModerationCreateResponse:
-        # pylint: disable=unused-argument
-        raise openai.RateLimitError(
-            message="This is a rate limited error",
-            response=httpx.Response(
-                status_code=429, request=httpx.Request(method="method", url="url")
-            ),
-            body=None,
-        )
-
-
-class MockAsyncOpenAI:
-    moderations = MockAsyncModerations()
-
-
-class MockAsyncOpenAIWithResults:
-    moderations = MockAsyncModerationsWithResults()
-
-
-class MockAsyncOpenAIRateLimited:
-    moderations = MockAsyncModerationsRateLimited()
+class MockContentSafetyClientWithError:
+    def analyze_text(self, *_args, **_kwargs: Any):
+        raise HttpResponseError("test")
 
 
 class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
@@ -152,7 +59,9 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
                 options=AzureContentSafetyModeratorOptions(api_key="", moderate="output")
             )
 
-    @mock.patch("openai.AsyncAzureOpenAI", return_value=MockAsyncOpenAI)
+    @mock.patch(
+        "azure.ai.contentsafety.ContentSafetyClient", return_value=MockContentSafetyClient()
+    )
     async def test_should_not_review_input(self, mock_async_openai):
         moderator = AzureContentSafetyModerator(
             options=AzureContentSafetyModeratorOptions(api_key="", moderate="output", endpoint=""),
@@ -161,7 +70,10 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         self.assertTrue(mock_async_openai.called)
         self.assertIsNone(plan)
 
-    @mock.patch("openai.AsyncAzureOpenAI", return_value=MockAsyncOpenAIWithResults)
+    @mock.patch(
+        "azure.ai.contentsafety.ContentSafetyClient",
+        return_value=MockContentSafetyClientWithResults(),
+    )
     async def test_should_review_input_and_flag(self, mock_async_openai):
         moderator = AzureContentSafetyModerator(
             options=AzureContentSafetyModeratorOptions(api_key="", moderate="input", endpoint="")
@@ -176,7 +88,10 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         assert isinstance(plan.commands[0], PredictedDoCommand)
         self.assertEqual(plan.commands[0].action, ActionTypes.FLAGGED_INPUT)
 
-    @mock.patch("openai.AsyncAzureOpenAI", return_value=MockAsyncOpenAIRateLimited)
+    @mock.patch(
+        "azure.ai.contentsafety.ContentSafetyClient",
+        return_value=MockContentSafetyClientWithError(),
+    )
     async def test_should_review_input_and_error(self, mock_async_openai):
         moderator = AzureContentSafetyModerator(
             options=AzureContentSafetyModeratorOptions(api_key="", moderate="both", endpoint="")
@@ -191,7 +106,9 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         assert isinstance(plan.commands[0], PredictedDoCommand)
         self.assertEqual(plan.commands[0].action, ActionTypes.HTTP_ERROR)
 
-    @mock.patch("openai.AsyncAzureOpenAI", return_value=MockAsyncOpenAI)
+    @mock.patch(
+        "azure.ai.contentsafety.ContentSafetyClient", return_value=MockContentSafetyClient()
+    )
     async def test_should_not_review_output(self, mock_async_openai):
         moderator = AzureContentSafetyModerator(
             options=AzureContentSafetyModeratorOptions(api_key="", moderate="input", endpoint="")
@@ -203,7 +120,10 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         self.assertTrue(mock_async_openai.called)
         self.assertEqual(plan, output)
 
-    @mock.patch("openai.AsyncAzureOpenAI", return_value=MockAsyncOpenAIWithResults)
+    @mock.patch(
+        "azure.ai.contentsafety.ContentSafetyClient",
+        return_value=MockContentSafetyClientWithResults(),
+    )
     async def test_should_review_output_and_flag(self, mock_async_openai):
         moderator = AzureContentSafetyModerator(
             options=AzureContentSafetyModeratorOptions(api_key="", moderate="output", endpoint="")
@@ -219,7 +139,10 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         assert isinstance(output.commands[0], PredictedDoCommand)
         self.assertEqual(output.commands[0].action, ActionTypes.FLAGGED_OUTPUT)
 
-    @mock.patch("openai.AsyncAzureOpenAI", return_value=MockAsyncOpenAIRateLimited)
+    @mock.patch(
+        "azure.ai.contentsafety.ContentSafetyClient",
+        return_value=MockContentSafetyClientWithError(),
+    )
     async def test_should_review_output_and_error(self, mock_async_openai):
         moderator = AzureContentSafetyModerator(
             options=AzureContentSafetyModeratorOptions(api_key="", moderate="both", endpoint="")
