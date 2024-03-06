@@ -11,7 +11,7 @@ The planner is an extensible part of the AI system. This means that a custom pla
 
 | Planner                              | Description                                                                                                                     | C#  | JS/TS | Python |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | --- | ----- | ------ |
-| [ActionPlanner](./ACTION-PLANNER.md) | Powerful planner that uses LLMs to generate plans. It has a built-in prompt management, LLM modularity, amongst other features. | ✅  | ✅    | ❌     |
+| [ActionPlanner](./ACTION-PLANNER.md) | Powerful planner that uses LLMs to generate plans. It has a built-in prompt management, LLM modularity, amongst other features. | ✅  | ✅    | ✅     |
 | AssistantsPlanner                    | A planner that uses OpenAI's Assistants APIs to generate plans.                                                                 | ✅  | ✅    | ❌     |
 
 ### Plan
