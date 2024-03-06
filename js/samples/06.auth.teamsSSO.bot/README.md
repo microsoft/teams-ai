@@ -6,10 +6,10 @@ This sample depends on Teams SSO and gives you more flexibility on how to config
 
 ## Showcase
 
-- The bot echos back any message it receives. That's it!
-- This app is the bot-equivalent of 'Hello world'.
-- The minimum setup shows how to set up a bot with the Teams AI SDK.
-- This sample leverages Teams SSO to acquire a token for app user.
+-   The bot echos back any message it receives. That's it!
+-   This app is the bot-equivalent of 'Hello world'.
+-   The minimum setup shows how to set up a bot with the Teams AI SDK.
+-   This sample leverages Teams SSO to acquire a token for app user.
 
 ## Setting up the sample
 
@@ -39,7 +39,9 @@ This sample depends on Teams SSO and gives you more flexibility on how to config
     cd samples/<this-sample-folder>/
     ```
 
-The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below. To read about other options, skip to [Other ways to run the sample](#other-ways-to-run-the-sample).
+1. Duplicate the `sample.env` in this folder. Rename the file to `.env`.
+
+1. Fill in the `.env` variables with your keys.
 
 ## Testing the sample
 
@@ -48,7 +50,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 

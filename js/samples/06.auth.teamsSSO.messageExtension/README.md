@@ -5,9 +5,10 @@ This sample shows how to incorporate a basic Message Extension app with SSO into
 This sample depends on Teams SSO and gives you more flexibility on how to configure AAD, like using a client certificate. There is no need to create an OAuth Connection in Azure Bot Service to run this sample.
 
 ## Showcase
-- Message Extensions are convenient ways to add functionality to Teams.
-- This sample adds a search command to the compose area of a chat.
-- This sample leverages Teams SSO to acquire a token to call Microsoft Graph APIs.
+
+-   Message Extensions are convenient ways to add functionality to Teams.
+-   This sample adds a search command to the compose area of a chat.
+-   This sample leverages Teams SSO to acquire a token to call Microsoft Graph APIs.
 
 > Note: this is not a chat bot and therefore the bot does not respond if you talk to it. Once it is installed in Teams, you can interact with it by selecting it's app icon in the chat compose area.
 
@@ -33,6 +34,10 @@ This sample depends on Teams SSO and gives you more flexibility on how to config
     yarn build
     ```
 
+1. Duplicate the `sample.env` in this folder. Rename the file to `.env`.
+
+1. Fill in the `.env` variables with your keys.
+
 ## Testing the sample
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
@@ -40,7 +45,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 

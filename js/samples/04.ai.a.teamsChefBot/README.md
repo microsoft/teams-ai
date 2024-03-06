@@ -1,19 +1,21 @@
 # Microsoft Teams Conversational Bot with AI: Teams Chef
+
 This is a conversational bot for Microsoft Teams that thinks it's a Chef to help you cook apps using the Teams AI Library. The bot uses the `gpt-3.5-turbo` model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [Microsoft Teams Conversational Bot with AI: Teams Chef](#microsoft-teams-conversational-bot-with-ai-teams-chef)
-  - [Summary](#summary)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+-   [Microsoft Teams Conversational Bot with AI: Teams Chef](#microsoft-teams-conversational-bot-with-ai-teams-chef)
+    -   [Summary](#summary)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
 ## Summary
+
 This sample illustrates how to use [Retrieval Augmented Generation (RAG)](https://en.wikipedia.org/wiki/Prompt_engineering#Retrieval-augmented_generation) to easily inject contextual relevant information into the prompt sent to the model. This results in better and more accurate replies from the bot.
 
 The sample uses a local Vector Database, called [Vectra](https://github.com/Stevenic/vectra), and [Semantic Search](https://en.wikipedia.org/wiki/Semantic_search) to find the most relevant information to include in the prompt for the users input. The index can be found in `./index/teams-ai` and includes all of the projects Getting Started docs and the source code for the Teams AI Library. This means you can ask the Teams Chef Bot anything about the library and it can answer it. You can even ask it to write sample code for you!
@@ -41,9 +43,10 @@ The sample uses a local Vector Database, called [Vectra](https://github.com/Stev
     ```bash
     cd teams-ai/js/samples/04.ai.a.teamsChefBot/
     ```
-4. Duplicate the `sample.env` in the `teams-ai/js/samples/04.ai.a.teamsChefBot` folder. Rename the file to `.env`. 
 
-5. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
+4. Duplicate the `sample.env` in this folder. Rename the file to `.env`.
+
+5. Add your bot's credentials and any other related credentials to that file. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
 
 6. Update `config.json` and `index.ts` with your model deployment name.
 
@@ -54,7 +57,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 

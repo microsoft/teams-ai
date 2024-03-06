@@ -6,18 +6,17 @@ This example shows how to create a basic conversational experience using OpenAI'
 
 <!-- code_chunk_output -->
 
-- [Math Tutor Assistant](#math-tutor-assistant)
-  - [Interacting with the bot](#interacting-with-the-bot)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+-   [Math Tutor Assistant](#math-tutor-assistant)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
 ## Interacting with the bot
 
 You can interact with this bot by sending it a message, and the bot will solve your requested math problem..
-
 
 ## Setting up the sample
 
@@ -40,9 +39,10 @@ You can interact with this bot by sending it a message, and the bot will solve y
     ```bash
     cd teams-ai/js/samples/06.assistants.a.mathBot/
     ```
+
 4. Duplicate the `sample.env` in the `teams-ai/js/samples/06.assistants.a.mathBot` folder. Rename the file to `.env`.
 
-5. Fill in the variables with your keys.
+5. Fill in the `.env` variables with your keys.
 
 ## Testing the sample
 
@@ -51,7 +51,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 

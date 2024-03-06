@@ -6,18 +6,17 @@ This sample shows how to incorporate Content Safety control into a Microsoft Tea
 
 <!-- code_chunk_output -->
 
-- [Chat Bot with Moderation Control](#chat-bot-with-moderation-control)
-  - [Interacting with the bot](#interacting-with-the-bot)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+-   [Chat Bot with Moderation Control](#chat-bot-with-moderation-control)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
 ## Interacting with the bot
 
 You can interact with this bot by sending it a message, and a moderation report will be sent back to you.
-
 
 ## Setting up the sample
 
@@ -41,9 +40,9 @@ You can interact with this bot by sending it a message, and a moderation report 
     cd teams-ai/js/samples/05.chatModeration/
     ```
 
-4. Duplicate the `sample.env` in the `teams-ai/js/samples/05.chatModeration` folder. Rename the file to `.env`. 
+4. Duplicate the `sample.env` in this folder. Rename the file to `.env`.
 
-5. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT`, `AZURE_MODERATOR_KEY` & `AZURE_MODERATOR_ENDPOINT` variables and fill them in appropriately.
+5. Add your bot credentials to the `.env` file. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT`, `AZURE_CONTENT_SAFETY_KEY` & `AZURE_CONTENT_SAFETY_ENDPOINT` variables and fill them in appropriately.
 
 6. Update `config.json` and `bot.ts` with your model deployment name.
 
@@ -54,7 +53,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 
