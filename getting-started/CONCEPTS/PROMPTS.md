@@ -1,6 +1,23 @@
 # Prompts
 
-Prompts play a crucial role in communicating and directing the behavior of Large Language Models (LLMs) AI. 
+<small>**Navigation**</small>
+
+- [00.OVERVIEW](./README.md)
+- [Action Planner](./ACTION-PLANNER.md)
+- [Actions](./ACTIONS.md)
+- [AI System](./AI-SYSTEM.md)
+- [Application class](./APPLICATION.md)
+- [Augmentations](./AUGMENTATIONS.md)
+- [Data Sources](./DATA-SOURCES.md)
+- [Moderator](./MODERATOR.md)
+- [Planner](./PLANNER.md)
+- [**Prompts**](./PROMPTS.md)
+- [Turns](./TURNS.md)
+- [User Authentication](./USER-AUTH.md)
+
+---
+
+Prompt management plays a crucial role in communicating and directing the behavior of Large Language Models (LLMs) AI.
 They serve as inputs or queries that users can provide to elicit specific responses from a model.
 
 Here's a prompt that asks the LLM for name suggestions:
@@ -66,12 +83,14 @@ Here's how to define variables in code:
 
 **C#**
 
-In an *action* or *route handler* where the turn state object is available:
+In an _action_ or _route handler_ where the turn state object is available:
+
 ```cs
 state.Temp.Post = "Lorem Ipsum..."
 ```
 
 The usage in the prompt:
+
 ```
 This is the user's post: {{ $post }}
 ```
@@ -87,12 +106,12 @@ app.beforeTurn((context, state) => {
 ```
 
 The usage in the prompt:
+
 ```
 This is the user's post: {{ $post }}
 ```
 
 You can simply add to the `state.temp` object, and it will be accessible from the prompt template on runtime. Note that the safest place to do that would be in the `beforeTurn` activity because it will execute before any activity handler or action.
-
 
 **Default Variables**
 
@@ -136,7 +155,8 @@ Each prompt template is a folder with two files, `skprompt.txt` and `config.json
 
 Here's an example of a prompt template from the [Twenty Questions](https://github.com/microsoft/teams-ai/blob/c5ec11842b808e48cd214b3cb52da84e5811da33/js/samples/04.e.twentyQuestions) sample.
 
-*skprompt.txt*
+_skprompt.txt_
+
 ```
 You are the AI in a game of 20 questions.
 The goal of the game is for the Human to guess a secret within 20 questions.
@@ -150,31 +170,33 @@ Secret: {{$conversation.secretWord}}
 Answer the human's question but do not mention the secret word.
 ```
 
-*config.json*
+_config.json_
+
 ```json
 {
-    "schema": 1.1,
-    "description": "A bot that plays a game of 20 questions",
-    "type": "completion",
-    "completion": {
-        "completion_type": "chat",
-        "include_history": false,
-        "include_input": true,
-        "max_input_tokens": 2000,
-        "max_tokens": 256,
-        "temperature": 0.7,
-        "top_p": 0.0,
-        "presence_penalty": 0.6,
-        "frequency_penalty": 0.0
-    }
+  "schema": 1.1,
+  "description": "A bot that plays a game of 20 questions",
+  "type": "completion",
+  "completion": {
+    "completion_type": "chat",
+    "include_history": false,
+    "include_input": true,
+    "max_input_tokens": 2000,
+    "max_tokens": 256,
+    "temperature": 0.7,
+    "top_p": 0.0,
+    "presence_penalty": 0.6,
+    "frequency_penalty": 0.0
+  }
 }
 ```
 
-> Note that the configuration properties in the file do not include all the possible configurations. To learn more about the description of each configuration and all the supported configurations see the [`PromptTemplatConfig`](https://github.com/microsoft/teams-ai/blob/2d43f5ca5b3bf27844f760663641741cae4a3243/js/packages/teams-ai/src/prompts/PromptTemplate.ts#L46C18-L46C39) Typescript interface. 
+> Note that the configuration properties in the file do not include all the possible configurations. To learn more about the description of each configuration and all the supported configurations see the [`PromptTemplatConfig`](https://github.com/microsoft/teams-ai/blob/2d43f5ca5b3bf27844f760663641741cae4a3243/js/packages/teams-ai/src/prompts/PromptTemplate.ts#L46C18-L46C39) Typescript interface.
 
 These files can be found under the `src/prompts/chat/` folder. So, this prompt template's name is `chat`. Then, to plug these files in the Action Planner, the prompt manager has to be created with the folder path specified and then passed into the Action Planner constructor:
 
 **C#**
+
 ```cs
 PromptManager prompts = new PromptManager(new PromptManagerOptions(){
     PromptFolder = "./prompts"
@@ -184,9 +206,19 @@ PromptManager prompts = new PromptManager(new PromptManagerOptions(){
 The file path is relative to the source of file in which the `PromptManager` is created. In this case the `Program.cs` was in the same folder as the `prompts` folder.
 
 **Javascript**
+
 ```ts
 const prompts = new PromptManager({
-    promptsFolder: path.join(__dirname, '../src/prompts')
+  promptsFolder: path.join(__dirname, "../src/prompts")
 });
 ```
 
+---
+
+## Return to other major section topics:
+
+- [**CONCEPTS**](../CONCEPTS/README.md)
+- [MIGRATION](../MIGRATION/README.md)
+- [QUICKSTART](../QUICKSTART.md)
+- [SAMPLES](../SAMPLES.md)
+- [OTHER](../OTHER/README.md)

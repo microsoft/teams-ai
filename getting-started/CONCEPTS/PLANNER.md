@@ -1,5 +1,22 @@
 # Planner
 
+<small>**Navigation**</small>
+
+- [00.OVERVIEW](./README.md)
+- [Action Planner](./ACTION-PLANNER.md)
+- [Actions](./ACTIONS.md)
+- [AI System](./AI-SYSTEM.md)
+- [Application class](./APPLICATION.md)
+- [Augmentations](./AUGMENTATIONS.md)
+- [Data Sources](./DATA-SOURCES.md)
+- [Moderator](./MODERATOR.md)
+- [**Planner**](./PLANNER.md)
+- [Prompts](./PROMPTS.md)
+- [Turns](./TURNS.md)
+- [User Authentication](./USER-AUTH.md)
+
+---
+
 The planner receives the user's ask and returns a plan on how to accomplish the request. The user's ask is in the form of a prompt or prompt template. It does this by using AI to mix and match atomic functions (called _actions_) registered to the AI system so that it can recombine them into a series of steps that complete a goal.
 
 This is a powerful concept because it allows you to create actions that can be used in ways that you as a developer may not have thought of.
@@ -7,7 +24,6 @@ This is a powerful concept because it allows you to create actions that can be u
 For instance, If you have a task with `Summarize` & `SendEmail` actions, the planner could combine them to create workflows like "Rewrite the following report into a short paragraph and email it to johndoe@email.com" without you explicitly having to write code for those scenarios.
 
 The planner is an extensible part of the AI system. This means that a custom planner can be created for your specific needs. Out of the box, the Teams AI library supports the following planners.
-
 
 | Planner                              | Description                                                                                                                     | C#  | JS/TS | Python |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | --- | ----- | ------ |
@@ -83,3 +99,13 @@ Plan:
 ```
 
 This plan is executed in sequential order. So first the list will be created and then an item will be added to it. Finally, the `response` message will be sent to the user.
+
+---
+
+## Return to other major section topics:
+
+- [**CONCEPTS**](../CONCEPTS/README.md)
+- [MIGRATION](../MIGRATION/README.md)
+- [QUICKSTART](../QUICKSTART.md)
+- [SAMPLES](../SAMPLES.md)
+- [OTHER](../OTHER/README.md)
