@@ -6,7 +6,6 @@ Licensed under the MIT License.
 from typing import Any, cast
 from unittest import IsolatedAsyncioTestCase, mock
 
-from azure.ai.contentsafety import models
 from azure.core.exceptions import HttpResponseError
 from botbuilder.core import TurnContext
 
@@ -27,12 +26,13 @@ class MockContentSafetyClient:
 
 class MockContentSafetyClientWithResults:
     def analyze_text(self, *_args, **_kwargs: Any):
-        return {'blocklistsMatchResults': [], 
-                'hateResult': {'category': 'Hate', 'severity': 6}, 
-                'selfHarmResult': {'category': 'SelfHarm', 'severity': 0}, 
-                'sexualResult': {'category': 'Sexual', 'severity': 0}, 
-                'violenceResult': {'category': 'Violence', 'severity': 0}
-            }
+        return {
+            "blocklistsMatchResults": [],
+            "hateResult": {"category": "Hate", "severity": 6},
+            "selfHarmResult": {"category": "SelfHarm", "severity": 0},
+            "sexualResult": {"category": "Sexual", "severity": 0},
+            "violenceResult": {"category": "Violence", "severity": 0},
+        }
 
 
 class MockContentSafetyClientWithError:
