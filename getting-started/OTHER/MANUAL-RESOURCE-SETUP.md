@@ -1,16 +1,12 @@
 # Manually set up resources
 
-<small>Getting started directory</small>
+<small>**Navigation**</small>
 
-1. [Migration](./00.MIGRATION.md)
-2. [AI Setup](./01.AI-SETUP.md)
-3. [Activity Routing](./02.ACTIVITY-ROUTING.md)
-4. [QNA](./03.QNA.md)
-5. [Other](../OTHER/TEAMS-TOOLKIT.md)
-   - [Bot Framework Emulator](./BOTFRAMEWORK-EMULATOR.md)
-   - [**Manual resource setup**](./MANUAL-RESOURCE-SETUP.md)
-   - [Teams Toolkit extra information](./TEAMS-TOOLKIT.md)
-   - [Teams Toolkit CLI](./TEAMS-TOOLKIT-CLI.md)
+- [00.OVERVIEW](../README.md)
+- [Bot Framework Emulator](./BOTFRAMEWORK-EMULATOR.md)
+- [**Manual resource setup**](./MANUAL-RESOURCE-SETUP.md)
+- [Teams Toolkit extra information](./TEAMS-TOOLKIT.md)
+- [Teams Toolkit CLI](./TEAMS-TOOLKIT-CLI.md)
 
 # Manual setup
 
@@ -61,3 +57,13 @@
    ```
 
 1. In Teams, [upload the app](https://learn.microsoft.com/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) file (manifest.zip created in the previous step) and install the app to test.
+
+---
+
+## Return to other major section topics:
+
+- [CONCEPTS](../CONCEPTS/README.md)
+- [MIGRATION](../MIGRATION/README.md)
+- [QUICKSTART](../QUICKSTART.md)
+- [SAMPLES](../SAMPLES.md)
+- [**OTHER**](../OTHER/README.md)
