@@ -6,24 +6,23 @@ This sample requires creating an OAuth Connection in Azure Bot Service, which pr
 
 Note that this bot will only work in tenants where the following graph scopes are permitted:
 
-- `User.Read`
+-   `User.Read`
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [OAuth Bot](#oauth-bot)
-  - [Interacting with the bot](#interacting-with-the-bot)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+-   [OAuth Bot](#oauth-bot)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
 ## Interacting with the bot
 
 You can interact with this bot by sending it a message, which will echo back to you.
-
 
 ## Setting up the sample
 
@@ -47,6 +46,10 @@ You can interact with this bot by sending it a message, which will echo back to 
     cd teams-ai/js/samples/06.auth.oauth.bot/
     ```
 
+4. Duplicate the `sample.env` in this folder. Rename the file to `.env`.
+
+5. Fill in the `.env` variables with your keys.
+
 ## Testing the sample
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
@@ -54,7 +57,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 
