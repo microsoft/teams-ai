@@ -22,19 +22,17 @@ from teams.state import ConversationState, TempState, TurnState, UserState
 
 class MockContentSafetyClient:
     def analyze_text(self, *_args, **_kwargs: Any):
-        return models.AnalyzeTextResult(categories_analysis=[])
+        return {}
 
 
 class MockContentSafetyClientWithResults:
     def analyze_text(self, *_args, **_kwargs: Any):
-        return models.AnalyzeTextResult(
-            categories_analysis=[
-                models.TextCategoriesAnalysis(
-                    category=models.TextCategory.HATE,
-                    severity=6,
-                )
-            ]
-        )
+        return {'blocklistsMatchResults': [], 
+                'hateResult': {'category': 'Hate', 'severity': 6}, 
+                'selfHarmResult': {'category': 'SelfHarm', 'severity': 0}, 
+                'sexualResult': {'category': 'Sexual', 'severity': 0}, 
+                'violenceResult': {'category': 'Violence', 'severity': 0}
+            }
 
 
 class MockContentSafetyClientWithError:
