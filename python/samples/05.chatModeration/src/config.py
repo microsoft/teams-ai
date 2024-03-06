@@ -19,3 +19,5 @@ class Config:
     OPENAI_KEY = os.environ.get("OPENAI_KEY", "")
     AZURE_OPENAI_KEY = os.environ.get("AZURE_OPENAI_KEY", "")
     AZURE_OPENAI_ENDPOINT = os.environ.get("AZURE_OPENAI_ENDPOINT", "")
+    AZURE_CONTENT_SAFETY_KEY = os.environ.get("AZURE_CONTENT_SAFETY_KEY", "")
+    AZURE_CONTENT_SAFETY_ENDPOINT = os.environ.get("AZURE_CONTENT_SAFETY_ENDPOINT", "")
