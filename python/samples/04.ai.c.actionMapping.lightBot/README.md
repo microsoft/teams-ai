@@ -28,9 +28,11 @@ You can interact with the bot by messaging it.
     git clone https://github.com/Microsoft/teams-ai.git
     ```
 
-1. Follow below instructions to run the sample
+2. Duplicate the `sample.env` in the `teams-ai/python/samples/04.ai.c.actionMapping.lightBot` folder. Rename the file to `.env`. 
 
-The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below. To read about other options, skip to [Other ways to run the sample](#other-ways-to-run-the-sample).
+3. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
+
+4. Update `config.json` and `bot.py` with your model deployment name.
 
 ## Testing the sample
 
@@ -51,10 +53,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 6. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
 7. Ensure that you have set up the sample from the previous step.
 8. Trigger **Python: Create Environment** from command palette and create a virtual environment
-9. Duplicate the `sample.env` in the `teams-ai/python/samples/04.ai.c.actionMapping.lightBot` folder. Rename the file to `.env`. 
-10. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately. If you are using a previously deployed bot, fill in `BOT_ID` and `BOT_PASSWORD`.
-11. Update `config.json` and `bot.py` with your model deployment name.
-12. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
-13. In the browser that launches, select the **Add** button to install the app to Teams.
+9. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
+10. In the browser that launches, select the **Add** button to install the app to Teams.
 
 > If you do not have permission to upload custom apps (sideloading), Teams Toolkit will recommend creating and using a Microsoft 365 Developer Program account - a free program to get your own dev environment sandbox that includes Teams.

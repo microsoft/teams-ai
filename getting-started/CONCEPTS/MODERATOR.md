@@ -52,7 +52,6 @@ const app = new Application({
 ```cs
 OpenAIModeratorOptions moderatorOptions = new(config.OpenAI.ApiKey, ModerationType.Both);
 IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(moderatorOptions);
-
 AIOptions<TurnState> aIOptions = new(planner)
 {
     Moderator = moderator
@@ -62,6 +61,17 @@ var app = new ApplicationBuilder<TurnState>()
 .WithStorage(storage)
 .WithAIOptions(aIOptions)
 .Build();
+```
+
+**Python**
+```python
+app = Application[TurnState](ApplicationOptions(
+    ai=AIOptions(
+        moderator=OpenAIModerator(OpenAIModeratorOptions(
+            api_key=config.OPENAI_KEY
+        ))
+    )
+))
 ```
 
 > This snippet is taken from the [Twenty Questions bot] sample.
@@ -89,6 +99,18 @@ AzureContentSafetyModeratorOptions moderatorOptions = new(config.Azure.ContentSa
 IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(moderatorOptions);
 ```
 
+**Python**
+```python
+app = Application[TurnState](ApplicationOptions(
+    ai=AIOptions(
+        moderator=AzureContentSafetyModerator(AzureContentSafetyModeratorOptions(
+            api_key=config.AZURE_CONTENT_SAFETY_KEY,
+            endpoint=config.AZURE_CONTENT_SAFETY_ENDPOINT
+        ))
+    )
+))
+```
+
 ---
 
 ## Return to other major section topics:
@@ -98,3 +120,4 @@ IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(mod
 - [QUICKSTART](../QUICKSTART.md)
 - [SAMPLES](../SAMPLES.md)
 - [OTHER](../OTHER/README.md)
+

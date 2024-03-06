@@ -19,6 +19,7 @@
 
 The Action Planner is a powerful planner that uses an LLM to generate plans. It can trigger parameterized actions and send text-based responses to the user. It supports the following advanced features:
 
+
 ### [Prompts](./PROMPTS.md)
 
 The Action Planner has a built-in prompt management system that supports creating prompt templates as folders in the file system. A prompt template is the prompt text along with all the configurations for completion with the LLM model. Dynamic prompts also support template variables and functions.
