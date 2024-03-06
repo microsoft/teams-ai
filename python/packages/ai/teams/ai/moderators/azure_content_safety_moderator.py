@@ -102,11 +102,18 @@ class AzureContentSafetyModerator(Generic[StateT], Moderator[StateT]):
             categories: Dict[str, bool] = {}
             category_scores: Dict[str, int] = {}
 
-            for result in res.categories_analysis:
-                categories[result.category] = result.severity is not None and result.severity > 0
-                category_scores[result.category] = 0 if result.severity is None else result.severity
-                if result.severity is not None and result.severity > 0:
-                    flagged = True
+            category_results = ["hateResult", "selfHarmResult", "sexualResult", "violenceResult"]
+
+            for category in category_results:
+                result = res[category] if category in res else None
+                if result is not None:
+                    category = result["category"].lower()
+                    if category == 'selfharm':
+                        category = 'self_harm'
+                    categories[category] = result["severity"] is not None and result["severity"] > 0
+                    category_scores[category] = 0 if result["severity"] is None else result["severity"]
+                    if result["severity"] is not None and result["severity"] > 0:
+                        flagged = True
 
             return (
                 None
@@ -150,15 +157,18 @@ class AzureContentSafetyModerator(Generic[StateT], Moderator[StateT]):
                     categories: Dict[str, bool] = {}
                     category_scores: Dict[str, int] = {}
 
-                    for result in res.categories_analysis:
-                        categories[result.category] = (
-                            result.severity is not None and result.severity > 0
-                        )
-                        category_scores[result.category] = (
-                            0 if result.severity is None else result.severity
-                        )
-                        if result.severity is not None and result.severity > 0:
-                            flagged = True
+                    category_results = ["hateResult", "selfHarmResult", "sexualResult", "violenceResult"]
+
+                    for category in category_results:
+                        result = res[category] if category in res else None
+                        if result is not None:
+                            category = result["category"].lower()
+                            if category == 'selfharm':
+                                category = 'self_harm'
+                            categories[category] = result["severity"] is not None and result["severity"] > 0
+                            category_scores[category] = 0 if result["severity"] is None else result["severity"]
+                            if result["severity"] is not None and result["severity"] > 0:
+                                flagged = True
 
                     if flagged:
                         return Plan(
