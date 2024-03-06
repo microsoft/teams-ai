@@ -35,8 +35,18 @@ app.ai.action("createList", async (context: TurnContext, state: ApplicationTurnS
   ensureListExists(state, parameters.list);
 
   // Continues exectuion of next command in the plan.
-  return true;
+  return "";
 });
+```
+
+### Python
+
+```python
+@app.ai.action("createList")
+async def create_list(context: ActionTurnContext, state: AppTurnState):
+  ensure_list_exists(state, context.data["list"])
+  # Continues exectuion of next command in the plan.
+  return ""
 ```
 
 > The `action` method registers the action named `createList` with corresponding callback function.

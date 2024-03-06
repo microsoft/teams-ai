@@ -33,7 +33,6 @@ const app = new Application({
 ```cs
 OpenAIModeratorOptions moderatorOptions = new(config.OpenAI.ApiKey, ModerationType.Both);
 IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(moderatorOptions);
-
 AIOptions<TurnState> aIOptions = new(planner)
 {
     Moderator = moderator
@@ -44,6 +43,18 @@ var app = new ApplicationBuilder<TurnState>()
 .WithAIOptions(aIOptions)
 .Build();
 ```
+
+**Python**
+```python
+app = Application[TurnState](ApplicationOptions(
+    ai=AIOptions(
+        moderator=OpenAIModerator(OpenAIModeratorOptions(
+            api_key=config.OPENAI_KEY
+        ))
+    )
+))
+```
+
 > This snippet is taken from the [Twenty Questions bot] sample.
 > Note for C# application, the moderator should be registered to the Web app's service collection as a singleton.
 
@@ -65,4 +76,16 @@ const moderator = new AzureContentSafetyModerator({
 ```cs
 AzureContentSafetyModeratorOptions moderatorOptions = new(config.Azure.ContentSafetyApiKey, config.Azure.ContentSafetyEndpoint, ModerationType.Both);
 IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(moderatorOptions);
+```
+
+**Python**
+```python
+app = Application[TurnState](ApplicationOptions(
+    ai=AIOptions(
+        moderator=AzureContentSafetyModerator(AzureContentSafetyModeratorOptions(
+            api_key=config.AZURE_CONTENT_SAFETY_KEY,
+            endpoint=config.AZURE_CONTENT_SAFETY_ENDPOINT
+        ))
+    )
+))
 ```

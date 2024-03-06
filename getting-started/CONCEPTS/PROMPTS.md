@@ -86,6 +86,15 @@ app.beforeTurn((context, state) => {
 });
 ```
 
+**Python**
+
+```python
+@app.before_turn
+async def before_turn(context: TurnContext, state: AppTurnState):
+    state.temp.post = "Lorem Ipsum..."
+    return True
+```
+
 The usage in the prompt:
 ```
 This is the user's post: {{ $post }}
@@ -128,6 +137,21 @@ prompts.addFunction('diceRoll', async (context, state, functions, tokenizer, arg
     let diceRoll = // random number between 1 and 6
     return diceRoll;
 });
+```
+
+**Python**
+
+```python
+@prompts.function("diceRoll")
+async def dice_roll(
+    context: TurnContext,
+    state: MemoryBase,
+    functions: PromptFunctions,
+    tokenizer: Tokenizer,
+    args: List[str]
+):
+    dice_roll = # random number between 1 and 6
+    return dice_roll
 ```
 
 # Creating Prompt Templates
@@ -190,3 +214,9 @@ const prompts = new PromptManager({
 });
 ```
 
+**Python**
+```python
+prompts = PromptManager(PromptManagerOptions(
+    prompts_folder=f"{os.getcwd()}/src/prompts"
+))
+```
