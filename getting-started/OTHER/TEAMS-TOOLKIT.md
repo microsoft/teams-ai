@@ -1,23 +1,18 @@
 # Teams Toolkit (TTK) extra information
 
-<small>Getting started directory</small>
+<small>**Navigation**</small>
 
-1. [Migration](./00.MIGRATION.md)
-2. [AI Setup](./01.AI-SETUP.md)
-3. [Activity Routing](./02.ACTIVITY-ROUTING.md)
-4. [QNA](./03.QNA.md)
-5. [Other](../OTHER/TEAMS-TOOLKIT.md)
-   - [**Teams Toolkit extra information**](./TEAMS-TOOLKIT.md)
-   - [Teams Toolkit CLI](./TEAMS-TOOLKIT-CLI.md)
-   - [Bot Framework Emulator](./BOTFRAMEWORK-EMULATOR.md)
-   - [Manual resource setup](./MANUAL-RESOURCE-SETUP.md)
+- [00.OVERVIEW](./README.md)
+- [**Teams Toolkit extra information**](./TEAMS-TOOLKIT.md)
+- [Teams Toolkit CLI](./TEAMS-TOOLKIT-CLI.md)
+- [Bot Framework Emulator](./BOTFRAMEWORK-EMULATOR.md)
+- [Manual resource setup](./MANUAL-RESOURCE-SETUP.md)
 
 Teams Toolkit is a handy way to get up and testing your app on Teams **quickly**. The process that has been set up in our samples has been optimized for minimal configuration and maximum speed.
 
 Using TTK will help you get a local bot running in Teams in a few minutes. This TTK setup will help by detecting and loading changes while in local development. However, there is some setup that will be required to get started.
 
 > Note that if you are testing a sample that does not use AI in it, **you do not need to set up an Azure OpenAI or OpenAI resource**. You can skip the steps that involve Azure OpenAI or OpenAI.
-
 
 ### What are the different `env` files for?
 
@@ -46,3 +41,13 @@ Teams Toolkit does **not** auto-generate:
 - A database or similar storage options
 
 You can check your provisioned resources in the [Azure Portal](https://portal.azure.com) or at the [Teams development portal](https://dev.teams.microsoft.com).
+
+---
+
+## Return to other major section topics:
+
+- [CONCEPTS](../CONCEPTS/README.md)
+- [MIGRATION](../MIGRATION/README.md)
+- [QUICKSTART](../QUICKSTART.md)
+- [SAMPLES](../SAMPLES.md)
+- [**OTHER**](../OTHER/README.md)

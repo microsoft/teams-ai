@@ -5,6 +5,7 @@ Licensed under the MIT License.
 Description: initialize the app and listen for `message` activitys
 """
 
+import os
 import sys
 import traceback
 from typing import Union
@@ -13,6 +14,7 @@ from botbuilder.core import MemoryStorage, TurnContext
 from botbuilder.schema import Attachment
 from botbuilder.schema.teams import MessagingExtensionResult, TaskModuleTaskInfo
 from teams import Application, ApplicationOptions, TeamsAdapter
+from teams.ai import AIOptions
 from teams.ai.models import AzureOpenAIModelOptions, OpenAIModel, OpenAIModelOptions
 from teams.ai.planners import ActionPlanner, ActionPlannerOptions
 from teams.ai.prompts import PromptManager, PromptManagerOptions
@@ -31,29 +33,28 @@ if config.OPENAI_KEY is None and config.AZURE_OPENAI_KEY is None:
     )
 
 # Create AI components
-model_options: Union[OpenAIModelOptions, AzureOpenAIModelOptions]
-if config.AZURE_OPENAI_KEY is not None and config.AZURE_OPENAI_ENDPOINT is not None:
-    # Azure OpenAI Support
-    model_options = AzureOpenAIModelOptions(
-        api_key=config.AZURE_OPENAI_KEY,
-        default_model="gpt-3.5-turbo",
-        endpoint=config.AZURE_OPENAI_ENDPOINT,
+model: OpenAIModel
+
+if config.OPENAI_KEY:
+    model = OpenAIModel(
+        OpenAIModelOptions(api_key=config.OPENAI_KEY, default_model="gpt-3.5-turbo")
     )
-elif config.OPENAI_KEY is not None:
-    # OpenAI Support
-    model_options = OpenAIModelOptions(api_key=config.OPENAI_KEY, default_model="gpt-3.5-turbo")
-else:
-    raise Exception(
-        "Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set."
+elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
+    model = OpenAIModel(
+        AzureOpenAIModelOptions(
+            api_key=config.AZURE_OPENAI_KEY,
+            default_model="gpt-35-turbo",
+            api_version="2023-03-15-preview",
+            endpoint=config.AZURE_OPENAI_ENDPOINT,
+        )
     )
 
-model = OpenAIModel(model_options)
-
-prompts = PromptManager(PromptManagerOptions("prompts"))
+prompts = PromptManager(PromptManagerOptions(prompts_folder=f"{os.getcwd()}/prompts"))
 
 planner = ActionPlanner(ActionPlannerOptions(model, prompts, "generate"))
 
 # Define storage and application
+# Note that we're not passing AI options as we won't be chatting with the app.
 storage = MemoryStorage()
 
 app = Application[AppTurnState](
@@ -81,7 +82,7 @@ async def create_post(context: TurnContext, _state: AppTurnState) -> TaskModuleT
 @app.message_extensions.submit_action("CreatePost")
 async def submit_create_post(
     context: TurnContext, state: AppTurnState, data: dict
-) -> MessagingExtensionResult:
+) -> Union[MessagingExtensionResult, TaskModuleTaskInfo]:
     try:
         if data["verb"] == "generate":
             # Call GPT and return response view
@@ -95,6 +96,7 @@ async def submit_create_post(
             return MessagingExtensionResult(
                 type="result", attachment_layout="list", attachments=attachments
             )
+        raise RuntimeError("Invalid verb was used.")
     except Exception as err:
         raise RuntimeError(f"Something went wrong: {str(err)}")
 

@@ -6,23 +6,23 @@ This sample requires creating an OAuth Connection in Azure Bot Service, which pr
 
 Note that this bot will only work in tenants where the following graph scopes are permitted:
 
-- `User.Read`
+-   `User.Read`
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [Teams Adaptive Card SSO Bot](#teams-adaptive-card-sso-bot)
-  - [Interacting with the bot](#interacting-with-the-bot)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+-   [Teams Adaptive Card SSO Bot](#teams-adaptive-card-sso-bot)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
 ## Interacting with the bot
 
-Once the bot is successfully sideloaded and installed, send any message to it. The bot will respond with an adaptive card with a sign in button. Clicking on it will initiate the sign in flow. Once that is done, the card should update to show the users profile picture and name. 
+Once the bot is successfully sideloaded and installed, send any message to it. The bot will respond with an adaptive card with a sign in button. Clicking on it will initiate the sign in flow. Once that is done, the card should update to show the users profile picture and name.
 
 ## Setting up the sample
 
@@ -46,6 +46,10 @@ Once the bot is successfully sideloaded and installed, send any message to it. T
     cd teams-ai/js/samples/06.auth.oauth.adaptivecard
     ```
 
+4. Duplicate the `sample.env` in this folder. Rename the file to `.env`.
+
+5. Fill in the variables with your keys in the `.env` file.
+
 ## Testing the sample
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
@@ -53,7 +57,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 

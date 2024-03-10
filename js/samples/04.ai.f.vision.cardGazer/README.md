@@ -44,7 +44,7 @@ You can interact with this bot by sending it a message with an image or a doodle
 
 4. Duplicate the `sample.env` in the `teams-ai/js/samples/04.ai.f.vision.cardGazer` folder. Rename the file to `.env`.
 
-5. Add in your `OPENAI_KEY` key.
+5. Fill in the variables with your keys. Add in your `OPENAI_KEY` key.
 
 6. Update `config.json` and `index.ts` with your model deployment name.
 

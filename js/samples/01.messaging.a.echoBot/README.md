@@ -6,11 +6,11 @@ This sample shows how to incorporate a basic conversational flow into a Microsof
 
 <!-- code_chunk_output -->
 
-- [Teams Echo Bot](#teams-echo-bot)
-  - [Interacting with the bot](#interacting-with-the-bot)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+-   [Teams Echo Bot](#teams-echo-bot)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
@@ -47,7 +47,9 @@ You can interact with the bot by messaging it and it will echo that back to you.
     yarn start
     ```
 
-The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below. To read about other options, skip to [Other ways to run the sample](#other-ways-to-run-the-sample).
+1. Duplicate the `sample.env` file in this folder. Rename the file to `.env`.
+
+1. Add your bot's credentials to that file.
 
 ## Testing the sample
 
@@ -56,7 +58,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 

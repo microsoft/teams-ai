@@ -6,24 +6,23 @@ This sample requires creating an OAuth Connection in Azure Bot Service, which pr
 
 Note that this bot will only work in tenants where the following graph scopes are permitted:
 
-- `User.Read`
+-   `User.Read`
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [Teams Message Extension SSO Bot](#teams-message-extension-sso-bot)
-  - [Interacting with the bot](#interacting-with-the-bot)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+-   [Teams Message Extension SSO Bot](#teams-message-extension-sso-bot)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
 ## Interacting with the bot
 
 ![Bot interaction image](https://github.com/OfficeDev/Microsoft-Teams-Samples/raw/main/samples/msgext-search-auth-config/csharp/Images/msgext-search-auth-config.gif)
-
 
 ## Setting up the sample
 
@@ -47,6 +46,10 @@ Note that this bot will only work in tenants where the following graph scopes ar
     cd teams-ai-/js/samples/06.auth.oauth.messageExtension
     ```
 
+4. Duplicate the `sample.env` in this folder. Rename the file to `.env`.
+
+5. Fill in the `.env` variables with your keys.
+
 ## Testing the sample
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
@@ -54,7 +57,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 

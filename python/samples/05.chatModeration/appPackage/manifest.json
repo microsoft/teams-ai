@@ -1,23 +1,23 @@
 {
     "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
-    "version": "1.1.0",
+    "version": "1.0.0",
     "manifestVersion": "1.15",
-    "id": "4a659e40-58a5-4883-957a-4b3cd037fe0e",
+    "id": "${{TEAMS_APP_ID}}",
     "packageName": "com.package.name",
     "name": {
-        "short": "CardGazer-local",
-        "full": "Teams Card Gazer"
+        "short": "ModeratedBot-${{TEAMSFX_ENV}}",
+        "full": "Moderated Bot"
     },
     "developer": {
-        "name": "CardGazer",
+        "name": "Microsoft",
         "mpnId": "",
         "websiteUrl": "https://microsoft.com",
         "privacyUrl": "https://privacy.microsoft.com/privacystatement",
         "termsOfUseUrl": "https://www.microsoft.com/legal/terms-of-use"
     },
     "description": {
-        "short": "A vision enabled bot capable of generating Adaptive Cards using uploaded images.",
-        "full": "A vision enabled bot capable of generating Adaptive Cards using uploaded images."
+        "short": "Sample bot that demonstrates moderation capabilities",
+        "full": "Sample bot that demonstrates moderation capabilities"
     },
     "icons": {
         "outline": "outline.png",
@@ -27,30 +27,24 @@
     "staticTabs": [
         {
             "entityId": "conversations",
-            "scopes": [
-                "personal"
-            ]
+            "scopes": ["personal"]
         },
         {
             "entityId": "about",
-            "scopes": [
-                "personal"
-            ]
+            "scopes": ["personal"]
         }
     ],
     "bots": [
         {
-            "botId": "b1df5988-0cda-4c1f-a7f3-db5b71ff6cb2",
-            "scopes": [
-                "personal",
-                "team",
-                "groupChat"
-            ],
+            "botId": "${{BOT_ID}}",
+            "scopes": ["personal", "team", "groupChat"],
             "isNotificationOnly": false,
             "supportsCalling": false,
             "supportsVideo": false,
             "supportsFiles": false
         }
     ],
-    "validDomains": []
+    "validDomains": [
+        "${{BOT_DOMAIN}}"
+    ]
 }
