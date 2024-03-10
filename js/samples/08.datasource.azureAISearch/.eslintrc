@@ -14,8 +14,6 @@
         "plugin:import/typescript",
         "plugin:import/recommended",
         "plugin:jsdoc/recommended",
-
-        "plugin:security/recommended",
         "plugin:prettier/recommended" // Recommended to be last
     ],
     "plugins": [
@@ -45,20 +43,11 @@
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-namespace": "off",
-        "@typescript-eslint/no-non-null-assertion": "off",
-        "@typescript-eslint/no-unused-vars": "off",
-        "lodash/prefer-includes": "off",
         "no-async-promise-executor": "off",
         "no-constant-condition": "off",
         "no-undef": "off", // Disabled due to conflicts with @typescript/eslint
         "no-unused-vars": "off", // Disabled due to conflicts with @typescript/eslint
-        "prettier/prettier": "error",
-        "jsdoc/check-tag-names": [
-            1,
-            {
-                "definedTags": ["remarks"] // Allow @remarks
-            }
-        ]
+        "prettier/prettier": "error"
     },
     "overrides": [
         {

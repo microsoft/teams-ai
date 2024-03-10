@@ -1,9 +1,18 @@
-import { OpenAIModel, PromptManager, ActionPlanner, Application, AI, TurnState, TeamsAdapter, ApplicationBuilder } from "@microsoft/teams-ai";
-import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from "botbuilder";
-import path from "path";
-import { AzureAISearchDataSource } from "./AzureAISearchDataSource";
-import { addResponseFormatter } from "./responseFormatter";
-import debug from "debug";
+import {
+    OpenAIModel,
+    PromptManager,
+    ActionPlanner,
+    Application,
+    AI,
+    TurnState,
+    TeamsAdapter,
+    ApplicationBuilder
+} from '@microsoft/teams-ai';
+import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
+import path from 'path';
+import { AzureAISearchDataSource } from './AzureAISearchDataSource';
+import { addResponseFormatter } from './responseFormatter';
+import debug from 'debug';
 
 const error = debug('azureaisearch:app:error');
 error.log = console.log.bind(console);
@@ -11,8 +20,15 @@ error.log = console.log.bind(console);
 interface ConversationState {}
 type ApplicationTurnState = TurnState<ConversationState>;
 
-if (!process.env.AZURE_OPENAI_KEY || !process.env.AZURE_OPENAI_ENDPOINT || !process.env.AZURE_SEARCH_ENDPOINT || !process.env.AZURE_SEARCH_KEY) {
-    throw new Error('Missing environment variables - please check that AZURE_OPENAI_KEY, AZURE_OPENAI_ENDPOINT, AZURE_SEARCH_KEY, AZURE_SEARCH_ENDPOINT are all set.');
+if (
+    !process.env.AZURE_OPENAI_KEY ||
+    !process.env.AZURE_OPENAI_ENDPOINT ||
+    !process.env.AZURE_SEARCH_ENDPOINT ||
+    !process.env.AZURE_SEARCH_KEY
+) {
+    throw new Error(
+        'Missing environment variables - please check that AZURE_OPENAI_KEY, AZURE_OPENAI_ENDPOINT, AZURE_SEARCH_KEY, AZURE_SEARCH_ENDPOINT are all set.'
+    );
 }
 
 // Create AI components
@@ -58,7 +74,7 @@ export const app = new Application<ApplicationTurnState>({
         {},
         new ConfigurationServiceClientCredentialFactory({
             MicrosoftAppId: process.env.BOT_ID, // Set to "" if using the Teams Test Tool
-            MicrosoftAppPassword: process.env.BOT_PASSWORD, // Set to "" if using the Teams Test Tool 
+            MicrosoftAppPassword: process.env.BOT_PASSWORD, // Set to "" if using the Teams Test Tool
             MicrosoftAppType: 'MultiTenant'
         })
     ),

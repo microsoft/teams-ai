@@ -102,6 +102,7 @@ export class AzureAISearchDataSource implements DataSource {
      * @remarks
      * The returned output should be a string of text that will be injected into the prompt at render time.
      * @param {TurnContext} context Turn context for the current turn of conversation with the user.
+     * @param _context
      * @param {Memory} memory An interface for accessing state values.
      * @param {Tokenizer} tokenizer Tokenizer to use when rendering the data source.
      * @param {number} maxTokens Maximum number of tokens allowed to be rendered.
