@@ -36,13 +36,13 @@
 
   <ItemGroup>
     <PackageReference Include="AdaptiveCards" Version="3.1.0" />
-    <PackageReference Include="Azure.AI.ContentSafety" Version="1.0.0-beta.1" />
-    <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.12" />
-    <PackageReference Include="JsonSchema.Net" Version="5.3.1" />
+    <PackageReference Include="Azure.AI.ContentSafety" Version="1.0.0" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.14" />
+    <PackageReference Include="JsonSchema.Net" Version="5.5.1" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Bot.Builder" Version="4.21.1" />
-    <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.21.1" />
-    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.21.1" />
+    <PackageReference Include="Microsoft.Bot.Builder" Version="4.22.2" />
+    <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.22.2" />
+    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.2" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.59.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SharpToken" Version="1.2.17" />
