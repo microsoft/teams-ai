@@ -233,14 +233,14 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
             command: PredictedCommand
             monologue: InnerMonologue = response.message.content
 
-            if monologue.action.name == "SAY":
-                params = monologue.action.parameters
+            if monologue['action']['name'] == "SAY":
+                params = monologue['action']['parameters']
                 response_val = cast(str, params.get("text")) if params else ""
                 command = PredictedSayCommand(response=response_val)
             else:
                 command = PredictedDoCommand(
-                    action=monologue.action.name,
-                    parameters=monologue.action.parameters if monologue.action.parameters else {},
+                    action=monologue['action']['name'],
+                    parameters=monologue['action']['parameters'] if monologue['action']['parameters'] else {},
                 )
             return Plan(commands=[command])
         return Plan()
