@@ -137,10 +137,10 @@ class TestMonologueAugmentation(IsolatedAsyncioTestCase):
             PromptResponse[InnerMonologue](
                 message=Message(
                     role="assistant",
-                    content=InnerMonologue(
-                        thoughts=Thoughts(thought="test", reasoning="test", plan="test"),
-                        action=Action(name="SAY", parameters={"text": "hello world"}),
-                    ),
+                    content=InnerMonologue({
+                        "thoughts": {"thought": "test", "reasoning": "test", "plan": "test"},
+                        "action": {"name": "SAY", "parameters": {"text": "hello world"}},
+                    }),
                 )
             ),
         )
@@ -157,10 +157,10 @@ class TestMonologueAugmentation(IsolatedAsyncioTestCase):
             PromptResponse[InnerMonologue](
                 message=Message(
                     role="assistant",
-                    content=InnerMonologue(
-                        thoughts=Thoughts(thought="test", reasoning="test", plan="test"),
-                        action=Action(name="test", parameters={"foo": "bar"}),
-                    ),
+                    content=InnerMonologue({
+                        "thoughts": {"thought": "test", "reasoning": "test", "plan": "test"},
+                        "action": {"name": "test", "parameters": {"foo": "bar"}},
+                    }),
                 )
             ),
         )
