@@ -38,7 +38,7 @@ export interface AzureAISearchDataSourceOptions {
     indexName: string;
 
     /**
-     * Azure OpenAI API key. AzureO
+     * Azure OpenAI API key.
      */
     azureOpenAIApiKey: string;
 
@@ -129,7 +129,6 @@ export class AzureAISearchDataSource implements DataSource {
             'tags',
             'rating',
             'location',
-            'link',
             'address'
         ];
 
