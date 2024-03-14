@@ -8,9 +8,17 @@ import * as restify from 'restify';
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
-import { ActivityTypes, ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
+import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
 
-import { LlamaModel, TurnState, TeamsAdapter, Application } from '@microsoft/teams-ai';
+import {
+    ActionPlanner,
+    Application,
+    LlamaModel,
+    Memory,
+    PromptManager,
+    TeamsAdapter,
+    TurnState
+} from '@microsoft/teams-ai';
 
 // Read botFilePath and botFileSecret from .env file.
 const ENV_FILE = path.join(__dirname, '..', '.env');
@@ -62,30 +70,49 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 interface ConversationState {
-    count: number;
+    lightsOn: boolean;
 }
 type ApplicationTurnState = TurnState<ConversationState>;
 // Create AI components
 const model = new LlamaModel({
     // Llama Support
-    apiKey: process.env.API_KEY!
+    apiKey: process.env.API_KEY!,
+    endpoint: process.env.ENDPOINT!
 });
 
+const prompts = new PromptManager({
+    promptsFolder: path.join(__dirname, 'prompts')
+});
+
+const planner = new ActionPlanner({
+    model,
+    prompts,
+    defaultPrompt: 'default'
+});
 // Define storage and application
 // - Note that we're not passing a prompt for our AI options as we won't be chatting with the app.
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
-    storage
+    storage,
+    ai: {
+        planner
+    }
 });
 
-// Listen for ANY message to be received. MUST BE AFTER ANY OTHER MESSAGE HANDLERS
-app.activity(ActivityTypes.Message, async (context: TurnContext, state: ApplicationTurnState) => {
-    // Increment count state
-    let count = state.conversation.count ?? 0;
-    state.conversation.count = ++count;
+// Define a prompt function for getting the current status of the lights
+planner.prompts.addFunction('getLightStatus', async (context: TurnContext, memory: Memory) => {
+    return memory.getValue('conversation.lightsOn') ? 'on' : 'off';
+});
 
-    // Echo back users request
-    await context.sendActivity(`[${count}] you said: ${context.activity.text}`);
+// Register action handlers
+app.ai.action('LightsOn', async (context: TurnContext, state: ApplicationTurnState) => {
+    state.conversation.lightsOn = true;
+    return `the lights are now on`;
+});
+
+app.ai.action('LightsOff', async (context: TurnContext, state: ApplicationTurnState) => {
+    state.conversation.lightsOn = false;
+    return `the lights are now off`;
 });
 
 // Listen for incoming server requests.

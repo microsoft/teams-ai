@@ -8,8 +8,7 @@ import { Tokenizer } from '../tokenizers';
 
 export interface LlamaModelOptions {
     apiKey: string;
-    defaultModel?: string;
-    endpoint?: string;
+    endpoint: string;
 }
 
 export class LlamaModel implements PromptCompletionModel {
@@ -44,25 +43,26 @@ export class LlamaModel implements PromptCompletionModel {
             };
         }
 
+        // TODO: Revisit this- compare to OpenAIModel impl
         let last: Message | undefined = result.output[result.output.length - 1];
         if (last.role !== 'user') {
             last = undefined;
         }
         // TODO: try catch
         // TODO: make real interface
-        const res = await this._httpClient.post<{ generated_text: string }[]>(
-            'https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b-chat-hf',
-            {
-                inputs: last?.content
+        const res = await this._httpClient.post<{ output: string }>(this.options.endpoint, {
+            input_data: {
+                input_string: result.output,
+                parameters: template.config.completion
             }
-        );
+        });
 
         return {
             status: 'success',
             input: last,
             message: {
                 role: 'assistant',
-                content: res.data.map((v) => v.generated_text).join('\n')
+                content: res.data.output
             }
         };
     }
