@@ -19,8 +19,8 @@
         "start": "tsc --build && node ./lib/index.js",
         "test": "echo \"Error: no test specified\" && exit 1",
         "watch": "nodemon --watch ./src -e ts --exec \"yarn start\"",
-        "indexer:create": "yarn build && env-cmd --silent -f .env node ./lib/indexer/setup.js",
-        "indexer:delete": "yarn build && env-cmd --silent -f .env node ./lib/indexer/delete.js"
+        "indexer:create": "yarn build && env-cmd --silent -f .env node ./lib/indexers/setup.js",
+        "indexer:delete": "yarn build && env-cmd --silent -f .env node ./lib/indexers/delete.js"
     },
     "repository": {
         "type": "git",
