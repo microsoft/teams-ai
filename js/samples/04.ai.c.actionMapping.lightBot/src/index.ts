@@ -11,14 +11,14 @@ import * as restify from 'restify';
 import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
 
 import {
-    Application,
     ActionPlanner,
+    Application,
+    DefaultConversationState,
+    Memory,
     OpenAIModel,
     PromptManager,
-    TurnState,
-    Memory,
-    DefaultConversationState,
-    TeamsAdapter
+    TeamsAdapter,
+    TurnState
 } from '@microsoft/teams-ai';
 
 // Read botFilePath and botFileSecret from .env file.
