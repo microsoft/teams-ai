@@ -4,9 +4,12 @@
     "type": "completion",
     "completion": {
         "model": "llama-2-7b-chat-18",
-        "temperature": 0.6,
+        "temperature": 0.2,
         "top_p": 0.9,
         "do_sample": true,
-        "max_new_tokens": 200
+        "max_new_tokens": 500
+    },
+    "augmentation": {
+        "augmentation_type": "sequence"
     }
 }

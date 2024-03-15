@@ -73,6 +73,10 @@ interface ConversationState {
     lightsOn: boolean;
 }
 type ApplicationTurnState = TurnState<ConversationState>;
+
+if (!process.env.API_KEY && !process.env.ENDPOINT) {
+    throw new Error('Missing environment variables - please check that API_KEY and ENDPOINT are set.');
+}
 // Create AI components
 const model = new LlamaModel({
     // Llama Support
@@ -107,11 +111,13 @@ planner.prompts.addFunction('getLightStatus', async (context: TurnContext, memor
 // Register action handlers
 app.ai.action('LightsOn', async (context: TurnContext, state: ApplicationTurnState) => {
     state.conversation.lightsOn = true;
+    await context.sendActivity(`[lights on]`);
     return `the lights are now on`;
 });
 
 app.ai.action('LightsOff', async (context: TurnContext, state: ApplicationTurnState) => {
     state.conversation.lightsOn = false;
+    await context.sendActivity(`[lights off]`);
     return `the lights are now off`;
 });
 
