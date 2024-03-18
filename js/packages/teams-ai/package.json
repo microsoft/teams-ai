@@ -26,13 +26,13 @@
     "types": "./lib/index.d.ts",
     "dependencies": {
         "@azure/msal-node": "^2.6.4",
-        "axios": "^1.6.7",
+        "axios": "^1.6.8",
         "botbuilder": "^4.22.1",
         "botbuilder-dialogs": "^4.22.1",
         "gpt-tokenizer": "^2.1.2",
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
-        "openai": "^4.28.4",
+        "openai": "^4.29.1",
         "uuid": "^9.0.1",
         "yaml": "^2.4.1"
     },
