@@ -28,8 +28,6 @@ You can interact with this bot by sending it a message. Send it a message of `st
     git clone https://github.com/Microsoft/teams-ai.git
     ```
 
-2. Duplicate the `sample.env` in the `teams-ai/python/samples/03.adaptiveCards.a.typeAheadBot` folder. Rename the file to `.env`. 
-
 ## Testing the sample
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
