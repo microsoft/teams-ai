@@ -99,7 +99,8 @@ const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
-        planner
+        planner,
+        allow_looping: false
     }
 });
 

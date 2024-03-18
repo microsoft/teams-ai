@@ -48,21 +48,26 @@ export class LlamaModel implements PromptCompletionModel {
         if (last.role !== 'user') {
             last = undefined;
         }
-        // TODO: try catch
-        // TODO: make real interface
-        const res = await this._httpClient.post<{ output: string }>(this.options.endpoint, {
-            input_data: {
-                input_string: result.output,
-                parameters: template.config.completion
-            }
-        });
+        let res;
+
+        try {
+            res = await this._httpClient.post<{ output: string }>(this.options.endpoint, {
+                input_data: {
+                    input_string: result.output,
+                    parameters: template.config.completion
+                }
+            });
+        } catch (err) {
+            console.error(err);
+            throw err;
+        }
 
         return {
             status: 'success',
             input: last,
             message: {
                 role: 'assistant',
-                content: res.data.output
+                content: res!.data.output
             }
         };
     }
