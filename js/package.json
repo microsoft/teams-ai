@@ -20,12 +20,12 @@
         "test:nyc:report": "npx rimraf coverage && yarn test:mocha && nyc report"
     },
     "devDependencies": {
-        "@azure/logger": "^1.0.2",
+        "@azure/logger": "^1.1.0",
         "@azure/ms-rest-js": "2.7.0",
         "@microsoft/api-extractor": "^7.42.3",
         "@standardlabs/is-private": "^1.0.1",
         "@types/jsonwebtoken": "9.0.4",
-        "@types/lodash": "^4.14.202",
+        "@types/lodash": "^4.17.0",
         "@types/mocha": "^10.0.6",
         "@types/sinon": "^10.0.19",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
