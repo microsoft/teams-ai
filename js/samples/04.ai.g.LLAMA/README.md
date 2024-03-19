@@ -6,12 +6,12 @@ This sample implements a custom model to utilize Meta Llama's capabilities in Mi
 
 <!-- code_chunk_output -->
 
-- [Meta Llama2 in Microsoft Teams](#meta-llama2-in-microsoft-teams)
-  - [Summary](#summary)
-  - [Obtaining a deployed Llama 2 model in Azure](#obtaining-a-deployed-llama-2-model-in-azure)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+-   [Meta Llama2 in Microsoft Teams](#meta-llama2-in-microsoft-teams)
+    -   [Summary](#summary)
+    -   [Obtaining a deployed Llama 2 model in Azure](#obtaining-a-deployed-llama-2-model-in-azure)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
@@ -64,7 +64,7 @@ For more information on using Llama 2 in Azure, see the [Llama 2 on Azure docume
 
 4. Duplicate the `sample.env` in the sample's folder. Rename the file to `.env`.
 
-5. Update the `.env` file with your bot's `MICROSOFT_APP_ID` and `MICROSOFT_APP_PASSWORD`. Under `Api_Key`, add the API key for the model you want to use.
+5. Update the `.env` file with your bot's `MICROSOFT_APP_ID` and `MICROSOFT_APP_PASSWORD`. Under `LLAMA_API_KEY`, add the API key for the model you want to use.
 
 6. Update `config.json` and `index.ts` with your model deployment name.
 

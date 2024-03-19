@@ -43,9 +43,8 @@ export class LlamaModel implements PromptCompletionModel {
             };
         }
 
-        // TODO: Revisit this- compare to OpenAIModel impl
         let last: Message | undefined = result.output[result.output.length - 1];
-        if (last.role !== 'user') {
+        if (last?.role !== 'user') {
             last = undefined;
         }
         let res;

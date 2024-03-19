@@ -74,14 +74,14 @@ interface ConversationState {
 }
 type ApplicationTurnState = TurnState<ConversationState>;
 
-if (!process.env.API_KEY && !process.env.ENDPOINT) {
-    throw new Error('Missing environment variables - please check that API_KEY and ENDPOINT are set.');
+if (!process.env.LLAMA_API_KEY && !process.env.LLAMA_ENDPOINT) {
+    throw new Error('Missing environment variables - please check that LLAMA_API_KEY and ENDPOINT are set.');
 }
 // Create AI components
 const model = new LlamaModel({
     // Llama Support
-    apiKey: process.env.API_KEY!,
-    endpoint: process.env.ENDPOINT!
+    apiKey: process.env.LLAMA_API_KEY!,
+    endpoint: process.env.LLAMA_ENDPOINT!
 });
 
 const prompts = new PromptManager({
@@ -99,8 +99,7 @@ const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
-        planner,
-        allow_looping: false
+        planner
     }
 });
 
