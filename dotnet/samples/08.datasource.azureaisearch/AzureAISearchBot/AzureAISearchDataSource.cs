@@ -118,8 +118,7 @@ namespace AzureAISearchBot
         private async Task<ReadOnlyMemory<float>> _GetEmbeddingVector(string query)
 #pragma warning restore IDE0051 // Remove unused private members
         {
-            // Update "text-embedding-ada-002" to the Azure OpenAI embeddings model deployment name
-            AzureOpenAIEmbeddingsOptions options = new(this.Options.AzureOpenAIApiKey, "text-embedding-ada-002", this.Options.AzureOpenAIEndpoint);
+            AzureOpenAIEmbeddingsOptions options = new(this.Options.AzureOpenAIApiKey, this.Options.AzureOpenAIEmbeddingDeployment, this.Options.AzureOpenAIEndpoint);
             OpenAIEmbeddings embeddings = new(options);
             EmbeddingsResponse response = await embeddings.CreateEmbeddingsAsync(new List<string> { query });
 
@@ -158,5 +157,10 @@ namespace AzureAISearchBot
         /// Azure AI Search endpoint
         /// </summary>
         public Uri AzureAISearchEndpoint { get; set; }
+
+        /// <summary>
+        /// Azure OpenAI embeddings deployment name
+        /// </summary>
+        public string AzureOpenAIEmbeddingDeployment { get; set; }
     }
 }
