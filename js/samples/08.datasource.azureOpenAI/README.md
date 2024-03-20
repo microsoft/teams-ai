@@ -1,5 +1,5 @@
 # Azure OpenAI On Your Data
-The following is a conversational bot that uses the Azure OpenAI Chat Completions endpoint internally and more specifically the "Azure OpenAI On Your Data" feature to allows retrieval and augmentation of data sources from other Azure services, more specifically Azure AI Search
+The following is a conversational bot that uses the Azure OpenAI Chat Completions API and more specifically the `Azure OpenAI On Your Data` feature to facilitate RAG (retrieval augmentation) from Azure data sources, more specifically Azure AI Search.
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
