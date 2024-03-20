@@ -13,9 +13,8 @@ import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext
 import {
     ActionPlanner,
     Application,
-    DefaultConversationState,
+    LlamaModel,
     Memory,
-    OpenAIModel,
     PromptManager,
     TeamsAdapter,
     TurnState
@@ -36,21 +35,18 @@ const adapter = new TeamsAdapter(
     })
 );
 
-// Create storage to use
-//const storage = new MemoryStorage();
-
 // Catch-all for errors.
-const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
+const onTurnErrorHandler = async (context: TurnContext, error: any) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
+    console.error(`\n [onTurnError] unhandled error: ${error}`);
     console.log(error);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${error.toString()}`,
+        `${error}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
@@ -73,43 +69,32 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface ConversationState extends DefaultConversationState {
+interface ConversationState {
     lightsOn: boolean;
 }
 type ApplicationTurnState = TurnState<ConversationState>;
 
-if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
-    throw new Error('Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set.');
+if (!process.env.LLAMA_API_KEY && !process.env.LLAMA_ENDPOINT) {
+    throw new Error('Missing environment variables - please check that LLAMA_API_KEY and ENDPOINT are set.');
 }
-
 // Create AI components
-const model = new OpenAIModel({
-    // OpenAI Support
-    apiKey: process.env.OPENAI_KEY!,
-    defaultModel: 'gpt-3.5-turbo',
-
-    // Azure OpenAI Support
-    azureApiKey: process.env.AZURE_OPENAI_KEY!,
-    azureDefaultDeployment: 'gpt-3.5-turbo',
-    azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
-    azureApiVersion: '2023-03-15-preview',
-
-    // Request logging
-    logRequests: true
+const model = new LlamaModel({
+    // Llama Support
+    apiKey: process.env.LLAMA_API_KEY!,
+    endpoint: process.env.LLAMA_ENDPOINT!
 });
 
 const prompts = new PromptManager({
-    promptsFolder: path.join(__dirname, '../src/prompts')
+    promptsFolder: path.join(__dirname, 'prompts')
 });
 
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'sequence'
+    defaultPrompt: 'default'
 });
-
 // Define storage and application
+// - Note that we're not passing a prompt for our AI options as we won't be chatting with the app.
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
@@ -134,16 +119,6 @@ app.ai.action('LightsOff', async (context: TurnContext, state: ApplicationTurnSt
     state.conversation.lightsOn = false;
     await context.sendActivity(`[lights off]`);
     return `the lights are now off`;
-});
-
-interface PauseParameters {
-    time: number;
-}
-
-app.ai.action('Pause', async (context: TurnContext, state: ApplicationTurnState, parameters: PauseParameters) => {
-    await context.sendActivity(`[pausing for ${parameters.time / 1000} seconds]`);
-    await new Promise((resolve) => setTimeout(resolve, parameters.time));
-    return `done pausing`;
 });
 
 // Listen for incoming server requests.
