@@ -1,15 +1,17 @@
 {
-    "name": "CardGazer-demo",
+    "name": "llama-demo",
     "version": "1.0.0",
-    "description": "A vision enabled bot capable of generating Adaptive Cards using uploaded images.",
+    "description": "Sample that creates a Meta LLAMA AI Model to use in a Teams bot",
     "author": "Microsoft",
     "license": "MIT",
     "main": "./lib/index.js",
     "scripts": {
-        "dev:teamsfx": "env-cmd --silent -f .localSettings yarn dev",
+        "dev:teamsfx": "env-cmd --silent -f .env npm run dev",
+        "dev:teamsfx:testtool": "env-cmd --silent -f .env npm run dev",
+        "dev:teamsfx:launch-testtool": "env-cmd --silent -f env/.env.testtool teamsapptester start",
         "dev": "nodemon --watch ./src --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts",
-        "build": "tsc --build",
-        "clean": "rimraf node_modules lib",
+        "build": "tsc --build && shx cp -r ./src/prompts ./lib/",
+        "clean": "rimraf node_modules lib tsconfig.tsbuildinfo",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "start": "tsc --build && node ./lib/index.js",
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -20,20 +22,18 @@
         "url": "https://github.com"
     },
     "dependencies": {
-        "@microsoft/teams-ai": "~1.1.1",
-        "@microsoft/teamsfx": "^2.3.0",
         "botbuilder": "^4.22.1",
-        "dotenv": "^16.4.5",
+        "@microsoft/teams-ai": "~1.1.0",
+        "dotenv": "^16.4.1",
         "replace": "~1.2.0",
         "restify": "~11.1.0"
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
         "@types/restify": "8.5.12",
-        "@types/node": "^20.11.29",
-        "ts-node": "^10.9.2",
-        "env-cmd": "^10.1.0",
         "nodemon": "~1.19.4",
-        "typescript": "^5.4.2"
+        "typescript": "^5.3.3",
+        "shx": "^0.3.4",
+        "ts-node": "^10.9.2"
     }
 }
