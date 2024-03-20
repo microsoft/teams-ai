@@ -19,8 +19,8 @@ export const documentKeyRetriever: (document: Restaurant) => string = (document:
 
 /**
  * A wrapper for setTimeout that resolves a promise after timeInMs milliseconds.
- * @param timeInMs - The number of milliseconds to be delayed.
- * @returns Promise that is resolved after timeInMs
+ * @param {number} timeInMs - The number of milliseconds to be delayed.
+ * @returns {Promise<void>} Promise that is resolved after timeInMs
  */
 export function delay(timeInMs: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, timeInMs));
@@ -28,8 +28,9 @@ export function delay(timeInMs: number): Promise<void> {
 
 /**
  * Deletes the index with the given name
- * @param client The search index client
- * @param name The name of the index
+ * @param {SearchIndexClient} client - The search index client
+ * @param {string} name - The name of the index
+ * @returns {Promise<void>} A promise that resolves when the index is deleted
  */
 export function deleteIndex(client: SearchIndexClient, name: string): Promise<void> {
     return client.deleteIndex(name);
@@ -37,9 +38,9 @@ export function deleteIndex(client: SearchIndexClient, name: string): Promise<vo
 
 /**
  * Adds or updates the given documents in the index
- * @param client The search index client
- * @param documents The documents to be added or updated
- * @returns The result of the operation
+ * @param {SearchClient<Restaurant>} client - The search index client
+ * @param {Restaurant[]} documents - The documents to be added or updated
+ * @returns {Promise<IndexDocumentsResult>} The result of the operation
  */
 export async function upsertDocuments(
     client: SearchClient<Restaurant>,
@@ -50,8 +51,8 @@ export async function upsertDocuments(
 
 /**
  * Creates the index with the given name
- * @param client The search index client
- * @param name The name of the index
+ * @param {SearchIndexClient} client - The search index client
+ * @param {string} name - The name of the index
  */
 export async function createIndexIfNotExists(client: SearchIndexClient, name: string): Promise<void> {
     const RestaurantIndex: SearchIndex = {

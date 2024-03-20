@@ -5,8 +5,7 @@ import {
     Application,
     AI,
     TurnState,
-    TeamsAdapter,
-    ApplicationBuilder
+    TeamsAdapter
 } from '@microsoft/teams-ai';
 import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
 import path from 'path';
@@ -115,7 +114,8 @@ app.ai.action(
     }
 );
 
-app.ai.action(AI.FlaggedOutputActionName, async (context: TurnContext, state: ApplicationTurnState, data: any) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.ai.action(AI.FlaggedOutputActionName, async (context: TurnContext, _state: ApplicationTurnState, _data: any) => {
     await context.sendActivity(`I'm not allowed to talk about such things.`);
     return AI.StopCommandName;
 });

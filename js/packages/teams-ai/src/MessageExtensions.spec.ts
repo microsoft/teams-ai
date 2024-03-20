@@ -1,3 +1,5 @@
+/* eslint-disable import/no-named-as-default-member */
+// Above linting exception should only be applied to test files
 import sinon from 'sinon';
 import { strict as assert } from 'assert';
 
