@@ -185,8 +185,10 @@ export interface ChatCompletionResponseMessage {
  * @private
  */
 export interface AzureOpenAIChatCompletionResponseMessage extends ChatCompletionResponseMessage {
-    context: AzureOpenAIChatCompletionCitation[];
-    intent: string;
+    context?: {
+        citations: AzureOpenAIChatCompletionCitation[];
+        intent: string;
+    };
 }
 
 /**
