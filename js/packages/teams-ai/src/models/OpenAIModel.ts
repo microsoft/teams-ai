@@ -242,7 +242,8 @@ export class OpenAIModel implements PromptCompletionModel {
                 'logit_bias',
                 'user',
                 'functions',
-                'function_call'
+                'function_call',
+                'data_sources'
             ]
         );
         const response = await this.createChatCompletion(request, model);
