@@ -162,10 +162,10 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
      * to be performed.
      *
      * The output from the last plan step that was executed is passed to the planner via `state.temp.input`.
-     * @param context Context for the current turn of conversation.
-     * @param state Application state for the current turn of conversation.
-     * @param ai The AI system that is generating the plan.
-     * @returns The plan that was generated.
+     * @param {TurnContext} context - Context for the current turn of conversation.
+     * @param {TState} state - Application state for the current turn of conversation.
+     * @param {AI<TState>} ai - The AI system that is generating the plan.
+     * @returns {Promise<Plan>} The plan that was generated.
      */
     public async continueTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan> {
         // Identify the prompt to use
@@ -195,11 +195,11 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
      * a message containing a JSON object. If no validator is used, the response will be a
      * message containing the response text as a string.
      * @template TContent Optional. Type of message content returned for a 'success' response. The `response.message.content` field will be of type TContent. Defaults to `string`.     * @param context Context for the current turn of conversation.
-     * @param context
-     * @param memory A memory interface used to access state variables (the turn state object implements this interface.)
-     * @param prompt Name of the prompt to use or a prompt template.
-     * @param validator Optional. A validator to use to validate the response returned by the model.
-     * @returns The result of the LLM call.
+     * @param {TurnContext} context - Context for the current turn of conversation.
+     * @param {Memory} memory A memory interface used to access state variables (the turn state object implements this interface.)
+     * @param {string | PromptTemplate} prompt - Name of the prompt to use or a prompt template.
+     * @param {PromptResponseValidator<TContent>} validator - Optional. A validator to use to validate the response returned by the model.
+     * @returns {Promise<PromptResponse<TContent>>} The result of the LLM call.
      */
     public async completePrompt<TContent = string>(
         context: TurnContext,
@@ -252,11 +252,8 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
 
     /**
      * Creates a semantic function that can be registered with the apps prompt manager.
-     * @param {string} name The name of the semantic function.
-     * @param {PromptTemplate} template The prompt template to use.
-     * @param {Partial<AIOptions<TState>>} options Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.
-     * @param prompt
-     * @param validator
+     * @param {string | PromptTemplate} prompt - The name of the prompt to use.
+     * @param {PromptResponseValidator<any>} validator - Optional. A validator to use to validate the response returned by the model.
      * @remarks
      * Semantic functions are functions that make model calls and return their results as template
      * parameters to other prompts. For example, you could define a semantic function called

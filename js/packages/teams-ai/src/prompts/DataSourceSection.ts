@@ -23,8 +23,8 @@ export class DataSourceSection extends PromptSectionBase {
 
     /**
      * Creates a new `DataSourceSection` instance.
-     * @param dataSource The data source to render.
-     * @param tokens Desired number of tokens to render.
+     * @param {DataSource} dataSource - The data source to render.
+     * @param {number} tokens - Desired number of tokens to render.
      */
     public constructor(dataSource: DataSource, tokens: number) {
         super(tokens, true, '\n\n');
@@ -32,12 +32,13 @@ export class DataSourceSection extends PromptSectionBase {
     }
 
     /**
-     * @param context
-     * @param memory
-     * @param functions
-     * @param tokenizer
-     * @param maxTokens
      * @private
+     * @param {TurnContext} context - Context for the current turn of conversation.
+     * @param {Memory} memory - Memory to use for rendering.
+     * @param {PromptFunctions} functions - Prompt functions to use for rendering.
+     * @param {Tokenizer} tokenizer - Tokenizer to use for encoding text.
+     * @param {number} maxTokens - Maximum number of tokens allowed.
+     * @returns {Promise<RenderedPromptSection<Message<string>[]>>} Rendered prompt section as a string.
      */
     public async renderAsMessages(
         context: TurnContext,

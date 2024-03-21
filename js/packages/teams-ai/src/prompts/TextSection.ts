@@ -32,12 +32,12 @@ export class TextSection extends PromptSectionBase {
 
     /**
      * Creates a new 'TextSection' instance.
-     * @param text Text to use for this section.
-     * @param role Message role to use for this section.
-     * @param tokens Optional. Sizing strategy for this section. Defaults to `auto`.
-     * @param required Optional. Indicates if this section is required. Defaults to `true`.
-     * @param separator Optional. Separator to use between sections when rendering as text. Defaults to `\n`.
-     * @param textPrefix Optional. Prefix to use for text output. Defaults to `undefined`.
+     * @param {string} text - Text to use for this section.
+     * @param {string} role - Message role to use for this section.
+     * @param {number} tokens - Optional. Sizing strategy for this section. Defaults to -1, `auto`.
+     * @param {boolean} required - Optional. Indicates if this section is required. Defaults to `true`.
+     * @param {string} separator - Optional. Separator to use between sections when rendering as text. Defaults to `\n`.
+     * @param {string} textPrefix - Optional. Prefix to use for text output. Defaults to `undefined`.
      */
     public constructor(
         text: string,
@@ -53,12 +53,13 @@ export class TextSection extends PromptSectionBase {
     }
 
     /**
-     * @param context
-     * @param memory
-     * @param functions
-     * @param tokenizer
-     * @param maxTokens
      * @private
+     * @param {TurnContext} context - Context for the current turn of conversation.
+     * @param {Memory} memory - Memory to use for rendering.
+     * @param {PromptFunctions} functions - Prompt functions to use for rendering.
+     * @param {Tokenizer} tokenizer - Tokenizer to use for encoding text.
+     * @param {number} maxTokens - Maximum number of tokens allowed.
+     * @returns {Promise<RenderedPromptSection<Message[]>>} Rendered prompt section as a string.
      */
     public async renderAsMessages(
         context: TurnContext,
