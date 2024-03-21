@@ -1,5 +1,3 @@
-/* eslint-disable import/no-named-as-default-member */
-// Above linting exception should only be applied to test files
 import http from 'http';
 import assert from 'assert';
 import sinon from 'sinon';
