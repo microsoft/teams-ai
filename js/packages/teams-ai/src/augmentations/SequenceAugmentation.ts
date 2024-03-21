@@ -183,6 +183,6 @@ export class SequenceAugmentation implements Augmentation<Plan | undefined> {
         memory: Memory,
         response: PromptResponse<Plan | undefined>
     ): Promise<Plan> {
-        return Promise.resolve(response.message?.content!);
+        return Promise.resolve(response.message!.content!);
     }
 }

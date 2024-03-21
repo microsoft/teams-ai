@@ -75,7 +75,7 @@ interface ConversationState {
 type ApplicationTurnState = TurnState<ConversationState>;
 
 if (!process.env.LLAMA_API_KEY && !process.env.LLAMA_ENDPOINT) {
-    throw new Error('Missing environment variables - please check that LLAMA_API_KEY and ENDPOINT are set.');
+    throw new Error('Missing environment variables - please check that LLAMA_API_KEY and LLAMA_ENDPOINT are set.');
 }
 // Create AI components
 const model = new LlamaModel({
