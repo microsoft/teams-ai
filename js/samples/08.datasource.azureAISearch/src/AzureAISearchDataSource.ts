@@ -101,8 +101,7 @@ export class AzureAISearchDataSource implements DataSource {
      * Renders the data source as a string of text.
      * @remarks
      * The returned output should be a string of text that will be injected into the prompt at render time.
-     * @param {TurnContext} context Turn context for the current turn of conversation with the user.
-     * @param _context
+     * @param {TurnContext} _context Turn context for the current turn of conversation with the user.
      * @param {Memory} memory An interface for accessing state values.
      * @param {Tokenizer} tokenizer Tokenizer to use when rendering the data source.
      * @param {number} maxTokens Maximum number of tokens allowed to be rendered.
@@ -212,8 +211,8 @@ export class AzureAISearchDataSource implements DataSource {
 
     /**
      * Uses Azure OpenAI to generate embeddings for the user's input.
-     * @param text The user's input.
-     * @returns The embedding vector for the user's input.
+     * @param {string} text - The user's input.
+     * @returns {Promise<number[]>} The embedding vector for the user's input.
      */
     private async getEmbeddingVector(text: string): Promise<number[]> {
         const embeddings = new OpenAIEmbeddings({

@@ -3,7 +3,7 @@ import { OpenAIEmbeddings } from '@microsoft/teams-ai';
 import { Restaurant } from '../AzureAISearchDataSource';
 
 /**
- *
+ * @returns {Promise<Restaurant[]>} A promise that resolves to an array of restaurants.
  */
 export async function getRestaurantData(): Promise<Restaurant[]> {
     const chickFilaADescription =
@@ -57,7 +57,8 @@ export async function getRestaurantData(): Promise<Restaurant[]> {
 
 /**
  *
- * @param text
+ * @param {string} text - The text for which to generate the embedding vector.
+ * @returns {Promise<number[]>} A promise that resolves to the embedding vector.
  */
 async function getEmbeddingVector(text: string): Promise<number[]> {
     const embeddings = new OpenAIEmbeddings({

@@ -44,7 +44,7 @@ namespace AzureAISearchBot
             List<string> searchFields = new() { "Category", "Tags", "RestaurantName" };
 
             //// TEXT SEARCH ////
-            //// Get the restaurants with the query has high lexical relevance to category, tags, and restaurant name.
+            //// Get the restaurants with the query that has high lexical relevance to category, tags, and restaurant name.
             SearchOptions options = new();
             foreach (string field in searchFields)
             {
@@ -59,7 +59,7 @@ namespace AzureAISearchBot
 
             //// VECTOR SEARCH ////
             //// Get the restaurants with description that is the most similar to the user input.
-            /*SearchOptions options = new();
+            /* SearchOptions options = new();
             ReadOnlyMemory<float> vectorizedQuery = await this._GetEmbeddingVector(query);
             foreach (string field in selectedFields)
             {

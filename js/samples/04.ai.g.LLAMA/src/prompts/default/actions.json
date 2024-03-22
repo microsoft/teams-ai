@@ -1,0 +1,10 @@
+[
+    {
+        "name": "LightsOn",
+        "description": "Turns on the lights"
+    },
+    {
+        "name": "LightsOff",
+        "description": "Turns off the lights"
+    }
+]
