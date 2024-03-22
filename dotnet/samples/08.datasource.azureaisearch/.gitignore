@@ -11,3 +11,4 @@ AzureAISearchBot/appsettings.Development.json
 AzureAISearchBot/appsettings.json
 AzureAISearchBot/appsettings.TestTool.json
 .vs/
+**/env/
