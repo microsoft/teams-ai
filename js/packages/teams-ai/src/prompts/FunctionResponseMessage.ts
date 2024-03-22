@@ -27,10 +27,10 @@ export class FunctionResponseMessage extends PromptSectionBase {
 
     /**
      * Creates a new 'FunctionResponseMessage' instance.
-     * @param name Name of the function that was called.
-     * @param response The response returned by the called function.
-     * @param tokens Optional. Sizing strategy for this section. Defaults to `auto`.
-     * @param functionPrefix Optional. Prefix to use for function messages when rendering as text. Defaults to `user: ` to simulate the response coming from the user.
+     * @param {string} name - Name of the function that was called.
+     * @param {any} response - The response returned by the called function.
+     * @param {number} tokens - Optional. Sizing strategy for this section. Defaults to `auto`.
+     * @param {string} functionPrefix - Optional. Prefix to use for function messages when rendering as text. Defaults to `user: ` to simulate the response coming from the user.
      */
     public constructor(name: string, response: any, tokens: number = -1, functionPrefix: string = 'user: ') {
         super(tokens, true, '\n', functionPrefix);
@@ -39,12 +39,13 @@ export class FunctionResponseMessage extends PromptSectionBase {
     }
 
     /**
-     * @param context
-     * @param memory
-     * @param functions
-     * @param tokenizer
-     * @param maxTokens
      * @private
+     * @param {TurnContext} context - Context for the current turn of conversation.
+     * @param {Memory} memory - Memory to use for rendering.
+     * @param {PromptFunctions} functions - Prompt functions to use for rendering.
+     * @param {Tokenizer} tokenizer - Tokenizer to use for encoding text.
+     * @param {number} maxTokens - Maximum number of tokens allowed.
+     * @returns {Promise<RenderedPromptSection<Message[]>>} Rendered prompt section as a string.
      */
     public async renderAsMessages(
         context: TurnContext,

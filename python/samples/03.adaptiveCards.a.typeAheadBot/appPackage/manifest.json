@@ -1,0 +1,37 @@
+{
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
+    "version": "1.1.0",
+    "manifestVersion": "1.15",
+    "id": "${{TEAMS_APP_ID}}",
+    "packageName": "com.package.name",
+    "name": {
+        "short": "TypeAheadBot-${{TEAMSFX_ENV}}",
+        "full": "Type Ahead Bot"
+    },
+    "developer": {
+        "name": "Teams App, Inc.",
+        "websiteUrl": "https://www.example.com",
+        "privacyUrl": "https://www.example.com/privacy",
+        "termsOfUseUrl": "https://www.example.com/termofuse"
+    },
+    "description": {
+        "short": "Adaptive Cards sample showing use of dynamic search",
+        "full": "Adaptive Cards sample showing use of dynamic search"
+    },
+    "icons": {
+        "outline": "outline.png",
+        "color": "color.png"
+    },
+    "accentColor": "#FFFFFF",
+    "bots": [
+        {
+            "botId": "${{BOT_ID}}",
+            "scopes": ["personal", "team", "groupChat"],
+            "isNotificationOnly": false,
+            "supportsCalling": false,
+            "supportsVideo": false,
+            "supportsFiles": false
+        }
+    ],
+    "validDomains": []
+}

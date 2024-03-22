@@ -5,7 +5,7 @@ import { Application, AI, PredictedSayCommand } from '@microsoft/teams-ai';
  * @param {Application} app Application to add the response formatter to.
  */
 export function addResponseFormatter(app: Application): void {
-    app.ai.action<PredictedSayCommand>(AI.SayCommandActionName, async (context, state, data) => {
+    app.ai.action<PredictedSayCommand>(AI.SayCommandActionName, async (context, _state, data) => {
         // Replace markdown code blocks with <pre> tags
         let addTag = false;
         let inCodeBlock = false;

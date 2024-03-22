@@ -26,12 +26,12 @@ export class GroupSection extends PromptSectionBase {
 
     /**
      *
-     * @param sections List of sections to group together.
-     * @param role Optional. Message role to use for this section. Defaults to `system`.
-     * @param tokens Optional. Sizing strategy for this section. Defaults to `auto`.
-     * @param required Optional. Indicates if this section is required. Defaults to `true`.
-     * @param separator Optional. Separator to use between sections when rendering as text. Defaults to `\n\n`.
-     * @param textPrefix Optional. Prefix to use for text output. Defaults to `undefined`.
+     * @param {PromptSection[]} sections - List of sections to group together.
+     * @param {string} role - Optional. Message role to use for this section. Defaults to `system`.
+     * @param {number} tokens - Optional. Sizing strategy for this section. Defaults to `auto`.
+     * @param {boolean} required - Optional. Indicates if this section is required. Defaults to `true`.
+     * @param {string} separator - Optional. Separator to use between sections when rendering as text. Defaults to `\n\n`.
+     * @param {string} textPrefix - Optional. Prefix to use for text output. Defaults to `undefined`.
      */
     public constructor(
         sections: PromptSection[],
@@ -48,12 +48,13 @@ export class GroupSection extends PromptSectionBase {
     }
 
     /**
-     * @param context
-     * @param memory
-     * @param functions
-     * @param tokenizer
-     * @param maxTokens
      * @private
+     * @param {TurnContext} context - Context for the current turn of conversation.
+     * @param {Memory} memory - Memory to use for rendering.
+     * @param {PromptFunctions} functions - Prompt functions to use for rendering.
+     * @param {Tokenizer} tokenizer - Tokenizer to use for encoding text.
+     * @param {number} maxTokens - Maximum number of tokens allowed.
+     * @returns {Promise<RenderedPromptSection<Message[]>>} Rendered prompt section as a string.
      */
     public async renderAsMessages(
         context: TurnContext,

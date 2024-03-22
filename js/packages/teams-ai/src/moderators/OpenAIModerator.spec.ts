@@ -1,7 +1,7 @@
 import { strict as assert } from 'assert';
 import { TestAdapter } from 'botbuilder';
 import axios from 'axios';
-import sinon, { SinonSandbox, SinonStub } from 'sinon';
+import sinon from 'sinon';
 
 import { AI } from '../AI';
 import { TestTurnState } from '../internals/testing/TestTurnState';
@@ -10,8 +10,8 @@ import { OpenAIModerator, OpenAIModeratorOptions } from './OpenAIModerator';
 
 describe('OpenAIModerator', () => {
     const mockAxios = axios;
-    let sinonSandbox: SinonSandbox;
-    let createStub: SinonStub;
+    let sinonSandbox: sinon.SinonSandbox;
+    let createStub: sinon.SinonStub;
     let inputModerator: OpenAIModerator;
     let outputModerator: OpenAIModerator;
     const adapter = new TestAdapter();

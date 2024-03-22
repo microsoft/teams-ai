@@ -9,6 +9,9 @@ from dataclasses import dataclass
 
 
 @dataclass
-class AdaptiveCardsSearchResult:
+class AdaptiveCardsSearchResult(dict):
     title: str
     value: str
+
+    def __init__(self, title, value):
+        dict.__init__(self, title=title, value=value)
