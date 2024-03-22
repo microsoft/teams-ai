@@ -9,7 +9,6 @@
 import { PromptSection } from './PromptSection';
 import { ChatCompletionAction } from '../models';
 import { Augmentation } from '../augmentations';
-import { AzureOpenAIChatCompletionDataSources } from '../internals/types';
 
 /**
  * Prompt template cached by the prompt manager.
@@ -46,7 +45,7 @@ export interface PromptTemplate {
  */
 export interface PromptTemplateConfig {
     /**
-     * The schema version of the prompt template. Can be '1', '1.1' or '1.2'.
+     * The schema version of the prompt template. Can be '1' or '1.1'.
      */
     schema: number;
 
@@ -87,6 +86,8 @@ export interface PromptTemplateConfig {
 export interface CompletionConfig {
     /**
      * Optional. Type of completion to use. Defaults to using the completion type of the configured default model.
+     * @remarks
+     * New in schema version 1.1.
      */
     completion_type?: 'chat' | 'text';
 
@@ -100,6 +101,7 @@ export interface CompletionConfig {
     /**
      * If true, the prompt will be augmented with the conversation history.
      * @remarks
+     * New in schema version 1.1.
      * Defaults to true.
      */
     include_history: boolean;
@@ -107,6 +109,7 @@ export interface CompletionConfig {
     /**
      * If true, the prompt will be augmented with the users input.
      * @remarks
+     * New in schema version 1.1.
      * Defaults to true.
      */
     include_input: boolean;
@@ -114,6 +117,7 @@ export interface CompletionConfig {
     /**
      * If true, the prompt will be augmented with any images uploaded by the user.
      * @remarks
+     * New in schema version 1.1.
      * Defaults to false.
      */
     include_images: boolean;
@@ -128,6 +132,7 @@ export interface CompletionConfig {
     /**
      * The maximum number of tokens allowed in the input.
      * @remarks
+     * New in schema version 1.1.
      * Defaults to 2048.
      */
     max_input_tokens: number;
@@ -135,6 +140,7 @@ export interface CompletionConfig {
     /**
      * Optional. Name of the model to use otherwise the configured default model is used.
      * @remarks
+     * New in schema version 1.1.
      */
     model?: string;
 
