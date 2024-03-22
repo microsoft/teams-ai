@@ -42,7 +42,7 @@ export interface CreateChatCompletionRequest {
 }
 
 export interface AzureOpenAIChatCompletionRequest extends OpenAICreateChatCompletionRequest {
-    data_sources: AzureOpenAIChatCompletionDataSources[];
+    data_sources?: AzureOpenAIChatCompletionDataSources[];
 }
 
 export type AzureOpenAIChatCompletionDataSources = AzureAISearchDataSource;

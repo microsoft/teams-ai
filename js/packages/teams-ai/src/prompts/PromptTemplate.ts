@@ -163,15 +163,6 @@ export interface CompletionConfig {
      * Defaults to 0.
      */
     top_p: number;
-
-    // TODO: Figure out a way to not expose an interal type here.
-    /**
-     * Optional. List of data sources to augment the prompt with.
-     * @remarks
-     * New in schema version 1.2.
-     * This is specific to Azure OpenAI Chat Completions API version `2024-02-15-preview` onwards. The `completion_type` must be set to 'chat'.
-     */
-    data_sources?: AzureOpenAIChatCompletionDataSources[];
 }
 
 /**
