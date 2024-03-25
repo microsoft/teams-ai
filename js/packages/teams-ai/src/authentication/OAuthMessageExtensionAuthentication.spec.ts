@@ -7,7 +7,7 @@ import assert from 'assert';
 import * as UserTokenAccess from './UserTokenAccess';
 import { OAuthPromptMessageExtensionAuthentication } from './OAuthMessageExtensionAuthentication';
 
-describe('OAuthMessageExtensionAuthentication', () => {
+describe('OAuthPromptMessageExtensionAuthentication', () => {
     const adapter = new TestAdapter();
 
     const createTurnContextAndState = async (activity: Partial<Activity>): Promise<[TurnContext, TurnState]> => {
@@ -238,7 +238,6 @@ describe('OAuthMessageExtensionAuthentication', () => {
                     const settings = {
                         connectionName: 'connectionName',
                         title: 'title',
-                        text: 'text',
                         enableSso: true
                     };
 
@@ -259,14 +258,9 @@ describe('OAuthMessageExtensionAuthentication', () => {
                     assert(sentActivity.value.body.composeExtension.suggestedActions.actions[0].type == 'openUrl');
                     assert(sentActivity.value.body.composeExtension.suggestedActions.actions[0].value == 'signInLink');
                     assert(
-                        sentActivity.value.body.composeExtension.suggestedActions.actions[0].title == settings.title
+                        sentActivity.value.body.composeExtension.suggestedActions.actions[0].title ==
+                            'Bot Service OAuth'
                     );
-                    assert(sentActivity.value.body.composeExtension.suggestedActions.actions[0].text == settings.text);
-                    assert(
-                        sentActivity.value.body.composeExtension.suggestedActions.actions[0].displayText ==
-                            settings.text
-                    );
-
                     // Only one activity should be sent
                     assert(adapter.getNextReply() == undefined);
                 });
