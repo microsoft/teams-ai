@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AzureAISearchIndexer": {
+      "commandName": "Project",
+      "commandLineArgs": "create"
+    }
+  }
+}

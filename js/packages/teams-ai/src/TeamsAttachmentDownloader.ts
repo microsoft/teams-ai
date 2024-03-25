@@ -94,13 +94,7 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
      * @returns {Promise<InputFile>} - Promise that resolves to the downloaded input file.
      */
     private async downloadFile(attachment: Attachment, accessToken: string): Promise<InputFile | undefined> {
-        if (attachment.content) {
-            return {
-                content: Buffer.from(attachment.content),
-                contentType: attachment.contentType,
-                contentUrl: attachment.contentUrl
-            };
-        } else if (
+        if (
             (attachment.contentUrl && attachment.contentUrl.startsWith('https://')) ||
             (attachment.contentUrl && attachment.contentUrl.startsWith('http://localhost'))
         ) {
@@ -129,6 +123,12 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
             return {
                 content,
                 contentType,
+                contentUrl: attachment.contentUrl
+            };
+        } else {
+            return {
+                content: Buffer.from(attachment.content),
+                contentType: attachment.contentType,
                 contentUrl: attachment.contentUrl
             };
         }

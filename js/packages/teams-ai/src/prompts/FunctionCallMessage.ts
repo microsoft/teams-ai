@@ -30,9 +30,9 @@ export class FunctionCallMessage extends PromptSectionBase {
 
     /**
      * Creates a new 'FunctionCallMessage' instance.
-     * @param function_call name and arguments of the function to call.
-     * @param tokens Optional. Sizing strategy for this section. Defaults to `auto`.
-     * @param assistantPrefix Optional. Prefix to use for assistant messages when rendering as text. Defaults to `assistant: `.
+     * @param {FunctionCall} function_call name and arguments of the function to call.
+     * @param {number} tokens Optional. Sizing strategy for this section. Defaults to `auto`.
+     * @param {string} assistantPrefix Optional. Prefix to use for assistant messages when rendering as text. Defaults to `assistant: `.
      */
     public constructor(function_call: FunctionCall, tokens: number = -1, assistantPrefix: string = 'assistant: ') {
         super(tokens, true, '\n', assistantPrefix);
@@ -40,12 +40,13 @@ export class FunctionCallMessage extends PromptSectionBase {
     }
 
     /**
-     * @param context
-     * @param memory
-     * @param functions
-     * @param tokenizer
-     * @param maxTokens
      * @private
+     * @param {TurnContext} context - Context for the current turn of conversation.
+     * @param {Memory} memory - Memory to use for rendering.
+     * @param {PromptFunctions} functions - Prompt functions to use for rendering.
+     * @param {Tokenizer} tokenizer - Tokenizer to use for encoding text.
+     * @param {number} maxTokens - Maximum number of tokens allowed.
+     * @returns {Promise<RenderedPromptSection<Message[]>>} Rendered prompt section as a string.
      */
     public async renderAsMessages(
         context: TurnContext,

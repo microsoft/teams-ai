@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-const colorizer = require('json-colorizer');
+import colorizer from 'json-colorizer';
 
 /**
  * @private
@@ -24,7 +24,7 @@ export class Colorize {
         if (typeof output === 'string') {
             return `\x1b[32m${quote}${output}${quote}\x1b[0m`;
         } else if (typeof output === 'object' && output !== null) {
-            return colorizer(output, {
+            return colorizer(JSON.stringify(output), {
                 pretty: true,
                 colors: {
                     BRACE: 'white',
