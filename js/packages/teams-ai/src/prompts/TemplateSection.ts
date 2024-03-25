@@ -37,12 +37,12 @@ export class TemplateSection extends PromptSectionBase {
 
     /**
      * Creates a new 'TemplateSection' instance.
-     * @param template Template to use for this section.
-     * @param role Message role to use for this section.
-     * @param tokens Optional. Sizing strategy for this section. Defaults to `auto`.
-     * @param required Optional. Indicates if this section is required. Defaults to `true`.
-     * @param separator Optional. Separator to use between sections when rendering as text. Defaults to `\n`.
-     * @param textPrefix Optional. Prefix to use for text output. Defaults to `undefined`.
+     * @param {string} template - Template to use for this section.
+     * @param {string} role - Message role to use for this section.
+     * @param {number} tokens - Optional. Sizing strategy for this section. Defaults to `auto`.
+     * @param {boolean} required - Optional. Indicates if this section is required. Defaults to `true`.
+     * @param {string} separator - Optional. Separator to use between sections when rendering as text. Defaults to `\n`.
+     * @param {string} textPrefix - Optional. Prefix to use for text output. Defaults to `undefined`.
      */
     public constructor(
         template: string,
@@ -59,12 +59,13 @@ export class TemplateSection extends PromptSectionBase {
     }
 
     /**
-     * @param context
-     * @param memory
-     * @param functions
-     * @param tokenizer
-     * @param maxTokens
      * @private
+     * @param {TurnContext} context - Context for the current turn of conversation with the user.
+     * @param {Memory} memory - An interface for accessing state values.
+     * @param {PromptFunctions} functions - An interface for calling functions.
+     * @param {Tokenizer} tokenizer - Tokenizer to use when rendering the section.
+     * @param {number} maxTokens - Maximum number of tokens allowed to be rendered.
+     * @returns {Promise<RenderedPromptSection<Message[]>>} A promise that resolves to the rendered section.
      */
     public async renderAsMessages(
         context: TurnContext,
@@ -154,8 +155,9 @@ export class TemplateSection extends PromptSectionBase {
     }
 
     /**
-     * @param text
      * @private
+     * @param {string} text - Text to render.
+     * @returns {PartRenderer} A renderer that will render the specified text.
      */
     private createTextRenderer(text: string): PartRenderer {
         return (
@@ -170,8 +172,9 @@ export class TemplateSection extends PromptSectionBase {
     }
 
     /**
-     * @param name
      * @private
+     * @param {string} name - Name of the variable to render.
+     * @returns {PartRenderer} A renderer that will render the specified variable.
      */
     private createVariableRenderer(name: string): PartRenderer {
         return (
@@ -187,8 +190,9 @@ export class TemplateSection extends PromptSectionBase {
     }
 
     /**
-     * @param param
      * @private
+     * @param {string} param - Function to render.
+     * @returns {PartRenderer} A renderer that will render the specified function.
      */
     private createFunctionRenderer(param: string): PartRenderer {
         let name = '';

@@ -20,7 +20,7 @@ This sample illustrates how to use [Retrieval Augmented Generation (RAG)](https:
 
 The sample uses a local Vector Database, called [Vectra](https://github.com/Stevenic/vectra), and [Semantic Search](https://en.wikipedia.org/wiki/Semantic_search) to find the most relevant information to include in the prompt for the users input. The index can be found in `./index/teams-ai` and includes all of the projects Getting Started docs and the source code for the Teams AI Library. This means you can ask the Teams Chef Bot anything about the library and it can answer it. You can even ask it to write sample code for you!
 
-![Teams Chef Bot](./assets/TeamsChef003.png)
+![Teams Chef Bot](./assets/TeamsChef003.png?raw=1)
 
 ## Setting up the sample
 
@@ -47,6 +47,8 @@ The sample uses a local Vector Database, called [Vectra](https://github.com/Stev
 4. Duplicate the `sample.env` in this folder. Rename the file to `.env`.
 
 5. Add your bot's credentials and any other related credentials to that file. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
+
+> Please note: If you are use Azure OpenAI, you will need both a GPT model and embedding model deployment to get this sample working. See `OpenAIModel` in `index.ts` and `OpenAIEmbeddings` in `VectraDataSource.ts`. If these are using different endpoints and/or keys, be sure to update your `.env` file and Teams Toolkit files (if applicable) accordingly.
 
 6. Update `config.json` and `index.ts` with your model deployment name.
 

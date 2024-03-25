@@ -55,6 +55,12 @@
     "overrides": [
         {
             "files": ["bin/*.js", "lib/*.js"]
+        },
+        {
+            "files": ["*.spec.ts"],
+            "rules": {
+                "import/no-named-as-default-member": 0
+            }
         }
     ],
     "ignorePatterns": ["node_modules/*"]

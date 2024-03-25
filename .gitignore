@@ -106,20 +106,4 @@ dist
 .tern-port
 
 .DS_Store
-/.vs
-/dotnet/packages/Microsoft.TeamsAI/.vs
-/dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/bin
-/dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/obj
-/dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests/bin
-/dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests/obj
-/dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests/bin/Debug/net6.0
-/dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests/obj/Debug/net6.0
-/dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests/IntegrationTests/testsettings.json
-/dotnet/samples/01.echoBot/.vs/*
-
-env/.env.*.user
-env/.env.local
-env/.env.staging
-.env*
-/dotnet/samples/NuGet.Config
-/dotnet/samples/LocalPkg/
+**/.vs/
