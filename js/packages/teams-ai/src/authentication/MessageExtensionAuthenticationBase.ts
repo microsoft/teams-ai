@@ -1,4 +1,4 @@
-import { ActivityTypes, InvokeResponse, TokenResponse, TurnContext } from 'botbuilder';
+import { ActivityTypes, CardAction, InvokeResponse, TokenResponse, TurnContext } from 'botbuilder';
 import { MessageExtensionsInvokeNames } from '../MessageExtensions';
 
 /**
@@ -6,6 +6,14 @@ import { MessageExtensionsInvokeNames } from '../MessageExtensions';
  * Base class to handle authentication for Teams Message Extension.
  */
 export abstract class MessageExtensionAuthenticationBase {
+    private readonly title: string;
+    private readonly text: string;
+
+    public constructor(title?: string, text?: string) {
+        this.title = title ?? 'Bot Service OAuth';
+        this.text = text ?? "You'll need to signin to use this app.";
+    }
+
     /**
      * Authenticates the user.
      * @param {TurnContext} context - The turn context.
@@ -65,8 +73,10 @@ export abstract class MessageExtensionAuthenticationBase {
                         {
                             type: 'openUrl',
                             value: signInLink,
-                            title: 'Bot Service OAuth'
-                        }
+                            title: this.title,
+                            text: this.text,
+                            displayText: this.text
+                        } as CardAction
                     ]
                 }
             }

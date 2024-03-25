@@ -18,7 +18,7 @@ export class OAuthPromptMessageExtensionAuthentication extends MessageExtensionA
      * @param {OAuthSettings} settings The OAuthPromptSettings.
      */
     public constructor(private readonly settings: OAuthSettings) {
-        super();
+        super(settings.title, settings.text);
     }
 
     /**
