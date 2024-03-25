@@ -25,7 +25,7 @@
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
     "dependencies": {
-        "@azure/msal-node": "^2.6.4",
+        "@azure/msal-node": "^2.6.5",
         "axios": "^1.6.8",
         "botbuilder": "^4.22.1",
         "botbuilder-dialogs": "^4.22.1",
