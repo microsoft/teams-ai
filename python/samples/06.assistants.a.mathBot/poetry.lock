@@ -1971,25 +1971,23 @@ version = "1.0.0"
 description = "SDK focused on building AI based applications for Microsoft Teams."
 optional = false
 python-versions = ">=3.8,<4.0"
-files = []
-develop = true
+files = [
+    {file = "teams_ai-1.0.0-py3-none-any.whl", hash = "sha256:d935aa61ebc074cbea432c310949437acc08a843f78768a1a7df86c6d0a69a9f"},
+    {file = "teams_ai-1.0.0.tar.gz", hash = "sha256:9b2a34c7ea34f633a2361a3f639b06c9060eb3e5de30d0eb3c93bc3cfdf41db5"},
+]
 
 [package.dependencies]
-aiohttp = "^3.8.5"
-azure-ai-contentsafety = "^1.0.0"
-botbuilder-core = "^4.14.8"
-botbuilder-integration-aiohttp = "^4.14.8"
-botframework-connector = "^4.14.8"
-dataclasses-json = "^0.6.4"
-jsonschema = "^4.21.1"
-openai = "^1.11.1"
-pyyaml = "^6.0.1"
-tiktoken = "^0.4.0"
-types-pyyaml = "^6.0.12.12"
-
-[package.source]
-type = "directory"
-url = "../../packages/ai"
+aiohttp = ">=3.8.5,<4.0.0"
+azure-ai-contentsafety = ">=1.0.0,<2.0.0"
+botbuilder-core = ">=4.14.8,<5.0.0"
+botbuilder-integration-aiohttp = ">=4.14.8,<5.0.0"
+botframework-connector = ">=4.14.8,<5.0.0"
+dataclasses-json = ">=0.6.4,<0.7.0"
+jsonschema = ">=4.21.1,<5.0.0"
+openai = ">=1.11.1,<2.0.0"
+pyyaml = ">=6.0.1,<7.0.0"
+tiktoken = ">=0.4.0,<0.5.0"
+types-pyyaml = ">=6.0.12.12,<7.0.0.0"
 
 [[package]]
 name = "tiktoken"
@@ -2331,4 +2329,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "4bcb45a17dd92d18e924e07c28eca953fb27207fa131a1c8dccf6c4d773c7ed1"
+content-hash = "8570b769e14c2776daaf4d97f291c77ff1279fef4e4f76049dcd1c53d65f4494"
