@@ -35,6 +35,6 @@
         "env-cmd": "^10.1.0",
         "nodemon": "~1.19.4",
         "ts-node": "^10.9.2",
-        "typescript": "^5.4.2"
+        "typescript": "^5.4.3"
     }
 }
