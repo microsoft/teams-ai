@@ -17,3 +17,4 @@ class ActionTypes(str, Enum):
     PLAN_READY = "___PlanReady___"
     DO_COMMAND = "___DO___"
     SAY_COMMAND = "___SAY___"
+    TOO_MANY_STEPS = "__TooManySteps__"

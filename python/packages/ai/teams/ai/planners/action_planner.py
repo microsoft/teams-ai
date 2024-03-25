@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from logging import Logger
-from typing import Awaitable, Callable, List, Optional, Union
+from typing import Awaitable, Callable, List, Optional, TypeVar, Union
 
 from botbuilder.core import TurnContext
 
@@ -28,6 +28,8 @@ from .planner import Planner
 ActionPlannerPromptFactory = Callable[
     [TurnContext, TurnState, "ActionPlanner"], Awaitable[PromptTemplate]
 ]
+
+StateT = TypeVar("StateT", bound=TurnState)
 
 
 @dataclass
@@ -55,7 +57,7 @@ class ActionPlannerOptions:
     "Optional. When set the model will log requests"
 
 
-class ActionPlanner(Planner):
+class ActionPlanner(Planner[StateT]):
     """
     A planner that uses a Large Language Model (LLM) to generate plans.
     """
