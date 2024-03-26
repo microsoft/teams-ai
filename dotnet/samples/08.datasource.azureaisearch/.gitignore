@@ -1,0 +1,14 @@
+AzureAISearchBot/bin/Debug
+AzureAISearchBot/obj
+AzureAISearchBot/AzureAISearchBot.csproj.user
+AzureAISearchBot/AzureAISearchBot.user
+AzureAISearchIndexer/bin/Debug/net8.0
+AzureAISearchIndexer/obj/Debug/net8.0
+AzureAISearchIndexer/obj
+AzureAISearchIndexer/obj
+AzureAISearchIndexer/appsettings.json
+AzureAISearchBot/appsettings.Development.json
+AzureAISearchBot/appsettings.json
+AzureAISearchBot/appsettings.TestTool.json
+.vs/
+**/env/

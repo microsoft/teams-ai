@@ -48,6 +48,8 @@ The sample uses a local Vector Database, called [Vectra](https://github.com/Stev
 
 5. Add your bot's credentials and any other related credentials to that file. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
 
+> Please note: If you are use Azure OpenAI, you will need both a GPT model and embedding model deployment to get this sample working. See `OpenAIModel` in `index.ts` and `OpenAIEmbeddings` in `VectraDataSource.ts`. If these are using different endpoints and/or keys, be sure to update your `.env` file and Teams Toolkit files (if applicable) accordingly.
+
 6. Update `config.json` and `index.ts` with your model deployment name.
 
 ## Testing the sample

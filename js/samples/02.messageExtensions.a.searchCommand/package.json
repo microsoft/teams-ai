@@ -24,13 +24,13 @@
         "dotenv": "^16.4.5",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
-        "axios": "^1.6.7"
+        "axios": "^1.6.8"
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
         "@types/restify": "8.5.12",
         "nodemon": "~1.19.4",
-        "typescript": "^5.4.2",
+        "typescript": "^5.4.3",
         "ts-node": "^10.9.2"
     }
 }

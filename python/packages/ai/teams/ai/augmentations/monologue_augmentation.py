@@ -251,7 +251,8 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
         # Identify the action to perform
         if response.message and response.message.content:
             command: PredictedCommand
-            monologue: InnerMonologue = response.message.content
+            # Double encoding/decoding required for class
+            monologue = InnerMonologue.from_dict(InnerMonologue.to_dict(response.message.content))
 
             if monologue.action.name == "SAY":
                 params = monologue.action.parameters

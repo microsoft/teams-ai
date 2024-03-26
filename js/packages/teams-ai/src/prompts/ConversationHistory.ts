@@ -25,12 +25,12 @@ export class ConversationHistory extends PromptSectionBase {
 
     /**
      * Creates a new 'ConversationHistory' instance.
-     * @param variable Name of memory variable used to store the histories `Message[]`.
-     * @param tokens Optional. Sizing strategy for this section. Defaults to `proportional` with a value of `1.0`.
-     * @param required Optional. Indicates if this section is required. Defaults to `false`.
-     * @param userPrefix Optional. Prefix to use for user messages when rendering as text. Defaults to `user: `.
-     * @param assistantPrefix Optional. Prefix to use for assistant messages when rendering as text. Defaults to `assistant: `.
-     * @param separator
+     * @param {string} variable - Name of memory variable used to store the histories `Message[]`.
+     * @param {number} tokens - Optional. Sizing strategy for this section. Defaults to `proportional` with a value of `1.0`.
+     * @param {boolean} required - Optional. Indicates if this section is required. Defaults to `false`.
+     * @param {string} userPrefix - Optional. Prefix to use for user messages when rendering as text. Defaults to `user: `.
+     * @param {string} assistantPrefix - Optional. Prefix to use for assistant messages when rendering as text. Defaults to `assistant: `.
+     * @param {string} separator - Optional. Separator to use between messages when rendering as text. Defaults to `\n`.
      */
     public constructor(
         variable: string,
@@ -47,11 +47,12 @@ export class ConversationHistory extends PromptSectionBase {
     }
 
     /**
-     * @param context
-     * @param memory
-     * @param functions
-     * @param tokenizer
-     * @param maxTokens
+     * @param {TurnContext} context - Context for the current turn of conversation.
+     * @param {Memory} memory - Memory to use for rendering.
+     * @param {PromptFunctions} functions - Prompt functions to use for rendering.
+     * @param {Tokenizer} tokenizer - Tokenizer to use for encoding text.
+     * @param {number} maxTokens - Maximum number of tokens allowed.
+     * @returns {Promise<RenderedPromptSection<string>>} Rendered prompt section as a string.
      * @private
      */
     public async renderAsText(
@@ -97,12 +98,13 @@ export class ConversationHistory extends PromptSectionBase {
     }
 
     /**
-     * @param context
-     * @param memory
-     * @param functions
-     * @param tokenizer
-     * @param maxTokens
      * @private
+     * @param {TurnContext} context - Context for the current turn of conversation.
+     * @param {Memory} memory - Memory to use for rendering.
+     * @param {PromptFunctions} functions - Prompt functions to use for rendering.
+     * @param {Tokenizer} tokenizer - Tokenizer to use for encoding text.
+     * @param {number} maxTokens - Maximum number of tokens allowed.
+     * @returns {Promise<RenderedPromptSection<Message[]>>} Rendered prompt section as a list of messages.
      */
     public async renderAsMessages(
         context: TurnContext,

@@ -36,6 +36,6 @@
         "rimraf": "^5.0.5",
         "ts-node": "^10.9.2",
         "tsc-watch": "^6.0.4",
-        "typescript": "^5.4.2"
+        "typescript": "^5.4.3"
     }
 }
