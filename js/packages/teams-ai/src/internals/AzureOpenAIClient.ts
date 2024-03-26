@@ -7,13 +7,13 @@
  */
 
 import {
+    AzureOpenAIChatCompletionRequest,
     CreateChatCompletionRequest,
     CreateChatCompletionResponse,
     CreateEmbeddingRequest,
     CreateEmbeddingResponse,
     ModerationInput,
     ModerationResponse,
-    OpenAICreateChatCompletionRequest,
     OpenAICreateEmbeddingRequest
 } from './types';
 import { OpenAIClient, OpenAIClientOptions, OpenAIClientResponse } from './OpenAIClient';
@@ -52,10 +52,10 @@ export class AzureOpenAIClient extends OpenAIClient {
     public createChatCompletion(
         request: CreateChatCompletionRequest
     ): Promise<OpenAIClientResponse<CreateChatCompletionResponse>> {
-        const clone = Object.assign({}, request) as OpenAICreateChatCompletionRequest;
+        const clone = Object.assign({}, request) as AzureOpenAIChatCompletionRequest;
         const deployment = request.model;
         const endpoint = (this.options as AzureOpenAIClientOptions).endpoint;
-        const apiVersion = (this.options as AzureOpenAIClientOptions).apiVersion ?? '2023-03-15-preview';
+        const apiVersion = (this.options as AzureOpenAIClientOptions).apiVersion ?? '2024-02-15-preview';
         const url = `${endpoint}/openai/deployments/${deployment}/chat/completions?api-version=${apiVersion}`;
         return this.post(url, clone);
     }
