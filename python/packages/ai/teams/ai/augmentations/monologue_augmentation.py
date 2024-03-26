@@ -86,15 +86,33 @@ InnerMonologueSchema: Dict[str, Any] = {
         "thoughts": {
             "type": "object",
             "properties": {
-                "thought": {"type": "string"},
-                "reasoning": {"type": "string"},
-                "plan": {"type": "string"},
+                "thought": {
+                    "type": "string",
+                    "description": "your current thought"
+                },
+                "reasoning": {
+                    "type": "string",
+                    "description": "self reflect on why you made this decision"
+                },
+                "plan": {
+                    "type": "string",
+                    "description": "a short bulleted list that conveys your long-term plan"
+                },
             },
             "required": ["thought", "reasoning", "plan"],
         },
         "action": {
             "type": "object",
-            "properties": {"name": {"type": "string"}, "parameters": {"type": "object"}},
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "name of action to execute"
+                },
+                "parameters": {
+                    "type": "object",
+                    "description": "action parameters"
+                }
+            },
             "required": ["name"],
         },
     },
@@ -174,6 +192,7 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
         Returns:
         Validation: A 'Validation' object.
         """
+
         # Validate that we got a well-formed inner monologue
         validation_result = await self._monologue_validator.validate_response(
             context, memory, tokenizer, response, remaining_attempts
@@ -190,6 +209,7 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
         # Validate that the action exists and its parameters are valid
         if validation_result.value:
             monologue = InnerMonologue.from_dict(validation_result.value)
+            validation_result.value = monologue
             parameters = (
                 json.dumps(monologue.action.parameters) if monologue.action.parameters else ""
             )

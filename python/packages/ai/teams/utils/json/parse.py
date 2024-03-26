@@ -21,7 +21,7 @@ def parse(text: str) -> List[Any]:
     for line in lines:
         obj = parse_object(line)
 
-        if obj is not None:
+        if obj is not None and len(obj) > 0:
             objects.append(obj)
 
     if len(objects) == 0:
