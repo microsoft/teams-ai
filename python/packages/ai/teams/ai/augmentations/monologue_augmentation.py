@@ -86,17 +86,14 @@ InnerMonologueSchema: Dict[str, Any] = {
         "thoughts": {
             "type": "object",
             "properties": {
-                "thought": {
-                    "type": "string",
-                    "description": "your current thought"
-                },
+                "thought": {"type": "string", "description": "your current thought"},
                 "reasoning": {
                     "type": "string",
-                    "description": "self reflect on why you made this decision"
+                    "description": "self reflect on why you made this decision",
                 },
                 "plan": {
                     "type": "string",
-                    "description": "a short bulleted list that conveys your long-term plan"
+                    "description": "a short bulleted list that conveys your long-term plan",
                 },
             },
             "required": ["thought", "reasoning", "plan"],
@@ -104,14 +101,8 @@ InnerMonologueSchema: Dict[str, Any] = {
         "action": {
             "type": "object",
             "properties": {
-                "name": {
-                    "type": "string",
-                    "description": "name of action to execute"
-                },
-                "parameters": {
-                    "type": "object",
-                    "description": "action parameters"
-                }
+                "name": {"type": "string", "description": "name of action to execute"},
+                "parameters": {"type": "object", "description": "action parameters"},
             },
             "required": ["name"],
         },
