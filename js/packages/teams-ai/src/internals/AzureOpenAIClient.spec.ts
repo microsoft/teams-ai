@@ -141,7 +141,7 @@ describe('AzureOpenAIClient', () => {
     describe('createChatCompletion', () => {
         it('creates valid chat completion response', async () => {
             const postStub = sinonSandbox.stub(mockAxios, 'post').returns(Promise.resolve(chatCompletionResponse));
-            const url = `${options.endpoint}/openai/deployments/${chatCompletionRequest.model}/chat/completions?api-version=2023-03-15-preview`;
+            const url = `${options.endpoint}/openai/deployments/${chatCompletionRequest.model}/chat/completions?api-version=2024-02-15-preview`;
             const response = await client.createChatCompletion(chatCompletionRequest);
 
             assert.equal(postStub.calledOnce, true);
