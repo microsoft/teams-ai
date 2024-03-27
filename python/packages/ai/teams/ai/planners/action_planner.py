@@ -130,9 +130,9 @@ class ActionPlanner(Planner):
         client = LLMClient(
             LLMClientOptions(
                 model=self._options.model,
-                history_variable=f"conversation.{name}_history"
-                if include_history
-                else f"temp.{name}_history",
+                history_variable=(
+                    f"conversation.{name}_history" if include_history else f"temp.{name}_history"
+                ),
                 input_variable="temp.input",
                 validator=validator,
                 logger=self._options.logger,

@@ -49,9 +49,7 @@ class MessageExtensions(Generic[StateT]):
     def __init__(self, routes: List[Route[StateT]]) -> None:
         self._routes = routes
 
-    def query(
-        self, command_id: Union[str, Pattern[str]]
-    ) -> Callable[
+    def query(self, command_id: Union[str, Pattern[str]]) -> Callable[
         [
             Callable[
                 [TurnContext, StateT, MessagingExtensionQuery],
@@ -115,9 +113,7 @@ class MessageExtensions(Generic[StateT]):
 
         return __call__
 
-    def query_link(
-        self, command_id: Union[str, Pattern[str]]
-    ) -> Callable[
+    def query_link(self, command_id: Union[str, Pattern[str]]) -> Callable[
         [Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]]],
         Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]],
     ]:
@@ -153,7 +149,10 @@ class MessageExtensions(Generic[StateT]):
                 [TurnContext, StateT, str],
                 Awaitable[MessagingExtensionResult],
             ]
-        ) -> Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult],]:
+        ) -> Callable[
+            [TurnContext, StateT, str],
+            Awaitable[MessagingExtensionResult],
+        ]:
             async def __invoke__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
@@ -175,9 +174,7 @@ class MessageExtensions(Generic[StateT]):
 
         return __call__
 
-    def anonymous_query_link(
-        self, command_id: Union[str, Pattern[str]]
-    ) -> Callable[
+    def anonymous_query_link(self, command_id: Union[str, Pattern[str]]) -> Callable[
         [Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]]],
         Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]],
     ]:
@@ -460,9 +457,7 @@ class MessageExtensions(Generic[StateT]):
 
         return __call__
 
-    def fetch_task(
-        self, command_id: Union[str, Pattern[str]]
-    ) -> Callable[
+    def fetch_task(self, command_id: Union[str, Pattern[str]]) -> Callable[
         [Callable[[TurnContext, StateT], Awaitable[Union[TaskModuleTaskInfo, str]]]],
         Callable[[TurnContext, StateT], Awaitable[Union[TaskModuleTaskInfo, str]]],
     ]:
@@ -499,7 +494,10 @@ class MessageExtensions(Generic[StateT]):
                 [TurnContext, StateT],
                 Awaitable[Union[TaskModuleTaskInfo, str]],
             ]
-        ) -> Callable[[TurnContext, StateT], Awaitable[Union[TaskModuleTaskInfo, str]],]:
+        ) -> Callable[
+            [TurnContext, StateT],
+            Awaitable[Union[TaskModuleTaskInfo, str]],
+        ]:
             async def __invoke__(context: TurnContext, state: StateT):
                 res = await func(context, state)
                 await self._invoke_task_response(context, res)
@@ -545,7 +543,10 @@ class MessageExtensions(Generic[StateT]):
                 [TurnContext, StateT, Any],
                 Awaitable[MessagingExtensionResult],
             ]
-        ) -> Callable[[TurnContext, StateT, Any], Awaitable[MessagingExtensionResult],]:
+        ) -> Callable[
+            [TurnContext, StateT, Any],
+            Awaitable[MessagingExtensionResult],
+        ]:
             async def __invoke__(context: TurnContext, state: StateT):
                 res = await func(context, state, context.activity.value)
                 await self._invoke_action_response(context, res)
@@ -556,9 +557,7 @@ class MessageExtensions(Generic[StateT]):
 
         return __call__
 
-    def submit_action(
-        self, command_id: Union[str, Pattern[str]]
-    ) -> Callable[
+    def submit_action(self, command_id: Union[str, Pattern[str]]) -> Callable[
         [
             Callable[
                 [TurnContext, StateT, Any],
