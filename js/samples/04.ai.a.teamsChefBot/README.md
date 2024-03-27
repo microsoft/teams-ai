@@ -30,27 +30,48 @@ The sample uses a local Vector Database, called [Vectra](https://github.com/Stev
     git clone https://github.com/Microsoft/teams-ai.git
     ```
 
-2. In the root JavaScript folder, install and build all dependencies
+2. Open the sample in VS Code with Teams Toolkit installed
 
     ```bash
-    cd teams-ai/js
-    yarn install
-    yarn build
+    cd teams-ai/js/samples/04.ai.a.teamsChefBot
+    code .    
     ```
 
-3. In a terminal, navigate to the sample root.
+3. Add your OpenAI key to the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
 
-    ```bash
-    cd teams-ai/js/samples/04.ai.a.teamsChefBot/
-    ```
+If you are using Azure OpenAI then follow these steps:
 
-4. Duplicate the `sample.env` in this folder. Rename the file to `.env`.
+- Comment the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
+- Add your Azure OpenAI key and endpoint values to the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables
+- Open the `teamsapp.local.yml` file and modify the last step to use Azure OpenAI variables instead:
 
-5. Add your bot's credentials and any other related credentials to that file. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
+```yml
+- uses: file/createOrUpdateEnvironmentFile
+    with:
+      target: ./.env
+      envs:
+        BOT_ID: ${{BOT_ID}}
+        BOT_PASSWORD: ${{SECRET_BOT_PASSWORD}}
+        #OPENAI_KEY: ${{SECRET_OPENAI_KEY}}
+        AZURE_OPENAI_KEY: ${{SECRET_AZURE_OPENAI_KEY}}
+        AZURE_OPENAI_ENDPOINT: ${{SECRET_AZURE_OPENAI_ENDPOINT}}
+```
 
-> Please note: If you are use Azure OpenAI, you will need both a GPT model and embedding model deployment to get this sample working. See `OpenAIModel` in `index.ts` and `OpenAIEmbeddings` in `VectraDataSource.ts`. If these are using different endpoints and/or keys, be sure to update your `.env` file and Teams Toolkit files (if applicable) accordingly.
+- Open `./infra/azure.bicep` and comment out lines 72-75 and uncomment lines 76-83.
+- Open `./infra/azure.parameters.json` and replace lines 20-22 with:
 
-6. Update `config.json` and `index.ts` with your model deployment name.
+```json
+      "azureOpenAIKey": {
+        "value": "${{SECRET_AZURE_OPENAI_KEY}}"
+      },
+      "azureOpenAIEndpoint": {
+        "value": "${{SECRET_AZURE_OPENAI_ENDPOINT}}"
+      }
+```
+
+> Please note: If you are use Azure OpenAI, you will need both a GPT model and embedding model deployment to get this sample working. See `OpenAIModel` in `index.ts` and `OpenAIEmbeddings` in `VectraDataSource.ts`.
+
+4. Update `./src/prompts/chat/config.json` and `/.src/index.ts` with your model deployment name.
 
 ## Testing the sample
 
