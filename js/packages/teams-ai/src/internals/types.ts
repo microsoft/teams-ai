@@ -41,6 +41,67 @@ export interface CreateChatCompletionRequest {
     tool_choice?: CreateChatCompletionRequestFunctionCall;
 }
 
+export interface AzureOpenAIChatCompletionRequest extends OpenAICreateChatCompletionRequest {
+    data_sources?: AzureOpenAIChatCompletionDataSources[];
+}
+
+export type AzureOpenAIChatCompletionDataSources = AzureAISearchDataSource;
+
+export interface AzureAISearchDataSource {
+    type: 'azure_search';
+    parameters: {
+        endpoint: string;
+        index_name: string;
+        authentication:
+            | ApiKeyAuthenticationOptions
+            | SystemAssignedManagedIdentityAuthenticationOptions
+            | UserAssignedManagedIdentityAuthenticationOptions;
+        embedding_dependency: DeploymentNameVectorizationSource | EndpointVectorizationSource;
+        fields_mapping?: FieldsMapping;
+        filter?: string;
+        in_scope?: boolean;
+        query_type?: 'simple' | 'semantic' | 'vector' | 'vector_simple_hybrid' | 'vector_semantic_hybrid';
+        role_information?: string;
+        semantic_configuration?: string;
+        strictness?: number;
+        top_n_documents?: number;
+    };
+}
+
+export interface DeploymentNameVectorizationSource {
+    type: 'deployment_name';
+    deployment_name: string;
+}
+
+export interface EndpointVectorizationSource {
+    type: 'endpoint';
+    endpoint: string;
+    authentication: ApiKeyAuthenticationOptions;
+}
+
+export interface ApiKeyAuthenticationOptions {
+    type: 'api_key';
+    key: string;
+}
+
+export interface SystemAssignedManagedIdentityAuthenticationOptions {
+    type: 'system_assigned_managed_identity';
+}
+
+export interface UserAssignedManagedIdentityAuthenticationOptions {
+    type: 'user_assigned_managed_identity';
+    managed_identity_resource_id: string;
+}
+
+export interface FieldsMapping {
+    content_fields: string[];
+    vector_fields: string[];
+    content_fields_separator: string;
+    filepath_field: string;
+    title_field: string;
+    url_field: string;
+}
+
 /**
  * @private
  */
@@ -106,7 +167,7 @@ export interface CreateChatCompletionResponse {
  */
 export interface CreateChatCompletionResponseChoicesInner {
     index?: number;
-    message?: ChatCompletionResponseMessage;
+    message?: ChatCompletionResponseMessage | AzureOpenAIChatCompletionResponseMessage;
     finish_reason?: string;
     logprobs?: object | null;
 }
@@ -118,6 +179,27 @@ export interface ChatCompletionResponseMessage {
     role: 'system' | 'user' | 'assistant';
     content: string | undefined;
     tool_calls?: Array<ChatCompletionRequestMessageToolCall>;
+}
+
+/**
+ * @private
+ */
+export interface AzureOpenAIChatCompletionResponseMessage extends ChatCompletionResponseMessage {
+    context?: {
+        citations: AzureOpenAIChatCompletionCitation[];
+        intent: string;
+    };
+}
+
+/**
+ * @private
+ */
+export interface AzureOpenAIChatCompletionCitation {
+    content: string;
+    title: string;
+    url: string;
+    filepath: string;
+    chunk_id: string;
 }
 
 /**
