@@ -66,7 +66,7 @@ class TeamsAdapter(CloudAdapter, _UserAgent):
             cast(WebSocketResponse, ws_response),
         )
 
-        if res:
+        if res != None:
             res.headers.add("User-Agent", self.user_agent)
 
         return res
