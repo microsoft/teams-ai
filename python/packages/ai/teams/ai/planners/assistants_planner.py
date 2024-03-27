@@ -154,6 +154,41 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
         # Submit user input
         return await self._submit_user_input(state)
 
+    @staticmethod
+    async def create_assistant(
+        api_key: str,
+        organization: Optional[str],
+        endpoint: Optional[str],
+        request: AssistantCreateParams,
+    ) -> Assistant:
+        """
+        Static method for programmatically creating an assistant.
+
+        Args:
+            api_key (str): The OpenAI API key.
+            organization (Optional[str]): The optional organization.
+            endpoint: (Optional[str]): The optional endpoint.
+            request: (AssistantCreateParams): The parameters used to create the assistant.
+
+        Returns:
+            Assistant: The assistant.
+        """
+        openai_client = openai.AsyncOpenAI(
+            api_key=api_key,
+            organization=organization if organization else None,
+            base_url=endpoint if endpoint else None,
+        )
+
+        return await openai_client.beta.assistants.create(
+            model=request.get("model", ""),
+            description=request.get("description"),
+            file_ids=request.get("file_ids", []),
+            instructions=request.get("instructions"),
+            metadata=request.get("metadata"),
+            name=request.get("name"),
+            tools=request.get("tools", []),
+        )
+
     async def _ensure_thread_created(self, state: TurnState) -> str:
         assistants_state = self._ensure_assistants_state(state)
         if not assistants_state.thread_id:
@@ -302,41 +337,6 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
         if run.status == "expired":
             return True
         return False
-
-    @staticmethod
-    async def create_assistant(
-        api_key: str,
-        organization: Optional[str],
-        endpoint: Optional[str],
-        request: AssistantCreateParams,
-    ) -> Assistant:
-        """
-        Static method for programmatically creating an assistant.
-
-        Args:
-            api_key (str): The OpenAI API key.
-            organization (Optional[str]): The optional organization.
-            endpoint: (Optional[str]): The optional endpoint.
-            request: (AssistantCreateParams): The parameters used to create the assistant.
-
-        Returns:
-            Assistant: The assistant.
-        """
-        openai_client = openai.AsyncOpenAI(
-            api_key=api_key,
-            organization=organization if organization else None,
-            base_url=endpoint if endpoint else None,
-        )
-
-        return await openai_client.beta.assistants.create(
-            model=request.get("model", ""),
-            description=request.get("description"),
-            file_ids=request.get("file_ids", []),
-            instructions=request.get("instructions"),
-            metadata=request.get("metadata"),
-            name=request.get("name"),
-            tools=request.get("tools", []),
-        )
 
     async def _submit_user_input(self, state: TurnState) -> Plan:
         # Get the current thread_id

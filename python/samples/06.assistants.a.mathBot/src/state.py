@@ -6,10 +6,10 @@ Licensed under the MIT License.
 from typing import Optional
 
 from botbuilder.core import Storage, TurnContext
-from teams.state import TurnState, ConversationState, UserState, TempState
+from teams.state import ConversationState, TempState, TurnState, UserState
+
 
 class AppTurnState(TurnState[ConversationState, UserState, TempState]):
-
     @classmethod
     async def load(cls, context: TurnContext, storage: Optional[Storage] = None) -> "AppTurnState":
         return cls(
