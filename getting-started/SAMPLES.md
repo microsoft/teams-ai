@@ -11,6 +11,9 @@ _**Navigation**_
 
 ---
 
+> [!IMPORTANT]
+> If you plan to contribute to the package and develop locally, you can modify the sample projects to avoid dependency issues. Before running a sample in Teams Toolkit, modify the `teamsapp.local.yml` and remove the step to run `npm install`. The Teams AI repo uses Yarn instead and `yarn install` is run in the `/js` directory instead.
+
 After completing the quickstart guide, the next step is to try out the samples.
 
 Samples are E2E teams apps that are easy to set up locally. There are various samples to showcase the different features supported.
