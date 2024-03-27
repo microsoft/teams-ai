@@ -26,16 +26,18 @@ The sample uses a local Vector Database, called [Vectra](https://github.com/Stev
 
 1. Clone the repository
 
-    ```bash
-    git clone https://github.com/Microsoft/teams-ai.git
-    ```
+```bash
+git clone https://github.com/Microsoft/teams-ai.git
+```
 
-2. Open the sample in VS Code with Teams Toolkit installed
+> [!IMPORTANT]
+> To prevent issues when installing dependencies after cloning the repo, copy or move the sample directory to it's own location first.
+> If you opened this sample from the Sample Gallery in Teams Toolkit, you can skip to step 3.
 
-    ```bash
-    cd teams-ai/js/samples/04.ai.a.teamsChefBot
-    code .    
-    ```
+```bash
+cd path/to/04.ai.a.teamsChefBot
+code .    
+```
 
 3. Add your OpenAI key to the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
 

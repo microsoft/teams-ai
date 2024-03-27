@@ -45,7 +45,7 @@ deploy:
   - uses: cli/runNpmCommand
     name: install dependencies
     with:
-      args: install
+      args: install --no-audit
 
 # Provides the Teams Toolkit .env file values to the apps runtime so they can be accessed with `process.env`.
   - uses: file/createOrUpdateEnvironmentFile
