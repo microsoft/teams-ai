@@ -71,7 +71,7 @@ If you are using Azure OpenAI then follow these steps:
       }
 ```
 
-> Please note: If you are use Azure OpenAI, you will need both a GPT model and embedding model deployment to get this sample working. See `OpenAIModel` in `index.ts` and `OpenAIEmbeddings` in `VectraDataSource.ts`.
+> Please note: If you are using Azure OpenAI, you will need both a GPT model and embedding model deployment to get this sample working. See `OpenAIModel` in `index.ts` and `OpenAIEmbeddings` in `VectraDataSource.ts`.
 
 4. Update `./src/prompts/chat/config.json` and `/.src/index.ts` with your model deployment name.
 
