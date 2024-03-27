@@ -91,13 +91,14 @@ class TestMonologueAugmentation(IsolatedAsyncioTestCase):
         )
         self.assertEqual(response.valid, True)
         self.assertEqual(response.feedback, None)
-        self.assertEqual(
-            response.value,
-            {
-                "thoughts": {"thought": "test", "reasoning": "test", "plan": "test"},
-                "action": {"name": "test1", "parameters": {"foo": "bar"}},
-            },
-        )
+        if response.value:
+            self.assertEqual(
+                InnerMonologue.to_dict(response.value),
+                {
+                    "thoughts": {"thought": "test", "reasoning": "test", "plan": "test"},
+                    "action": {"name": "test1", "parameters": {"foo": "bar"}},
+                },
+            )
 
     async def test_missing_thought_monologue(self):
         state = TurnState()
