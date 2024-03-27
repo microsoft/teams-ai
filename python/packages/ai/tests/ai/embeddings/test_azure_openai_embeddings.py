@@ -44,7 +44,7 @@ class MockAsyncEmbeddings:
             ],
             model="text-embedding-ada-002",
             object="list",
-            usage={"prompt_tokens": 5, "total_tokens": 5}  # type: ignore[arg-type]
+            usage={"prompt_tokens": 5, "total_tokens": 5},  # type: ignore[arg-type]
             # need to ignore as "Usage" class is not yet an exported type from openai
         )
 
