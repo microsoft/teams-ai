@@ -17,13 +17,11 @@ T = TypeVar("T")
 
 
 @overload
-def state(_cls: None = ...) -> Callable[[Type[T]], Type[T]]:
-    ...
+def state(_cls: None = ...) -> Callable[[Type[T]], Type[T]]: ...
 
 
 @overload
-def state(_cls: Type[T]) -> Type[T]:
-    ...
+def state(_cls: Type[T]) -> Type[T]: ...
 
 
 def state(_cls: Optional[Type[T]] = None) -> Union[Callable[[Type[T]], Type[T]], Type[T]]:
