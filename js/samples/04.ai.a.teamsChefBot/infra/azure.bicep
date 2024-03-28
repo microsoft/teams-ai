@@ -16,13 +16,13 @@ param webAppSKU string
 param botDisplayName string
 
 @secure()
-param openAIKey string
+param openAIKey string = ''
 
 @secure()
-param azureOpenAIKey string
+param azureOpenAIKey string = ''
 
 @secure()
-param auzreOpenAIEndpoint string
+param auzreOpenAIEndpoint string = ''
 
 param serverfarmsName string = resourceBaseName
 param webAppName string = resourceBaseName
