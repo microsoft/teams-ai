@@ -26,12 +26,14 @@
         "dotenv": "^16.4.5",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
-        "vectra": "^0.5.5"
+        "vectra": "^0.5.5",
+        "openai": "4.28.4"
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
         "@types/restify": "8.5.12",
         "@types/node": "^20.11.30",
+        "@types/jsonwebtoken": "^9.0.6",
         "ts-node": "^10.9.2",
         "env-cmd": "^10.1.0",
         "nodemon": "~1.19.4",
