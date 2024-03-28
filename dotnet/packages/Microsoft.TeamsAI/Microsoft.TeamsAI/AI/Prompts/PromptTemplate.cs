@@ -245,6 +245,12 @@ namespace Microsoft.Teams.AI.AI.Prompts
         public double TopP { get; set; } = 0.0f;
 
         /// <summary>
+        /// Additional data provided in the completion configuration.
+        /// </summary>
+        [JsonExtensionData]
+        public IDictionary<string, JsonElement>? AdditionalData { get; set; } = null;
+
+        /// <summary>
         /// Completion Type
         /// </summary>
         public enum CompletionType

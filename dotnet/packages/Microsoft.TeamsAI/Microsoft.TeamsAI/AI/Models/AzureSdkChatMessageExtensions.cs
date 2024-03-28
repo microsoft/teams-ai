@@ -36,6 +36,21 @@ namespace Microsoft.Teams.AI.AI.Models
 
             }
 
+            message.Context = new MessageContext();
+            if (chatMessage.AzureExtensionsContext.Intent != null)
+            {
+                message.Context.Intent = chatMessage.AzureExtensionsContext.Intent;
+            }
+
+            IReadOnlyList<AzureChatExtensionDataSourceResponseCitation>? citations = chatMessage.AzureExtensionsContext.Citations;
+            if (citations != null)
+            {
+                foreach (AzureChatExtensionDataSourceResponseCitation citation in citations)
+                {
+                    message.Context.Citations.Add(new Citation(citation.Content, citation.Title, citation.Url));
+                };
+            }
+
             return message;
         }
 
