@@ -6,14 +6,17 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import Generic, TypeVar
 
 from botbuilder.core import TurnContext
 
 from ...state import TurnState
 from .plan import Plan
 
+StateT = TypeVar("StateT", bound=TurnState)
 
-class Planner(ABC):
+
+class Planner(Generic[StateT], ABC):
     """
     A planner is responsible for generating a plan that the AI system will execute.
     """

@@ -8,12 +8,15 @@ from .action_planner import (
     ActionPlannerOptions,
     ActionPlannerPromptFactory,
 )
+from .assistants_planner import AssistantsPlanner, AssistantsPlannerOptions
 from .plan import Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand
 from .planner import Planner
 
 __all__ = [
     "ActionPlanner",
     "ActionPlannerOptions",
+    "AssistantsPlanner",
+    "AssistantsPlannerOptions",
     "ActionPlannerPromptFactory",
     "Plan",
     "PredictedCommand",

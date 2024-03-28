@@ -40,7 +40,7 @@ class AI(Generic[StateT]):
         return self._options
 
     @property
-    def planner(self) -> Planner:
+    def planner(self) -> Planner[StateT]:
         return self._options.planner
 
     @property
@@ -71,6 +71,9 @@ class AI(Generic[StateT]):
             ),
             ActionTypes.SAY_COMMAND: ActionEntry[StateT](
                 ActionTypes.SAY_COMMAND, True, self._on_say_command
+            ),
+            ActionTypes.TOO_MANY_STEPS: ActionEntry[StateT](
+                ActionTypes.TOO_MANY_STEPS, True, self._on_too_many_steps
             ),
         }
 
@@ -267,3 +270,11 @@ class AI(Generic[StateT]):
             await context.send_activity(response)
 
         return ""
+
+    async def _on_too_many_steps(
+        self,
+        _context: ActionTurnContext,
+        _state: StateT,
+    ) -> str:
+        self._logger.error("The run retrieval for the Assistants Planner has expired.")
+        return ActionTypes.STOP

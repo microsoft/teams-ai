@@ -6,15 +6,19 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Generic, TypeVar
 
+from ..state import TurnState
 from .moderators.default_moderator import DefaultModerator
 from .moderators.moderator import Moderator
 from .planners.planner import Planner
 
+StateT = TypeVar("StateT", bound=TurnState)
+
 
 @dataclass
-class AIOptions:
-    planner: Planner
+class AIOptions(Generic[StateT]):
+    planner: Planner[StateT]
     """
     The planner to use for generating plans.
     """
