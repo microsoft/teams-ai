@@ -13,7 +13,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <returns>The sign in response</returns>
-        public async Task<SignInResponse> AuthenticateAsync(ITurnContext context)
+        public Task<SignInResponse> AuthenticateAsync(ITurnContext context)
         {
             throw new NotImplementedException();
         }

@@ -16,7 +16,7 @@ namespace Microsoft.Teams.AI.AI.DataSources
         public string Name { get; }
 
         private readonly string _text;
-        private List<int> _tokens = new();
+        private IReadOnlyList<int> _tokens = new List<int>();
 
         /// <summary>
         /// Creates instance of `TextDataSource`

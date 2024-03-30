@@ -59,7 +59,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             // truncate
             if (this.Tokens > 1 && length > this.Tokens)
             {
-                List<int> encoded = tokenizer.Encode(text);
+                IReadOnlyList<int> encoded = tokenizer.Encode(text);
                 text = tokenizer.Decode(encoded.Take(this.Tokens).ToList());
                 length = this.Tokens;
             }

@@ -1,4 +1,4 @@
-﻿using SharpToken;
+﻿using Microsoft.ML.Tokenizers;
 
 namespace Microsoft.Teams.AI.AI.Tokenizers
 {
@@ -7,52 +7,37 @@ namespace Microsoft.Teams.AI.AI.Tokenizers
     /// </summary>
     public class GPTTokenizer : ITokenizer
     {
-        private readonly GptEncoding _encoding;
+        private readonly Tokenizer _encoding;
 
         /// <summary>
-        /// Creates an instance of `GPTTokenizer` using the `cl100k_base` encoding by default
+        /// Creates an instance of `GPTTokenizer` using "gpt-4" model name by default which is using the `cl100k_base` encoding
         /// </summary>
-        public GPTTokenizer()
-        {
-            this._encoding = GptEncoding.GetEncoding("cl100k_base");
-        }
+        public GPTTokenizer() => _encoding = Tokenizer.CreateTiktokenForModel("gpt-4");
 
         /// <summary>
         /// Creates an instance of `GPTTokenizer`
         /// </summary>
         /// <param name="encoding">encoding to use</param>
-        public GPTTokenizer(GptEncoding encoding)
-        {
-            this._encoding = encoding;
-        }
+        public GPTTokenizer(Tokenizer encoding) => this._encoding = encoding;
 
         /// <summary>
         /// Creates an instance of `GPTTokenizer`
         /// </summary>
         /// <param name="model">model to encode/decode for</param>
-        public GPTTokenizer(string model)
-        {
-            this._encoding = GptEncoding.GetEncodingForModel(model);
-        }
+        public GPTTokenizer(string model) => this._encoding = Tokenizer.CreateTiktokenForModel(model);
 
         /// <summary>
         /// Encode
         /// </summary>
         /// <param name="text">text to encode</param>
         /// <returns>encoded tokens</returns>
-        public List<int> Encode(string text)
-        {
-            return this._encoding.Encode(text);
-        }
+        public IReadOnlyList<int> Encode(string text) => this._encoding.EncodeToIds(text);
 
         /// <summary>
         /// Decode
         /// </summary>
         /// <param name="tokens">tokens to decode</param>
         /// <returns>decoded text</returns>
-        public string Decode(List<int> tokens)
-        {
-            return this._encoding.Decode(tokens);
-        }
+        public string Decode(IEnumerable<int> tokens) => this._encoding.Decode(tokens)!;
     }
 }
