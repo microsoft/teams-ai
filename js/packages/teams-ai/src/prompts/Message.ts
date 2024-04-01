@@ -27,6 +27,11 @@ export interface Message<TContent = string> {
     function_call?: FunctionCall;
 
     /**
+     * The context used for the message.
+     */
+    context?: MessageContext;
+
+    /**
      * Optional. Name of the function that was called.
      */
     name?: string;
@@ -71,4 +76,36 @@ export interface ImageContentPart {
      * The URL of the image.
      */
     image_url: string | { url: string };
+}
+
+/**
+ * Citations returned by the model.
+ */
+export interface Citation {
+    /**
+     * The content of the citation.
+     */
+    content: string;
+
+    /**
+     * The title of the citation.
+     */
+    title: string;
+
+    /**
+     * The URL of the citation.
+     */
+    url: string;
+}
+
+export interface MessageContext {
+    /**
+     * Citations used in the message.
+     */
+    citations: Citation[];
+
+    /**
+     * The intent of the message.
+     */
+    intent: string;
 }

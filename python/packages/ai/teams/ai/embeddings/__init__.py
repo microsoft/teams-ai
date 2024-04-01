@@ -2,6 +2,7 @@
 Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
+
 from .azure_openai_embeddings import AzureOpenAIEmbeddings
 from .azure_openai_embeddings_options import AzureOpenAIEmbeddingsOptions
 from .embeddings_model import EmbeddingsModel

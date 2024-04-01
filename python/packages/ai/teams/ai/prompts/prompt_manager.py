@@ -328,7 +328,9 @@ class PromptManager(PromptFunctions):
             elif template_config.completion.include_input:
                 sections.append(UserMessage("{{$temp.input}}", self._options.max_input_tokens))
 
-            template = PromptTemplate(template_name, Prompt(sections), template_config)
+            template = PromptTemplate(
+                template_name, Prompt(sections), template_config, template_actions
+            )
 
             if augmentation:
                 template.augmentation = augmentation

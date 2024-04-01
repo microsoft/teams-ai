@@ -35,9 +35,7 @@ class TaskModules(Generic[StateT]):
         self._route_registry = route_registry
         self._task_data_filter = task_data_filter
 
-    def fetch(
-        self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]
-    ) -> Callable[
+    def fetch(self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]) -> Callable[
         [Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]]],
         Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]],
     ]:
@@ -81,9 +79,7 @@ class TaskModules(Generic[StateT]):
         return __call__
 
     # TODO: Ported the code first. Need more discussion on the functionality.
-    def submit(
-        self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]
-    ) -> Callable[
+    def submit(self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]) -> Callable[
         [Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]]],
         Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]],
     ]:

@@ -37,16 +37,16 @@
         "dotenv": "^16.4.1",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
-        "vectra": "^0.5.5"
+        "vectra": "^0.6.0"
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
-        "@types/node": "^20.11.29",
+        "@types/node": "^20.12.2",
         "@types/restify": "8.5.12",
         "env-cmd": "^10.1.0",
         "nodemon": "~1.19.4",
         "rimraf": "^3.0.2",
         "ts-node": "^10.9.2",
-        "typescript": "^5.3.3"
+        "typescript": "^5.4.3"
     }
 }

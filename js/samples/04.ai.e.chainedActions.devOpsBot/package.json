@@ -20,10 +20,11 @@
     },
     "dependencies": {
         "botbuilder": "^4.22.1",
-        "@microsoft/teams-ai": "~1.1.1",
+        "@microsoft/teams-ai": "~1.1.2",
         "dotenv": "^16.4.5",
         "replace": "~1.2.0",
-        "restify": "~11.1.0"
+        "restify": "~11.1.0",
+        "openai": "^4.28.4"
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
@@ -31,6 +32,7 @@
         "nodemon": "~1.19.4",
         "shx": "^0.3.4",
         "ts-node": "^10.9.2",
-        "typescript": "^5.4.2"
+        "typescript": "^5.4.3",
+        "@types/jsonwebtoken": "^9.0.6"
     }
 }

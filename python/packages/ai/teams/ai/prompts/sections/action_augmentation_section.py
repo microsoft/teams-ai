@@ -8,7 +8,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 
-import yaml
 from botbuilder.core import TurnContext
 from dataclasses_json import DataClassJsonMixin, dataclass_json
 
@@ -21,8 +20,9 @@ from ..rendered_prompt_section import RenderedPromptSection
 from .prompt_section_base import PromptSectionBase
 
 
+@dataclass_json
 @dataclass
-class ActionValue(yaml.YAMLObject):
+class ActionValue(DataClassJsonMixin):
     description: Optional[str] = None
     parameters: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None
 
@@ -78,7 +78,7 @@ class ActionAugmentationSection(PromptSectionBase):
                 )
 
         # Build augmentation text
-        self._text = f"{yaml.dump(action_list.to_dict())}\n\n{call_to_action}"
+        self._text = f"{action_list.to_json()}\n\n{call_to_action}"
 
     async def render_as_messages(
         self,

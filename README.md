@@ -1,12 +1,12 @@
-# ![teams logo](https://github.com/microsoft/teams-ai/assets/14900841/10a0fbac-9d31-46d5-ad65-0eeb33b787a8) Teams AI Library
+# <img src="https://media.githubusercontent.com/media/microsoft/teams-ai/main/assets/icon.png" width="100px"> Teams AI Library
 
 [![Coverage Status](https://coveralls.io/repos/github/microsoft/teams-ai/badge.svg?branch=main)](https://coveralls.io/github/microsoft/teams-ai?branch=main)
 
-| Name          | Status                | Package |
-|---------------|-----------------------|---------|
-| Javascript    | [![Javascript Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.javascript?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=5&branchName=main) | [NPM](https://www.npmjs.com/package/@microsoft/teams-ai) |
-| C#            | [![C# Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.dotnet?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=4&branchName=main) | [NuGet](https://www.nuget.org/packages/Microsoft.Teams.AI) |
-| Python        | [![Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.python?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=10&branchName=main) | [PyPI](https://pypi.org/project/teams-ai/) |
+| Name       | Status                                                                                                                                                                                                                                                                  | Package                                                    |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Javascript | [![Javascript Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.javascript?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=5&branchName=main) | [NPM](https://www.npmjs.com/package/@microsoft/teams-ai)   |
+| C#         | [![C# Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.dotnet?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=4&branchName=main)             | [NuGet](https://www.nuget.org/packages/Microsoft.Teams.AI) |
+| Python     | [![Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.python?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=10&branchName=main)               | [PyPI](https://pypi.org/project/teams-ai/)                 |
 
 Welcome to the Teams AI Library! This SDK is specifically designed to assist you in creating bots capable of interacting with Teams and Microsoft 365 applications. It is constructed using the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) as its foundation, simplifying the process of developing bots that interact with Teams' artificial intelligence capabilities.
 
@@ -49,17 +49,19 @@ With a simple text file written in human language, you can describe the function
 
 ### Moderation
 
-A configurable API call to filter inappropriate content for input content, output content, or both. 
+A configurable API call to filter inappropriate content for input content, output content, or both.
 
-Moderators are available whether you decide to you OpenAI or Azure OpenAI for your models. 
+Moderators are available whether you decide to you OpenAI or Azure OpenAI for your models.
 
-If using OpenAI see: 
+If using OpenAI see:
+
 - [OpenAIModerator.ts](./js/packages/teams-ai/src/moderators/OpenAIModerator.ts)
-- [OpenAIModerator.cs](./dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/AI/Moderator/OpenAIModerator.cs) 
+- [OpenAIModerator.cs](./dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/AI/Moderator/OpenAIModerator.cs)
 - [openai_moderator.py](./python/packages/ai/teams/ai/moderators/openai_moderator.py).
 
 For Azure's moderator, see:
-- [AzureContentSafetyModerator.ts](./js/packages/teams-ai/src/moderators/AzureContentSafetyModerator.ts) 
+
+- [AzureContentSafetyModerator.ts](./js/packages/teams-ai/src/moderators/AzureContentSafetyModerator.ts)
 - [AzureContentSafetyModerator.cs](./dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/AI/Moderator/AzureContentSafetyModerator.cs)
 - [azure_content_safety_moderator.py](./python/packages/ai/teams/ai/moderators/azure_content_safety_moderator.py)
 
@@ -106,4 +108,4 @@ Any use of third-party trademarks or logos are subject to those third-party's po
 
 ## Accessing daily builds
 
-Please see [Daily Builds](docs/DAILYBUILDS.md) for instructions on how to access daily builds.
+Please see [Daily Builds](https://github.com/microsoft/teams-ai/blob/main/docs/DAILYBUILDS.MD) for instructions on how to access daily builds.
