@@ -18,7 +18,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         public readonly Dictionary<string, ChatCompletionAction> Actions;
 
         private readonly string _text;
-        private IReadOnlyList<int>? _tokens;
+        private List<int>? _tokens;
 
         private class ActionMap
         {
@@ -64,7 +64,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
                 this._tokens = tokenizer.Encode(this._text);
             }
 
-            IReadOnlyList<int> tokens = this._tokens;
+            List<int> tokens = this._tokens;
             bool tooLong = false;
 
             if (this._tokens.Count > maxTokens)

@@ -31,13 +31,17 @@ namespace Microsoft.Teams.AI.AI.Tokenizers
         /// </summary>
         /// <param name="text">text to encode</param>
         /// <returns>encoded tokens</returns>
-        public IReadOnlyList<int> Encode(string text) => this._encoding.EncodeToIds(text);
+        public List<int> Encode(string text)
+        {
+            IReadOnlyList<int> readOlyList = this._encoding.EncodeToIds(text);
+            return readOlyList is List<int> list ? list : readOlyList.ToList();
+        }
 
         /// <summary>
         /// Decode
         /// </summary>
         /// <param name="tokens">tokens to decode</param>
         /// <returns>decoded text</returns>
-        public string Decode(IEnumerable<int> tokens) => this._encoding.Decode(tokens)!;
+        public string Decode(List<int> tokens) => this._encoding.Decode(tokens)!;
     }
 }
