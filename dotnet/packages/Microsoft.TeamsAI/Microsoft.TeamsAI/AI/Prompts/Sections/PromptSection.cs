@@ -124,7 +124,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             // truncate
             if (this.Tokens > 1 && length > this.Tokens)
             {
-                List<int> encoded = tokenizer.Encode(text);
+                IReadOnlyList<int> encoded = tokenizer.Encode(text);
                 text = tokenizer.Decode(encoded.Take(this.Tokens).ToList());
                 length = this.Tokens;
             }
@@ -148,7 +148,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             foreach (ChatMessage message in messages)
             {
                 string text = this.GetMessageText(message);
-                List<int> encoded = tokenizer.Encode(text);
+                IReadOnlyList<int> encoded = tokenizer.Encode(text);
 
                 if (len + encoded.Count > budget)
                 {
