@@ -3,6 +3,7 @@ using Azure.AI.OpenAI;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Microsoft.Bot.Builder;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Teams.AI.AI.Prompts;
@@ -315,17 +316,25 @@ namespace Microsoft.Teams.AI.AI.Models
 
             if (additionalData != null && additionalData.TryGetValue("data_sources", out JsonElement array))
             {
+                List<AzureChatExtensionConfiguration> configurations = new();
                 List<object> entries = array.Deserialize<List<object>>()!;
                 foreach (object item in entries)
                 {
                     AzureChatExtensionConfiguration? dataSourceItem = ModelReaderWriter.Read<AzureChatExtensionConfiguration>(BinaryData.FromObjectAsJson(item));
                     if (dataSourceItem != null)
                     {
-                        options.AzureExtensionsOptions.Extensions.Add(dataSourceItem);
+                        configurations.Add(dataSourceItem);
                     }
                 }
 
-                return;
+                if (configurations.Count > 0)
+                {
+                    options.AzureExtensionsOptions = new();
+                    foreach (AzureChatExtensionConfiguration configuration in configurations)
+                    {
+                        options.AzureExtensionsOptions.Extensions.Add(configuration);
+                    }
+                }
             }
         }
     }
