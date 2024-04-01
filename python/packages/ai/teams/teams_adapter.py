@@ -6,21 +6,31 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from logging import Logger
-from typing import Any, Optional, cast
+from typing import Any, Awaitable, Callable, Optional, cast
 
 from aiohttp import ClientResponse, ClientResponseError, ClientSession
 from aiohttp.web import Request, Response, WebSocketResponse
 from botbuilder.core import Bot
+from botbuilder.core.turn_context import TurnContext
 from botbuilder.integration.aiohttp import (
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
 )
-from botframework.connector import HttpClientBase, HttpRequest, HttpResponseBase
+from botbuilder.schema import Activity
+from botframework.connector import (
+    ConnectorClient,
+    HttpClientBase,
+    HttpRequest,
+    HttpResponseBase,
+)
 from botframework.connector.auth import (
     AuthenticationConfiguration,
+    ClaimsIdentity,
     HttpClientFactory,
     ServiceClientCredentialsFactory,
 )
+from botframework.connector.auth.connector_factory import ConnectorFactory
+from botframework.connector.auth.user_token_client import UserTokenClient
 
 from .user_agent import _UserAgent
 
@@ -70,6 +80,30 @@ class TeamsAdapter(CloudAdapter, _UserAgent):
             res.headers.add("User-Agent", self.user_agent)
 
         return res
+
+    def _create_turn_context(
+        self,
+        activity: Activity,
+        claims_identity: ClaimsIdentity,
+        oauth_scope: str,
+        connector_client: ConnectorClient,
+        user_token_client: UserTokenClient,
+        logic: Callable[[TurnContext], Awaitable],
+        connector_factory: ConnectorFactory,
+    ) -> TurnContext:
+        connector_client.config.add_user_agent(self.user_agent)
+        connector_client.conversations.config.add_user_agent(self.user_agent)
+        connector_client.attachments.config.add_user_agent(self.user_agent)
+
+        return super()._create_turn_context(
+            activity,
+            claims_identity,
+            oauth_scope,
+            connector_client,
+            user_token_client,
+            logic,
+            connector_factory,
+        )
 
 
 class _TeamsHttpClientFactory(HttpClientFactory):
