@@ -6,7 +6,7 @@
     "license": "MIT",
     "main": "./lib/index.js",
     "scripts": {
-        "dev:teamsfx": "env-cmd --silent -f .localSettings npm run dev",
+        "dev:teamsfx": "npm run dev",
         "dev": "nodemon --watch ./src --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts",
         "build": "tsc --build",
         "clean": "rimraf node_modules lib",
@@ -35,7 +35,6 @@
         "@types/node": "^20.11.30",
         "@types/jsonwebtoken": "^9.0.6",
         "ts-node": "^10.9.2",
-        "env-cmd": "^10.1.0",
         "nodemon": "~1.19.4",
         "typescript": "^5.4.3"
     }
