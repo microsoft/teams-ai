@@ -17,7 +17,7 @@ namespace Microsoft.Teams.AI.Tests.UtilitiesTests
         {
             string text = "Hello, World";
             Assert.NotNull(tokenizer);
-            List<int> tokens = tokenizer.Encode(text);
+            IReadOnlyList<int> tokens = tokenizer.Encode(text);
 
             Assert.Equal(new int[] { 9906, 11, 4435 }, tokens);
             Assert.Equal(text, tokenizer.Decode(tokens));
