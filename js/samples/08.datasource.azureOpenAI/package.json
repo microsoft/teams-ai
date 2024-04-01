@@ -35,7 +35,7 @@
         "dotenv": "^16.4.1",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
-        "vectra": "^0.5.5"
+        "vectra": "^0.6.0"
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
