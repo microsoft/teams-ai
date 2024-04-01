@@ -1,4 +1,4 @@
-# ![teams logo](https://github.com/microsoft/teams-ai/assets/14900841/10a0fbac-9d31-46d5-ad65-0eeb33b787a8) Teams AI Library
+# <img src="https://media.githubusercontent.com/media/microsoft/teams-ai/main/assets/icon.png" width="100px"> Teams AI Library
 
 [![Coverage Status](https://coveralls.io/repos/github/microsoft/teams-ai/badge.svg?branch=main)](https://coveralls.io/github/microsoft/teams-ai?branch=main)
 
