@@ -19,7 +19,7 @@ routes = web.RouteTableDef()
 async def on_messages(req: web.Request) -> web.Response:
     res = await app.process(req)
 
-    if res:
+    if res is not None:
         return res
 
     return web.Response(status=HTTPStatus.OK)
