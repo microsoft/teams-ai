@@ -22,7 +22,7 @@ param openAIKey string = ''
 param azureOpenAIKey string = ''
 
 @secure()
-param auzreOpenAIEndpoint string = ''
+param azureOpenAIEndpoint string = ''
 
 param serverfarmsName string = resourceBaseName
 param webAppName string = resourceBaseName
@@ -79,7 +79,7 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         // }
         // {
         //   name: 'AZURE_OPENAI_ENDPOINT'
-        //   value: auzreOpenAIEndpoint
+        //   value: azureOpenAIEndpoint
         // }
       ]
       ftpsState: 'FtpsOnly'
