@@ -39,7 +39,7 @@
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
-        "@types/node": "^20.11.10",
+        "@types/node": "^20.12.2",
         "@types/restify": "8.5.12",
         "env-cmd": "^10.1.0",
         "nodemon": "~1.19.4",
