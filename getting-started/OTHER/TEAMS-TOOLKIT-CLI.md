@@ -35,7 +35,7 @@ Below are directions on running samples via the Teams Toolkit CLI.
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
    ```bash
-   cd teams-ai/js/samples/01.messaging.a.echobot/
+   cd teams-ai/js/samples/00.path-to/x.sample/
    teamsfx provision --env local
 
    ```
