@@ -11,7 +11,7 @@ It is recommended to use the Teams Toolkit for Visual Studio Code way to test a 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](#testing-in-botframework-emulator) section.
-#### Using Teams Toolkit for Visual Studio Code 
+#### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 
@@ -53,7 +53,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
     ```bash
-    cd teams-ai/js/samples/04.ai.d.chainedactions.listbot/
+    cd teams-ai/js/samples/<sample-directory>/
     teamsfx provision --env local
 
     ```
@@ -74,10 +74,10 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 > If you used Teams Toolkit in the above steps, you can [upload a custom app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `/appPackage/appPackage.local.zip` file created by the tools and skip to step 6.
 
-1. In a terminal, navigate to `teams-ai/js/samples/04.ai.d.chainedactions.listbot/`
+1. In a terminal, navigate to `teams-ai/js/samples/<sample-directory>/`
 
     ```bash
-    cd teams-ai/js/samples/04.ai.d.chainedactions.listbot
+    cd teams-ai/js/samples/<sample-directory>
     ```
 
 1. Run ngrok tunneling service - point to port 3978

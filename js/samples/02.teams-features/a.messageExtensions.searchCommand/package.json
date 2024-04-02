@@ -11,7 +11,7 @@
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "start": "tsc --build && node ./lib/index.js",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "watch": "nodemon --watch ./src -e ts --exec \"yarn start\"",
+        "watch": "nodemon --watch ./src -e ts --exec \"npm start\"",
         "dev:teamsfx": "nodemon --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts"
     },
     "repository": {
@@ -29,11 +29,11 @@
     },
     "devDependencies": {
         "@types/node": "^20.12.2",
-        "@types/restify": "8.5.12",
+        "@types/restify": "^8.5.12",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
         "eslint": "^8.57.0",
-        "nodemon": "~1.19.4",
+        "nodemon": "~3.0.1",
         "prettier": "^3.2.5",
         "typescript": "^5.4.3",
         "ts-node": "^10.9.2"
