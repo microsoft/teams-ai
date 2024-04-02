@@ -11,6 +11,9 @@ _**Navigation**_
 
 ---
 
+> [!IMPORTANT]
+> If you plan to contribute to the package and develop locally, you can modify the sample projects to avoid dependency issues. Before running a sample in Teams Toolkit, modify the `teamsapp.local.yml` and remove the step to run `npm install`. The Teams AI repo uses Yarn instead and `yarn install` is run in the `/js` directory instead.
+
 After completing the quickstart guide, the next step is to try out the samples.
 
 Samples are E2E teams apps that are easy to set up locally. There are various samples to showcase the different features supported.
@@ -32,7 +35,7 @@ These samples showcase basic functionalities to build message extensions and con
 | Name                               | Description                                                                                       | Languages Supported                                                                                                                                                                                                                                                                   |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _Echo bot_                         | Bot that echos back the users message.                                                            | [JS](https://github.com/microsoft/teams-ai/tree/main/js/samples/01.getting-started/a.echoBot), [C#](https://github.com/microsoft/teams-ai/tree/main/dotnet/samples/01.messaging.echoBot), [PY](https://github.com/microsoft/teams-ai/tree/main/python/samples/01.messaging.a.echoBot) |
-| _Search Command Message Extension_ | Message Extension to search NPM for a specific package and return the result as an Adaptive Card. | [JS](https://github.com/microsoft/teams-ai/tree/main/js/samples/02.messageExtensions.a.searchCommand), [C#](https://github.com/microsoft/teams-ai/tree/main/dotnet/samples/02.messageExtensions.a.searchCommand)                                                                      |
+| _Search Command Message Extension_ | Message Extension to search NPM for a specific package and return the result as an Adaptive Card. | [JS](https://github.com/microsoft/teams-ai/tree/main/js/samples/02.teams-features/a.messageExtensions.searchCommand), [C#](https://github.com/microsoft/teams-ai/tree/main/dotnet/samples/02.messageExtensions.a.searchCommand)                                                                      |
 | _Type-Ahead Bot_                   | Bot that shows how to incorporate Adaptive Cards into the coversational flow.                     | [JS](https://github.com/microsoft/teams-ai/tree/main/js/samples/03.adaptiveCards.a.typeAheadBot), [C#](https://github.com/microsoft/teams-ai/tree/main/dotnet/samples/03.adaptiveCards.a.typeAheadBot)                                                                                |
 
 ## AI Samples
