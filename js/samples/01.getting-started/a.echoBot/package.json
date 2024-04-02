@@ -28,7 +28,7 @@
     },
     "devDependencies": {
         "@types/node": "^20.12.2",
-        "@types/restify": "8.5.12",
+        "@types/restify": "^8.5.12",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
         "eslint": "^8.57.0",
