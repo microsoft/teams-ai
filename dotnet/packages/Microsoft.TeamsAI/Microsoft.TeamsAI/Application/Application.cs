@@ -922,7 +922,7 @@ namespace Microsoft.Teams.AI
                 }
 
                 // Populate {{$temp.input}}
-                if (turnState.Temp.Input == null || turnState.Temp.Input.Length == 0)
+                if ((turnState.Temp.Input == null || turnState.Temp.Input.Length == 0) && turnContext.Activity.Text != null)
                 {
                     turnState.Temp.Input = turnContext.Activity.Text;
                 }
