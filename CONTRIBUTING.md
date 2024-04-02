@@ -1,5 +1,19 @@
 # Instructions for Contributing Code
 
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+- [Instructions for Contributing Code](#instructions-for-contributing-code)
+  - [Contributing bug fixes and features](#contributing-bug-fixes-and-features)
+  - [Legal](#legal)
+  - [Contributing guide](#contributing-guide)
+    - [Using local bits in JavaScript](#using-local-bits-in-javascript)
+      - [Using latest package changes in `js` samples](#using-latest-package-changes-in-js-samples)
+    - [PR styling requirements](#pr-styling-requirements)
+
+<!-- /code_chunk_output -->
+
 Please note that as of August 2023, signed commits are required for all contributions to this project. For more information on how to set up, see the [GitHub Authentication verify commit signature](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification) documentation.
 
 ## Contributing bug fixes and features
@@ -36,7 +50,37 @@ agreement ([Microsoft Contribution License Agreement.docx](https://www.codeplex.
 and email it back to <cla@microsoft.com>. Be sure to include your github user name along with the agreement. Once we have received the
 signed CLA, we'll review the request.
 
-## PR styling requirements
+## Contributing guide
+
+Below are sections of information you may need when contributing to our repository.
+
+### Using local bits in JavaScript
+
+At the time of writing, this repository does not have daily builds. To check the latest status of daily builds, please see [Daily Builds information](./docs/DAILYBUILDS.MD).
+
+If making changes to our main package(s), (at time of writing, `teams-ai` is the only published package in this repo), it may be necessary to test samples using local bits. By default, all samples will use the latest **published** version of `teams-ai`. To run a sample using local bits, please do the following:
+
+#### Using latest package changes in `js` samples
+
+1. Update the `teamsapp.local.yml` and comment out the step to run `npm install`.
+
+   ```diff
+   -  - uses: cli/runNpmCommand
+   -    name: install dependencies
+   -    with:
+   -      args: install --no-audit
+   ```
+
+1. **Do not run npm install or build in the sample root**. Instead use `yarn` to hoist packages and use the latest changes from the `teams-ai` package.
+   1. If not already installed, [install yarn globally](https://classic.yarnpkg.com/lang/en/docs/install).
+   1. Delete `node_modules` and `package-lock.json` from the sample, if applicable.
+1. Navigate to the root `js` folder.
+1. In the `js` directory, run `yarn && yarn build` to hoist and install all dependencies, plus build all packages (including the samples).
+1. To run/use a sample, open that sample in it's own VS Code instance e.g. `code js/samples/path-to-sample`.
+1. With the changes listed above, you will be able to run the sample using latest bits, even while using TTK. Further information on running the samples can be found within the sample README.md.
+1. Revert these changes before making commits or if you need to use the latest published package.
+
+### PR styling requirements
 
 1. All PRs must indicate what programming language they are for in the title with a prefix of [JS], [C#] [PY], or [repo].
 1. All PRs must be prepended with one of the following keywords:

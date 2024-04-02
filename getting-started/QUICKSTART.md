@@ -129,7 +129,7 @@ This guide will show you have the set up the Echo Bot using the JS library.
 
 10. After the dependencies are installed and project is built, select `File > Open Folder`.
 
-11. Go to `teams-ai > js > samples > 01.messaging.a.echoBot` and click `Select Folder`. This open the echo bot sample folder in vscode.
+11. Go to `teams-ai > js > samples > 01.getting-started > a.echoBot` and click `Select Folder`. This open the echo bot sample folder in vscode.
 
 12. From the left pane, select `Teams Toolkit`.
 

@@ -173,9 +173,7 @@ class AdaptiveCards(Generic[StateT]):
 
         return __call__
 
-    def search(
-        self, dataset: Union[str, Pattern[str], Callable[[TurnContext], bool]]
-    ) -> Callable[
+    def search(self, dataset: Union[str, Pattern[str], Callable[[TurnContext], bool]]) -> Callable[
         [
             Callable[
                 [TurnContext, StateT, Query[AdaptiveCardsSearchParams]],
@@ -240,12 +238,16 @@ class AdaptiveCards(Generic[StateT]):
                 params = context.activity.value
                 # Flatten search parameters
                 query = Query[AdaptiveCardsSearchParams](
-                    count=params["queryOptions"]["top"]
-                    if params and params["queryOptions"] and params["queryOptions"]["top"]
-                    else 25,
-                    skip=params["queryOptions"]["skip"]
-                    if params and params["queryOptions"] and params["queryOptions"]["skip"]
-                    else 0,
+                    count=(
+                        params["queryOptions"]["top"]
+                        if params and params["queryOptions"] and params["queryOptions"]["top"]
+                        else 25
+                    ),
+                    skip=(
+                        params["queryOptions"]["skip"]
+                        if params and params["queryOptions"] and params["queryOptions"]["skip"]
+                        else 0
+                    ),
                     parameters=AdaptiveCardsSearchParams(
                         query_text=params["queryText"] if params and params["queryText"] else "",
                         dataset=params["dataset"] if params and params["dataset"] else "",
