@@ -36,10 +36,10 @@ git clone https://github.com/Microsoft/teams-ai.git
 
 ```bash
 cd path/to/04.ai.a.teamsChefBot
-code .    
+code .
 ```
 
-3. Add your OpenAI key to the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
+1. Add your OpenAI key to the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
 
 If you are using Azure OpenAI then follow these steps:
 
@@ -88,7 +88,8 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
-1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
+1. Copy this sample into a new folder outside of teams-ai
+1. Select File > Open Folder in VS Code and choose this sample's directory
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
 1. Ensure that you have set up the sample from the previous step.
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
