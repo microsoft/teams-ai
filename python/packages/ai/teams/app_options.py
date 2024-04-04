@@ -7,12 +7,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from logging import Logger
-from typing import Optional
+from typing import List, Optional
 
 from botbuilder.core import Storage
 
 from .adaptive_cards import AdaptiveCardsOptions
 from .ai import AIOptions
+from .input_file import InputFileDownloader
 from .task_modules import TaskModulesOptions
 from .teams_adapter import TeamsAdapter
 
@@ -76,4 +77,9 @@ class ApplicationOptions:
     task_modules: TaskModulesOptions = field(default_factory=TaskModulesOptions)
     """
     Optional. Options used to customize the processing of Task Module requests.
+    """
+
+    file_downloaders: Optional[List[InputFileDownloader]] = []
+    """
+    Optional. Array of input file download plugins to use. 
     """

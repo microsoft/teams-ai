@@ -11,6 +11,10 @@ from .input_file import InputFile
 from .message_reaction_types import MessageReactionTypes
 from .query import Query
 from .teams_adapter import TeamsAdapter
+from .teams_attachment_downloader import (
+    TeamsAttachmentDownloader,
+    TeamsAttachmentDownloaderOptions,
+)
 
 __all__ = [
     "ActivityType",
@@ -22,4 +26,6 @@ __all__ = [
     "Query",
     "TeamsAdapter",
     "MessageReactionTypes",
+    "TeamsAttachmentDownloader",
+    "TeamsAttachmentDownloaderOptions",
 ]
