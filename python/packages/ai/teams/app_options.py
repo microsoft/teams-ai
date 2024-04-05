@@ -79,7 +79,7 @@ class ApplicationOptions:
     Optional. Options used to customize the processing of Task Module requests.
     """
 
-    file_downloaders: Optional[List[InputFileDownloader]] = []
+    file_downloaders: List[InputFileDownloader] = field(default_factory=list)
     """
     Optional. Array of input file download plugins to use. 
     """

@@ -76,14 +76,14 @@ class TeamsAttachmentDownloader(InputFileDownloader):
         valid_attachments = []
         attachments = context.activity.attachments
 
-        if not attachments:
+        if attachments is None or len(attachments) == 0:
             return []
 
         for attachment in attachments:
-            if not attachment.content_type.starts_with("text/html"):
+            if not attachment.content_type.startswith("text/html"):
                 valid_attachments.append(attachment)
 
-        if len(attachments) == 0:
+        if len(valid_attachments) == 0:
             return []
 
         access_token = ""
@@ -119,9 +119,9 @@ class TeamsAttachmentDownloader(InputFileDownloader):
 
             async with aiohttp.ClientSession() as session:
                 async with session.get(attachment.content_url, headers=headers) as response:
-                    json_response = response.json()
+                    json_response = response.json
 
-                    # Convert to a binary buffer
+                    # Convert to bytes
                     content = json.dumps(json_response).encode("utf-8")
 
                     # Fix content type
@@ -132,7 +132,7 @@ class TeamsAttachmentDownloader(InputFileDownloader):
 
                     return InputFile(content, content_type, attachment.content_url)
         else:
-            content = bytearray(attachment.content) if attachment.content else bytearray()
+            content = bytes(attachment.content) if attachment.content else bytes()
             return InputFile(content, attachment.content_type, attachment.content_url)
 
     async def _get_access_token(self):
@@ -143,28 +143,32 @@ class TeamsAttachmentDownloader(InputFileDownloader):
         )
 
         to_channel_from_bot_login_url = getattr(
-            self._options.adapter.configuration,
-            "TO_CHANNEL_FROM_BOT_LOGIN_URL",
-            to_channel_from_bot_login_url_default,
-        ).lower()
+            self._options.adapter.configuration, "TO_CHANNEL_FROM_BOT_LOGIN_URL", ""
+        )
+
+        if not to_channel_from_bot_login_url:
+            to_channel_from_bot_login_url = to_channel_from_bot_login_url_default
 
         audience = getattr(
             self._options.adapter.configuration, "TO_CHANNEL_FROM_BOT_OAUTH_SCOPE", ""
         )
-        login_endpoint = to_channel_from_bot_login_url
 
-        # If there is no loginEndpoint set on the provided ConfigurationBotFrameworkAuthenticationOptions,
-        # or it starts with 'https://login.microsoftonline.com/', the bot is operating in Public Azure.
-        # So we use the Public Azure audience or the specified audience.
-        if login_endpoint.startswith(AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX):
-            if audience == "":
+        # If there is no loginEndpoint set on the provided
+        # ConfigurationBotFrameworkAuthenticationOptions, or it starts with
+        # 'https://login.microsoftonline.com/', the bot is operating in
+        # Public Azure. So we use the Public Azure audience
+        # or the specified audience.
+        if to_channel_from_bot_login_url.startswith(
+            AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX
+        ):
+            if not audience:
                 audience = AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
         elif to_channel_from_bot_login_url == GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL:
             # Or if the bot is operating in US Government Azure, use that audience.
-            if audience == "":
+            if not audience:
                 audience = GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
 
         app_creds = await self._options.adapter.credentials_factory.create_credentials(
-            self._options.bot_app_id, audience, login_endpoint, True
+            self._options.bot_app_id, audience, to_channel_from_bot_login_url, True
         )
         return app_creds.get_access_token()
