@@ -28,7 +28,7 @@ This sample shows how to incorporate Adaptive Cards into a Microsoft Teams appli
     git clone https://github.com/Microsoft/teams-ai.git
     ```
 
-1. If you do not have `yarn` installed, install it globally
+1. If you do not have `yarn` installed, and want to run local bits, install it globally
 
     ```bash
     npm install -g yarn@1.21.1
@@ -38,14 +38,22 @@ This sample shows how to incorporate Adaptive Cards into a Microsoft Teams appli
 
     ```bash
     cd teams-ai/js
+    # This will use the latest changes from teams-ai in the sample.
     yarn install #only needs to be run once, after clone or remote pull
     yarn build
+    # To run using latest published version of teams-ai, do the following instead:
+    cd teams-ai/js/samples/<this-sample-folder>
+    npm install --workspaces=false
+    npm run build
     ```
 
 1. In a terminal, navigate to the sample root.
 
     ```bash
     cd samples/<this-sample-folder>/
+    yarn start
+    # If running the sample on published version of teams-ai
+    npm start
     ```
 
 1. Duplicate the `sample.env` file in this folder. Rename the file to `.env`.
@@ -65,7 +73,8 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
-1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
+1. Copy this sample into a new folder outside of teams-ai
+1. Select File > Open Folder in VS Code and choose this sample's directory
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
 1. Ensure that you have set up the sample from the previous step.
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.

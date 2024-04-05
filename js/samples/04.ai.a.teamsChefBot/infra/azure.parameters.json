@@ -19,6 +19,6 @@
       },
       "openAIKey": {
         "value": "${{SECRET_OPENAI_KEY}}"
-      }      
+      }
     }
   }
