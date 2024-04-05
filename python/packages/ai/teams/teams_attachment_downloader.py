@@ -5,7 +5,6 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from typing import List, Optional
 
@@ -105,10 +104,7 @@ class TeamsAttachmentDownloader(InputFileDownloader):
 
             async with aiohttp.ClientSession() as session:
                 async with session.get(attachment.content_url, headers=headers) as response:
-                    json_response = response.json
-
-                    # Convert to bytes
-                    content = json.dumps(json_response).encode("utf-8")
+                    content = await response.read()
 
                     # Fix content type
                     content_type = attachment.content_type

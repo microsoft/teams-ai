@@ -52,6 +52,11 @@ class MockConfiguration:
     CALLER_ID: Optional[str] = ""
 
 
+class MockedResponse:
+    async def read(self):
+        return bytes("file.png", "utf-8")
+
+
 class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
     def create_mock_context(
         self, channel_id="channel1", bot_id="bot1", conversation_id="conversation1", user_id="user1"
@@ -107,7 +112,9 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
 
     @mock.patch("aiohttp.ClientSession.get")
     async def test_should_download_file(self, mock_get):
-        mock_get.return_value.__aenter__.return_value.json = {"data": "file.png"}
+        response_obj = MockedResponse()
+        mock_get.return_value.__aenter__.return_value = response_obj
+        mocked_content = await response_obj.read()
         attachment = Attachment(
             content_url="https://example.com/file.png", content_type="image/png", name="file.png"
         )
@@ -127,7 +134,7 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
             input_files,
             [
                 InputFile(
-                    content=json.dumps({"data": "file.png"}).encode("utf-8"),
+                    content=mocked_content,
                     content_type="image/png",
                     content_url="https://example.com/file.png",
                 )
@@ -136,7 +143,9 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
 
     @mock.patch("aiohttp.ClientSession.get")
     async def test_should_download_local_file(self, mock_get):
-        mock_get.return_value.__aenter__.return_value.json = {"data": "file.png"}
+        response_obj = MockedResponse()
+        mock_get.return_value.__aenter__.return_value = response_obj
+        mocked_content = await response_obj.read()
         attachment = Attachment(
             content_url="http://localhost:3978/file.png", content_type="image/png", name="file.png"
         )
@@ -156,7 +165,7 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
             input_files,
             [
                 InputFile(
-                    content=json.dumps({"data": "file.png"}).encode("utf-8"),
+                    content=mocked_content,
                     content_type="image/png",
                     content_url="http://localhost:3978/file.png",
                 )
@@ -219,7 +228,9 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
 
     @mock.patch("aiohttp.ClientSession.get")
     async def test_should_update_mime_content_type(self, mock_get):
-        mock_get.return_value.__aenter__.return_value.json = {"data": "file.png"}
+        response_obj = MockedResponse()
+        mock_get.return_value.__aenter__.return_value = response_obj
+        mocked_content = await response_obj.read()
         attachment = Attachment(
             content_url="https://example.com/file.png", content_type="image/*", name="file.png"
         )
@@ -239,7 +250,7 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
             input_files,
             [
                 InputFile(
-                    content=json.dumps({"data": "file.png"}).encode("utf-8"),
+                    content=mocked_content,
                     content_type="image/png",
                     content_url="https://example.com/file.png",
                 )
@@ -248,7 +259,9 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
 
     @mock.patch("aiohttp.ClientSession.get")
     async def test_should_download_file_with_enabled_auth(self, mock_get):
-        mock_get.return_value.__aenter__.return_value.json = {"data": "file.png"}
+        response_obj = MockedResponse()
+        mock_get.return_value.__aenter__.return_value = response_obj
+        mocked_content = await response_obj.read()
         attachment = Attachment(
             content_url="https://example.com/file.png", content_type="image/png", name="file.png"
         )
@@ -271,7 +284,7 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
             input_files,
             [
                 InputFile(
-                    content=json.dumps({"data": "file.png"}).encode("utf-8"),
+                    content=mocked_content,
                     content_type="image/png",
                     content_url="https://example.com/file.png",
                 )
@@ -280,7 +293,9 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
 
     @mock.patch("aiohttp.ClientSession.get")
     async def test_should_download_file_with_enabled_auth_with_audience(self, mock_get):
-        mock_get.return_value.__aenter__.return_value.json = {"data": "file.png"}
+        response_obj = MockedResponse()
+        mock_get.return_value.__aenter__.return_value = response_obj
+        mocked_content = await response_obj.read()
         attachment = Attachment(
             content_url="https://example.com/file.png", content_type="image/png", name="file.png"
         )
@@ -309,7 +324,7 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
             input_files,
             [
                 InputFile(
-                    content=json.dumps({"data": "file.png"}).encode("utf-8"),
+                    content=mocked_content,
                     content_type="image/png",
                     content_url="https://example.com/file.png",
                 )
@@ -318,7 +333,9 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
 
     @mock.patch("aiohttp.ClientSession.get")
     async def test_should_download_file_with_enabled_auth_gov(self, mock_get):
-        mock_get.return_value.__aenter__.return_value.json = {"data": "file.png"}
+        response_obj = MockedResponse()
+        mock_get.return_value.__aenter__.return_value = response_obj
+        mocked_content = await response_obj.read()
         attachment = Attachment(
             content_url="https://example.com/file.png", content_type="image/png", name="file.png"
         )
@@ -348,7 +365,7 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
             input_files,
             [
                 InputFile(
-                    content=json.dumps({"data": "file.png"}).encode("utf-8"),
+                    content=mocked_content,
                     content_type="image/png",
                     content_url="https://example.com/file.png",
                 )
@@ -357,7 +374,9 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
 
     @mock.patch("aiohttp.ClientSession.get")
     async def test_should_download_file_with_enabled_auth_no_audience(self, mock_get):
-        mock_get.return_value.__aenter__.return_value.json = {"data": "file.png"}
+        response_obj = MockedResponse()
+        mock_get.return_value.__aenter__.return_value = response_obj
+        mocked_content = await response_obj.read()
         attachment = Attachment(
             content_url="https://example.com/file.png", content_type="image/png", name="file.png"
         )
@@ -387,7 +406,7 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
             input_files,
             [
                 InputFile(
-                    content=json.dumps({"data": "file.png"}).encode("utf-8"),
+                    content=mocked_content,
                     content_type="image/png",
                     content_url="https://example.com/file.png",
                 )
