@@ -32,19 +32,6 @@ class TeamsAttachmentDownloaderOptions:
     "ServiceClientCredentialsFactory"
 
 
-@dataclass
-class AuthenticatorResult:
-    """
-    The result body of the authentication.
-    """
-
-    access_token: str
-    "The value of the access token resulting from an authentication process."
-
-    expires_on: Date
-    "The date and time of expiration."
-
-
 class TeamsAttachmentDownloader(InputFileDownloader):
     """
     Downloads attachments from Teams using the bot's access token.
