@@ -13,6 +13,7 @@ from botbuilder.core import Storage
 
 from .adaptive_cards import AdaptiveCardsOptions
 from .ai import AIOptions
+from .auth import AuthOptions
 from .task_modules import TaskModulesOptions
 from .teams_adapter import TeamsAdapter
 
@@ -22,6 +23,11 @@ class ApplicationOptions:
     adapter: Optional[TeamsAdapter] = None
     """
     Optional. Options used to initialize your `BotAdapter`
+    """
+
+    auth: Optional[AuthOptions] = None
+    """
+    Optional. Auth settings.
     """
 
     bot_app_id: str = ""

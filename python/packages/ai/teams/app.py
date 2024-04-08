@@ -21,7 +21,7 @@ from typing import (
 
 from aiohttp.web import Request, Response
 from botbuilder.core import Bot, TurnContext
-from botbuilder.schema import ActivityTypes
+from botbuilder.schema import ActivityTypes, SignInConstants
 from botbuilder.schema.teams import (
     FileConsentCardResponse,
     O365ConnectorCardActionQuery,
@@ -37,15 +37,18 @@ from .adaptive_cards.adaptive_cards import AdaptiveCards
 from .ai import AI
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
+from .auth import AuthManager, OAuth, OAuthOptions
+from .auth.token_exchange_middleware import _TokenExchangeMiddleware
 from .meetings.meetings import Meetings
 from .message_extensions.message_extensions import MessageExtensions
 from .route import Route, RouteHandler
-from .state import TurnState
+from .state import TurnState, UserState
 from .task_modules import TaskModules
 from .teams_adapter import TeamsAdapter
 from .typing import Typing
 
 StateT = TypeVar("StateT", bound=TurnState)
+IN_SIGN_IN_KEY = "__InSignInFlow__"
 
 
 class Application(Bot, Generic[StateT]):
@@ -67,6 +70,7 @@ class Application(Bot, Generic[StateT]):
     _adaptive_card: AdaptiveCards[StateT]
     _options: ApplicationOptions
     _adapter: Optional[TeamsAdapter] = None
+    _auth: Optional[AuthManager[StateT]] = None
     _before_turn: List[RouteHandler[StateT]] = []
     _after_turn: List[RouteHandler[StateT]] = []
     _routes: List[Route[StateT]] = []
@@ -104,6 +108,29 @@ class Application(Bot, Generic[StateT]):
         if options.adapter:
             self._adapter = options.adapter
 
+        if options.auth:
+            self._auth = AuthManager[StateT](default=options.auth.default)
+
+            for name, opts in options.auth.settings.items():
+                if self._adapter and options.storage:
+                    self._adapter.use(_TokenExchangeMiddleware(options.storage, name))
+
+                if isinstance(opts, OAuthOptions):
+                    self._auth.set(name, OAuth[StateT](opts))
+                    self._routes.append(
+                        Route[StateT](
+                            selector=lambda context: context.activity.type == ActivityTypes.invoke
+                            and (
+                                context.activity.name
+                                in (
+                                    SignInConstants.token_exchange_operation_name,
+                                    SignInConstants.verify_state_operation_name,
+                                )
+                            ),
+                            handler=self._auth._on_sign_in_complete(name),
+                        )
+                    )
+
     @property
     def adapter(self) -> TeamsAdapter:
         """
@@ -135,6 +162,21 @@ class Application(Bot, Generic[StateT]):
             )
 
         return self._ai
+
+    @property
+    def auth(self) -> AuthManager[StateT]:
+        """
+        The application's authentication manager
+        """
+        if not self._auth:
+            raise ApplicationError(
+                """
+                The `Application.auth` property is unavailable because
+                no Auth options were configured.
+                """
+            )
+
+        return self._auth
 
     @property
     def options(self) -> ApplicationOptions:
@@ -619,6 +661,31 @@ class Application(Bot, Generic[StateT]):
 
             await state.load(context, self._options.storage)
             state.temp.input = context.activity.text
+            user_state = cast(UserState, state.user)
+
+            # handle auth flow
+            if self.options.auth and self.options.auth.auto and self._auth:
+                key: Optional[str] = (
+                    user_state[IN_SIGN_IN_KEY]
+                    if IN_SIGN_IN_KEY in user_state
+                    else self.options.auth.default
+                )
+
+                if not IN_SIGN_IN_KEY in user_state:
+                    user_state[IN_SIGN_IN_KEY] = key
+
+                res = await self._auth.sign_in(context, state, key=key)
+
+                if res.status == "complete":
+                    del user_state[IN_SIGN_IN_KEY]
+
+                if res.status == "pending":
+                    await state.save(context, self._options.storage)
+                    return
+
+                if res.status == "error" and res.reason != "invalid-activity":
+                    del user_state[IN_SIGN_IN_KEY]
+                    raise ApplicationError(f"[{res.reason}] => {res.message}")
 
             # run before turn middleware
             for before_turn in self._before_turn:
