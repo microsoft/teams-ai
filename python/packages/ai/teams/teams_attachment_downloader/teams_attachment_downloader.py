@@ -5,7 +5,6 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import List, Optional
 
 import aiohttp
@@ -13,21 +12,8 @@ from botbuilder.core import TurnContext
 from botbuilder.schema import Attachment
 from botframework.connector.auth import AuthenticationConstants, GovernmentConstants
 
-from .input_file import InputFile, InputFileDownloader
-from .teams_adapter import TeamsAdapter
-
-
-@dataclass
-class TeamsAttachmentDownloaderOptions:
-    """
-    Options for the `TeamsAttachmentDownloader` class.
-    """
-
-    bot_app_id: str
-    "The Microsoft App ID of the bot"
-
-    adapter: TeamsAdapter
-    "ServiceClientCredentialsFactory"
+from ..input_file import InputFile, InputFileDownloader
+from .teams_attachment_downloader_options import TeamsAttachmentDownloaderOptions
 
 
 class TeamsAttachmentDownloader(InputFileDownloader):
@@ -106,7 +92,6 @@ class TeamsAttachmentDownloader(InputFileDownloader):
                 async with session.get(attachment.content_url, headers=headers) as response:
                     content = await response.read()
 
-                    # Fix content type
                     content_type = attachment.content_type
 
                     if content_type == "image/*":
