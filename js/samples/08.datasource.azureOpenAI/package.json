@@ -39,12 +39,12 @@
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
-        "@types/node": "^20.12.2",
+        "@types/node": "^20.12.5",
         "@types/restify": "8.5.12",
         "env-cmd": "^10.1.0",
         "nodemon": "~1.19.4",
         "rimraf": "^3.0.2",
         "ts-node": "^10.9.2",
-        "typescript": "^5.3.3"
+        "typescript": "^5.4.4"
     }
 }

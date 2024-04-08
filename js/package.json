@@ -31,7 +31,7 @@
         "@types/jsonwebtoken": "9.0.4",
         "@types/lodash": "^4.17.0",
         "@types/mocha": "^10.0.6",
-        "@types/node": "^20.12.2",
+        "@types/node": "^20.12.5",
         "@types/sinon": "^10.0.19",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
@@ -64,7 +64,7 @@
         "sponge": "^0.1.0",
         "tinyify": "^4.0.0",
         "ts-node": "^10.9.2",
-        "typescript": "^5.4.3",
+        "typescript": "^5.4.4",
         "wsrun": "^5.2.4"
     }
 }
