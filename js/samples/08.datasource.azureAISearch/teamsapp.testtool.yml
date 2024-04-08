@@ -4,21 +4,14 @@
 version: v1.3
 
 deploy:
-  # Install development tool(s)
-  - uses: devTool/install
-    with:
-      testTool:
-        version: ~0.1.0-beta
-        symlinkDir: ./devTools/teamsapptester
+    # Install development tool(s)
+    - uses: devTool/install
+      with:
+          testTool:
+              version: ~0.1.0-beta
+              symlinkDir: ./devTools/teamsapptester
 
-  # Run npm command
-  - uses: cli/runNpmCommand
-    with:
-      args: install --no-audit
-
-  # Generate runtime environment variables
-  - uses: file/createOrUpdateEnvironmentFile
-    with:
-      target: ./.env
-      envs:
-        TEAMSFX_NOTIFICATION_STORE_FILENAME: ${{TEAMSFX_NOTIFICATION_STORE_FILENAME}}
+    # Run npm command
+    - uses: cli/runNpmCommand
+      with:
+          args: install --no-audit

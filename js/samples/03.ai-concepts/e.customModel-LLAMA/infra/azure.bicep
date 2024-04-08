@@ -10,6 +10,12 @@ param botAadAppClientId string
 @description('Required by Bot Framework package in your bot project')
 param botAadAppClientSecret string
 
+@secure()
+param llamaAPIKey string = ''
+
+@secure()
+param llamaEndpoint string = ''
+
 param webAppSKU string
 
 @maxLength(42)
@@ -59,6 +65,14 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           name: 'BOT_PASSWORD'
           value: botAadAppClientSecret
+        }
+        {
+          name: 'LLAMA_KEY'
+          value: llamaAPIKey
+        }
+        {
+          name: 'LLAMA_ENDPOINT'
+          value: llamaEndpoint
         }
       ]
       ftpsState: 'FtpsOnly'

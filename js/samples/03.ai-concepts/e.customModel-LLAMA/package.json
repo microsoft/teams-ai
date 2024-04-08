@@ -11,7 +11,7 @@
         "dev:teamsfx:launch-testtool": "env-cmd --silent -f env/.env.testtool teamsapptester start",
         "dev": "nodemon --watch ./src --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts",
         "build": "tsc --build && shx cp -r ./src/prompts ./lib/",
-        "clean": "rimraf node_modules lib tsconfig.tsbuildinfo",
+        "clean": "npx rimraf node_modules lib tsconfig.tsbuildinfo",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "start": "tsc --build && node ./lib/index.js",
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -24,14 +24,19 @@
     "dependencies": {
         "botbuilder": "^4.22.1",
         "@microsoft/teams-ai": "~1.1.0",
+        "openai": "4.28.4",
         "dotenv": "^16.4.1",
         "replace": "~1.2.0",
         "restify": "~11.1.0"
     },
     "devDependencies": {
-        "@types/dotenv": "6.1.1",
+        "@types/node": "^20.12.2",
         "@types/restify": "8.5.12",
+        "@typescript-eslint/eslint-plugin": "^6.21.0",
+        "@typescript-eslint/parser": "^6.21.0",
+        "eslint": "^8.57.0",
         "nodemon": "~1.19.4",
+        "prettier": "^3.2.5",
         "typescript": "^5.4.4",
         "shx": "^0.3.4",
         "ts-node": "^10.9.2"

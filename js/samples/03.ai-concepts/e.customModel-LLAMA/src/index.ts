@@ -81,7 +81,8 @@ if (!process.env.LLAMA_API_KEY && !process.env.LLAMA_ENDPOINT) {
 const model = new LlamaModel({
     // Llama Support
     apiKey: process.env.LLAMA_API_KEY!,
-    endpoint: process.env.LLAMA_ENDPOINT!
+    endpoint: process.env.LLAMA_ENDPOINT!,
+    logRequests: true
 });
 
 const prompts = new PromptManager({
