@@ -28,7 +28,7 @@
         "openai": "4.28.4",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
-        "vectra": "^0.6.0"
+        "vectra": "^0.7.6"
     },
     "devDependencies": {
         "@types/jsonwebtoken": "^9.0.6",
