@@ -32,7 +32,7 @@
         "nodemon": "~1.19.4",
         "shx": "^0.3.4",
         "ts-node": "^10.9.2",
-        "typescript": "^5.4.3",
+        "typescript": "^5.4.4",
         "@types/jsonwebtoken": "^9.0.6"
     }
 }
