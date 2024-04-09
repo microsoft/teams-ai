@@ -1,25 +1,17 @@
-# Teams Search Command Message Extension
+# AI in Microsoft Teams: Twenty Questions
 
-This sample shows how to incorporate a basic Message Extension app into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK. Users can search npmjs for packages.
+Welcome to the 20 Questions Bot: The Ultimate Guessing Game! This developer sample application showcases the incredible capabilities of language models and the concept of user intent. Challenge your skills as the human player and try to guess a secret within 20 questions, while the AI-powered bot answers your queries about the secret. Experience firsthand how language models interpret user input and provide informative responses, creating an engaging and interactive gaming experience. Get ready to dive into the world of language models and explore the fascinating realm of user interaction and intent.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [Teams Search Command Message Extension](#teams-search-command-message-extension)
-  - [Interacting with the message extension](#interacting-with-the-message-extension)
+- [AI in Microsoft Teams: Twenty Questions](#ai-in-microsoft-teams-twenty-questions)
   - [Setting up the sample](#setting-up-the-sample)
   - [Testing the sample](#testing-the-sample)
     - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
-
-## Interacting with the message extension
-
--   Message Extensions are convenient ways to add functionality to Teams.
--   This sample adds a search command to the compose area of a chat.
-
-> Note: this is not a chat bot and therefore the bot does not respond if you talk to it. Once it is installed in Teams, you can interact with it by selecting it's app icon in the chat compose area.
 
 ## Setting up the sample
 
@@ -31,6 +23,7 @@ This sample shows how to incorporate a basic Message Extension app into a Micros
 
 > [!IMPORTANT]
 > To prevent issues when installing dependencies after cloning the repo, copy or move the sample directory to it's own location first.
+> If you opened this sample from the Sample Gallery in Teams Toolkit, you can skip to step 3.
 
 1. If you do not have `yarn` installed, and want to run local bits, install it globally
 
@@ -60,7 +53,10 @@ This sample shows how to incorporate a basic Message Extension app into a Micros
     npm start
     ```
 
-1. Duplicate the `sample.env` file in this folder. Rename the file to `.env` and add your bot's credentials and any other credentials to that file. Alternatively, if you are using Teams Toolkit (see below), you can add these credentials to the `/env/.env.*.*` files.
+1. Update any prompt `config.json` and `/src/index.ts` with your model deployment name.
+
+1. If developing without Teams Toolkit, add your OpenAI or Azure OpenAI key to the `OPENAI_KEY` or `AZURE_OPENAI_KEY` and `AZURE_OPENAI_ENDPOINT` variable(s) in `.env` file, which you can copy from `sample.env`. If using TTK, continue following the directions below.
+
 
 ## Testing the sample
 
@@ -72,7 +68,37 @@ To use Teams Toolkit, continue following the directions below.
 
 ### Using Teams Toolkit for Visual Studio Code
 
-The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
+1. Add your OpenAI key to the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
+
+If you are using Azure OpenAI then follow these steps:
+
+- Comment the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
+- Add your Azure OpenAI key and endpoint values to the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables
+- Open the `teamsapp.local.yml` file and modify the last step to use Azure OpenAI variables instead:
+
+```yml
+- uses: file/createOrUpdateEnvironmentFile
+    with:
+      target: ./.env
+      envs:
+        BOT_ID: ${{BOT_ID}}
+        BOT_PASSWORD: ${{SECRET_BOT_PASSWORD}}
+        #OPENAI_KEY: ${{SECRET_OPENAI_KEY}}
+        AZURE_OPENAI_KEY: ${{SECRET_AZURE_OPENAI_KEY}}
+        AZURE_OPENAI_ENDPOINT: ${{SECRET_AZURE_OPENAI_ENDPOINT}}
+```
+
+- Open `./infra/azure.bicep` and comment out lines 72-75 and uncomment lines 76-83.
+- Open `./infra/azure.parameters.json` and replace lines 20-22 with:
+
+```json
+      "azureOpenAIKey": {
+        "value": "${{SECRET_AZURE_OPENAI_KEY}}"
+      },
+      "azureOpenAIEndpoint": {
+        "value": "${{SECRET_AZURE_OPENAI_ENDPOINT}}"
+      }
+```
 
 1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)

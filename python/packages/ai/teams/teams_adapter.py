@@ -15,6 +15,7 @@ from botbuilder.core.turn_context import TurnContext
 from botbuilder.integration.aiohttp import (
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
+    ConfigurationServiceClientCredentialFactory,
 )
 from botbuilder.schema import Activity
 from botframework.connector import (
@@ -41,6 +42,26 @@ class TeamsAdapter(CloudAdapter, _UserAgent):
     and can be hosted in different cloud environments both public and private.
     """
 
+    _credentials_factory: ServiceClientCredentialsFactory
+    "The credentials factory used by the bot adapter to create a [ServiceClientCredentials] object."
+    _configuration: Any
+
+    @property
+    def credentials_factory(self) -> ServiceClientCredentialsFactory:
+        """
+        The bot's credentials factory.
+        """
+
+        return self._credentials_factory
+
+    @property
+    def configuration(self) -> Any:
+        """
+        The bot's configuration.
+        """
+
+        return self._configuration
+
     def __init__(
         self,
         configuration: Any,
@@ -62,6 +83,13 @@ class TeamsAdapter(CloudAdapter, _UserAgent):
                 http_client_factory=_TeamsHttpClientFactory(parent=http_client_factory),
                 logger=cast(Logger, logger),
             )
+        )
+
+        self._configuration = configuration
+        self._credentials_factory = (
+            cast(ServiceClientCredentialsFactory, credentials_factory)
+            if credentials_factory
+            else ConfigurationServiceClientCredentialFactory(configuration)
         )
 
     async def process(
