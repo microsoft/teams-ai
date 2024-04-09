@@ -65,7 +65,7 @@ class TaskModules(Generic[StateT]):
             )
 
         def __call__(
-            func: Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]]
+            func: Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]],
         ) -> Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]]:
             async def __handler__(context: TurnContext, state: StateT) -> bool:
                 # the selector already ensures data exists
@@ -111,7 +111,7 @@ class TaskModules(Generic[StateT]):
         def __call__(
             func: Callable[
                 [TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]
-            ]
+            ],
         ) -> Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]]:
             async def __handler__(context: TurnContext, state: StateT) -> bool:
                 # the selector already ensures data exists

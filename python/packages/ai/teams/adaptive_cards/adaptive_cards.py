@@ -86,7 +86,7 @@ class AdaptiveCards(Generic[StateT]):
             return False
 
         def __call__(
-            func: Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]]
+            func: Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]],
         ) -> Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]]:
             async def __handler__(context: TurnContext, state: StateT) -> bool:
                 result = await func(context, state, context.activity.value["action"]["data"])
@@ -162,7 +162,7 @@ class AdaptiveCards(Generic[StateT]):
             return False
 
         def __call__(
-            func: Callable[[TurnContext, StateT, dict], Awaitable[None]]
+            func: Callable[[TurnContext, StateT, dict], Awaitable[None]],
         ) -> Callable[[TurnContext, StateT, dict], Awaitable[None]]:
             async def __handler__(context: TurnContext, state: StateT) -> bool:
                 await func(context, state, context.activity.value)
@@ -229,7 +229,7 @@ class AdaptiveCards(Generic[StateT]):
             func: Callable[
                 [TurnContext, StateT, Query[AdaptiveCardsSearchParams]],
                 Awaitable[List[AdaptiveCardsSearchResult]],
-            ]
+            ],
         ) -> Callable[
             [TurnContext, StateT, Query[AdaptiveCardsSearchParams]],
             Awaitable[List[AdaptiveCardsSearchResult]],

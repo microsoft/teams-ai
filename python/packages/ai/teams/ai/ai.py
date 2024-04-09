@@ -110,12 +110,10 @@ class AI(Generic[StateT]):
             existing = self._actions.get(action_name)
 
             if existing and not existing.allow_overrides:
-                raise ApplicationError(
-                    f"""
+                raise ApplicationError(f"""
                     The AI.action() method was called with a previously 
                     registered action named \"{action_name}\".
-                    """
-                )
+                    """)
 
             self._actions[action_name] = ActionEntry[StateT](action_name, allow_overrides, func)
             return func
@@ -228,10 +226,8 @@ class AI(Generic[StateT]):
         status = _context.data.get("status")
         message = _context.data.get("message")
         raise ApplicationError(
-            (
-                "An AI request failed because an http error occurred. "
-                f"Status code:{status}. Message:{message}"
-            )
+            "An AI request failed because an http error occurred. "
+            f"Status code:{status}. Message:{message}"
         )
 
     async def _on_plan_ready(

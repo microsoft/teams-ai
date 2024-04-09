@@ -29,11 +29,11 @@ msal = "^1.28.0"
 botbuilder-dialogs = "^4.14.8"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.4.0"
-pylint = "^2.17.4"
-pytest-cov = "^4.1.0"
+pytest = "^8.1.1"
+pylint = "^3.1.0"
+pytest-cov = "^5.0.0"
 pytest-asyncio = "^0.21.1"
-black = ">=23.7,<25.0"
+black = "24.3.0"
 isort = "^5.12.0"
 mypy = "^1.5.0"
 httpx = "^0.26.0"
@@ -50,8 +50,10 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
+preview = true
 line-length = 100
 target-version = ['py38']
+enable-unstable-feature = ['string_processing', 'multiline_string_handling']
 
 [tool.isort]
 profile = "black"

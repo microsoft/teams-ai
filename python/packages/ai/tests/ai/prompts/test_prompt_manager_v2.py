@@ -82,10 +82,8 @@ class TestPromptManager(IsolatedAsyncioTestCase):
             self.prompt_manager.add_prompt(prompt)
         self.assertEqual(
             str(context.exception),
-            (
-                "The PromptManager.add_prompt() method was called with a "
-                "previously registered prompt named 'test'."
-            ),
+            "The PromptManager.add_prompt() method was called with a "
+            "previously registered prompt named 'test'.",
         )
 
     def test_has_prompt_from_file(self):
