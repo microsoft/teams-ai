@@ -7,6 +7,12 @@ param resourceBaseName string
 param botAadAppClientId string
 
 @secure()
+param openAIKey string = ''
+
+@secure()
+param assistantId string = ''
+
+@secure()
 @description('Required by Bot Framework package in your bot project')
 param botAadAppClientSecret string
 
@@ -59,6 +65,14 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           name: 'BOT_PASSWORD'
           value: botAadAppClientSecret
+        }
+        {
+          name: 'OPENAI_KEY'
+          value: openAIKey
+        }
+        {
+          name: 'ASSISTANT_ID'
+          value: assistantId
         }
       ]
       ftpsState: 'FtpsOnly'
