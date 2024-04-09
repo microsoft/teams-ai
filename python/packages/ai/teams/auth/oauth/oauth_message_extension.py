@@ -5,20 +5,26 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from typing import Generic, Optional, TypeVar
+from typing import Generic, Optional, TypeVar, cast
 
 from botbuilder.core import TurnContext
-from botbuilder.schema import Activity, ActivityTypes, TokenResponse
+from botbuilder.schema import Activity, ActivityTypes, InvokeResponse, TokenResponse
+from botbuilder.schema.teams import (
+    MessagingExtensionActionResponse,
+    MessagingExtensionResult,
+    MessagingExtensionSuggestedAction,
+)
+from botframework.connector.models import CardAction
 
 from ...state import TurnState
-from ..message_extension import MessageExtension
+from ..auth import Auth
 from ..user_token import exchange_token, get_sign_in_resource, get_user_token
 from .oauth_options import OAuthOptions
 
 StateT = TypeVar("StateT", bound=TurnState)
 
 
-class OAuthMessageExtension(Generic[StateT], MessageExtension[StateT]):
+class OAuthMessageExtension(Generic[StateT], Auth[StateT]):
     """
     handles message extension oauth authentication
     """
@@ -28,18 +34,6 @@ class OAuthMessageExtension(Generic[StateT], MessageExtension[StateT]):
     def __init__(self, options: OAuthOptions = OAuthOptions()) -> None:
         super().__init__()
         self._options = options
-
-    @property
-    def enable_sso(self) -> bool:
-        return self._options.enable_sso
-
-    @property
-    def title(self) -> str:
-        return self._options.title
-
-    @property
-    def text(self) -> str:
-        return self._options.text
 
     def is_valid_activity(self, activity: Activity) -> bool:
         return activity.type == ActivityTypes.invoke and activity.name in (
@@ -66,6 +60,60 @@ class OAuthMessageExtension(Generic[StateT], MessageExtension[StateT]):
 
         if res is not None and res.token != "":
             return res.token
+
+        return None
+
+    async def sign_in(self, context: TurnContext, state: StateT) -> str | None:
+        value = cast(dict, context.activity.value)
+
+        if "authentication" in value and "token" in value["authentication"]:
+            res = await self.sso_token_exchange(context)
+
+            if res is not None and res.token != "":
+                return res.token
+
+            await context.send_activity(
+                Activity(
+                    type=ActivityTypes.invoke_response,
+                    value=InvokeResponse(status=412),
+                )
+            )
+
+            return None
+
+        res = await self.on_sign_in_complete(context, state)
+
+        if res is not None:
+            return res.token
+
+        await context.send_activity(
+            Activity(
+                type=ActivityTypes.invoke_response,
+                value=InvokeResponse(
+                    status=200,
+                    body=MessagingExtensionActionResponse(
+                        compose_extension=MessagingExtensionResult(
+                            type=(
+                                "silentAuth"
+                                if context.activity.name == "composeExtension/query"
+                                and self._options.enable_sso
+                                else "auth"
+                            ),
+                            suggested_actions=MessagingExtensionSuggestedAction(
+                                actions=[
+                                    CardAction(
+                                        type="openUrl",
+                                        title=self._options.title,
+                                        text=self._options.text,
+                                        display_text=self._options.text,
+                                    )
+                                ],
+                            ),
+                        ),
+                    ),
+                ),
+            )
+        )
 
         return None
 
