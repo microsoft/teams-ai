@@ -309,8 +309,7 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
                 bot_app_id="botAppId",
                 adapter=TeamsAdapter(
                     MockConfiguration(
-                        TO_CHANNEL_FROM_BOT_OAUTH_SCOPE=
-                        GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                        TO_CHANNEL_FROM_BOT_OAUTH_SCOPE=GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
                     ),
                     credentials_factory=MockCredentialsFactory(),
                 ),
@@ -390,8 +389,7 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
                 bot_app_id="botAppId",
                 adapter=TeamsAdapter(
                     MockConfiguration(
-                        TO_CHANNEL_FROM_BOT_LOGIN_URL=
-                        GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL,
+                        TO_CHANNEL_FROM_BOT_LOGIN_URL=GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL,
                         CALLER_ID=CallerIdConstants.us_gov_channel,
                     ),
                     credentials_factory=MockCredentialsFactory(),
