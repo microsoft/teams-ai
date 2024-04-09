@@ -8,14 +8,19 @@ from __future__ import annotations
 from typing import Generic, Optional, TypeVar, cast
 
 from botbuilder.core import TurnContext
-from botbuilder.schema import Activity, ActivityTypes, InvokeResponse, TokenResponse
-from botbuilder.schema.teams import (
-    MessagingExtensionActionResponse,
-    MessagingExtensionResult,
-    MessagingExtensionSuggestedAction,
+from botbuilder.schema import (
+    Activity,
+    ActivityTypes,
+    ChannelAccount,
+    InvokeResponse,
+    TokenResponse,
 )
 from botframework.connector.auth import TokenExchangeRequest
-from botframework.connector.models import CardAction
+from botframework.connector.models import (
+    AdaptiveCardInvokeResponse,
+    AdaptiveCardInvokeValue,
+    CardAction,
+)
 
 from ...state import TurnState
 from ..auth import Auth
@@ -25,33 +30,22 @@ from .oauth_options import OAuthOptions
 StateT = TypeVar("StateT", bound=TurnState)
 
 
-class OAuthMessageExtension(Generic[StateT], Auth[StateT]):
-    """
-    handles message extension oauth authentication
-    """
+class OAuthAdaptiveCard(Generic[StateT], Auth[StateT]):
+    "handles adaptive card oauth authentication"
 
     _options: OAuthOptions
 
-    def __init__(self, options: OAuthOptions = OAuthOptions()) -> None:
+    def __init__(self, options: OAuthOptions) -> None:
         super().__init__()
         self._options = options
 
     def is_valid_activity(self, activity: Activity) -> bool:
-        return activity.type == ActivityTypes.invoke and activity.name in (
-            "composeExtension/query",
-            "composeExtension/queryLink",
-            "composeExtension/anonymousQueryLink",
-            "composeExtension/fetchTask",
-        )
-
-    async def get_sign_in_link(self, context: TurnContext) -> Optional[str]:
-        res = await get_sign_in_resource(context, self._options.connection_name)
-        return res.sign_in_link
+        return activity.type == ActivityTypes.invoke and activity.name == "adaptiveCard/action"
 
     async def sso_token_exchange(self, context: TurnContext) -> Optional[TokenResponse]:
         value = context.activity.value
 
-        if value is None or not hasattr(value, "authentication"):
+        if value is None or not isinstance(value, AdaptiveCardInvokeValue):
             return None
 
         auth = value.authentication
@@ -81,7 +75,17 @@ class OAuthMessageExtension(Generic[StateT], Auth[StateT]):
             await context.send_activity(
                 Activity(
                     type=ActivityTypes.invoke_response,
-                    value=InvokeResponse(status=412),
+                    value=InvokeResponse(
+                        status=200,
+                        body=AdaptiveCardInvokeResponse(
+                            status_code=412,
+                            type="application/vnd.microsoft.error.preconditionFailed",
+                            value={
+                                "code": "412",
+                                "message": "failed to exchange token",
+                            },
+                        ),
+                    ),
                 )
             )
 
@@ -92,30 +96,40 @@ class OAuthMessageExtension(Generic[StateT], Auth[StateT]):
         if res is not None:
             return res.token
 
+        sign_in_res = await get_sign_in_resource(context, self._options.connection_name)
+
+        if not sign_in_res.sign_in_link:
+            raise ValueError("OAuth:AdaptiveCard => no sign-in link found")
+
         await context.send_activity(
             Activity(
                 type=ActivityTypes.invoke_response,
                 value=InvokeResponse(
                     status=200,
-                    body=MessagingExtensionActionResponse(
-                        compose_extension=MessagingExtensionResult(
-                            type=(
-                                "silentAuth"
-                                if context.activity.name == "composeExtension/query"
+                    body=AdaptiveCardInvokeResponse(
+                        status_code=401,
+                        type="application/vnd.microsoft.activity.loginRequest",
+                        value={
+                            "text": self._options.title,
+                            "connection_name": self._options.connection_name,
+                            "buttons": [
+                                CardAction(
+                                    type="signin",
+                                    title="Sign-In",
+                                    text="Sign-In",
+                                    value=sign_in_res.sign_in_link,
+                                )
+                            ],
+                            "token_exchange_resource": (
+                                {
+                                    "id": cast(ChannelAccount, context.activity.recipient).id,
+                                    "uri": self._options.token_exchange_url,
+                                }
+                                if self._options.token_exchange_url is not None
                                 and self._options.enable_sso
-                                else "auth"
+                                else None
                             ),
-                            suggested_actions=MessagingExtensionSuggestedAction(
-                                actions=[
-                                    CardAction(
-                                        type="openUrl",
-                                        title=self._options.title,
-                                        text=self._options.text,
-                                        display_text=self._options.text,
-                                    )
-                                ],
-                            ),
-                        ),
+                        },
                     ),
                 ),
             )

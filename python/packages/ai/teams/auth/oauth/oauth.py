@@ -15,6 +15,7 @@ from teams.auth.sign_in_response import SignInResponse
 from ...state import TempState, TurnState
 from ..auth import Auth
 from ..user_token import get_user_token, sign_out_user
+from .oauth_adaptive_card import OAuthAdaptiveCard
 from .oauth_dialog import OAuthDialog
 from .oauth_message_extension import OAuthMessageExtension
 from .oauth_options import OAuthOptions
@@ -34,6 +35,7 @@ class OAuth(Auth[StateT]):
         self._components = [
             OAuthDialog[StateT](options),
             OAuthMessageExtension[StateT](options),
+            OAuthAdaptiveCard[StateT](options),
         ]
 
     def is_valid_activity(self, activity: Activity) -> bool:
