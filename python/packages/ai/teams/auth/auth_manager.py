@@ -77,6 +77,17 @@ class AuthManager(Generic[StateT]):
 
         return res
 
+    async def sign_out(
+        self, context: TurnContext, state: StateT, *, key: Optional[str] = None
+    ) -> None:
+        key = key if key is not None else self._default
+
+        if not key:
+            raise ValueError("must specify a connection 'key'")
+
+        auth = self.get(key)
+        await auth.sign_out(context, state)
+
     def _on_sign_in_complete(self, key: str):
         auth = self.get(key)
 
