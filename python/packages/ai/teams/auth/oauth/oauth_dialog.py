@@ -39,7 +39,7 @@ class OAuthDialog(Generic[StateT], Dialog[StateT, PromptOptions], Auth[StateT]):
 
     _options: OAuthOptions
 
-    def __init__(self, options: OAuthOptions = OAuthOptions()) -> None:
+    def __init__(self, options: OAuthOptions) -> None:
         super().__init__("OAuthDialog")
         self._options = options
         self.add_dialog(OAuthPrompt("OAuthPrompt", options))

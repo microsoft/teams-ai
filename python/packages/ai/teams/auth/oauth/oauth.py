@@ -29,7 +29,7 @@ class OAuth(Auth[StateT]):
     _options: OAuthOptions
     _components: List[Auth[StateT]]
 
-    def __init__(self, options: OAuthOptions = OAuthOptions()) -> None:
+    def __init__(self, options: OAuthOptions) -> None:
         super().__init__()
         self._options = options
         self._components = [
