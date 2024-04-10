@@ -7,7 +7,7 @@
     "main": "./lib/index.js",
     "scripts": {
         "build": "tsc --build && shx cp -r ./src/prompts ./lib/",
-        "clean": "rimraf node_modules lib tsconfig.tsbuildinfo",
+        "clean": "npx rimraf node_modules lib tsconfig.tsbuildinfo",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "start": "tsc --build && node ./lib/index.js",
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -16,7 +16,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com"
+        "url": "https://github.com/microsoft/teams-ai"
     },
     "dependencies": {
         "botbuilder": "^4.22.1",
@@ -27,12 +27,16 @@
         "openai": "^4.28.4"
     },
     "devDependencies": {
-        "@types/dotenv": "6.1.1",
-        "@types/restify": "8.5.12",
-        "nodemon": "~1.19.4",
+        "@types/jsonwebtoken": "^9.0.6",
+        "@types/node": "^20.12.2",
+        "@types/restify": "^8.5.12",
+        "@typescript-eslint/eslint-plugin": "^6.21.0",
+        "@typescript-eslint/parser": "^6.21.0",
+        "eslint": "^8.57.0",
+        "nodemon": "~3.0.1",
+        "prettier": "^3.2.5",
         "shx": "^0.3.4",
         "ts-node": "^10.9.2",
-        "typescript": "^5.4.4",
-        "@types/jsonwebtoken": "^9.0.6"
+        "typescript": "^5.4.3"
     }
 }
