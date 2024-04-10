@@ -5,7 +5,6 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-import inspect
 import json
 from abc import ABC, abstractmethod
 from copy import deepcopy
@@ -76,8 +75,10 @@ class State(dict, ABC):
         self.__deleted__ = []
 
         # copy public attributes that are not functions
-        for name, value in inspect.getmembers(self, lambda m: not callable(m)):
-            if not name.startswith("_"):
+        for name in dir(self):
+            value = object.__getattribute__(self, name)
+
+            if not name.startswith("_") and not callable(value):
                 self[name] = deepcopy(value)
 
         for key, value in kwargs.items():
