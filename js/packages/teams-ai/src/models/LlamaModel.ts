@@ -1,14 +1,16 @@
 import axios, { AxiosInstance } from 'axios';
 import { TurnContext } from 'botbuilder';
 
-import { PromptCompletionModel, PromptResponse } from '../models';
+import { Colorize } from '../internals/Colorize';
 import { Memory } from '../MemoryFork';
 import { Message, PromptFunctions, PromptTemplate } from '../prompts';
+import { PromptCompletionModel, PromptResponse } from '../models';
 import { Tokenizer } from '../tokenizers';
 
 export interface LlamaModelOptions {
     apiKey: string;
     endpoint: string;
+    logRequests?: boolean;
 }
 
 export class LlamaModel implements PromptCompletionModel {
@@ -49,6 +51,11 @@ export class LlamaModel implements PromptCompletionModel {
         }
         let res;
 
+        if (this.options.logRequests) {
+            console.log(Colorize.title('CHAT PROMPT:'));
+            console.log(Colorize.output(result.output));
+        }
+
         try {
             res = await this._httpClient.post<{ output: string }>(this.options.endpoint, {
                 input_data: {
@@ -56,6 +63,11 @@ export class LlamaModel implements PromptCompletionModel {
                     parameters: template.config.completion
                 }
             });
+            if (this.options.logRequests) {
+                console.log(Colorize.title('CHAT RESPONSE:'));
+                console.log(Colorize.value('status', res.status));
+                console.log(Colorize.output(res.data.output));
+            }
         } catch (err) {
             console.error(err);
             throw err;
