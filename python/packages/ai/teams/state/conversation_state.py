@@ -13,7 +13,7 @@ from .state import State, state
 
 
 @state
-class ConversationState(State[Any]):
+class ConversationState(State):
     """
     Default Conversation State
     """
@@ -43,7 +43,7 @@ class ConversationState(State[Any]):
 
         if key in data:
             if isinstance(data[key], StoreItem):
-                return cls(__key__=key, **data[key].__dict__)
+                return cls(__key__=key, **vars(data[key]))
             return cls(__key__=key, **data[key])
 
         return cls(__key__=key, **data)

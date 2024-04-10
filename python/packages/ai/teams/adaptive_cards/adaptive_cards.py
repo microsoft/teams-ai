@@ -90,7 +90,8 @@ class AdaptiveCards(Generic[StateT]):
         ) -> Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]]:
             async def __handler__(context: TurnContext, state: StateT) -> bool:
                 result = await func(context, state, context.activity.value["action"]["data"])
-                if context.turn_state.get(ActivityTypes.invoke_response) is None:
+
+                if context.turn_state.get(context._INVOKE_RESPONSE_KEY) is None:
                     if isinstance(result, str):
                         response = AdaptiveCardInvokeResponse(
                             status_code=200,
@@ -254,7 +255,7 @@ class AdaptiveCards(Generic[StateT]):
                     ),
                 )
                 result = await func(context, state, query)
-                if context.turn_state.get(ActivityTypes.invoke_response) is None:
+                if context.turn_state.get(context._INVOKE_RESPONSE_KEY) is None:
                     # Format invoke response
                     response = {
                         "type": "application/vnd.microsoft.search.searchResponse",

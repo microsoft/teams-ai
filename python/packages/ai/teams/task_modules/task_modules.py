@@ -147,7 +147,7 @@ class TaskModules(Generic[StateT]):
         return False
 
     async def _send_response(self, context: TurnContext, result):
-        if context.turn_state.get(ActivityTypes.invoke_response) is None:
+        if context.turn_state.get(context._INVOKE_RESPONSE_KEY) is None:
             if isinstance(result, str):
                 response = TaskModuleResponse(task=TaskModuleMessageResponse(value=result))
             elif isinstance(result, TaskModuleTaskInfo):

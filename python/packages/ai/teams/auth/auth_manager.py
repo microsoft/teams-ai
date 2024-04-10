@@ -71,8 +71,7 @@ class AuthManager(Generic[StateT]):
             return res
 
         if token:
-            temp = cast(TempState, state.temp)
-            temp.auth_tokens[key] = token
+            cast(TempState, state.temp).auth_tokens[key] = token
             res.status = "complete"
 
         return res

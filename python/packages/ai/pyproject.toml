@@ -59,7 +59,7 @@ enable-unstable-feature = ['string_processing', 'multiline_string_handling']
 profile = "black"
 
 [tool.pytest.ini_options]
-addopts = "-rx --cov-report html:coverage/html --cov-report lcov:coverage/lcov.info --cov=teams"
+addopts = "-rx --cov-report html:coverage/html --cov-report lcov:coverage/lcov.info --cov=teams --verbose"
 log_cli = true
 log_cli_level = "INFO"
 

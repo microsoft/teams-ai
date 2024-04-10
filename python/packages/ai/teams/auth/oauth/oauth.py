@@ -80,8 +80,9 @@ class OAuth(Auth[StateT]):
                 res = await component.on_sign_in_complete(context, state)
 
                 if res is not None:
-                    temp = cast(TempState, state.temp)
-                    temp.auth_tokens[self._options.connection_name] = res.token
+                    cast(TempState, state.temp).auth_tokens[
+                        self._options.connection_name
+                    ] = res.token
 
                 return res
 
