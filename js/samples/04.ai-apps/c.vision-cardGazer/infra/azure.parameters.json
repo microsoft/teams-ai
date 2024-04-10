@@ -16,6 +16,9 @@
         },
         "botDisplayName": {
             "value": "CardGazer"
+        },
+        "openAIKey": {
+            "value": "${{SECRET_OPENAI_KEY}}"
         }
     }
 }
