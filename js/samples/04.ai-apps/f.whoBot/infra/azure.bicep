@@ -7,6 +7,15 @@ param resourceBaseName string
 param botAadAppClientId string
 
 @secure()
+param openAIKey string = ''
+
+@secure()
+param azureOpenAIKey string = ''
+
+@secure()
+param azureOpenAIEndpoint string = ''
+
+@secure()
 @description('Required by Bot Framework package in your bot project')
 param botAadAppClientSecret string
 
@@ -66,6 +75,18 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
           name: 'OAUTH_CONNECTION_NAME'
           value: oauthConnectionName
         }
+        {
+          name: 'OPENAI_KEY'
+          value: openAIKey
+        }
+        // {
+        //   name: 'AZURE_OPENAI_KEY'
+        //   value: azureOpenAIKey
+        // }
+        // {
+        //   name: 'AZURE_OPENAI_ENDPOINT'
+        //   value: azureOpenAIEndpoint
+        // }
       ]
       ftpsState: 'FtpsOnly'
     }
