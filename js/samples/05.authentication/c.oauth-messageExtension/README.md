@@ -26,6 +26,13 @@ Note that this bot will only work in tenants where the following graph scopes ar
 
 ## Setting up the sample
 
+1. Clone the repository
+
+    ```bash
+    git clone https://github.com/Microsoft/teams-ai.git
+    ```
+
+
 > [!IMPORTANT]
 > To prevent issues when installing dependencies after cloning the repo, copy or move the sample directory to it's own location first.
 

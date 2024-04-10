@@ -19,6 +19,9 @@ This sample depends on Teams SSO and gives you more flexibility on how to config
     git clone https://github.com/Microsoft/teams-ai.git
     ```
 
+> [!IMPORTANT]
+> To prevent issues when installing dependencies after cloning the repo, copy or move the sample directory to it's own location first.
+
 1. If you do not have `yarn` installed, and want to run local bits, install it globally
 
     ```bash
