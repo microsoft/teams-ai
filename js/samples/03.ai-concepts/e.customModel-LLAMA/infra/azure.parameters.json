@@ -17,8 +17,11 @@
         "botDisplayName": {
             "value": "LLAMA-Infra"
         },
-        "openAIKey": {
-            "value": "${{SECRET_OPENAI_KEY}}"
+        "llamaAPIKey": {
+            "value": "${{SECRET_LLAMA_API_KEY}}"
+        },
+        "llamaEndpoint": {
+            "value": "${{SECRET_LLAMA_ENDPOINT}}"
         }
     }
 }

@@ -3,7 +3,6 @@
     "description": "A bot that can turn the lights on and off",
     "type": "completion",
     "completion": {
-        "model": "llama-2-7b-chat-18",
         "temperature": 0.2,
         "top_p": 0.9,
         "do_sample": true,
