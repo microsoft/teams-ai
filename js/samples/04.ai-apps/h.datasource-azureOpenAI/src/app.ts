@@ -86,6 +86,12 @@ app.error(async (context: TurnContext, err: any) => {
 
 app.activity(ActivityTypes.Message, async (context: TurnContext, state: ApplicationTurnState) => {
     const response = await planner.completePrompt(context, state, 'chat');
+
+    if (response.status == 'error') {
+        // If completion response was unsuccessful `response.error` will have the error object.
+        throw response.error;
+    }
+
     const attachment = CardFactory.adaptiveCard(createResponseCard(response));
     const activity = MessageFactory.attachment(attachment);
     await context.sendActivity(activity);

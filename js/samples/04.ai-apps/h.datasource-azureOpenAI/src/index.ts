@@ -24,6 +24,7 @@ server.use(restify.plugins.bodyParser());
 server.listen(port, () => {
     log(`listening on ${port} 🚀`);
     log('To test your bot in Teams, sideload the app manifest.json within Teams Apps.');
+    log(`\nBot Started, ${server.name} listening to ${server.url}`);
 });
 
 server.post('/api/messages', async (req, res) => {
