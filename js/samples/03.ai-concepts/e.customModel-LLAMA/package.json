@@ -11,7 +11,7 @@
         "dev:teamsfx:launch-testtool": "env-cmd --silent -f env/.env.testtool teamsapptester start",
         "dev": "nodemon --watch ./src --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts",
         "build": "tsc --build && shx cp -r ./src/prompts ./lib/",
-        "clean": "npx rimraf node_modules lib tsconfig.tsbuildinfo",
+        "clean": "rimraf node_modules lib tsconfig.tsbuildinfo",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "start": "tsc --build && node ./lib/index.js",
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -37,6 +37,7 @@
         "eslint": "^8.57.0",
         "nodemon": "~1.19.4",
         "prettier": "^3.2.5",
+        "rimraf": "^5.0.5",
         "typescript": "^5.4.4",
         "shx": "^0.3.4",
         "ts-node": "^10.9.2"
