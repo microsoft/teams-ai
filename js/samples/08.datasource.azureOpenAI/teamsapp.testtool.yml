@@ -10,10 +10,3 @@ deploy:
       testTool:
         version: ~0.1.0-beta
         symlinkDir: ./devTools/teamsapptester
-  
-  # Generate runtime environment variables
-  - uses: file/createOrUpdateEnvironmentFile
-    with:
-      target: ./.env
-      envs:
-        TEAMSFX_NOTIFICATION_STORE_FILENAME: ${{TEAMSFX_NOTIFICATION_STORE_FILENAME}}
