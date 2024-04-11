@@ -359,7 +359,7 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
         results = await self._wait_for_run(thread_id, run.id, True)
 
         if results:
-            if results.status == "required_action":
+            if results.status == "requires_action" and results.required_action is not None:
                 state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
                 return self._generate_plan_from_tools(state, results.required_action)
             if results.status == "completed":
