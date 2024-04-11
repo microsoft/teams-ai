@@ -49,7 +49,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/");
             var versions = new List<string>
             {
-                "2022-12-01", "2023-05-15", "2023-06-01-preview", "2023-07-01-preview", "2023-08-01-preview", "2023-09-01-preview"
+                "2022-12-01", "2023-05-15", "2023-06-01-preview", "2023-07-01-preview", "2024-02-15-preview", "2024-03-01-preview"
             };
 
             // Act
@@ -177,7 +177,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
                 LogRequests = true
             };
             var clientMock = new Mock<OpenAIClient>();
-            var choice = CreateChoice("test-choice", 0, null, null, null);
+            var choice = CreateChoice("test-choice", 0, null, null, null, null);
             var usage = CreateCompletionsUsage(0, 0, 0);
             var completions = CreateCompletions("test-id", DateTimeOffset.UtcNow, new List<Choice> { choice }, usage);
             Response response = new TestResponse(200, string.Empty);
@@ -308,8 +308,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
                 LogRequests = true
             };
             var clientMock = new Mock<OpenAIClient>();
-            var chatResponseMessage = CreateChatResponseMessage(Azure.AI.OpenAI.ChatRole.Assistant, "test-choice", null, null, null);
-            var chatChoice = CreateChatChoice(chatResponseMessage, 0, null, null, null, null, null);
+            var chatResponseMessage = CreateChatResponseMessage(Azure.AI.OpenAI.ChatRole.Assistant, "test-choice", null, null, null, null);
+            var chatChoice = CreateChatChoice(chatResponseMessage, null, 0, null, null, null, null, null, null);
             var usage = CreateCompletionsUsage(0, 0, 0);
             var chatCompletions = CreateChatCompletions("test-id", DateTimeOffset.UtcNow, new List<ChatChoice> { chatChoice }, usage);
             Response response = new TestResponse(200, string.Empty);
@@ -328,10 +328,10 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             Assert.Equal("test-choice", result.Message.Content);
         }
 
-        private static Choice CreateChoice(string text, int index, ContentFilterResultsForChoice? contentFilterResults, CompletionsLogProbabilityModel? logProbabilityModel, CompletionsFinishReason? finishReason)
+        private static Choice CreateChoice(string text, int index, ContentFilterResultsForChoice? contentFilterResults, CompletionsLogProbabilityModel? logProbabilityModel, CompletionsFinishReason? finishReason, IDictionary<string, BinaryData>? serializedAdditionalRawData)
         {
-            Type[] paramTypes = new Type[] { typeof(string), typeof(int), typeof(ContentFilterResultsForChoice), typeof(CompletionsLogProbabilityModel), typeof(CompletionsFinishReason) };
-            object[] paramValues = new object[] { text, index, contentFilterResults, logProbabilityModel!, finishReason! };
+            Type[] paramTypes = new Type[] { typeof(string), typeof(int), typeof(ContentFilterResultsForChoice), typeof(CompletionsLogProbabilityModel), typeof(CompletionsFinishReason), typeof(IDictionary<string, BinaryData>) };
+            object[] paramValues = new object[] { text, index, contentFilterResults!, logProbabilityModel!, finishReason!, serializedAdditionalRawData! };
             return Construct<Choice>(paramTypes, paramValues);
         }
 
@@ -349,17 +349,17 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             return Construct<Completions>(paramTypes, paramValues);
         }
 
-        private static ChatResponseMessage CreateChatResponseMessage(Azure.AI.OpenAI.ChatRole role, string content, IReadOnlyList<Azure.AI.OpenAI.ChatCompletionsToolCall>? toolCalls, Azure.AI.OpenAI.FunctionCall? functionCall, AzureChatExtensionsMessageContext? azureExtensionsContext)
+        private static ChatResponseMessage CreateChatResponseMessage(Azure.AI.OpenAI.ChatRole role, string content, IReadOnlyList<Azure.AI.OpenAI.ChatCompletionsToolCall>? toolCalls, Azure.AI.OpenAI.FunctionCall? functionCall, AzureChatExtensionsMessageContext? azureExtensionsContext, IDictionary<string, BinaryData>? serializedAdditionalRawData)
         {
-            Type[] paramTypes = new Type[] { typeof(Azure.AI.OpenAI.ChatRole), typeof(string), typeof(IReadOnlyList<Azure.AI.OpenAI.ChatCompletionsToolCall>), typeof(Azure.AI.OpenAI.FunctionCall), typeof(AzureChatExtensionsMessageContext) };
-            object[] paramValues = new object[] { role, content, toolCalls!, functionCall!, azureExtensionsContext! };
+            Type[] paramTypes = new Type[] { typeof(Azure.AI.OpenAI.ChatRole), typeof(string), typeof(IReadOnlyList<Azure.AI.OpenAI.ChatCompletionsToolCall>), typeof(Azure.AI.OpenAI.FunctionCall), typeof(AzureChatExtensionsMessageContext), typeof(IDictionary<string, BinaryData>) };
+            object[] paramValues = new object[] { role, content, toolCalls!, functionCall!, azureExtensionsContext!, serializedAdditionalRawData! };
             return Construct<ChatResponseMessage>(paramTypes, paramValues);
         }
 
-        private static ChatChoice CreateChatChoice(ChatResponseMessage message, int index, CompletionsFinishReason? finishReason, ChatFinishDetails? finishDetails, ChatResponseMessage? internalStreamingDeltaMessage, ContentFilterResultsForChoice? contentFilterResults, AzureChatEnhancements? enhancements)
+        private static ChatChoice CreateChatChoice(ChatResponseMessage message, ChatChoiceLogProbabilityInfo? logProbabilityInfo, int index, CompletionsFinishReason? finishReason, ChatFinishDetails? finishDetails, ChatResponseMessage? internalStreamingDeltaMessage, ContentFilterResultsForChoice? contentFilterResults, AzureChatEnhancements? enhancements, IDictionary<string, BinaryData>? serializedAdditionalRawData)
         {
-            Type[] paramTypes = new Type[] { typeof(ChatResponseMessage), typeof(int), typeof(CompletionsFinishReason), typeof(ChatFinishDetails), typeof(ChatResponseMessage), typeof(ContentFilterResultsForChoice), typeof(AzureChatEnhancements) };
-            object[] paramValues = new object[] { message, index, finishReason!, finishDetails!, internalStreamingDeltaMessage!, contentFilterResults!, enhancements! };
+            Type[] paramTypes = new Type[] { typeof(ChatResponseMessage), typeof(ChatChoiceLogProbabilityInfo), typeof(int), typeof(CompletionsFinishReason), typeof(ChatFinishDetails), typeof(ChatResponseMessage), typeof(ContentFilterResultsForChoice), typeof(AzureChatEnhancements), typeof(IDictionary<string, BinaryData>) };
+            object[] paramValues = new object[] { message, logProbabilityInfo!, index, finishReason!, finishDetails!, internalStreamingDeltaMessage!, contentFilterResults!, enhancements!, serializedAdditionalRawData! };
             return Construct<ChatChoice>(paramTypes, paramValues);
         }
 
