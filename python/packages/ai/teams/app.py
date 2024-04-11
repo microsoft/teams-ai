@@ -628,6 +628,17 @@ class Application(Bot, Generic[StateT]):
                     await state.save(context, self._options.storage)
                     return
 
+            # download input files
+            if (
+                self._options.file_downloaders is not None
+                and len(self._options.file_downloaders) > 0
+            ):
+                input_files = state.temp.input_files if state.temp.input_files is not None else []
+                for file_downloader in self._options.file_downloaders:
+                    files = await file_downloader.download_files(context)
+                    input_files.append(files)
+                state.temp.input_files = input_files
+
             # run activity handlers
             is_ok, matches = await self._on_activity(context, state)
 
