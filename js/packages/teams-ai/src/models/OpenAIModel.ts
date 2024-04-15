@@ -99,7 +99,7 @@ export interface OpenAIModelOptions extends BaseOpenAIModelOptions {
 }
 
 /**
- * Options for configuring a model that calls and `OpenAI` complient endpoint.
+ * Options for configuring a model that calls and `OpenAI` compliant endpoint.
  * @remarks
  * The endpoint should comply with the OpenAPI spec for OpenAI's API:
  * 
