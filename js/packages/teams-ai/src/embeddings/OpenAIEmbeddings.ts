@@ -72,7 +72,7 @@ export interface OpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
 }
 
 /**
- * Options for configuring an embeddings object that calls and `OpenAI` complient endpoint.
+ * Options for configuring an embeddings object that calls an `OpenAI` compliant endpoint.
  * @remarks
  * The endpoint should comply with the OpenAPI spec for OpenAI's API:
  * 
