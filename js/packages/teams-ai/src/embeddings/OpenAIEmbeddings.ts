@@ -15,6 +15,13 @@ import { CreateEmbeddingRequest, CreateEmbeddingResponse, OpenAICreateEmbeddingR
  */
 export interface BaseOpenAIEmbeddingsOptions {
     /**
+     * Optional. Number of dimensions to use when generating embeddings.
+     * @remarks
+     * Only valid for embedding models that support dynamic dimensionality.
+     */
+    dimensions?: number;
+
+    /**
      * Optional. Whether to log requests to the console.
      * @remarks
      * This is useful for debugging prompts and defaults to `false`.
@@ -189,12 +196,16 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
             console.log(Colorize.output(inputs));
         }
 
-        const startTime = Date.now();
-        const response = await this.createEmbeddingRequest({
+        const request: CreateEmbeddingRequest = {
             model: model,
             input: inputs
-        });
+        };
+        if (this.options.dimensions) {
+            request.dimensions = this.options.dimensions;
+        }
 
+        const startTime = Date.now();
+        const response = await this.createEmbeddingRequest(request);
         if (this.options.logRequests) {
             console.log(Colorize.title('RESPONSE:'));
             console.log(Colorize.value('status', response.status));

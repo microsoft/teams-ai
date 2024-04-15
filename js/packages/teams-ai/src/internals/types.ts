@@ -270,6 +270,7 @@ export interface CreateEmbeddingRequest {
     model: string;
     encoding_format?: string;
     user?: string;
+    dimensions?: number;
 }
 
 /**
