@@ -32,6 +32,13 @@ export interface BaseOpenAIModelOptions {
     logRequests?: boolean;
 
     /**
+     * Optional. Forces the model return a specific response format.
+     * @remarks
+     * This can be used to force the model to always return a valid JSON object. 
+     */
+    responseFormat?: { "type": "json_object" };
+
+    /**
      * Optional. Retry policy to use when calling the OpenAI API.
      * @remarks
      * The default retry policy is `[2000, 5000]` which means that the first retry will be after
@@ -283,6 +290,9 @@ export class OpenAIModel implements PromptCompletionModel {
                 'data_sources',
             ]
         );
+        if (this.options.responseFormat) {
+            request.response_format = this.options.responseFormat;
+        }
         if (this.options.seed !== undefined) {
             request.seed = this.options.seed;
         }
