@@ -16,7 +16,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com"
+        "url": "https://github.com/microsoft/teams-ai"
     },
     "dependencies": {
         "botbuilder": "^4.22.1",

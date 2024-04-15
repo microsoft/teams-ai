@@ -3,6 +3,7 @@ using Azure.AI.OpenAI;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Microsoft.Bot.Builder;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Teams.AI.AI.Prompts;
@@ -11,6 +12,7 @@ using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
+using System.ClientModel.Primitives;
 using System.Net;
 using System.Text.Json;
 using static Azure.AI.OpenAI.OpenAIClientOptions;
@@ -93,7 +95,7 @@ namespace Microsoft.Teams.AI.AI.Models
             {
                 throw new ArgumentException($"Model created with an invalid endpoint of `{options.AzureEndpoint}`. The endpoint must be a valid HTTPS url.");
             }
-            string apiVersion = options.AzureApiVersion ?? "2023-05-15";
+            string apiVersion = options.AzureApiVersion ?? "2024-02-15-preview";
             ServiceVersion? serviceVersion = ConvertStringToServiceVersion(apiVersion);
             if (serviceVersion == null)
             {
@@ -240,6 +242,9 @@ namespace Microsoft.Teams.AI.AI.Models
                     FrequencyPenalty = (float)promptTemplate.Configuration.Completion.FrequencyPenalty,
                 };
 
+                IDictionary<string, JsonElement>? additionalData = promptTemplate.Configuration.Completion.AdditionalData;
+                AddAzureChatExtensionConfigurations(chatCompletionsOptions, additionalData);
+
                 Response? rawResponse;
                 Response<ChatCompletions>? chatCompletionsResponse = null;
                 PromptResponse promptResponse = new();
@@ -295,10 +300,41 @@ namespace Microsoft.Teams.AI.AI.Models
                 case "2023-05-15": return ServiceVersion.V2023_05_15;
                 case "2023-06-01-preview": return ServiceVersion.V2023_06_01_Preview;
                 case "2023-07-01-preview": return ServiceVersion.V2023_07_01_Preview;
-                case "2023-08-01-preview": return ServiceVersion.V2023_08_01_Preview;
-                case "2023-09-01-preview": return ServiceVersion.V2023_09_01_Preview;
+                case "2024-02-15-preview": return ServiceVersion.V2024_02_15_Preview;
+                case "2024-03-01-preview": return ServiceVersion.V2024_03_01_Preview;
                 default:
                     return null;
+            }
+        }
+
+        private void AddAzureChatExtensionConfigurations(ChatCompletionsOptions options, IDictionary<string, JsonElement>? additionalData)
+        {
+            if (additionalData == null)
+            {
+                return;
+            }
+
+            if (additionalData != null && additionalData.TryGetValue("data_sources", out JsonElement array))
+            {
+                List<AzureChatExtensionConfiguration> configurations = new();
+                List<object> entries = array.Deserialize<List<object>>()!;
+                foreach (object item in entries)
+                {
+                    AzureChatExtensionConfiguration? dataSourceItem = ModelReaderWriter.Read<AzureChatExtensionConfiguration>(BinaryData.FromObjectAsJson(item));
+                    if (dataSourceItem != null)
+                    {
+                        configurations.Add(dataSourceItem);
+                    }
+                }
+
+                if (configurations.Count > 0)
+                {
+                    options.AzureExtensionsOptions = new();
+                    foreach (AzureChatExtensionConfiguration configuration in configurations)
+                    {
+                        options.AzureExtensionsOptions.Extensions.Add(configuration);
+                    }
+                }
             }
         }
     }

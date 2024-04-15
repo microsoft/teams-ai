@@ -1,0 +1,12 @@
+AzureOpenAIBot/bin/Debug
+AzureOpenAIBot/obj
+AzureOpenAIBot.csproj.user
+AzureOpenAIBot.user
+appsettings.Development.json
+appsettings.json
+appsettings.TestTool.json
+.vs/
+**/env/
+bin/Debug/
+obj/
+appPackage/
