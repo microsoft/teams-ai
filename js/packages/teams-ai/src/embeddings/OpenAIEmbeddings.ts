@@ -78,7 +78,7 @@ export interface OpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
  * 
  * https://github.com/openai/openai-openapi
  * 
- * And an example of a complient endpoint is LLaMA.cpp's reference server:
+ * And an example of a compliant endpoint is LLaMA.cpp's reference server:
  * 
  * https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md
  * 
