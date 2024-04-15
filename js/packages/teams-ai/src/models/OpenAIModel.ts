@@ -45,6 +45,13 @@ export interface BaseOpenAIModelOptions {
     requestConfig?: AxiosRequestConfig;
 
     /**
+     * Optional. A static seed to use when making model calls.
+     * @remarks
+     * The default is to use a random seed. Specifying a seed will make the model deterministic.
+     */
+    seed?: number;
+
+    /**
      * Optional. Whether to use `system` messages when calling the OpenAI API.
      * @remarks
      * The current generation of models tend to follow instructions from `user` messages better
@@ -52,6 +59,7 @@ export interface BaseOpenAIModelOptions {
      * prompt to be sent as `user` messages instead.
      */
     useSystemMessages?: boolean;
+    
 }
 
 /**
@@ -250,7 +258,7 @@ export class OpenAIModel implements PromptCompletionModel {
             input = result.output[last];
         }
 
-        // Call chat completion API
+        // Initialize chat completion request
         const request: CreateChatCompletionRequest = this.copyOptionsToRequest<CreateChatCompletionRequest>(
             {
                 messages: result.output as ChatCompletionRequestMessage[]
@@ -272,9 +280,14 @@ export class OpenAIModel implements PromptCompletionModel {
                 'user',
                 'functions',
                 'function_call',
-                'data_sources'
+                'data_sources',
             ]
         );
+        if (this.options.seed !== undefined) {
+            request.seed = this.options.seed;
+        }
+
+        // Call chat completion API
         const response = await this.createChatCompletion(request, model);
         if (this.options.logRequests) {
             console.log(Colorize.title('CHAT RESPONSE:'));
