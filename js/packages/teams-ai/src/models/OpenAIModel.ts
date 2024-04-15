@@ -84,6 +84,35 @@ export interface OpenAIModelOptions extends BaseOpenAIModelOptions {
 }
 
 /**
+ * Options for configuring a model that calls and `OpenAI` complient endpoint.
+ * @remarks
+ * The endpoint should comply with the OpenAPI spec for OpenAI's API:
+ * 
+ * https://github.com/openai/openai-openapi
+ * 
+ * And an example of a complient endpoint is LLaMA.cpp's reference server:
+ * 
+ * https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md
+ * 
+ */
+export interface OpenAILikeModelOptions extends BaseOpenAIModelOptions {
+    /**
+     * Endpoint of the model server to call.
+     */
+    endpoint: string;
+
+    /**
+     * Default model to use for completions.
+     */
+    defaultModel: string;
+
+    /**
+     * Optional. API key to use when calling the models endpoint.
+     */
+    apiKey?: string;
+}
+
+/**
  * Options for configuring an `OpenAIModel` to call an Azure OpenAI hosted model.
  */
 export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
@@ -120,13 +149,13 @@ export class OpenAIModel implements PromptCompletionModel {
     /**
      * Options the client was configured with.
      */
-    public readonly options: OpenAIModelOptions | AzureOpenAIModelOptions;
+    public readonly options: OpenAIModelOptions | AzureOpenAIModelOptions | OpenAILikeModelOptions;
 
     /**
      * Creates a new `OpenAIModel` instance.
      * @param {OpenAIModelOptions} options - Options for configuring the model client.
      */
-    public constructor(options: OpenAIModelOptions | AzureOpenAIModelOptions) {
+    public constructor(options: OpenAIModelOptions | AzureOpenAIModelOptions | OpenAILikeModelOptions) {
         // Check for azure config
         if ((options as AzureOpenAIModelOptions).azureApiKey) {
             this._useAzure = true;
@@ -346,7 +375,7 @@ export class OpenAIModel implements PromptCompletionModel {
         if (this._useAzure) {
             const options = this.options as AzureOpenAIModelOptions;
             requestConfig.headers['api-key'] = options.azureApiKey;
-        } else {
+        } else if ((this.options as OpenAIModelOptions).apiKey) {
             const options = this.options as OpenAIModelOptions;
             requestConfig.headers['Authorization'] = `Bearer ${options.apiKey}`;
             if (options.organization) {
