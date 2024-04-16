@@ -1,4 +1,4 @@
-# Teams Message Extension SSO Bot
+# Teams Adaptive Card SSO Bot
 
 This sample shows how to incorporate a basic conversational flow into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
 
@@ -12,7 +12,7 @@ Note that this bot will only work in tenants where the following graph scopes ar
 
 <!-- code_chunk_output -->
 
--   [Teams Message Extension SSO Bot](#teams-message-extension-sso-bot)
+-   [Teams Adaptive Card SSO Bot](#teams-adaptive-card-sso-bot)
     -   [Interacting with the bot](#interacting-with-the-bot)
     -   [Setting up the sample](#setting-up-the-sample)
     -   [Testing the sample](#testing-the-sample)
@@ -22,33 +22,41 @@ Note that this bot will only work in tenants where the following graph scopes ar
 
 ## Interacting with the bot
 
-![Bot interaction image](https://github.com/OfficeDev/Microsoft-Teams-Samples/raw/main/samples/msgext-search-auth-config/csharp/Images/msgext-search-auth-config.gif)
+Once the bot is successfully sideloaded and installed, send any message to it. The bot will respond with an adaptive card with a sign in button. Clicking on it will initiate the sign in flow. Once that is done, the card should update to show the users profile picture and name.
 
 ## Setting up the sample
 
-1. Clone the repository
+1. If you do not have `yarn` installed, and want to run local bits, install it globally
 
     ```bash
-    git clone https://github.com/Microsoft/teams-ai.git
+    npm install -g yarn@1.21.1
     ```
 
-2. In the root JavaScript folder, install and build all dependencies
+1. In the root **JavaScript folder**, install and build all dependencies
 
     ```bash
     cd teams-ai/js
-    yarn install
+    # This will use the latest changes from teams-ai in the sample.
+    yarn install #only needs to be run once, after clone or remote pull
     yarn build
+    # To run using latest published version of teams-ai, do the following instead:
+    cd teams-ai/js/samples/<this-sample-folder>
+    npm install --workspaces=false
+    npm run build
     ```
 
-3. In a terminal, navigate to the sample root.
+1. In a terminal, navigate to the sample root.
 
     ```bash
-    cd teams-ai-/js/samples/06.auth.oauth.messageExtension
+    cd samples/<this-sample-folder>/
+    yarn start
+    # If running the sample on published version of teams-ai
+    npm start
     ```
 
-4. Duplicate the `sample.env` in this folder. Rename the file to `.env`.
+1. Duplicate the `sample.env` in this folder. Rename the file to `.env`.
 
-5. Fill in the `.env` variables with your keys.
+1. Fill in the variables with your keys in the `.env` file.
 
 ## Testing the sample
 
@@ -63,7 +71,8 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
-1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
+1. Copy this sample into a new folder outside of teams-ai
+1. Select File > Open Folder in VS Code and choose this sample's directory
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
 1. Ensure that you have set up the sample from the previous step.
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
