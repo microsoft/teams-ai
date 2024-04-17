@@ -138,12 +138,12 @@ To configure the Azure resources to have an environment variable for the OpenAI 
 
 The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
 
-2. (optional) If you want to use Linux Web app to host your bot, there're some changes you need to make. 
+2. (optional) If you want to use Linux Web app to host your bot, there are some changes you need to make. 
 
-    2.1. Updatge Bicep templates.
+    2.1. Update Bicep templates.
 
 
-    ```
+    ```Bicep
     @description('The Runtime stack of current web app')
     param linuxFxVersion string = 'NODE|18-lts'
 
@@ -169,7 +169,7 @@ The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in 
     }
     ```
 
-    2.2. Change start command in package.json (only for deployment to Azure, change it back if you do local debug)
+    2.2. Change the start command in package.json. (Note: Only for deployment to Azure; remember to change it back if you are doing local debugging.)
     ```json
     "scripts": {
         ...
