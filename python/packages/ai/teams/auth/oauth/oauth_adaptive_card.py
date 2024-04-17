@@ -9,6 +9,7 @@ from typing import Generic, Optional, TypeVar, cast
 
 from botbuilder.core import TurnContext
 from botbuilder.schema import (
+    ActionTypes,
     Activity,
     ActivityTypes,
     ChannelAccount,
@@ -111,7 +112,7 @@ class OAuthAdaptiveCard(Generic[StateT], AuthComponent[StateT]):
                             "connection_name": self._options.connection_name,
                             "buttons": [
                                 CardAction(
-                                    type="signin",
+                                    type=ActionTypes.signin,
                                     title="Sign-In",
                                     text="Sign-In",
                                     value=sign_in_res.sign_in_link,

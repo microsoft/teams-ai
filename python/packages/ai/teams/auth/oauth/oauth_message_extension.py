@@ -8,7 +8,13 @@ from __future__ import annotations
 from typing import Generic, Optional, TypeVar, cast
 
 from botbuilder.core import TurnContext
-from botbuilder.schema import Activity, ActivityTypes, InvokeResponse, TokenResponse
+from botbuilder.schema import (
+    ActionTypes,
+    Activity,
+    ActivityTypes,
+    InvokeResponse,
+    TokenResponse,
+)
 from botbuilder.schema.teams import (
     MessagingExtensionActionResponse,
     MessagingExtensionResult,
@@ -106,7 +112,7 @@ class OAuthMessageExtension(Generic[StateT], AuthComponent[StateT]):
                             suggested_actions=MessagingExtensionSuggestedAction(
                                 actions=[
                                     CardAction(
-                                        type="openUrl",
+                                        type=ActionTypes.open_url,
                                         title=self._options.title,
                                         text=self._options.text,
                                         display_text=self._options.text,
