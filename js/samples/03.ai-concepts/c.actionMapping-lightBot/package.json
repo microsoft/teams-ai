@@ -7,7 +7,7 @@
     "main": "./lib/index.js",
     "scripts": {
         "build": "tsc --build && shx cp -r ./src/prompts ./lib/",
-        "clean": "npx rimraf node_modules lib tsconfig.tsbuildinfo",
+        "clean": "rimraf node_modules lib tsconfig.tsbuildinfo",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "start": "tsc --build && node ./lib/index.js",
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -16,7 +16,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com"
+        "url": "https://github.com/microsoft/teams-ai"
     },
     "dependencies": {
         "botbuilder": "^4.22.1",
@@ -33,8 +33,9 @@
         "@typescript-eslint/parser": "^6.21.0",
         "eslint": "^8.57.0",
         "nodemon": "~1.19.4",
-        "typescript": "^5.4.4",
         "prettier": "^3.2.5",
+        "rimraf": "^5.0.5",
+        "typescript": "^5.4.4",
         "shx": "^0.3.4",
         "ts-node": "^10.9.2"
     }
