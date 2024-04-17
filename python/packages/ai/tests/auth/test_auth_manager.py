@@ -21,8 +21,8 @@ class TestAuthManager(IsolatedAsyncioTestCase):
                 auth=AuthOptions(
                     default="a",
                     settings={
-                        "a": OAuthOptions(),
-                        "b": OAuthOptions(),
+                        "a": OAuthOptions(title="a", connection_name="a"),
+                        "b": OAuthOptions(title="b", connection_name="b"),
                     },
                 ),
             )

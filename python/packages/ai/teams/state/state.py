@@ -10,6 +10,7 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Any, Callable, List, Optional, Type, TypeVar, Union, overload
 
+from botbuilder.core import StatePropertyAccessor as _StatePropertyAccessor
 from botbuilder.core import Storage, TurnContext
 
 from .todict import todict
@@ -117,6 +118,9 @@ class State(dict, ABC):
         """
         return cls()
 
+    def create_property(self, name: str) -> _StatePropertyAccessor:
+        return StatePropertyAccessor(self, name)
+
     def __setitem__(self, key: str, item: Any) -> None:
         super().__setitem__(key, item)
 
@@ -150,3 +154,33 @@ class State(dict, ABC):
 
     def __str__(self) -> str:
         return json.dumps(todict(self))
+
+
+class StatePropertyAccessor(_StatePropertyAccessor):
+    _name: str
+    _state: State
+
+    def __init__(self, state: State, name: str) -> None:
+        self._name = name
+        self._state = state
+
+    async def get(
+        self,
+        turn_context: TurnContext,
+        default_value_or_factory: Optional[Union[Any, Callable[[], Optional[Any]]]] = None,
+    ) -> Optional[Any]:
+        value = self._state[self._name] if self._name in self._state else None
+
+        if value is None and default_value_or_factory is not None:
+            if callable(default_value_or_factory):
+                value = default_value_or_factory()
+            else:
+                value = default_value_or_factory
+
+        return value
+
+    async def delete(self, turn_context: TurnContext) -> None:
+        del self._state[self._name]
+
+    async def set(self, turn_context: TurnContext, value: Any) -> None:
+        self._state[self._name] = value

@@ -6,10 +6,11 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Awaitable, Callable, Generic, Optional, TypeVar
+from typing import Awaitable, Callable, Generic, Optional, TypeVar, cast
 
-from botbuilder.core import TurnContext
+from botbuilder.core import CloudAdapterBase, TurnContext
 from botbuilder.schema import Activity, TokenResponse
+from botframework.connector.auth import UserTokenClient
 
 from ..state import TurnState
 from .sign_in_response import SignInResponse
@@ -28,7 +29,7 @@ class Auth(ABC, Generic[StateT]):
     ] = None
 
     @abstractmethod
-    def is_valid_activity(self, activity: Activity) -> bool:
+    def is_sign_in_activity(self, activity: Activity) -> bool:
         """
         Whether the current activity is a valid activity that supports authentication
 
@@ -65,7 +66,7 @@ class Auth(ABC, Generic[StateT]):
         """
 
     @abstractmethod
-    async def is_signed_in(self, context: TurnContext) -> Optional[str]:
+    async def get_token(self, context: TurnContext) -> Optional[str]:
         """
         Check if the user is signed, if they are then return the token.
 
@@ -77,11 +78,19 @@ class Auth(ABC, Generic[StateT]):
         """
 
     @abstractmethod
-    async def on_sign_in_complete(
-        self, context: TurnContext, state: StateT
-    ) -> Optional[TokenResponse]:
+    async def verify_state(self, context: TurnContext, state: StateT) -> Optional[TokenResponse]:
         """
-        Called when a sign in flow has been completed (signin/verifyState activity).
+        Called on signin/verifyState activity.
+
+        Args:
+            context (TurnContext): Context for the current turn of conversation with the user.
+            state (StateT): Current turn state.
+        """
+
+    @abstractmethod
+    async def exchange_token(self, context: TurnContext, state: StateT) -> Optional[TokenResponse]:
+        """
+        Called on signin/tokenExchange activity.
 
         Args:
             context (TurnContext): Context for the current turn of conversation with the user.
@@ -109,3 +118,9 @@ class Auth(ABC, Generic[StateT]):
             callback (Callable): The callback to call.
         """
         self._on_sign_in_failure = callback
+
+    def _user_token_client(self, context: TurnContext) -> UserTokenClient:
+        return cast(
+            UserTokenClient,
+            context.turn_state.get(cast(CloudAdapterBase, context.adapter).USER_TOKEN_CLIENT_KEY),
+        )

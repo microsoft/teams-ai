@@ -5,16 +5,15 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from typing import Awaitable, Callable, List, Optional, TypeVar, cast
+from typing import List, Optional, TypeVar
 
 from botbuilder.core import TurnContext
 from botbuilder.schema import Activity, TokenResponse
+from botframework.connector.token_api.models import TokenExchangeRequest
 
-from teams.auth.sign_in_response import SignInResponse
-
-from ...state import TempState, TurnState
+from ...state import TurnState
 from ..auth import Auth
-from ..user_token import get_user_token, sign_out_user
+from ..auth_component import AuthComponent
 from .oauth_adaptive_card import OAuthAdaptiveCard
 from .oauth_dialog import OAuthDialog
 from .oauth_message_extension import OAuthMessageExtension
@@ -27,7 +26,7 @@ class OAuth(Auth[StateT]):
     "Handles authentication using OAuth Connection."
 
     _options: OAuthOptions
-    _components: List[Auth[StateT]]
+    _components: List[AuthComponent[StateT]]
 
     def __init__(self, options: OAuthOptions) -> None:
         super().__init__()
@@ -38,64 +37,93 @@ class OAuth(Auth[StateT]):
             OAuthAdaptiveCard[StateT](options),
         ]
 
-    def is_valid_activity(self, activity: Activity) -> bool:
+    def is_sign_in_activity(self, activity: Activity) -> bool:
         for component in self._components:
-            if component.is_valid_activity(activity):
+            if component.is_sign_in_activity(activity):
                 return True
 
         return False
 
-    async def is_signed_in(self, context: TurnContext) -> Optional[str]:
-        for component in self._components:
-            if component.is_valid_activity(context.activity):
-                return await component.is_signed_in(context)
+    async def get_token(self, context: TurnContext) -> Optional[str]:
+        client = self._user_token_client(context)
+        res = await client.get_user_token(
+            getattr(context.activity.from_property, "id"),
+            self._options.connection_name,
+            context.activity.channel_id,
+            "",
+        )
+
+        if res and res.token:
+            return res.token
 
         return None
 
     async def sign_in(self, context: TurnContext, state: StateT) -> Optional[str]:
-        res = await get_user_token(context, self._options.connection_name, "")
+        token = await self.get_token(context)
 
-        if res.token is not None and res.token != "":
-            return res.token
+        if token:
+            return token
 
         for component in self._components:
-            if component.is_valid_activity(context.activity):
+            if component.is_sign_in_activity(context.activity):
+                state.user["__auth__"] = state.temp.input
                 return await component.sign_in(context, state)
 
         return None
 
     async def sign_out(self, context: TurnContext, state: StateT) -> None:
+        client = self._user_token_client(context)
+
         for component in self._components:
-            if component.is_valid_activity(context.activity):
-                await component.sign_out(context, state)
-                break
+            await component.sign_out(context, state)
 
-        await sign_out_user(context, self._options.connection_name)
+        await client.sign_out_user(
+            getattr(context.activity.from_property, "id"),
+            self._options.connection_name,
+            context.activity.channel_id,
+        )
 
-    async def on_sign_in_complete(
-        self, context: TurnContext, state: StateT
-    ) -> Optional[TokenResponse]:
-        for component in self._components:
-            if component.is_valid_activity(context.activity):
-                res = await component.on_sign_in_complete(context, state)
+    async def verify_state(self, context: TurnContext, state: StateT) -> Optional[TokenResponse]:
+        client = self._user_token_client(context)
+        value = context.activity.value
+        code: Optional[str] = None
 
-                if res is not None:
-                    cast(TempState, state.temp).auth_tokens[
-                        self._options.connection_name
-                    ] = res.token
+        if value is None:
+            return None
 
-                return res
+        if hasattr(value, "state") and isinstance(value.state, str):
+            code = getattr(value, "state")
 
-        return None
+        if isinstance(value, dict) and "state" in value:
+            code = value["state"]
 
-    def on_sign_in_success(
-        self, callback: Callable[[TurnContext, StateT], Awaitable[None]]
-    ) -> None:
-        for component in self._components:
-            component.on_sign_in_success(callback)
+        if code is None:
+            return None
 
-    def on_sign_in_failure(
-        self, callback: Callable[[TurnContext, StateT, SignInResponse], Awaitable[None]]
-    ) -> None:
-        for component in self._components:
-            component.on_sign_in_failure(callback)
+        if "__auth__" in state.user:
+            state.temp.input = state.user["__auth__"]
+            del state.user["__auth__"]
+
+        return await client.get_user_token(
+            getattr(context.activity.from_property, "id"),
+            self._options.connection_name,
+            context.activity.channel_id,
+            code,
+        )
+
+    async def exchange_token(self, context: TurnContext, state: StateT) -> Optional[TokenResponse]:
+        client = self._user_token_client(context)
+
+        if not context.activity.value:
+            return None
+
+        if "__auth__" in state.user:
+            state.temp.input = state.user["__auth__"]
+            del state.user["__auth__"]
+
+        return await client.exchange_token(
+            getattr(context.activity.from_property, "id"),
+            self._options.connection_name,
+            context.activity.channel_id,
+            TokenExchangeRequest(token=context.activity.value.get("token")),
+        )

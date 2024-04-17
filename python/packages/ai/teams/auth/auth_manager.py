@@ -8,6 +8,7 @@ from __future__ import annotations
 from typing import Dict, Generic, Optional, TypeVar, cast
 
 from botbuilder.core import TurnContext
+from botbuilder.schema import ActivityTypes, SignInConstants
 
 from ..state import TempState, TurnState
 from .auth import Auth
@@ -21,6 +22,7 @@ class AuthManager(Generic[StateT]):
 
     _default: Optional[str]
     _connections: Dict[str, Auth[StateT]] = {}
+    _exchanges: Dict[str, str] = {}
 
     def __init__(self, *, default: Optional[str] = None) -> None:
         self._default = default
@@ -60,19 +62,48 @@ class AuthManager(Generic[StateT]):
             raise ValueError("must specify a connection 'key'")
 
         auth = self.get(key)
+        token: Optional[str] = await auth.get_token(context)
         res = SignInResponse("pending")
-        token: Optional[str] = None
+
+        if token:
+            cast(TempState, state.temp).auth_tokens[key] = token
+            return SignInResponse("complete")
 
         try:
-            token = await auth.sign_in(context, state)
+            if self._is_exchange_activity(context):
+                exchange_key = self._get_exchange_key(key, context)
+
+                if exchange_key in self._exchanges:
+                    return res
+
+                self._exchanges[exchange_key] = cast(dict, context.activity.value)["id"]
+                token_res = await auth.exchange_token(context, state)
+
+                if token_res is not None:
+                    token = token_res.token
+
+                del self._exchanges[exchange_key]
+            elif self._is_verify_state_activity(context):
+                token_res = await auth.verify_state(context, state)
+
+                if token_res is not None:
+                    token = token_res.token
+            else:
+                token = await auth.sign_in(context, state)
         except Exception as err:  # pylint:disable=broad-exception-caught
             res.status = "error"
+            res.reason = "other"
             res.message = str(err)
-            return res
+
+            if auth._on_sign_in_failure:
+                await auth._on_sign_in_failure(context, state, res)
 
         if token:
             cast(TempState, state.temp).auth_tokens[key] = token
             res.status = "complete"
+
+            if auth._on_sign_in_success:
+                await auth._on_sign_in_success(context, state)
 
         return res
 
@@ -87,11 +118,21 @@ class AuthManager(Generic[StateT]):
         auth = self.get(key)
         await auth.sign_out(context, state)
 
-    def _on_sign_in_complete(self, key: str):
-        auth = self.get(key)
+    def _is_exchange_activity(self, context: TurnContext) -> bool:
+        return context.activity.type == ActivityTypes.invoke and (
+            context.activity.name == SignInConstants.token_exchange_operation_name
+        )
 
-        async def __call__(context: TurnContext, state: StateT) -> bool:
-            await auth.on_sign_in_complete(context, state)
-            return True
+    def _is_verify_state_activity(self, context: TurnContext) -> bool:
+        return context.activity.type == ActivityTypes.invoke and (
+            context.activity.name == SignInConstants.verify_state_operation_name
+        )
 
-        return __call__
+    def _get_exchange_key(self, key: str, context: TurnContext) -> str:
+        return (
+            cast(str, getattr(context.activity.from_property, "id"))
+            + "/"
+            + cast(str, getattr(context.activity.conversation, "id"))
+            + "/"
+            + key
+        )

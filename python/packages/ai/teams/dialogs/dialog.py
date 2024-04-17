@@ -3,25 +3,23 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Generic, Optional, TypeVar
+from typing import Generic, Optional, TypeVar, cast
 
 from botbuilder.core import TurnContext
 from botbuilder.dialogs import (
     ComponentDialog,
     DialogContext,
-    DialogSet,
-    DialogState,
     DialogTurnResult,
     DialogTurnStatus,
+    PromptOptions,
 )
 
-from ..state import StatePropertyAccessor, TurnState
+from ..state import ConversationState, TurnState
 
 StateT = TypeVar("StateT", bound=TurnState)
-OptionsT = TypeVar("OptionsT")
 
 
-class Dialog(ComponentDialog, Generic[StateT, OptionsT]):
+class Dialog(ComponentDialog, Generic[StateT]):
     "base class for dialog implementations"
 
     async def create_dialog_context(self, context: TurnContext, state: StateT) -> DialogContext:
@@ -36,13 +34,13 @@ class Dialog(ComponentDialog, Generic[StateT, OptionsT]):
         Returns:
             The dialog context
         """
-        accessor = StatePropertyAccessor[DialogState](state.conversation, self.id)
-        dialog_set = DialogSet(accessor)
-        dialog_set.add(self)
-        return await dialog_set.create_context(context)
+        self._dialogs._dialog_state = cast(ConversationState, state.conversation).create_property(
+            self.id
+        )
+        return await self._dialogs.create_context(context)
 
     async def run_dialog(
-        self, context: TurnContext, state: StateT, *, options: Optional[OptionsT] = None
+        self, context: TurnContext, state: StateT, *, options: Optional[PromptOptions] = None
     ) -> DialogTurnResult:
         """
         Run or continue the authentication dialog.
@@ -59,6 +57,6 @@ class Dialog(ComponentDialog, Generic[StateT, OptionsT]):
         res = await ctx.continue_dialog()
 
         if res.status == DialogTurnStatus.Empty:
-            res = await ctx.begin_dialog(self.id, options)
+            res = await ctx.begin_dialog(self.initial_dialog_id or "default", options)
 
         return res

@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, cast
 
 from botbuilder.dialogs import OAuthPromptSettings
 from botframework.connector.auth import AppCredentials
@@ -32,11 +32,14 @@ class OAuthOptions(OAuthPromptSettings):
         enable_sso: bool = False,
         token_exchange_url: Optional[str] = None,
     ) -> None:
-        self.connection_name = connection_name
-        self.title = title
-        self.text = text or title
-        self.timeout = timeout
-        self.oath_app_credentials = oauth_app_credentials
-        self.end_on_invalid_message = end_on_invalid_message
+        super().__init__(
+            connection_name,
+            title,
+            text or title,
+            cast(int, timeout),
+            cast(AppCredentials, oauth_app_credentials),
+            end_on_invalid_message,
+        )
+
         self.enable_sso = enable_sso
         self.token_exchange_url = token_exchange_url

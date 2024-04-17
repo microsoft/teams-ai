@@ -18,14 +18,13 @@ from botframework.connector.auth import TokenExchangeRequest
 from botframework.connector.models import CardAction
 
 from ...state import TurnState
-from ..auth import Auth
-from ..user_token import exchange_token, get_sign_in_resource, get_user_token
+from ..auth_component import AuthComponent
 from .oauth_options import OAuthOptions
 
 StateT = TypeVar("StateT", bound=TurnState)
 
 
-class OAuthMessageExtension(Generic[StateT], Auth[StateT]):
+class OAuthMessageExtension(Generic[StateT], AuthComponent[StateT]):
     """
     handles message extension oauth authentication
     """
@@ -36,7 +35,7 @@ class OAuthMessageExtension(Generic[StateT], Auth[StateT]):
         super().__init__()
         self._options = options
 
-    def is_valid_activity(self, activity: Activity) -> bool:
+    def is_sign_in_activity(self, activity: Activity) -> bool:
         return activity.type == ActivityTypes.invoke and activity.name in (
             "composeExtension/query",
             "composeExtension/queryLink",
@@ -45,10 +44,17 @@ class OAuthMessageExtension(Generic[StateT], Auth[StateT]):
         )
 
     async def get_sign_in_link(self, context: TurnContext) -> Optional[str]:
-        res = await get_sign_in_resource(context, self._options.connection_name)
+        client = self._user_token_client(context)
+        res = await client.get_sign_in_resource(
+            self._options.connection_name,
+            context.activity,
+            "",
+        )
+
         return res.sign_in_link
 
     async def sso_token_exchange(self, context: TurnContext) -> Optional[TokenResponse]:
+        client = self._user_token_client(context)
         value = context.activity.value
 
         if value is None or not hasattr(value, "authentication"):
@@ -59,15 +65,12 @@ class OAuthMessageExtension(Generic[StateT], Auth[StateT]):
         if auth is None or not isinstance(auth, TokenExchangeRequest):
             return None
 
-        return await exchange_token(context, self._options.connection_name, auth)
-
-    async def is_signed_in(self, context: TurnContext) -> Optional[str]:
-        res = await get_user_token(context, self._options.connection_name, "")
-
-        if res is not None and res.token != "":
-            return res.token
-
-        return None
+        return await client.exchange_token(
+            getattr(context.activity.from_property, "id"),
+            self._options.connection_name,
+            context.activity.channel_id,
+            auth,
+        )
 
     async def sign_in(self, context: TurnContext, state: StateT) -> str | None:
         value = cast(dict, context.activity.value)
@@ -86,11 +89,6 @@ class OAuthMessageExtension(Generic[StateT], Auth[StateT]):
             )
 
             return None
-
-        res = await self.on_sign_in_complete(context, state)
-
-        if res is not None:
-            return res.token
 
         await context.send_activity(
             Activity(
@@ -122,16 +120,3 @@ class OAuthMessageExtension(Generic[StateT], Auth[StateT]):
         )
 
         return None
-
-    async def sign_out(self, context: TurnContext, state: StateT) -> None:
-        return
-
-    async def on_sign_in_complete(
-        self, context: TurnContext, state: StateT
-    ) -> Optional[TokenResponse]:
-        value = context.activity.value
-
-        if value is None or not hasattr(value, "state") or not isinstance(value.state, str):
-            return None
-
-        return await get_user_token(context, self._options.connection_name, value.state)

@@ -6,20 +6,20 @@ Description: initialize the app and listen for `message` activitys
 """
 
 import sys
-import os
 import traceback
 
-from botbuilder.core import TurnContext
+from botbuilder.core import MemoryStorage, TurnContext
 from teams import Application, ApplicationOptions, TeamsAdapter
-from teams.state import TurnState
-from teams.auth import AuthOptions, OAuthOptions
+from teams.auth import AuthOptions, OAuthOptions, SignInResponse
+from teams.state import ConversationState, TempState, TurnState, UserState
 
 from config import Config
 
 config = Config()
-app = Application[TurnState](
+app = Application[TurnState[ConversationState, UserState, TempState]](
     ApplicationOptions(
         bot_app_id=config.APP_ID,
+        storage=MemoryStorage(),
         adapter=TeamsAdapter(config),
         auth=AuthOptions(
             default="graph",
@@ -37,10 +37,39 @@ app = Application[TurnState](
     )
 )
 
+
+@app.message("/signout")
+async def on_sign_out(
+    context: TurnContext, state: TurnState[ConversationState, UserState, TempState]
+):
+    await app.auth.get("graph").sign_out(context, state)
+    await context.send_activity("you are now signed out...👋")
+    return False
+
+
 @app.activity("message")
-async def on_message(context: TurnContext, _state: TurnState):
+async def on_message(
+    context: TurnContext, _state: TurnState[ConversationState, UserState, TempState]
+):
     await context.send_activity(f"you said: {context.activity.text}")
-    return True
+    return False
+
+
+@app.auth.get("graph").on_sign_in_success
+async def on_sign_in_success(
+    context: TurnContext, state: TurnState[ConversationState, UserState, TempState]
+):
+    await context.send_activity("successfully logged in!")
+    await context.send_activity(f"token: {state.temp.auth_tokens['graph']}")
+
+
+@app.auth.get("graph").on_sign_in_failure
+async def on_sign_in_failure(
+    context: TurnContext,
+    state: TurnState[ConversationState, UserState, TempState],
+    res: SignInResponse,
+):
+    await context.send_activity("failed to login...")
 
 
 @app.error
