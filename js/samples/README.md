@@ -138,6 +138,47 @@ To configure the Azure resources to have an environment variable for the OpenAI 
 
 The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
 
+2. (optional) If you want to use Linux Web app to host your bot, there're some changes you need to make. 
+
+    2.1. Updatge Bicep templates.
+
+
+    ```
+    @description('The Runtime stack of current web app')
+    param linuxFxVersion string = 'NODE|18-lts'
+
+    // Compute resources for your Web App
+    resource serverfarm 'Microsoft.Web/serverfarms@2021-02-01' = {
+      kind: 'linux'
+      location: location
+      name: serverfarmsName
+      sku: {
+        name: webAppSKU
+      }
+      properties: {
+        reserved: true // This indicates it's a Linux app service plan
+      }
+    }
+
+    // Web App that hosts your bot
+    resource webApp 'Microsoft.Web/sites@2021-02-01' = {
+      kind: 'app'
+      ...
+      linuxFxVersion: linuxFxVersion
+      ...
+    }
+    ```
+
+    2.2. Change start command in package.json (only for deployment to Azure, change it back if you do local debug)
+    ```json
+    "scripts": {
+        ...
+        "postinstall": "tsc --build",
+        "start": "node ./lib/index.js",
+        ...
+    }
+    ```
+
 Use the **Provision**, **Deploy**, and **Publish** buttons of the Teams Toolkit extension or from the CLI with `teamsfx provision` and `teamsfx deploy`. [Visit the documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/provision) for more info on hosting your app in Azure with Teams Toolkit.
 
 Alternatively, you can learn more about deploying a bot to Azure manually in the [Deploy your bot to Azure](https://aka.ms/azuredeployment) documentation.
