@@ -29,7 +29,7 @@
         "openai": "4.28.4"
     },
     "dependencies": {
-        "@azure/msal-node": "^2.6.6",
+        "@azure/msal-node": "^2.7.0",
         "axios": "^1.6.8",
         "botbuilder-dialogs": "^4.22.1",
         "botframework-connector": "^4.22.1",
@@ -49,7 +49,7 @@
         "@types/express": "^4.17.21",
         "@types/jsonwebtoken": "^9.0.4",
         "@types/mocha": "^10.0.6",
-        "@types/node": "^20.12.5",
+        "@types/node": "^20.12.7",
         "@types/uuid": "^9.0.8",
         "botbuilder-core": "^4.22.1",
         "eslint": "^8.57.0",

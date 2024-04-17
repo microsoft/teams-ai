@@ -15,6 +15,13 @@ import { CreateEmbeddingRequest, CreateEmbeddingResponse, OpenAICreateEmbeddingR
  */
 export interface BaseOpenAIEmbeddingsOptions {
     /**
+     * Optional. Number of dimensions to use when generating embeddings.
+     * @remarks
+     * Only valid for embedding models that support dynamic dimensionality.
+     */
+    dimensions?: number;
+
+    /**
      * Optional. Whether to log requests to the console.
      * @remarks
      * This is useful for debugging prompts and defaults to `false`.
@@ -47,9 +54,7 @@ export interface OpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
     apiKey: string;
 
     /**
-     * Model to use for completion.
-     * @remarks
-     * For Azure OpenAI this is the name of the deployment to use.
+     * Embeddings Model to use.
      */
     model: string;
 
@@ -64,6 +69,35 @@ export interface OpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
      * For Azure OpenAI this is the deployment endpoint.
      */
     endpoint?: string;
+}
+
+/**
+ * Options for configuring an embeddings object that calls an `OpenAI` compliant endpoint.
+ * @remarks
+ * The endpoint should comply with the OpenAPI spec for OpenAI's API:
+ * 
+ * https://github.com/openai/openai-openapi
+ * 
+ * And an example of a compliant endpoint is LLaMA.cpp's reference server:
+ * 
+ * https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md
+ * 
+ */
+export interface OpenAILikeEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
+    /**
+     * Endpoint of the embeddings server to call.
+     */
+    endpoint: string;
+
+    /**
+     * Embeddings Model to use.
+     */
+    model: string;
+
+    /**
+     * Optional. API key to use when calling the embeddings server.
+     */
+    apiKey?: string;
 }
 
 /**
@@ -103,11 +137,11 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
     /**
      * Options the client was configured with.
      */
-    public readonly options: OpenAIEmbeddingsOptions | AzureOpenAIEmbeddingsOptions;
+    public readonly options: OpenAIEmbeddingsOptions | AzureOpenAIEmbeddingsOptions | OpenAILikeEmbeddingsOptions;
 
     /**
      * Creates a new `OpenAIEmbeddings` instance.
-     * @param {OpenAIEmbeddingsOptions | AzureOpenAIEmbeddingsOptions} options Options for configuring the embeddings client.
+     * @param {OpenAIEmbeddingsOptions | AzureOpenAIEmbeddingsOptions | OpenAILikeEmbeddingsOptions} options Options for configuring the embeddings client.
      */
     public constructor(options: OpenAIEmbeddingsOptions | AzureOpenAIEmbeddingsOptions) {
         // Check for azure config
@@ -162,12 +196,16 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
             console.log(Colorize.output(inputs));
         }
 
-        const startTime = Date.now();
-        const response = await this.createEmbeddingRequest({
+        const request: CreateEmbeddingRequest = {
             model: model,
             input: inputs
-        });
+        };
+        if (this.options.dimensions) {
+            request.dimensions = this.options.dimensions;
+        }
 
+        const startTime = Date.now();
+        const response = await this.createEmbeddingRequest(request);
         if (this.options.logRequests) {
             console.log(Colorize.title('RESPONSE:'));
             console.log(Colorize.value('status', response.status));
@@ -236,7 +274,7 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
         if (this._useAzure) {
             const options = this.options as AzureOpenAIEmbeddingsOptions;
             requestConfig.headers['api-key'] = options.azureApiKey;
-        } else {
+        } else if ((this.options as OpenAIEmbeddingsOptions).apiKey){
             const options = this.options as OpenAIEmbeddingsOptions;
             requestConfig.headers['Authorization'] = `Bearer ${options.apiKey}`;
             if (options.organization) {

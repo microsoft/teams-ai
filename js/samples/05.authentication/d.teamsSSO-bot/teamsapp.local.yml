@@ -12,7 +12,7 @@ version: 1.0.0
 provision:
   - uses: aadApp/create # Creates a new Azure Active Directory (AAD) app to authenticate users if the environment variable that stores clientId is empty
     with:
-      name: MessageExtensionSSO-aad # Note: when you run aadApp/update, the AAD app name will be updated based on the definition in manifest. If you don't want to change the name, make sure the name in AAD manifest is the same with the name defined here.
+      name: SsoAuthBot-aad # Note: when you run aadApp/update, the AAD app name will be updated based on the definition in manifest. If you don't want to change the name, make sure the name in AAD manifest is the same with the name defined here.
       generateClientSecret: true # If the value is false, the action will not generate client secret for you
       signInAudience: "AzureADMyOrg" # Authenticate users with a Microsoft work or school account in your organization's Azure AD tenant (for example, single tenant).
     writeToEnvironmentFile: # Write the information of created resources into environment file for the specified environment variable(s).
@@ -26,7 +26,7 @@ provision:
   # Automates the creation of a Teams app registration and saves the App ID to an environment file.
   - uses: teamsApp/create
     with:
-      name: MessageExtensionSSO-${{TEAMSFX_ENV}}
+      name: SsoAuthBot-${{TEAMSFX_ENV}}
     writeToEnvironmentFile:
       teamsAppId: TEAMS_APP_ID
 
@@ -34,7 +34,7 @@ provision:
   # The Bot ID (AAD app client ID) and Bot Password (AAD app client secret) are saved to an environment file.
   - uses: botAadApp/create
     with:
-      name: MessageExtensionSSO-${{TEAMSFX_ENV}}
+      name: SsoAuthBot-${{TEAMSFX_ENV}}
     writeToEnvironmentFile:
       botId: BOT_ID
       botPassword: SECRET_BOT_PASSWORD
@@ -45,7 +45,7 @@ provision:
   - uses: botFramework/create
     with:
       botId: ${{BOT_ID}}
-      name: MessageExtensionSSO
+      name: SsoAuthBot
       messagingEndpoint: ${{BOT_ENDPOINT}}/api/messages
       description: ""
       channels:
@@ -78,6 +78,11 @@ provision:
 # Defines what the `deploy` lifecycle step does with Teams Toolkit.
 # Runs after `provision` during Start Debugging (F5) or run manually using `teamsfx deploy --env local`.
 deploy:
+  # Install any dependencies and build the web app using NPM
+  - uses: cli/runNpmCommand
+    name: install dependencies
+    with:
+        args: install --no-audit --workspaces=false
   # Provides the Teams Toolkit .env file values to the apps runtime so they can be accessed with `process.env`.
   - uses: file/createOrUpdateEnvironmentFile
     with:

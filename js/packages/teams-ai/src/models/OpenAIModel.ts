@@ -32,6 +32,13 @@ export interface BaseOpenAIModelOptions {
     logRequests?: boolean;
 
     /**
+     * Optional. Forces the model return a specific response format.
+     * @remarks
+     * This can be used to force the model to always return a valid JSON object. 
+     */
+    responseFormat?: { "type": "json_object" };
+
+    /**
      * Optional. Retry policy to use when calling the OpenAI API.
      * @remarks
      * The default retry policy is `[2000, 5000]` which means that the first retry will be after
@@ -45,6 +52,13 @@ export interface BaseOpenAIModelOptions {
     requestConfig?: AxiosRequestConfig;
 
     /**
+     * Optional. A static seed to use when making model calls.
+     * @remarks
+     * The default is to use a random seed. Specifying a seed will make the model deterministic.
+     */
+    seed?: number;
+
+    /**
      * Optional. Whether to use `system` messages when calling the OpenAI API.
      * @remarks
      * The current generation of models tend to follow instructions from `user` messages better
@@ -52,6 +66,7 @@ export interface BaseOpenAIModelOptions {
      * prompt to be sent as `user` messages instead.
      */
     useSystemMessages?: boolean;
+    
 }
 
 /**
@@ -81,6 +96,35 @@ export interface OpenAIModelOptions extends BaseOpenAIModelOptions {
      * For Azure OpenAI this is the deployment endpoint.
      */
     endpoint?: string;
+}
+
+/**
+ * Options for configuring a model that calls and `OpenAI` compliant endpoint.
+ * @remarks
+ * The endpoint should comply with the OpenAPI spec for OpenAI's API:
+ * 
+ * https://github.com/openai/openai-openapi
+ * 
+ * And an example of a compliant endpoint is LLaMA.cpp's reference server:
+ * 
+ * https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md
+ * 
+ */
+export interface OpenAILikeModelOptions extends BaseOpenAIModelOptions {
+    /**
+     * Endpoint of the model server to call.
+     */
+    endpoint: string;
+
+    /**
+     * Default model to use for completions.
+     */
+    defaultModel: string;
+
+    /**
+     * Optional. API key to use when calling the models endpoint.
+     */
+    apiKey?: string;
 }
 
 /**
@@ -120,13 +164,13 @@ export class OpenAIModel implements PromptCompletionModel {
     /**
      * Options the client was configured with.
      */
-    public readonly options: OpenAIModelOptions | AzureOpenAIModelOptions;
+    public readonly options: OpenAIModelOptions | AzureOpenAIModelOptions | OpenAILikeModelOptions;
 
     /**
      * Creates a new `OpenAIModel` instance.
      * @param {OpenAIModelOptions} options - Options for configuring the model client.
      */
-    public constructor(options: OpenAIModelOptions | AzureOpenAIModelOptions) {
+    public constructor(options: OpenAIModelOptions | AzureOpenAIModelOptions | OpenAILikeModelOptions) {
         // Check for azure config
         if ((options as AzureOpenAIModelOptions).azureApiKey) {
             this._useAzure = true;
@@ -221,7 +265,7 @@ export class OpenAIModel implements PromptCompletionModel {
             input = result.output[last];
         }
 
-        // Call chat completion API
+        // Initialize chat completion request
         const request: CreateChatCompletionRequest = this.copyOptionsToRequest<CreateChatCompletionRequest>(
             {
                 messages: result.output as ChatCompletionRequestMessage[]
@@ -243,9 +287,17 @@ export class OpenAIModel implements PromptCompletionModel {
                 'user',
                 'functions',
                 'function_call',
-                'data_sources'
+                'data_sources',
             ]
         );
+        if (this.options.responseFormat) {
+            request.response_format = this.options.responseFormat;
+        }
+        if (this.options.seed !== undefined) {
+            request.seed = this.options.seed;
+        }
+
+        // Call chat completion API
         const response = await this.createChatCompletion(request, model);
         if (this.options.logRequests) {
             console.log(Colorize.title('CHAT RESPONSE:'));
@@ -346,7 +398,7 @@ export class OpenAIModel implements PromptCompletionModel {
         if (this._useAzure) {
             const options = this.options as AzureOpenAIModelOptions;
             requestConfig.headers['api-key'] = options.azureApiKey;
-        } else {
+        } else if ((this.options as OpenAIModelOptions).apiKey) {
             const options = this.options as OpenAIModelOptions;
             requestConfig.headers['Authorization'] = `Bearer ${options.apiKey}`;
             if (options.organization) {
