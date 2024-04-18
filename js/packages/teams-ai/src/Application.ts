@@ -624,8 +624,12 @@ export class Application<TState extends TurnState = TurnState> {
                 context.activity.type === ActivityTypes.Invoke && context.activity.name === 'handoff/action'
             );
         };
-        const handlerWrapper = (context: TurnContext, state: TState) => {
-            return handler(context, state, context.activity.value!.continuation);
+        const handlerWrapper = async (context: TurnContext, state: TState) => {
+            await handler(context, state, context.activity.value!.continuation);
+            await context.sendActivity({
+                type: ActivityTypes.InvokeResponse,
+                value: { status: 200 },
+            });
         };
         this.addRoute(selector, handlerWrapper);
         return this;
