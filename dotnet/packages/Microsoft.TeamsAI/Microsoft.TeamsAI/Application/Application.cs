@@ -762,7 +762,7 @@ namespace Microsoft.Teams.AI
             );
             RouteHandler<TState> routeHandler = async (turnContext, turnState, cancellationToken) =>
             {
-                string token = turnContext.Activity.Value.GetType().GetProperty("cancellation").GetValue(turnContext.Activity.Value) as string;
+                string token = turnContext.Activity.Value.GetType().GetProperty("Continuation").GetValue(turnContext.Activity.Value) as string;
                 await handler(turnContext, turnState, token, cancellationToken);
 
                 // Check to see if an invoke response has already been added

@@ -2288,7 +2288,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Type = ActivityTypes.Invoke,
                 Name = "handoff/action",
-                Value = new { continuation = "test" },
+                Value = new { Continuation = "test" },
                 Id = "test",
                 Recipient = new() { Id = "recipientId" },
                 Conversation = new() { Id = "conversationId" },
