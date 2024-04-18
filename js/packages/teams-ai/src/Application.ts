@@ -614,6 +614,24 @@ export class Application<TState extends TurnState = TurnState> {
     }
 
     /**
+     * Registers a handler to process when a file consent card is accepted by the user.
+     * @param {(context: TurnContext, state: TState, continuation: string) => Promise<void>} handler Function to call when the route is triggered.
+     * @returns {this} The application instance for chaining purposes.
+     */
+    public handoff(handler: (context: TurnContext, state: TState, continuation: string) => Promise<void>): this {
+        const selector = (context: TurnContext): Promise<boolean> => {
+            return Promise.resolve(
+                context.activity.type === ActivityTypes.Invoke && context.activity.name === 'handoff/action'
+            );
+        };
+        const handlerWrapper = (context: TurnContext, state: TState) => {
+            return handler(context, state, context.activity.value!.continuation);
+        };
+        this.addRoute(selector, handlerWrapper);
+        return this;
+    }
+
+    /**
      * Dispatches an incoming activity to a handler registered with the application.
      * @remarks
      * This method should be called from your bot's "turn handler" (its primary message handler)

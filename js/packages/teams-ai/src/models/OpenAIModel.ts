@@ -34,9 +34,9 @@ export interface BaseOpenAIModelOptions {
     /**
      * Optional. Forces the model return a specific response format.
      * @remarks
-     * This can be used to force the model to always return a valid JSON object. 
+     * This can be used to force the model to always return a valid JSON object.
      */
-    responseFormat?: { "type": "json_object" };
+    responseFormat?: { type: 'json_object' };
 
     /**
      * Optional. Retry policy to use when calling the OpenAI API.
@@ -66,7 +66,6 @@ export interface BaseOpenAIModelOptions {
      * prompt to be sent as `user` messages instead.
      */
     useSystemMessages?: boolean;
-    
 }
 
 /**
@@ -102,13 +101,12 @@ export interface OpenAIModelOptions extends BaseOpenAIModelOptions {
  * Options for configuring a model that calls and `OpenAI` compliant endpoint.
  * @remarks
  * The endpoint should comply with the OpenAPI spec for OpenAI's API:
- * 
+ *
  * https://github.com/openai/openai-openapi
- * 
+ *
  * And an example of a compliant endpoint is LLaMA.cpp's reference server:
- * 
+ *
  * https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md
- * 
  */
 export interface OpenAILikeModelOptions extends BaseOpenAIModelOptions {
     /**
@@ -287,7 +285,7 @@ export class OpenAIModel implements PromptCompletionModel {
                 'user',
                 'functions',
                 'function_call',
-                'data_sources',
+                'data_sources'
             ]
         );
         if (this.options.responseFormat) {
