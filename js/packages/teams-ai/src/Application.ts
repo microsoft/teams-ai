@@ -566,7 +566,7 @@ export class Application<TState extends TurnState = TurnState> {
         const handlerWrapper = (context: TurnContext, state: TState) => {
             return handler(context, state, context.activity.value as FileConsentCardResponse);
         };
-        this.addRoute(selector, handlerWrapper);
+        this.addRoute(selector, handlerWrapper, true);
         return this;
     }
 
@@ -588,7 +588,7 @@ export class Application<TState extends TurnState = TurnState> {
         const handlerWrapper = (context: TurnContext, state: TState) => {
             return handler(context, state, context.activity.value as FileConsentCardResponse);
         };
-        this.addRoute(selector, handlerWrapper);
+        this.addRoute(selector, handlerWrapper, true);
         return this;
     }
 
@@ -609,7 +609,7 @@ export class Application<TState extends TurnState = TurnState> {
         const handlerWrapper = (context: TurnContext, state: TState) => {
             return handler(context, state, context.activity.value as O365ConnectorCardActionQuery);
         };
-        this.addRoute(selector, handlerWrapper);
+        this.addRoute(selector, handlerWrapper, true);
         return this;
     }
 
@@ -631,7 +631,7 @@ export class Application<TState extends TurnState = TurnState> {
                 value: { status: 200 },
             });
         };
-        this.addRoute(selector, handlerWrapper);
+        this.addRoute(selector, handlerWrapper, true);
         return this;
     }
 
