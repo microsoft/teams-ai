@@ -10,7 +10,7 @@ import { Attachment, CardFactory } from 'botbuilder';
 export function createDynamicSearchCard(): Attachment {
     return CardFactory.adaptiveCard({
         $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
-        version: '1.3',
+        version: '1.6',
         type: 'AdaptiveCard',
         body: [
             {
@@ -21,35 +21,19 @@ export function createDynamicSearchCard(): Attachment {
             {
                 columns: [
                     {
-                        width: 'stretch',
                         items: [
                             {
-                                choices: [
-                                    {
-                                        title: '@microsoft/teams-ai',
-                                        value: 'microsoft_teams_ai'
-                                    },
-                                    {
-                                        title: '@microsoft/botframework-webchat',
-                                        value: 'microsoft_botframework_webchat'
-                                    },
-                                    {
-                                        title: '@microsoft/botframework-emulator',
-                                        value: 'microsoft_botframework_emulator'
-                                    }
-                                ],
                                 'choices.data': {
                                     type: 'Data.Query',
                                     dataset: 'npmpackages'
                                 },
-                                id: 'choiceSelect',
+                                id: 'dynamicSelect',
                                 type: 'Input.ChoiceSet',
                                 placeholder: 'Package name',
                                 label: 'NPM package search',
                                 isRequired: true,
-                                errorMessage: 'There was an error',
-                                isMultiSelect: true,
-                                style: 'filtered'
+                                errorMessage: 'There was an error x',
+                                isMultiSelect: true
                             }
                         ],
                         type: 'Column'
@@ -61,7 +45,7 @@ export function createDynamicSearchCard(): Attachment {
         actions: [
             {
                 type: 'Action.Submit',
-                title: 'Submit',
+                title: 'DynamicSubmit',
                 data: {
                     verb: 'DynamicSubmit'
                 }
