@@ -304,13 +304,14 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
         context.activity.type = "message"
         context.activity.text = "Here is the attachment"
         context.activity.attachments = [attachment]
+        config = MockConfiguration(
+            TO_CHANNEL_FROM_BOT_OAUTH_SCOPE=GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+        )
         downloader = TeamsAttachmentDownloader(
             TeamsAttachmentDownloaderOptions(
                 bot_app_id="botAppId",
                 adapter=TeamsAdapter(
-                    MockConfiguration(
-                        TO_CHANNEL_FROM_BOT_OAUTH_SCOPE=GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-                    ),
+                    config,
                     credentials_factory=MockCredentialsFactory(),
                 ),
             )
@@ -384,14 +385,15 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
         context.activity.type = "message"
         context.activity.text = "Here is the attachment"
         context.activity.attachments = [attachment]
+        config = MockConfiguration(
+            TO_CHANNEL_FROM_BOT_LOGIN_URL=GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL,
+            CALLER_ID=CallerIdConstants.us_gov_channel,
+        )
         downloader = TeamsAttachmentDownloader(
             TeamsAttachmentDownloaderOptions(
                 bot_app_id="botAppId",
                 adapter=TeamsAdapter(
-                    MockConfiguration(
-                        TO_CHANNEL_FROM_BOT_LOGIN_URL=GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL,
-                        CALLER_ID=CallerIdConstants.us_gov_channel,
-                    ),
+                    config,
                     credentials_factory=MockCredentialsFactory(),
                 ),
             )
