@@ -614,7 +614,7 @@ export class Application<TState extends TurnState = TurnState> {
     }
 
     /**
-     * Registers a handler to process when a file consent card is accepted by the user.
+     * Registers a handler to handoff conversations from one copilot to another.
      * @param {(context: TurnContext, state: TState, continuation: string) => Promise<void>} handler Function to call when the route is triggered.
      * @returns {this} The application instance for chaining purposes.
      */
