@@ -6,7 +6,9 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, Optional
+from typing import Callable, Dict, Optional, Union
+
+from botbuilder.core import TurnContext
 
 from .oauth import OAuthOptions
 
@@ -15,7 +17,7 @@ from .oauth import OAuthOptions
 class AuthOptions:
     "authentication options"
 
-    auto: bool = False
+    auto: Union[bool, Callable[[TurnContext], bool]] = False
     "Should sign in flow start automatically."
 
     default: Optional[str] = None

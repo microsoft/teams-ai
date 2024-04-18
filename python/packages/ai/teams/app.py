@@ -641,7 +641,19 @@ class Application(Bot, Generic[StateT]):
             if (
                 self.options.auth
                 and self._auth
-                and (self.options.auth.auto or IN_SIGN_IN_KEY in state.user)
+                and (
+                    (
+                        (
+                            isinstance(self.options.auth.auto, bool)
+                            and self.options.auth.auto == True
+                        )
+                        or (
+                            callable(self.options.auth.auto)
+                            and self.options.auth.auto(context) == True
+                        )
+                    )
+                    or IN_SIGN_IN_KEY in state.user
+                )
             ):
                 key: Optional[str] = (
                     state.user[IN_SIGN_IN_KEY]
