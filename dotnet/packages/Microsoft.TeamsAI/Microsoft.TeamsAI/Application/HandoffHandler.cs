@@ -4,7 +4,7 @@ using Microsoft.Teams.AI.State;
 namespace Microsoft.Teams.AI.Application
 {
     /// <summary>
-    /// Function for handling O365 Connector Card Action activities.
+    /// Function for handling handoff activities.
     /// </summary>
     /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
     /// <param name="turnContext">A strongly-typed context object for this turn.</param>
