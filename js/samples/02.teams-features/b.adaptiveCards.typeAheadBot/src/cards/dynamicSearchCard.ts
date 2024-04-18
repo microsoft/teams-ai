@@ -32,7 +32,7 @@ export function createDynamicSearchCard(): Attachment {
                                 placeholder: 'Package name',
                                 label: 'NPM package search',
                                 isRequired: true,
-                                errorMessage: 'There was an error x',
+                                errorMessage: 'There was an error',
                                 isMultiSelect: true
                             }
                         ],
