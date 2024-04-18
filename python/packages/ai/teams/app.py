@@ -519,7 +519,7 @@ class Application(Bot, Generic[StateT]):
         Callable[[TurnContext, StateT, str], Awaitable[None]],
     ]:
         """
-        Registers a handler for when a O365 connector card action is received from the user.
+        Registers a handler to handoff conversations from one copilot to another.
          ```python
         # Use this method as a decorator
         @app.handoff
