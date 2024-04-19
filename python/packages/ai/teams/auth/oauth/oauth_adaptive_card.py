@@ -8,6 +8,7 @@ from __future__ import annotations
 from typing import Generic, Optional, TypeVar, cast
 
 from botbuilder.core import TurnContext
+from botbuilder.core.serializer_helper import serializer_helper
 from botbuilder.schema import (
     ActionTypes,
     Activity,
@@ -76,13 +77,15 @@ class OAuthAdaptiveCard(Generic[StateT], AuthComponent[StateT]):
                     type=ActivityTypes.invoke_response,
                     value=InvokeResponse(
                         status=200,
-                        body=AdaptiveCardInvokeResponse(
-                            status_code=412,
-                            type="application/vnd.microsoft.error.preconditionFailed",
-                            value={
-                                "code": "412",
-                                "message": "failed to exchange token",
-                            },
+                        body=serializer_helper(
+                            AdaptiveCardInvokeResponse(
+                                status_code=412,
+                                type="application/vnd.microsoft.error.preconditionFailed",
+                                value={
+                                    "code": "412",
+                                    "message": "failed to exchange token",
+                                },
+                            )
                         ),
                     ),
                 )

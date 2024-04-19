@@ -8,6 +8,7 @@ from __future__ import annotations
 from typing import Generic, Optional, TypeVar, cast
 
 from botbuilder.core import TurnContext
+from botbuilder.core.serializer_helper import serializer_helper
 from botbuilder.schema import (
     ActionTypes,
     Activity,
@@ -101,25 +102,27 @@ class OAuthMessageExtension(Generic[StateT], AuthComponent[StateT]):
                 type=ActivityTypes.invoke_response,
                 value=InvokeResponse(
                     status=200,
-                    body=MessagingExtensionActionResponse(
-                        compose_extension=MessagingExtensionResult(
-                            type=(
-                                "silentAuth"
-                                if context.activity.name == "composeExtension/query"
-                                and self._options.enable_sso
-                                else "auth"
+                    body=serializer_helper(
+                        MessagingExtensionActionResponse(
+                            compose_extension=MessagingExtensionResult(
+                                type=(
+                                    "silentAuth"
+                                    if context.activity.name == "composeExtension/query"
+                                    and self._options.enable_sso
+                                    else "auth"
+                                ),
+                                suggested_actions=MessagingExtensionSuggestedAction(
+                                    actions=[
+                                        CardAction(
+                                            type=ActionTypes.open_url,
+                                            title=self._options.title,
+                                            text=self._options.text,
+                                            display_text=self._options.text,
+                                        )
+                                    ],
+                                ),
                             ),
-                            suggested_actions=MessagingExtensionSuggestedAction(
-                                actions=[
-                                    CardAction(
-                                        type=ActionTypes.open_url,
-                                        title=self._options.title,
-                                        text=self._options.text,
-                                        display_text=self._options.text,
-                                    )
-                                ],
-                            ),
-                        ),
+                        )
                     ),
                 ),
             )

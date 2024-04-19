@@ -7,20 +7,21 @@ Description: initialize the app and listen for `message` activitys
 
 import sys
 import traceback
+import base64
 
-from typing import List
+from typing import List, Any
 
-from msgraph import GraphServiceClient, GraphRequestAdapter
+from msgraph import GraphServiceClient
 from botbuilder.core import MemoryStorage, TurnContext, CardFactory
-from botbuilder.schema import ThumbnailCard, CardImage, Attachment
-from botbuilder.schema.teams import MessagingExtensionQuery, MessagingExtensionResult, MessagingExtensionParameter
+from botbuilder.schema import ThumbnailCard, CardImage
+from botbuilder.schema.teams import MessagingExtensionQuery, MessagingExtensionResult, MessagingExtensionParameter, MessagingExtensionAttachment, TaskModuleTaskInfo
 
 from teams import Application, ApplicationOptions, TeamsAdapter
-from teams.auth import AuthOptions, OAuthOptions, SignInResponse
+from teams.auth import AuthOptions, OAuthOptions
 from teams.state import ConversationState, TempState, TurnState, UserState
 
 from config import Config
-from graph import GraphAuthenticationProvider
+from graph import GraphTokenProvider
 
 config = Config()
 app = Application[TurnState[ConversationState, UserState, TempState]](
@@ -30,16 +31,6 @@ app = Application[TurnState[ConversationState, UserState, TempState]](
         adapter=TeamsAdapter(config),
         auth=AuthOptions(
             default="graph",
-            auto=lambda ctx: (
-                ctx.activity.value is None or
-                ((
-                    "commandId" in ctx.activity.value and
-                    ctx.activity.value["commandId"] != "signOutCommand"
-                ) or (
-                    "command_id" in ctx.activity.value and
-                    ctx.activity.value["command_id"] != "signOutCommand"
-                ))
-            ),
             settings={
                 "graph": OAuthOptions(
                     connection_name=config.OAUTH_CONNECTION_NAME,
@@ -54,57 +45,75 @@ app = Application[TurnState[ConversationState, UserState, TempState]](
 )
 
 
+@app.message_extensions.fetch_task("signOutCommand")
+async def on_sign_out_fetch(
+    context: TurnContext,
+    state: TurnState[ConversationState, UserState, TempState]
+):
+    await app.auth.get("graph").sign_out(context, state)
+    return TaskModuleTaskInfo(
+        title="Adaptive Card: Inputs",
+        height=100,
+        width=400,
+        card=CardFactory.adaptive_card({
+            "version": "1.0.0",
+            "type": "AdaptiveCard",
+            "body": [{
+                "type": "TextBlock",
+                "text": "You have been signed out."
+            }],
+            "actions": [{
+                "type": "Action.Submit",
+                "title": "Close",
+                "data": { "key": "close" }
+            }]
+        })
+    )
+
+
+@app.message_extensions.submit_action("signOutCommand")
+async def on_sign_out_submit(
+    _context: TurnContext,
+    _state: TurnState[ConversationState, UserState, TempState],
+    _data: Any
+):
+    return None
+
+
 @app.message_extensions.query("searchCmd")
-async def on_search_command(
+async def on_search(
     context: TurnContext,
     state: TurnState[ConversationState, UserState, TempState],
     query: MessagingExtensionQuery
 ):
     params: List[MessagingExtensionParameter] = query.parameters or []
-    res: List[Attachment] = []
+    res: List[MessagingExtensionAttachment] = []
     q = [param for param in params if param.name == "queryText"][0].value
-    token = await app.auth.get("graph").get_token(context)
+    token = await app.auth.get("graph").sign_in(context, state)
 
     if token is None:
         return MessagingExtensionResult()
     
-    graph = GraphServiceClient(
-        request_adapter=GraphRequestAdapter(
-            GraphAuthenticationProvider(token)
-        )
-    )
+    graph = GraphServiceClient(GraphTokenProvider(token))
 
     if q == "profile":
         me = await graph.me.get()
-        
+        photo = await graph.me.photo.content.get()
+
         if me:
-            res.append(CardFactory.thumbnail_card(ThumbnailCard(
-                title=me.display_name or "",
-                images=[CardImage(url=me.photo.)] if me.photo else None
-            )))
+            res.append(MessagingExtensionAttachment(
+                content_type=CardFactory.content_types.thumbnail_card,
+                content=ThumbnailCard(
+                    title=me.display_name or "",
+                    images=[CardImage(url="data:image/png;base64,"+base64.b64encode(photo).decode("ascii"))]
+                )
+            ))
 
     return MessagingExtensionResult(
         type="result",
         attachments=res,
         attachment_layout="list",
     )
-
-
-@app.auth.get("graph").on_sign_in_success
-async def on_sign_in_success(
-    context: TurnContext, state: TurnState[ConversationState, UserState, TempState]
-):
-    await context.send_activity("successfully logged in!")
-    await context.send_activity(f"token: {state.temp.auth_tokens['graph']}")
-
-
-@app.auth.get("graph").on_sign_in_failure
-async def on_sign_in_failure(
-    context: TurnContext,
-    state: TurnState[ConversationState, UserState, TempState],
-    res: SignInResponse,
-):
-    await context.send_activity("failed to login...")
 
 
 @app.error
