@@ -645,11 +645,11 @@ class Application(Bot, Generic[StateT]):
                     (
                         (
                             isinstance(self.options.auth.auto, bool)
-                            and self.options.auth.auto == True
+                            and self.options.auth.auto is True
                         )
                         or (
                             callable(self.options.auth.auto)
-                            and self.options.auth.auto(context) == True
+                            and self.options.auth.auto(context) is True
                         )
                     )
                     or IN_SIGN_IN_KEY in state.user
