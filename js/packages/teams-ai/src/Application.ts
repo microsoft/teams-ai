@@ -566,7 +566,7 @@ export class Application<TState extends TurnState = TurnState> {
         const handlerWrapper = (context: TurnContext, state: TState) => {
             return handler(context, state, context.activity.value as FileConsentCardResponse);
         };
-        this.addRoute(selector, handlerWrapper);
+        this.addRoute(selector, handlerWrapper, true);
         return this;
     }
 
@@ -588,7 +588,7 @@ export class Application<TState extends TurnState = TurnState> {
         const handlerWrapper = (context: TurnContext, state: TState) => {
             return handler(context, state, context.activity.value as FileConsentCardResponse);
         };
-        this.addRoute(selector, handlerWrapper);
+        this.addRoute(selector, handlerWrapper, true);
         return this;
     }
 
@@ -609,7 +609,29 @@ export class Application<TState extends TurnState = TurnState> {
         const handlerWrapper = (context: TurnContext, state: TState) => {
             return handler(context, state, context.activity.value as O365ConnectorCardActionQuery);
         };
-        this.addRoute(selector, handlerWrapper);
+        this.addRoute(selector, handlerWrapper, true);
+        return this;
+    }
+
+    /**
+     * Registers a handler to handoff conversations from one copilot to another.
+     * @param {(context: TurnContext, state: TState, continuation: string) => Promise<void>} handler Function to call when the route is triggered.
+     * @returns {this} The application instance for chaining purposes.
+     */
+    public handoff(handler: (context: TurnContext, state: TState, continuation: string) => Promise<void>): this {
+        const selector = (context: TurnContext): Promise<boolean> => {
+            return Promise.resolve(
+                context.activity.type === ActivityTypes.Invoke && context.activity.name === 'handoff/action'
+            );
+        };
+        const handlerWrapper = async (context: TurnContext, state: TState) => {
+            await handler(context, state, context.activity.value!.continuation);
+            await context.sendActivity({
+                type: ActivityTypes.InvokeResponse,
+                value: { status: 200 },
+            });
+        };
+        this.addRoute(selector, handlerWrapper, true);
         return this;
     }
 

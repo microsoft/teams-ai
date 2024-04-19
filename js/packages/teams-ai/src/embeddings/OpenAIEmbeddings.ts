@@ -75,13 +75,12 @@ export interface OpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
  * Options for configuring an embeddings object that calls an `OpenAI` compliant endpoint.
  * @remarks
  * The endpoint should comply with the OpenAPI spec for OpenAI's API:
- * 
+ *
  * https://github.com/openai/openai-openapi
- * 
+ *
  * And an example of a compliant endpoint is LLaMA.cpp's reference server:
- * 
+ *
  * https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md
- * 
  */
 export interface OpenAILikeEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
     /**
@@ -274,7 +273,7 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
         if (this._useAzure) {
             const options = this.options as AzureOpenAIEmbeddingsOptions;
             requestConfig.headers['api-key'] = options.azureApiKey;
-        } else if ((this.options as OpenAIEmbeddingsOptions).apiKey){
+        } else if ((this.options as OpenAIEmbeddingsOptions).apiKey) {
             const options = this.options as OpenAIEmbeddingsOptions;
             requestConfig.headers['Authorization'] = `Bearer ${options.apiKey}`;
             if (options.organization) {

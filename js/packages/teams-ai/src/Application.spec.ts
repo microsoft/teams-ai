@@ -747,6 +747,33 @@ describe('Application', () => {
         });
     });
 
+    describe('handoff', () => {
+        let app = new Application();
+
+        beforeEach(() => {
+            app = new Application();
+            sandbox.stub(app, 'adapter').get(() => testAdapter);
+        });
+
+        it('should route to correct handler for handoff', async () => {
+            let handlerCalled = false;
+
+            app.handoff(async (context, _state, token) => {
+                handlerCalled = true;
+                assert.equal(context.activity.type, ActivityTypes.Invoke);
+                assert.equal(context.activity.name, 'handoff/action');
+                assert.equal(token, 'test');
+            });
+
+            const activity = createTestInvoke('handoff/action', { continuation: 'test' });
+
+            await testAdapter.processActivity(activity, async (context) => {
+                await app.run(context);
+                assert.equal(handlerCalled, true);
+            });
+        });
+    });
+
     describe('messageUpdate', () => {
         let app = new Application();
 
