@@ -260,7 +260,7 @@
   resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-7.6.0.tgz#b52e97ef540275f72611cff57937dfa0b34cdcca"
   integrity sha512-XqfbglUTVLdkHQ8F9UQJtKseRr3sSnr9ysboxtoswvaMVaEfvyLtMoHv9XdKUfOc0qKGzNgRFd9yRjIWVepl6Q==
 
-"@azure/msal-node@^1.10.0", "@azure/msal-node@^1.14.6", "@azure/msal-node@^1.2.0":
+"@azure/msal-node@^1.10.0", "@azure/msal-node@^1.14.6", "@azure/msal-node@^1.18.4", "@azure/msal-node@^1.2.0":
   version "1.18.4"
   resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-1.18.4.tgz#c921b0447c92fb3b0cb1ebf5a9a76fcad2ec7c21"
   integrity sha512-Kc/dRvhZ9Q4+1FSfsTFDME/v6+R2Y1fuMty/TfwqE5p9GTPw08BPbKgeWinE8JRHRp+LemjQbUZsn4Q4l6Lszg==
@@ -2301,7 +2301,7 @@ botbuilder-azure-blobs@^4.22.1:
     p-map "^4.0.0"
     zod "^3.22.4"
 
-botbuilder-core@4.22.1, botbuilder-core@^4.22.1:
+botbuilder-core@4.22.1:
   version "4.22.1"
   resolved "https://registry.yarnpkg.com/botbuilder-core/-/botbuilder-core-4.22.1.tgz#b582ba6c32645fe8becfba0e5f106cc15fdd30c7"
   integrity sha512-ZT1hixW9Badsytm1YFzfXkfPrjaTWru1yIe4kPEtB4X7rorqdU1wvwMylqvi0x34oiUhwmJPcvm82c9VpRsVmw==
@@ -2313,10 +2313,29 @@ botbuilder-core@4.22.1, botbuilder-core@^4.22.1:
     uuid "^8.3.2"
     zod "^3.22.4"
 
+botbuilder-core@^4.22.2:
+  version "4.22.2"
+  resolved "https://registry.yarnpkg.com/botbuilder-core/-/botbuilder-core-4.22.2.tgz#f5c308f23e7ef8924707e6cfa12bfe8ce4f1b1e1"
+  integrity sha512-3qzdiq0V51mrKzEZzle6TSAcX/XfiKyxyKQfStV8C4ivmYFC1RDAv2MVvvg2U4hcLvcp1MHqnDBlQJq/bwrT2w==
+  dependencies:
+    botbuilder-dialogs-adaptive-runtime-core "4.22.2-preview"
+    botbuilder-stdlib "4.22.2-internal"
+    botframework-connector "4.22.2"
+    botframework-schema "4.22.2"
+    uuid "^8.3.2"
+    zod "^3.22.4"
+
 botbuilder-dialogs-adaptive-runtime-core@4.22.1-preview:
   version "4.22.1-preview"
   resolved "https://registry.yarnpkg.com/botbuilder-dialogs-adaptive-runtime-core/-/botbuilder-dialogs-adaptive-runtime-core-4.22.1-preview.tgz#74ce7de15b9cf910919d1569fc6aaff7c3d4c601"
   integrity sha512-Zzbbl2kKCHqAHbz/zf3ZG1JLCPVk2UD26gWjIVqqBgACdwMj2MPZ4w5FkBQ0eKHvSZvbNATVVqvP4NdHCd/AZQ==
+  dependencies:
+    dependency-graph "^0.10.0"
+
+botbuilder-dialogs-adaptive-runtime-core@4.22.2-preview:
+  version "4.22.2-preview"
+  resolved "https://registry.yarnpkg.com/botbuilder-dialogs-adaptive-runtime-core/-/botbuilder-dialogs-adaptive-runtime-core-4.22.2-preview.tgz#757b7f14216335a17f28527eb8328a531abe118b"
+  integrity sha512-eMUkwu2dmf7r+tA1jPp4lP3XD2mVHGv1oRRcqkkWV/4B3xS9vnGpMywKL1xYVwm88eyZA64QGQFlxi6GOtpPaA==
   dependencies:
     dependency-graph "^0.10.0"
 
@@ -2342,6 +2361,11 @@ botbuilder-stdlib@4.22.1-internal:
   resolved "https://registry.yarnpkg.com/botbuilder-stdlib/-/botbuilder-stdlib-4.22.1-internal.tgz#901020b9d048f536066bf65db176a08f6f63b197"
   integrity sha512-iPTO//HYfqwwvmbVtWZFkffRVSkxz/fesE60nMPVxGe93XkHSXgNVaZKjKnxjbX192LQFubae0777pCYBD6hsQ==
 
+botbuilder-stdlib@4.22.2-internal:
+  version "4.22.2-internal"
+  resolved "https://registry.yarnpkg.com/botbuilder-stdlib/-/botbuilder-stdlib-4.22.2-internal.tgz#862d396c95a0ebec80132f4d32431c805f960305"
+  integrity sha512-ny6rFD/KM63XtiIITrYdwM+1qh9A5m83bf9E8O0cTrFQjvHLP+zHAHslbl1/Wpv7j6nEnAoLUJB6IVBEkb53Kw==
+
 botbuilder@^4.22.1:
   version "4.22.1"
   resolved "https://registry.yarnpkg.com/botbuilder/-/botbuilder-4.22.1.tgz#77f9f1fa6d8a48911954daad2658451c5bdbd955"
@@ -2362,7 +2386,7 @@ botbuilder@^4.22.1:
     uuid "^8.3.2"
     zod "^3.22.4"
 
-botframework-connector@4.22.1, botframework-connector@^4.22.1:
+botframework-connector@4.22.1:
   version "4.22.1"
   resolved "https://registry.yarnpkg.com/botframework-connector/-/botframework-connector-4.22.1.tgz#e0a866e77663d284210428679912c9b3241064e1"
   integrity sha512-uo3KrIyj6D8P9kWk7AKd00XDkCuTk/LqH1Jx0jGQCkfjHCVFfGclgNZcqUdgZkQkWcisk5QOtTSPGAl4a92TpA==
@@ -2381,10 +2405,38 @@ botframework-connector@4.22.1, botframework-connector@^4.22.1:
     rsa-pem-from-mod-exp "^0.8.4"
     zod "^3.22.4"
 
-botframework-schema@4.22.1, botframework-schema@^4.22.1:
+botframework-connector@4.22.2, botframework-connector@^4.22.1:
+  version "4.22.2"
+  resolved "https://registry.yarnpkg.com/botframework-connector/-/botframework-connector-4.22.2.tgz#4a884f067d44557dc7057b9b0e3313001dee772c"
+  integrity sha512-V6mRsQPthhlKHxNw73fW7ZcfM0AlOXlTR6u49O+5+PQ8fDwLbNNswN4AyUpSp+JFW9facR407dd2vNbUoKYOcA==
+  dependencies:
+    "@azure/core-http" "^3.0.2"
+    "@azure/identity" "^2.0.4"
+    "@azure/msal-node" "^1.18.4"
+    base64url "^3.0.0"
+    botbuilder-stdlib "4.22.2-internal"
+    botframework-schema "4.22.2"
+    cross-fetch "^3.0.5"
+    https-proxy-agent "^7.0.2"
+    jsonwebtoken "^9.0.0"
+    node-fetch "^2.6.7"
+    openssl-wrapper "^0.3.4"
+    rsa-pem-from-mod-exp "^0.8.4"
+    zod "^3.22.4"
+
+botframework-schema@4.22.1:
   version "4.22.1"
   resolved "https://registry.yarnpkg.com/botframework-schema/-/botframework-schema-4.22.1.tgz#32086e61f78f17e2d7c703a41c6f9712efde6dc4"
   integrity sha512-4hE7iMYMgLz+L+MrgkZ7Y1pir3ze5Puhjko0a/VKkLUXkoSTHcZ5P0mIqhl/lxu7TlrREtGanGsX0rWkQ8+FJA==
+  dependencies:
+    adaptivecards "1.2.3"
+    uuid "^8.3.2"
+    zod "^3.22.4"
+
+botframework-schema@4.22.2, botframework-schema@^4.22.1:
+  version "4.22.2"
+  resolved "https://registry.yarnpkg.com/botframework-schema/-/botframework-schema-4.22.2.tgz#9a8748704eada397e99d4537e0591ad42bb1f794"
+  integrity sha512-D2SauTdimpfN6TRfDS94GYrRGn/dpTq/n24yAR1cQ9GcV8qq1MydxCYyVbsgzdlkNOFSRJHYJMAp85VKUoYUGg==
   dependencies:
     adaptivecards "1.2.3"
     uuid "^8.3.2"
@@ -4194,10 +4246,10 @@ eslint-plugin-jsdoc@^46.10.1:
     semver "^7.5.4"
     spdx-expression-parse "^4.0.0"
 
-eslint-plugin-mocha@^10.4.2:
-  version "10.4.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-mocha/-/eslint-plugin-mocha-10.4.2.tgz#dfaed06d362506c5e4d561c534314e25b3b0f1f7"
-  integrity sha512-cur4dVYnSEWTBwdqIBQFxa/9siAhesu0TX+lbJ4ClE9j0eNMNe6BSx3vkFFNz6tGoveyMyELFXa30f3fvuAVDg==
+eslint-plugin-mocha@^10.4.3:
+  version "10.4.3"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-mocha/-/eslint-plugin-mocha-10.4.3.tgz#bf641379d9f1c7d6a84646a3fc1a0baa50da8bfd"
+  integrity sha512-emc4TVjq5Ht0/upR+psftuz6IBG5q279p+1dSRDeHf+NS9aaerBi3lXKo1SEzwC29hFIW21gO89CEWSvRsi8IQ==
   dependencies:
     eslint-utils "^3.0.0"
     globals "^13.24.0"
@@ -8944,7 +8996,7 @@ string-argv@^0.3.1, string-argv@~0.3.1:
   resolved "https://registry.yarnpkg.com/string-argv/-/string-argv-0.3.2.tgz#2b6d0ef24b656274d957d54e0a4bbf6153dc02b6"
   integrity sha512-aqD2Q0144Z+/RqG52NeHEkZauTAUWJO8c6yTftGJKO3Tja5tUgIfmIl6kExvhtxSDP7fXB6DvzkfMpCd/F3G+Q==
 
-"string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
+"string-width-cjs@npm:string-width@^4.2.0":
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -8969,6 +9021,15 @@ string-width@^3.0.0, string-width@^3.1.0:
     emoji-regex "^7.0.1"
     is-fullwidth-code-point "^2.0.0"
     strip-ansi "^5.1.0"
+
+string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
+  integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
+  dependencies:
+    emoji-regex "^8.0.0"
+    is-fullwidth-code-point "^3.0.0"
+    strip-ansi "^6.0.1"
 
 string-width@^5.0.1, string-width@^5.1.2:
   version "5.1.2"
@@ -9061,7 +9122,7 @@ string_decoder@~1.1.1:
   dependencies:
     safe-buffer "~5.1.0"
 
-"strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+"strip-ansi-cjs@npm:strip-ansi@^6.0.1":
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
@@ -9088,6 +9149,13 @@ strip-ansi@^5.0.0, strip-ansi@^5.1.0, strip-ansi@^5.2.0:
   integrity sha512-DuRs1gKbBqsMKIZlrffwlug8MHkcnpjs5VPmL1PAh+mA30U0DTotfDZ0d2UUsXpPmPmMMJ6W773MaA3J+lbiWA==
   dependencies:
     ansi-regex "^4.1.0"
+
+strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
+  integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
+  dependencies:
+    ansi-regex "^5.0.1"
 
 strip-ansi@^7.0.1:
   version "7.1.0"
@@ -9624,15 +9692,10 @@ typescript@5.4.2:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.4.2.tgz#0ae9cebcfae970718474fe0da2c090cad6577372"
   integrity sha512-+2/g0Fds1ERlP6JsakQQDXjZdZMM+rqpamFZJEKh4kwTIn3iDkgKtby0CeNd5ATNZ4Ry1ax15TMx0W2V+miizQ==
 
-typescript@^5.4.3:
+typescript@^5.4.5:
   version "5.4.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.4.5.tgz#42ccef2c571fdbd0f6718b1d1f5e6e5ef006f611"
   integrity sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==
-
-typescript@^5.4.4:
-  version "5.4.4"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.4.4.tgz#eb2471e7b0a5f1377523700a21669dce30c2d952"
-  integrity sha512-dGE2Vv8cpVvw28v8HCPqyb08EzbBURxDpuhJvTrusShUfGnhHBafDsLdS1EhhxyL6BJQE+2cT3dDPAv+MQ6oLw==
 
 uc.micro@^1.0.1, uc.micro@^1.0.5:
   version "1.0.6"
@@ -10001,7 +10064,7 @@ workerpool@6.2.1:
   resolved "https://registry.yarnpkg.com/workerpool/-/workerpool-6.2.1.tgz#46fc150c17d826b86a008e5a4508656777e9c343"
   integrity sha512-ILEIE97kDZvF9Wb9f6h5aXK4swSlKGUcOEGiIYb2OOu/IrDU9iwj0fD//SsA6E5ibwJxpEvhullJY4Sl4GcpAw==
 
-"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0":
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
@@ -10023,6 +10086,15 @@ wrap-ansi@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-6.2.0.tgz#e9393ba07102e6c91a3b221478f0257cd2856e53"
   integrity sha512-r6lPcBGxZXlIcymEu7InxDMhdW0KDxpLgoFLcguasxCaJ/SOIZwINatK9KY/tf+ZrlywOKU0UDj3ATXUBfxJXA==
+  dependencies:
+    ansi-styles "^4.0.0"
+    string-width "^4.1.0"
+    strip-ansi "^6.0.0"
+
+wrap-ansi@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
+  integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
   dependencies:
     ansi-styles "^4.0.0"
     string-width "^4.1.0"
