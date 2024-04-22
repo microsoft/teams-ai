@@ -2,7 +2,9 @@ import { Application, preview, AI } from '@microsoft/teams-ai';
 import { MemoryStorage, TurnContext } from 'botbuilder';
 
 if (!process.env.AZURE_OPENAI_KEY || !process.env.AZURE_OPENAI_ENDPOINT) {
-    throw new Error('Missing environment variables - please check that OPENAI_KEY.');
+    throw new Error(
+        'Missing environment variables - please check that AZURE_OPENAI_KEY and AZURE_OPENAI_ENDPOINT is set.'
+    );
 }
 
 const { AssistantsPlanner } = preview;

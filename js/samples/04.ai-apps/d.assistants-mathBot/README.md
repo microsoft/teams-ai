@@ -58,12 +58,7 @@ You can interact with this bot by sending it a message, and the bot will solve y
     npm start
     ```
 
-1. Update any prompt `config.json` and `/src/index.ts` with your model deployment name.
-
-1. If developing without Teams Toolkit, add your OpenAI keys to the `OPENAI_KEY` and `ASSISTANT_ID` <!-- or `AZURE_OPENAI_KEY` and `AZURE_OPENAI_ENDPOINT` --> variable(s) in `.env` file, which you can copy from `sample.env`. If using TTK, continue following the directions below.
-
-> [!NOTE]
-> At this time, assistants are only supported with OpenAI, not Azure OpenAI.
+1. If developing without Teams Toolkit, add your Azure OpenAI keys to the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` and `ASSISTANT_ID` <!-- or `OPENAI_KEY` --> variable(s) in `.env` file, which you can copy from `sample.env`. If using TTK, continue following the directions below.
 
 ## Testing the sample
 

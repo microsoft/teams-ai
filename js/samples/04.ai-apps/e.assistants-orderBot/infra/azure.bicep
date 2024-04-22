@@ -67,9 +67,17 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
           value: botAadAppClientSecret
         }
         {
-          name: 'OPENAI_KEY'
+          name: 'AZURE_OPENAI_KEY'
           value: openAIKey
         }
+        {
+          name: 'AZURE_OPENAI_ENDPOINT'
+          value: openAIKey
+        }
+        // {
+        //   name: 'OPENAI_KEY'
+        //   value: openAIKey
+        // }
         {
           name: 'ASSISTANT_ID'
           value: assistantId

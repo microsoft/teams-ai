@@ -3,8 +3,10 @@ import { CardFactory, MemoryStorage, MessageFactory, TurnContext } from 'botbuil
 import { Order } from './foodOrderViewSchema';
 import { generateCardForOrder } from './foodOrderCard';
 
-if (!process.env.OPENAI_KEY) {
-    throw new Error('Missing environment variables - please check that OPENAI_KEY.');
+if (!process.env.AZURE_OPENAI_KEY || !process.env.AZURE_OPENAI_ENDPOINT) {
+    throw new Error(
+        'Missing environment variables - please check that AZURE_OPENAI_KEY and AZURE_OPENAI_ENDPOINT is set.'
+    );
 }
 
 const { AssistantsPlanner } = preview;
@@ -12,26 +14,30 @@ const { AssistantsPlanner } = preview;
 // Create Assistant if no ID is provided, this will require you to restart the program and fill in the process.env.ASSISTANT_ID afterwards.
 if (!process.env.ASSISTANT_ID) {
     (async () => {
-        const assistant = await AssistantsPlanner.createAssistant(process.env.OPENAI_KEY!, {
-            name: 'Order Bot',
-            instructions: [
-                `You are a food ordering bot for a restaurant named The Pub.`,
-                `The customer can order pizza, beer, or salad.`,
-                `If the customer doesn't specify the type of pizza, beer, or salad they want ask them.`,
-                `Verify the order is complete and accurate before placing it with the place_order function.`
-            ].join('\n'),
-            tools: [
-                {
-                    type: 'function',
-                    function: {
-                        name: 'place_order',
-                        description: 'Creates or updates a food order.',
-                        parameters: require('../src/foodOrderViewSchema.json')
+        const assistant = await AssistantsPlanner.createAssistant(
+            process.env.AZURE_OPENAI_KEY!,
+            {
+                name: 'Order Bot',
+                instructions: [
+                    `You are a food ordering bot for a restaurant named The Pub.`,
+                    `The customer can order pizza, beer, or salad.`,
+                    `If the customer doesn't specify the type of pizza, beer, or salad they want ask them.`,
+                    `Verify the order is complete and accurate before placing it with the place_order function.`
+                ].join('\n'),
+                tools: [
+                    {
+                        type: 'function',
+                        function: {
+                            name: 'place_order',
+                            description: 'Creates or updates a food order.',
+                            parameters: require('../src/foodOrderViewSchema.json')
+                        }
                     }
-                }
-            ],
-            model: 'gpt-4-1106-preview'
-        });
+                ],
+                model: 'gpt-4'
+            },
+            process.env.AZURE_OPENAI_ENDPOINT!
+        );
 
         console.log(`Created a new assistant with an ID of: ${assistant.id}`);
         process.exit();
@@ -40,7 +46,8 @@ if (!process.env.ASSISTANT_ID) {
 
 // Create Assistant Planner
 const planner = new AssistantsPlanner({
-    apiKey: process.env.OPENAI_KEY!,
+    apiKey: process.env.AZURE_OPENAI_KEY!,
+    endpoint: process.env.AZURE_OPENAI_ENDPOINT,
     assistant_id: process.env.ASSISTANT_ID!
 });
 
