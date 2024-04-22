@@ -128,13 +128,16 @@ app.adaptiveCards.search('npmpackages', async (context: TurnContext, state: Turn
     return npmPackages;
 });
 
+interface DynamicSubmitData {
+    dynamicSelect?: string;
+}
 interface SubmitData {
     choiceSelect?: string;
 }
 
 // Listen for submit buttons
-app.adaptiveCards.actionSubmit('DynamicSubmit', async (context, _state, data: SubmitData) => {
-    await context.sendActivity(`Dynamically selected option is: ${data.choiceSelect}`);
+app.adaptiveCards.actionSubmit('DynamicSubmit', async (context, _state, data: DynamicSubmitData) => {
+    await context.sendActivity(`Dynamically selected option is: ${data.dynamicSelect}`);
 });
 
 app.adaptiveCards.actionSubmit('StaticSubmit', async (context, _state, data: SubmitData) => {
