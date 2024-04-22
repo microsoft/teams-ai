@@ -139,20 +139,20 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
      * @returns {Promise<string>} - Promise that resolves to the access token.
      */
     private async getAccessToken(): Promise<string> {
-        // Normalize the ToChannelFromBotLoginUrl (and use a default value when it is undefined).
+        // Normalize the ToChannelFromBotLoginUrlPrefix (and use a default value when it is undefined).
+        // If non-public (specific tenant) login URL is to be used, make sure the full url including tenant ID is provided to TeamsAdapter on setup.
         const toChannelFromBotLoginUrl = (
             this._options.adapter.botFrameworkAuthConfig?.ToChannelFromBotLoginUrl ||
             AuthenticationConstants.ToChannelFromBotLoginUrlPrefix + AuthenticationConstants.DefaultChannelAuthTenant
         ).toLowerCase();
 
         let audience = this._options.adapter.botFrameworkAuthConfig?.ToChannelFromBotOAuthScope;
-        const loginEndpoint = toChannelFromBotLoginUrl;
 
-        // If there is no loginEndpoint set on the provided ConfigurationBotFrameworkAuthenticationOptions, or it starts with 'https://login.microsoftonline.com/', the bot is operating in Public Azure.
+        // If there is no toChannelFromBotLoginUrl set on the provided ConfigurationBotFrameworkAuthenticationOptions, or it starts with 'https://login.microsoftonline.com/', the bot is operating in Public Azure.
         // So we use the Public Azure audience or the specified audience.
-        if (loginEndpoint.startsWith(AuthenticationConstants.ToChannelFromBotLoginUrlPrefix)) {
+        if (toChannelFromBotLoginUrl.startsWith(AuthenticationConstants.ToChannelFromBotLoginUrlPrefix)) {
             audience = audience ?? AuthenticationConstants.ToChannelFromBotOAuthScope;
-        } else if (toChannelFromBotLoginUrl === GovernmentConstants.ToChannelFromBotLoginUrl) {
+        } else if (toChannelFromBotLoginUrl.startsWith(GovernmentConstants.ToChannelFromBotLoginUrlPrefix)) {
             // Or if the bot is operating in US Government Azure, use that audience.
             audience = audience ?? GovernmentConstants.ToChannelFromBotOAuthScope;
         }
@@ -160,7 +160,7 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
         const appCreds = (await this._options.adapter.credentialsFactory.createCredentials(
             this._options.botAppId,
             audience,
-            loginEndpoint,
+            toChannelFromBotLoginUrl,
             true
         )) as AppCredentials;
 

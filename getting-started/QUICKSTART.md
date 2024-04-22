@@ -162,11 +162,11 @@ This guide will show you have the set up the Echo Bot using the Python library.
 To get started, ensure that you have the following tools:
 
 | Install                                                                                                                       | For using...                                                                                                                                                                                                                                                        |
-| ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Visual Studio Code](https://code.visualstudio.com/download)                                                                  | Python build environments. Use the latest version.                                                                                                                                                                                                                  |
 | [Teams Toolkit](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension) (5.3.x or greater) | Microsoft Visual Studio Code extension that creates a project scaffolding for your app. Use the latest version.                                                                                                                                                     |
 | [Git](https://git-scm.com/downloads)                                                                                          | Git is a version control system that helps you manage different versions of code within a repository.                                                                                                                                                               |
-| [Python](https://www.python.org/downloads/) (>=3.8)                                                                           | Python programming language                                                                                                                                                                                                                                         |
+| [Python](https://www.python.org/downloads/) (>=3.8, <4.0)                                                                           | Python programming language                                                                                                                                                                                                                                         |
 | [Poetry](https://python-poetry.org/docs/)                                                                                     | Dependency management and packaging tool for Python                                                                                                                                                                                                                 |     |
 | [Python VSCode Extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python)                               | Provides rich support for Python on VSCode                                                                                                                                                                                                                          |     |
 | [Microsoft Teams](https://www.microsoft.com/microsoft-teams/download-app)                                                     | Microsoft Teams to collaborate with everyone you work with through apps for chat, meetings, and call-all in one place.                                                                                                                                              |
@@ -183,51 +183,37 @@ To get started, ensure that you have the following tools:
 
 2. Go to **Visual Studio Code**.
 
-3. Select `File > Open Folder`.
+3. Go to the location where you cloned teams-ai repo and select `teams-ai > python > samples > 01.messaging.a.echoBot` and click `Select Folder`. This opens the echo bot sample folder in vscode.
 
-4. Go to the location where you cloned teams-ai repo and select the `teams-ai` folder.
-
-5. Select `View > Terminal`. A terminal window opens.
-
-6. In the terminal window, run the following command to go to the python folder:
-
-   ```
-   cd ./python/
-   ```
-
-7. Run the following command to install dependencies:
+4. Run the following command to install dependencies:
 
    ```terminal
    poetry install
    ```
 
-8. Run the following command to build project and samples:
+5. Run the following command to build this sample:
 
    ```terminal
    poetry build
    ```
 
-9. After the dependencies are installed and project is built, select `File > Open Folder`.
+6. From the left pane, select `Teams Toolkit`.
 
-10. Go to `teams-ai > python > samples > 01.messaging.a.echoBot` and click `Select Folder`. This open the echo bot sample folder in vscode.
-
-11. From the left pane, select `Teams Toolkit`.
-
-12. Under `ACCOUNTS`, sign in to the following:
+7. Under `ACCOUNTS`, sign in to the following:
 
     - **Microsoft 365 account**
 
-13. To debug your app, press the **F5** key.
+8. To debug your app, press the **F5** key.
 
     A browser tab opens a Teams web client requesting to add the bot to your tenant.
 
-14. Select **Add**.
+9. Select **Add**.
 
     ![add-image](./assets/quickstart-echobot-add.png)
 
     A chat window opens.
 
-15. In the message compose area, send a message to invoke the bot.
+10. In the message compose area, send a message to invoke the bot.
 
     ![demo-image](./assets/quickstart-echobot-demo.png)
 

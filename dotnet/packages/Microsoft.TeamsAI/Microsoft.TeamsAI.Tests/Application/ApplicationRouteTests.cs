@@ -2275,6 +2275,80 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
+        public async Task Test_OnHandoff()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "handoff/action",
+                Value = new { Continuation = "test" },
+                Id = "test",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.Event,
+                Name = "actionableMessage/executeAction",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "composeExtension/queryLink",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
+            };
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var expectedInvokeResponse = new InvokeResponse
+            {
+                Status = 200
+            };
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
+            });
+            var ids = new List<string>();
+            app.OnHandoff((turnContext, _, _, _) =>
+            {
+                ids.Add(turnContext.Activity.Id);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(ids);
+            Assert.Equal("test", ids[0]);
+            Assert.NotNull(activitiesToSend);
+            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
+            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
+        }
+
+        [Fact]
         public async Task Test_OnTeamsReadReceipt()
         {
             // Arrange

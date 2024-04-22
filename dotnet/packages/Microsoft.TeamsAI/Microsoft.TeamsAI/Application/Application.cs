@@ -4,6 +4,7 @@ using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.Application;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
@@ -747,6 +748,35 @@ namespace Microsoft.Teams.AI
         }
 
         /// <summary>
+        /// Handles handoff activities.
+        /// </summary>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState> OnHandoff(HandoffHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            RouteSelectorAsync routeSelector = (context, _) => Task.FromResult
+            (
+                string.Equals(context.Activity?.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(context.Activity?.Name, "handoff/action")
+            );
+            RouteHandler<TState> routeHandler = async (turnContext, turnState, cancellationToken) =>
+            {
+                string token = turnContext.Activity.Value.GetType().GetProperty("Continuation").GetValue(turnContext.Activity.Value) as string;
+                await handler(turnContext, turnState, token, cancellationToken);
+
+                // Check to see if an invoke response has already been added
+                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
+                {
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity();
+                    await turnContext.SendActivityAsync(activity, cancellationToken);
+                }
+            };
+            AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
+            return this;
+        }
+
+        /// <summary>
         /// Add a handler that will execute before the turn's activity handler logic is processed.
         /// <br/>
         /// Handler returns true to continue execution of the current turn. Handler returning false
@@ -919,6 +949,12 @@ namespace Microsoft.Teams.AI
 
                         return;
                     }
+                }
+
+                // Populate {{$temp.input}}
+                if ((turnState.Temp.Input == null || turnState.Temp.Input.Length == 0) && turnContext.Activity.Text != null)
+                {
+                    turnState.Temp.Input = turnContext.Activity.Text;
                 }
 
                 bool eventHandlerCalled = false;
