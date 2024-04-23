@@ -79,7 +79,7 @@ class OAuthMessageExtension(Generic[StateT], AuthComponent[StateT]):
             auth,
         )
 
-    async def sign_in(self, context: TurnContext, state: StateT) -> str | None:
+    async def sign_in(self, context: TurnContext, state: StateT) -> Optional[str]:
         value = cast(dict, context.activity.value)
 
         if "authentication" in value and "token" in value["authentication"]:
