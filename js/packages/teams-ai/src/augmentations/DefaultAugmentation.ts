@@ -68,7 +68,7 @@ export class DefaultAugmentation implements Augmentation<string> {
             commands: [
                 {
                     type: 'SAY',
-                    response: response.message!.content ?? ''
+                    response: response.message
                 } as PredictedSayCommand
             ]
         });

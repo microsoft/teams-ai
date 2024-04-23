@@ -294,9 +294,9 @@ export class AI<TState extends TurnState = TurnState> {
             }
 
             if (context.activity.channelId == Channels.Msteams) {
-                await context.sendActivity(data.response.split('\n').join('<br>'));
+                await context.sendActivity(data.response.content!.split('\n').join('<br>'));
             } else {
-                await context.sendActivity(data.response);
+                await context.sendActivity(data.response.content!);
             }
 
             return '';
