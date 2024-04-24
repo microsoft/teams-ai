@@ -103,7 +103,9 @@ class TeamsAttachmentDownloader(InputFileDownloader):
             return InputFile(content, attachment.content_type, attachment.content_url)
 
     async def _get_access_token(self):
-        # Normalize the ToChannelFromBotLoginUrl (and use a default value when it is undefined).
+        # Normalize the to_channel_from_bot_login_url_prefix (and use a default when undefined).
+        # If non-public (specific tenant) login URL is to be used, make sure the full url
+        # including tenant ID is provided to TeamsAdapter on setup.
         to_channel_from_bot_login_url_default = (
             AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX
             + AuthenticationConstants.DEFAULT_CHANNEL_AUTH_TENANT
@@ -120,7 +122,7 @@ class TeamsAttachmentDownloader(InputFileDownloader):
             self._options.adapter.configuration, "TO_CHANNEL_FROM_BOT_OAUTH_SCOPE", ""
         )
 
-        # If there is no loginEndpoint set on the provided
+        # If there is no to_channel_from_bot_login_url set on the provided
         # ConfigurationBotFrameworkAuthenticationOptions, or it starts with
         # 'https://login.microsoftonline.com/', the bot is operating in
         # Public Azure. So we use the Public Azure audience
@@ -130,7 +132,9 @@ class TeamsAttachmentDownloader(InputFileDownloader):
         ):
             if not audience:
                 audience = AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-        elif to_channel_from_bot_login_url == GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL:
+        elif to_channel_from_bot_login_url.startswith(
+            GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX
+        ):
             # Or if the bot is operating in US Government Azure, use that audience.
             if not audience:
                 audience = GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
