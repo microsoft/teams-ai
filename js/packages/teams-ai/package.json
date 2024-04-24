@@ -60,7 +60,7 @@
         "rimraf": "5.0.5",
         "shx": "^0.3.4",
         "ts-mocha": "10.0.0",
-        "typescript": "^5.4.4"
+        "typescript": "^5.4.5"
     },
     "scripts": {
         "build": "tsc -b",
