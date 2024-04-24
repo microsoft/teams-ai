@@ -74,7 +74,7 @@ To use Teams Toolkit, continue following the directions below.
 
 If you are using OpenAI then follow these steps:
 
--   Comment the the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables in the `./env/.env.local.user` file.
+-   Comment out the the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables in the `./env/.env.local.user` file.
 -   Add your OpenAI key to the `SECRET_OPENAI_KEY` variable
 -   Open the `teamsapp.local.yml` file and modify the last step to use OpenAI variables instead. Be sure to comment out the Azure credentials:
 
