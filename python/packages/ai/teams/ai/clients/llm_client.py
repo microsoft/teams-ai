@@ -79,7 +79,7 @@ class LLMClient:
 
     @property
     def options(self) -> LLMClientOptions:
-        return self.options
+        return self._options
 
     def __init__(self, options: LLMClientOptions) -> None:
         """
