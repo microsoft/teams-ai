@@ -16,6 +16,11 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
         public string ApiKey { get; set; }
 
         /// <summary>
+        /// Optional. Azure OpenAI Endpoint.
+        /// </summary>
+        public string? Endpoint { get; set; }
+
+        /// <summary>
         /// The Assistant ID.
         /// </summary>
         public string AssistantId { get; set; }

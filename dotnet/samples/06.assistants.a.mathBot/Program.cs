@@ -3,11 +3,11 @@ using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Teams.AI;
 using Microsoft.Teams.AI.AI;
-using Microsoft.Teams.AI.AI.OpenAI.Models;
 using Microsoft.Teams.AI.AI.Planners.Experimental;
 using Microsoft.Teams.AI.AI.Planners;
 
 using MathBot;
+using Azure.AI.OpenAI.Assistants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,19 +26,14 @@ if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
 if (string.IsNullOrEmpty(config.OpenAI.AssistantId))
 {
     Console.WriteLine("No Assistant ID configured, creating new Assistant...");
-    string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(config.OpenAI.ApiKey, null, new()
+    AssistantCreationOptions assistantCreateParams = new("gpt-3.5-turbo")
     {
         Name = "Math Tutor",
-        Instructions = "You are a personal math tutor. Write and run code to answer math questions.",
-        Tools = new()
-        {
-            new()
-            {
-                Type = Tool.CODE_INTERPRETER_TYPE
-            }
-        },
-        Model = "gpt-3.5-turbo"
-    }).Result.Id;
+        Instructions = "You are a personal math tutor. Write and run code to answer math questions."
+    };
+    assistantCreateParams.Tools.Add(new CodeInterpreterToolDefinition());
+
+    string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(config.OpenAI.ApiKey, assistantCreateParams, null).Result.Id;
     Console.WriteLine($"Created a new assistant with an ID of: {newAssistantId}");
     Console.WriteLine("Copy and save above ID, and set `OpenAI:AssistantId` in appsettings.Development.json.");
     Console.WriteLine("Press any key to exit.");
