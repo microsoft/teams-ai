@@ -9,6 +9,7 @@
 import { TurnContext } from 'botbuilder';
 import { TurnState } from '../TurnState';
 import { AI } from '../AI';
+import { Message } from '../prompts';
 
 /**
  * A planner is responsible for generating a plan that the AI system will execute.
@@ -107,5 +108,5 @@ export interface PredictedSayCommand extends PredictedCommand {
     /**
      * The response that the AI system should say.
      */
-    response: string;
+    response: Message<string>;
 }

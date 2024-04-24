@@ -15,7 +15,7 @@ export class TestPlanner implements Planner<TurnState> {
     public constructor(beginPlan?: Plan, continuePlan?: Plan) {
         this.beginPlan = beginPlan || {
             type: 'plan',
-            commands: [{ type: 'SAY', response: 'Hello World' } as PredictedSayCommand]
+            commands: [{ type: 'SAY', response: { role: 'assistant', content: 'Hello World' } } as PredictedSayCommand]
         };
         this.continuePlan = continuePlan || {
             type: 'plan',

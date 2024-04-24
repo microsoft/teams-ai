@@ -244,7 +244,7 @@ export class AzureContentSafetyModerator<TState extends TurnState = TurnState> e
                     if (cmd.type == 'SAY') {
                         const predictedSayCommand = cmd as PredictedSayCommand;
                         const output = predictedSayCommand.response;
-                        const result = await this.createModeration(output);
+                        const result = await this.createModeration(output.content || '');
                         if (result) {
                             if (result.flagged) {
                                 // Output flagged
