@@ -8,68 +8,60 @@ trigger:
     - python
     - pipelines/python.yml
 
-resources:
-  repositories:
-  - repository: 1ESPipelineTemplates
-    type: git
-    name: 1ESPipelineTemplates/1ESPipelineTemplates
-    ref: refs/tags/release
+pool:
+  vmImage: 'ubuntu-latest'
 
-extends:
-  template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
-  parameters:
-    pool:
-      os: windows
-      image: windows-2022
-    customBuildTags:
-    - ES365AIMigrationTooling
-    stages:
-    - stage: stage
-      jobs:
-      - job: job
-        templateContext:
-          outputs:
-          - output: pipelineArtifact
-            displayName: 'Publish Artifact'
-            targetPath: '$(Build.ArtifactStagingDirectory)/python/packages/ai'
-            artifactName: Packages
+strategy:
+  matrix:
+    Python38:
+      python.version: '3.8'
+    Python39:
+      python.version: '3.9'
+    Python310:
+      python.version: '3.10'
 
-        steps:
-        - task: UsePythonVersion@0
-          inputs:
-            versionSpec: '$(python.version)'
-          displayName: 'Use Python $(python.version)'
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(python.version)'
+  displayName: 'Use Python $(python.version)'
 
-        - script: |
-            python -m pip install --upgrade pip
-            pip install poetry
-            python scripts/install.py
-          displayName: 'Install Dependencies'
-          workingDirectory: 'python'
+- script: |
+    python -m pip install --upgrade pip
+    pip install poetry
+    python scripts/install.py
+  displayName: 'Install Dependencies'
+  workingDirectory: 'python'
 
-        - script: |
-            python scripts/check.py
-          displayName: 'Check'
-          workingDirectory: 'python'
+- script: |
+    python scripts/check.py
+  displayName: 'Check'
+  workingDirectory: 'python'
 
-        - script: |
-            python scripts/build.py
-          displayName: 'Build'
-          workingDirectory: 'python'
+- script: |
+    python scripts/build.py
+  displayName: 'Build'
+  workingDirectory: 'python'
 
-        - script: |
-            python scripts/test.py
-          displayName: 'Test'
-          workingDirectory: 'python'
+- script: |
+    python scripts/test.py
+  displayName: 'Test'
+  workingDirectory: 'python'
 
-        - script: |
-            python scripts/lint.py
-          displayName: 'Lint'
-          workingDirectory: 'python'
+- script: |
+    python scripts/lint.py
+  displayName: 'Lint'
+  workingDirectory: 'python'
 
-        - task: CopyFiles@2
-          inputs:
-            sourceFolder: '$(Build.SourcesDirectory)'
-            contents: |
-              python/packages/ai/dist/*
-            targetFolder: $(Build.ArtifactStagingDirectory)
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: '$(Build.SourcesDirectory)'
+    contents: |
+      python/packages/ai/dist/*
+    targetFolder: $(Build.ArtifactStagingDirectory)
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    PathToPublish: '$(Build.ArtifactStagingDirectory)/python/packages/ai'
+    ArtifactName: Packages
