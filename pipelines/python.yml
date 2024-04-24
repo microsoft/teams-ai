@@ -8,14 +8,14 @@ trigger:
     - python
     - pipelines/python.yml
     
-strategy:
-  matrix:
-    Python38:
-      python.version: '3.8'
-    Python39:
-      python.version: '3.9'
-    Python310:
-      python.version: '3.10'
+# strategy:
+#   matrix:
+#     Python38:
+#       python.version: '3.8'
+#     Python39:
+#       python.version: '3.9'
+#     Python310:
+#       python.version: '3.10'
 
 resources:
   repositories:
@@ -28,9 +28,7 @@ extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
     pool:
-      name: Azure-Pipelines-1ESPT-ExDShared
-      image: windows-2022
-      os: windows
+      vmImage: 'ubuntu-latest'
 
     customBuildTags:
     - ES365AIMigrationTooling
