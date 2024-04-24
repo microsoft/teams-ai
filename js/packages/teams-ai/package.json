@@ -32,7 +32,7 @@
         "@azure/openai-assistants": "1.0.0-beta.5",
         "@azure/msal-node": "^2.7.0",
         "axios": "^1.6.8",
-        "botbuilder-dialogs": "^4.22.1",
+        "botbuilder-dialogs": "^4.22.2",
         "botframework-connector": "^4.22.1",
         "botframework-schema": "^4.22.1",
         "botframework-streaming": "^4.22.1",
@@ -61,7 +61,7 @@
         "rimraf": "5.0.5",
         "shx": "^0.3.4",
         "ts-mocha": "10.0.0",
-        "typescript": "^5.4.4"
+        "typescript": "^5.4.5"
     },
     "scripts": {
         "build": "tsc -b",
