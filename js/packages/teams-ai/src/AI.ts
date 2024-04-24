@@ -6,12 +6,13 @@
  * Licensed under the MIT License.
  */
 
-import { Channels, TurnContext } from 'botbuilder';
+import { ActivityTypes, Channels, TurnContext } from 'botbuilder';
 
 import { DefaultModerator } from './moderators';
 import { Moderator } from './moderators/Moderator';
 import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from './planners';
 import { TurnState } from './TurnState';
+import { Utilities } from './Utilities';
 
 /**
  * Entities argument passed to the action handler for AI.DoCommandActionName.
@@ -77,6 +78,12 @@ export interface AIOptions<TState extends TurnState> {
      * any accidental looping.
      */
     allow_looping?: boolean;
+
+    /**
+     * Optional. If true, the AI system will enable the feedback loop in Teams that allows a user to give thumbs up or down to a response. Default is `false`.
+     * NOTE: At this time, there is no activity handler support in the Teams AI Library to handle when a user gives feedback.
+     */
+    enableFeedbackLoop?: boolean;
 }
 
 /**
@@ -108,6 +115,11 @@ export interface ConfiguredAIOptions<TState extends TurnState> {
      * If true, the AI system will allow the planner to loop.
      */
     allow_looping: boolean;
+
+    /**
+     * If true, the AI system will enable the feedback loop in Teams that allows a user to give thumbs up or down to a response.
+     */
+    enableFeedbackLoop: boolean;
 }
 
 /**
@@ -133,6 +145,112 @@ export interface TooManyStepsParameters {
      * Number of steps that have been executed.
      */
     step_count: number;
+}
+
+/**
+ * Sensitivity Usage info for content sent to the user. This is used to provide information about the content to the user.
+ */
+export interface SensitivityUsageInfo {
+    /**
+     * Must be "https://schema.org/Message"
+     */
+    type: string;
+
+    /**
+     * Set to CreativeWork;
+     */
+    '@type': string;
+
+    /**
+     * Sensitivity description of the content
+     */
+    description?: string;
+
+    /**
+     * Sensitivity title of the content
+     */
+    name: string;
+
+    /**
+     * Optional; ignored in Teams.
+     */
+    position?: number;
+
+    pattern?: {
+        /**
+         * Set to DefinedTerm
+         */
+        '@type': string;
+
+        inDefinedTermSet: string;
+
+        /**
+         * Color
+         */
+        name: string;
+
+        /**
+         * e.g. #454545
+         */
+        termCode: string;
+    };
+}
+export interface ClientCitation {
+    /**
+     * Must be "Claim"
+     */
+    '@type': string;
+
+    /**
+     * Required. Number and position of the citation.
+     */
+    position: string;
+    appearance: {
+        /**
+         * Required; Must be 'DigitalDocument'
+         */
+        '@type': string; // Required; Must be 'DigitalDocument'
+
+        /**
+         * Name of the document.
+         */
+        name: string;
+
+        /**
+         * Optional; ignored in Teams
+         */
+        text?: string;
+
+        /**
+         * URL of the document.
+         */
+        url: string;
+
+        /**
+         * Content of the citation. Should be clipped if longer than ~500 characters.
+         */
+        abstract: string;
+
+        /**
+         * Used for icon; for now it is ignored.
+         */
+        encodingFormat?: 'text/html';
+
+        /**
+         * For now ignored, later used for icon
+         */
+        image?: string;
+
+        /**
+         * Optional; set by developer
+         */
+        keywords?: string[];
+
+        /**
+         * Optional sensitivity content information.
+         */
+        usageInfo?: SensitivityUsageInfo; // Optional;
+    };
 }
 
 /**
@@ -235,7 +353,8 @@ export class AI<TState extends TurnState = TurnState> {
             {
                 max_steps: 25,
                 max_time: 300000,
-                allow_looping: true
+                allow_looping: true,
+                enableFeedbackLoop: false
             },
             options
         ) as ConfiguredAIOptions<TState>;
@@ -293,11 +412,54 @@ export class AI<TState extends TurnState = TurnState> {
                 return '';
             }
 
-            if (context.activity.channelId == Channels.Msteams) {
-                await context.sendActivity(data.response.split('\n').join('<br>'));
-            } else {
-                await context.sendActivity(data.response);
+            let content = data.response.content || '';
+
+            if (context.activity.channelId === Channels.Msteams) {
+                content = content.split('\n').join('<br>');
             }
+
+            // If the response from AI includes citations, those citations will be parsed and added to the SAY command.
+            let citations: ClientCitation[] | undefined = undefined;
+
+            if (data.response.context && data.response.context.citations.length > 0) {
+                citations = data.response.context!.citations.map((citation, i) => {
+                    return {
+                        '@type': 'Claim',
+                        position: `${i + 1}`,
+                        appearance: {
+                            '@type': 'DigitalDocument',
+                            name: citation.title,
+                            url: citation.url,
+                            abstract: Utilities.snippet(citation.content, 500)
+                        }
+                    };
+                });
+            }
+
+            await context.sendActivity({
+                type: ActivityTypes.Message,
+                // If there are citations, modify the content so that the sources are numbers instead of [doc1], [doc2], etc.
+                text: !citations ? content : Utilities.formatCitationsResponse(content),
+                channelData: {
+                    feedbackLoopEnabled: this._options.enableFeedbackLoop
+                },
+                entities: [
+                    {
+                        type: 'https://schema.org/Message',
+                        '@type': 'Message',
+                        '@context': 'https://schema.org',
+                        /**
+                         * Must be left blank. This is for Bot Framework schema.
+                         */
+                        '@id': '',
+                        /**
+                         * Indicate that the content was generated by AI.
+                         */
+                        additionalType: ['AIGeneratedContent'],
+                        citation: citations
+                    }
+                ]
+            });
 
             return '';
         });

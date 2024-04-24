@@ -36,4 +36,29 @@ export class Utilities {
             return value.toString();
         }
     }
+
+    /**
+     *
+     * Clips the text to a maximum length in case it exceeds the limit.
+     * @param {string} text The text to clip.
+     * @param {number} maxLength The maximum length of the text to return, cutting off the last whole word.
+     * @returns {string} The modified text
+     */
+    public static snippet(text: string, maxLength: number): string {
+        if (text.length <= maxLength) {
+            return text;
+        }
+        let snippet = text.slice(0, maxLength);
+        snippet = snippet.slice(0, Math.min(snippet.length, snippet.lastIndexOf(' ')));
+        snippet += '...';
+        return snippet;
+    }
+    /**
+     * Convert citation tags `[doc(s)n]` to `[n]` where n is a number.
+     * @param {string} text The text to format.
+     * @returns {string} The formatted text.
+     */
+    public static formatCitationsResponse(text: string): string {
+        return text.replace(/\[docs?(\d)+\]/gi, '[$1]');
+    }
 }
