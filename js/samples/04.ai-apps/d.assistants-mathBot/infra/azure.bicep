@@ -7,7 +7,10 @@ param resourceBaseName string
 param botAadAppClientId string
 
 @secure()
-param openAIKey string = ''
+param azureOpenAIKey string = ''
+
+@secure()
+param azureOpenAIEndpoint string = ''
 
 @secure()
 param assistantId string = ''
@@ -68,11 +71,11 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         }
         {
           name: 'AZURE_OPENAI_KEY'
-          value: openAIKey
+          value: azureOpenAIKey
         }
         {
           name: 'AZURE_OPENAI_ENDPOINT'
-          value: openAIKey
+          value: azureOpenAIEndpoint
         }
         // {
         //   name: 'OPENAI_KEY'
