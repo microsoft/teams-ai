@@ -58,7 +58,7 @@ You can interact with this bot by sending it a message, and the bot will solve y
     npm start
     ```
 
-1. If developing without Teams Toolkit, add your Azure OpenAI keys to the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` and `ASSISTANT_ID` <!-- or `OPENAI_KEY` --> variable(s) in `.env` file, which you can copy from `sample.env`. If using TTK, continue following the directions below.
+1. If developing without Teams Toolkit, add your Azure OpenAI keys to the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` and `ASSISTANT_ID` variable(s) in `.env` file, which you can copy from `sample.env`. If your using OpenAI then add `OPENAI_KEY` key to the `.env` file. If using TTK, continue following the directions below.
 
 ## Testing the sample
 
@@ -74,7 +74,7 @@ To use Teams Toolkit, continue following the directions below.
 
 If you are using OpenAI then follow these steps:
 
--   Comment the the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables in the `./env/.env.local.user` file.
+-   Comment out the the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables in the `./env/.env.local.user` file.
 -   Add your OpenAI key to the `SECRET_OPENAI_KEY` variable
 -   Open the `teamsapp.local.yml` file and modify the last step to use OpenAI variables instead. Be sure to comment out the Azure credentials:
 
