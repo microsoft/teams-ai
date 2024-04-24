@@ -38,7 +38,11 @@ class MockCredentialsFactory(PasswordServiceClientCredentialFactory):
         super().__init__(app_id="botAppId", password="botAppPassword")
 
     async def create_credentials(
-        self, app_id: str, oauth_scope: str, login_endpoint: str, validate_authority: bool,
+        self,
+        app_id: str,
+        oauth_scope: str,
+        login_endpoint: str,
+        validate_authority: bool,
     ) -> Authentication:
         return MockBFAppCredentials()
 
