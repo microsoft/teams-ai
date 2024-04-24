@@ -1,15 +1,7 @@
 import { OpenAIModel, PromptManager, ActionPlanner, Application, TurnState, TeamsAdapter } from '@microsoft/teams-ai';
-import {
-    ActivityTypes,
-    CardFactory,
-    ConfigurationServiceClientCredentialFactory,
-    MemoryStorage,
-    MessageFactory,
-    TurnContext
-} from 'botbuilder';
+import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
 import path from 'path';
 import debug from 'debug';
-import { createResponseCard } from './card';
 
 const error = debug('azureopenai:app:error');
 error.log = console.log.bind(console);
@@ -53,6 +45,9 @@ const planner = new ActionPlanner({
 // Define storage and application
 const storage = new MemoryStorage();
 export const app = new Application<ApplicationTurnState>({
+    ai: {
+        planner: planner
+    },
     storage: storage,
     adapter: new TeamsAdapter(
         {},
@@ -82,17 +77,4 @@ app.error(async (context: TurnContext, err: any) => {
     // Send a message to the user
     await context.sendActivity('The bot encountered an error or bug.');
     await context.sendActivity('To continue to run this bot, please fix the bot source code.');
-});
-
-app.activity(ActivityTypes.Message, async (context: TurnContext, state: ApplicationTurnState) => {
-    const response = await planner.completePrompt(context, state, 'chat');
-
-    if (response.status == 'error') {
-        // If completion response was unsuccessful `response.error` will have the error object.
-        throw response.error;
-    }
-
-    const attachment = CardFactory.adaptiveCard(createResponseCard(response));
-    const activity = MessageFactory.attachment(attachment);
-    await context.sendActivity(activity);
 });
