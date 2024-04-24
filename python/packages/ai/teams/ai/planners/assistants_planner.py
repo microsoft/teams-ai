@@ -182,7 +182,6 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
         return await openai_client.beta.assistants.create(
             model=request.get("model", ""),
             description=request.get("description"),
-            file_ids=request.get("file_ids", []),
             instructions=request.get("instructions"),
             metadata=request.get("metadata"),
             name=request.get("name"),
