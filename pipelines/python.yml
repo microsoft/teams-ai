@@ -7,10 +7,7 @@ trigger:
     include:
     - python
     - pipelines/python.yml
-
-pool:
-  vmImage: 'ubuntu-latest'
-
+    
 strategy:
   matrix:
     Python38:
@@ -20,48 +17,71 @@ strategy:
     Python310:
       python.version: '3.10'
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
+resources:
+  repositories:
+  - repository: m365Pipelines
+    type: git
+    name: 1ESPipelineTemplates/M365GPT
+    ref: refs/tags/release
 
-- script: |
-    python -m pip install --upgrade pip
-    pip install poetry
-    python scripts/install.py
-  displayName: 'Install Dependencies'
-  workingDirectory: 'python'
+extends:
+  template: v1/M365.Official.PipelineTemplate.yml@m365Pipelines
+  parameters:
+    pool:
+      name: Azure-Pipelines-1ESPT-ExDShared
+      image: windows-2022
+      os: windows
 
-- script: |
-    python scripts/check.py
-  displayName: 'Check'
-  workingDirectory: 'python'
+    customBuildTags:
+    - ES365AIMigrationTooling
 
-- script: |
-    python scripts/build.py
-  displayName: 'Build'
-  workingDirectory: 'python'
+    stages:
+    - stage: stage
+      jobs:
+      - job: job
+        templateContext:
+          outputs:
+          - output: pipelineArtifact
+            displayName: 'Publish Artifact'
+            targetPath: '$(Build.ArtifactStagingDirectory)/python/packages/ai'
+            artifactName: Packages
 
-- script: |
-    python scripts/test.py
-  displayName: 'Test'
-  workingDirectory: 'python'
+        steps:
+        - task: UsePythonVersion@0
+          inputs:
+            versionSpec: '$(python.version)'
+          displayName: 'Use Python $(python.version)'
 
-- script: |
-    python scripts/lint.py
-  displayName: 'Lint'
-  workingDirectory: 'python'
+        - script: |
+            python -m pip install --upgrade pip
+            pip install poetry
+            python scripts/install.py
+          displayName: 'Install Dependencies'
+          workingDirectory: 'python'
 
-- task: CopyFiles@2
-  inputs:
-    sourceFolder: '$(Build.SourcesDirectory)'
-    contents: |
-      python/packages/ai/dist/*
-    targetFolder: $(Build.ArtifactStagingDirectory)
+        - script: |
+            python scripts/check.py
+          displayName: 'Check'
+          workingDirectory: 'python'
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
-  inputs:
-    PathToPublish: '$(Build.ArtifactStagingDirectory)/python/packages/ai'
-    ArtifactName: Packages
+        - script: |
+            python scripts/build.py
+          displayName: 'Build'
+          workingDirectory: 'python'
+
+        - script: |
+            python scripts/test.py
+          displayName: 'Test'
+          workingDirectory: 'python'
+
+        - script: |
+            python scripts/lint.py
+          displayName: 'Lint'
+          workingDirectory: 'python'
+
+        - task: CopyFiles@2
+          inputs:
+            sourceFolder: '$(Build.SourcesDirectory)'
+            contents: |
+              python/packages/ai/dist/*
+            targetFolder: $(Build.ArtifactStagingDirectory)
