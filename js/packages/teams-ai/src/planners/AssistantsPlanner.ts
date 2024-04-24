@@ -217,7 +217,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
      * @private
      * Exposed for unit testing.
      * @param {string} thread_id - The current thread id
-     * @param {ListMessagesOptions} options - The messages listing options
+     * @param {ListMessagesOptions} options - The message's listing options
      * @returns {Promise<ThreadMessage>} The list of messages.
      */
     protected async listMessages(
