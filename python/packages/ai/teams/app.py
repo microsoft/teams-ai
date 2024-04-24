@@ -556,7 +556,7 @@ class Application(Bot, Generic[StateT]):
             )
 
         def __call__(
-            func: Callable[[TurnContext, StateT, str], Awaitable[None]]
+            func: Callable[[TurnContext, StateT, str], Awaitable[None]],
         ) -> Callable[[TurnContext, StateT, str], Awaitable[None]]:
             async def __handler__(context: TurnContext, state: StateT):
                 if not context.activity.value:
