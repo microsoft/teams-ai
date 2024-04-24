@@ -19,10 +19,7 @@ extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
     pool:
-      type: linux
-      isCustom: true
-      name: Azure Pipelines
-      vmImage: 'ubuntu-latest'
+      os: windows
     customBuildTags:
     - ES365AIMigrationTooling
     stages:
