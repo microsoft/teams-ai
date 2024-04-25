@@ -46,7 +46,8 @@ const planner = new ActionPlanner({
 const storage = new MemoryStorage();
 export const app = new Application<ApplicationTurnState>({
     ai: {
-        planner: planner
+        planner: planner,
+        enable_feedback_loop: true
     },
     storage: storage,
     adapter: new TeamsAdapter(
@@ -77,4 +78,14 @@ app.error(async (context: TurnContext, err: any) => {
     // Send a message to the user
     await context.sendActivity('The bot encountered an error or bug.');
     await context.sendActivity('To continue to run this bot, please fix the bot source code.');
+});
+
+app.feedbackLoop(async (context, state, feedbackLoopData) => {
+    console.log(context.activity);
+    console.log(JSON.stringify(feedbackLoopData, null, 2));
+    if (feedbackLoopData.actionValue.reaction === 'like') {
+        console.log('👍');
+    } else {
+        console.log('👎');
+    }
 });
