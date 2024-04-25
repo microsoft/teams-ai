@@ -11,6 +11,7 @@
 - [Data Sources](./DATA-SOURCES.md)
 - [Moderator](./MODERATOR.md)
 - [Planner](./PLANNER.md)
+- [Powered by AI](./POWERED-BY-AI.md)
 - [Prompts](./PROMPTS.md)
 - [Turns](./TURNS.md)
 - [User Authentication](./USER-AUTH.md)
@@ -47,6 +48,7 @@ app.OnMessage("/login", async (ITurnContext turnContext, TurnState turnState, Ca
 ```
 
 **Python**
+
 ```python
 # Listen for user to say '/login'.
 @app.message("/login")
@@ -55,9 +57,8 @@ async def on_login(context: ActionTurnContext, state: TurnState):
     # start signin flow
 ```
 
-> The `message` and `OnMessage` methods are referred to as activity or *route registration* method. 
+> The `message` and `OnMessage` methods are referred to as activity or _route registration_ method.
 > The `turnContext` and `turnState` parameters are present in every route handler. To learn more about them see [TURNS](TURNS.md).
-
 
 The `Application` groups the route registration methods based on the specific feature groups:
 

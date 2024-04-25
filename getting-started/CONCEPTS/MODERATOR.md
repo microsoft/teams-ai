@@ -11,6 +11,7 @@
 - [Data Sources](./DATA-SOURCES.md)
 - [**Moderator**](./MODERATOR.md)
 - [Planner](./PLANNER.md)
+- [Powered by AI](./POWERED-BY-AI.md)
 - [Prompts](./PROMPTS.md)
 - [Turns](./TURNS.md)
 - [User Authentication](./USER-AUTH.md)
@@ -64,6 +65,7 @@ var app = new ApplicationBuilder<TurnState>()
 ```
 
 **Python**
+
 ```python
 app = Application[TurnState](ApplicationOptions(
     ai=AIOptions(
@@ -100,6 +102,7 @@ IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(mod
 ```
 
 **Python**
+
 ```python
 app = Application[TurnState](ApplicationOptions(
     ai=AIOptions(
@@ -120,4 +123,3 @@ app = Application[TurnState](ApplicationOptions(
 - [QUICKSTART](../QUICKSTART.md)
 - [SAMPLES](../SAMPLES.md)
 - [OTHER](../OTHER/README.md)
-
