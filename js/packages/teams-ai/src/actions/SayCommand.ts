@@ -1,3 +1,11 @@
+/**
+ * @module teams-ai
+ */
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
 import { ActivityTypes, Channels, TurnContext } from 'botbuilder';
 
 import { TurnState } from '../TurnState';
