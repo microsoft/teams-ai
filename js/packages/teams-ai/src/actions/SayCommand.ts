@@ -125,11 +125,11 @@ export interface SensitivityUsageInfo {
  */
 export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEnabled: boolean = false) {
     return async (context: TurnContext, _state: TState, data: PredictedSayCommand) => {
-        if (!data.response) {
+        if (!data.response?.content) {
             return '';
         }
 
-        let content = data.response.content || '';
+        let content = data.response.content;
 
         if (context.activity.channelId === Channels.Msteams) {
             content = content.split('\n').join('<br>');
