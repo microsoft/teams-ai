@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { StopCommandName } from './StopCommandName';
+import { StopCommandName } from './Action';
 
 /**
  * @private

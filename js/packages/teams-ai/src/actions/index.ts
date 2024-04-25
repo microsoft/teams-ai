@@ -7,7 +7,6 @@
  */
 
 export * from './Action';
-export * from './StopCommandName';
 export * from './Unknown';
 export * from './FlaggedInput';
 export * from './FlaggedOutput';

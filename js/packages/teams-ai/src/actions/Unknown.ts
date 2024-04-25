@@ -9,7 +9,7 @@
 import { TurnContext } from 'botbuilder-core';
 
 import { TurnState } from '../TurnState';
-import { StopCommandName } from './StopCommandName';
+import { StopCommandName } from './Action';
 
 /**
  * @private

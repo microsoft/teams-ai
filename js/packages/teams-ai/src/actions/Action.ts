@@ -11,6 +11,11 @@ import { TurnContext } from 'botbuilder-core';
 import { TurnState } from '../TurnState';
 
 /**
+ * @private
+ */
+export const StopCommandName = 'STOP';
+
+/**
  * The code to execute when the action's name is triggered.
  * @name ActionHandler
  * @function
