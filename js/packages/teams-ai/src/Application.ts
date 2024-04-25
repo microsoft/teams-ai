@@ -628,7 +628,7 @@ export class Application<TState extends TurnState = TurnState> {
             await handler(context, state, context.activity.value!.continuation);
             await context.sendActivity({
                 type: ActivityTypes.InvokeResponse,
-                value: { status: 200 },
+                value: { status: 200 }
             });
         };
         this.addRoute(selector, handlerWrapper, true);
