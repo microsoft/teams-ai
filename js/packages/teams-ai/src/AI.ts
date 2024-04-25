@@ -6,34 +6,13 @@
  * Licensed under the MIT License.
  */
 
-import { ActivityTypes, Channels, TurnContext } from 'botbuilder';
+import { TurnContext } from 'botbuilder';
 
 import { DefaultModerator } from './moderators';
 import { Moderator } from './moderators/Moderator';
-import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from './planners';
+import { PredictedDoCommand, Planner, Plan } from './planners';
 import { TurnState } from './TurnState';
-import { Utilities } from './Utilities';
-
-/**
- * Entities argument passed to the action handler for AI.DoCommandActionName.
- * @template TState Type of the turn state.
- */
-export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand {
-    /**
-     * The handler that should be called to execute the command.
-     * @param context Current turn context.
-     * @param state Current turn state.
-     * @param parameters Optional parameters for the action.
-     * @param action Name of the action being executed.
-     * @returns Whether the AI system should continue executing the plan.
-     */
-    handler: (
-        context: TurnContext,
-        state: TState,
-        parameters?: Record<string, any>,
-        action?: string
-    ) => Promise<string>;
-}
+import * as actions from './actions';
 
 /**
  * Options for configuring the AI system.
@@ -123,137 +102,6 @@ export interface ConfiguredAIOptions<TState extends TurnState> {
 }
 
 /**
- * Parameters passed to the AI.TooManyStepsActionName action.
- */
-export interface TooManyStepsParameters {
-    /**
-     * Configured maximum number of steps allowed.
-     */
-    max_steps: number;
-
-    /**
-     * Configured maximum amount of time allowed.
-     */
-    max_time: number;
-
-    /**
-     * Time the AI system started processing the current activity.
-     */
-    start_time: number;
-
-    /**
-     * Number of steps that have been executed.
-     */
-    step_count: number;
-}
-
-/**
- * Sensitivity Usage info for content sent to the user. This is used to provide information about the content to the user.
- */
-export interface SensitivityUsageInfo {
-    /**
-     * Must be "https://schema.org/Message"
-     */
-    type: string;
-
-    /**
-     * Set to CreativeWork;
-     */
-    '@type': string;
-
-    /**
-     * Sensitivity description of the content
-     */
-    description?: string;
-
-    /**
-     * Sensitivity title of the content
-     */
-    name: string;
-
-    /**
-     * Optional; ignored in Teams.
-     */
-    position?: number;
-
-    pattern?: {
-        /**
-         * Set to DefinedTerm
-         */
-        '@type': string;
-
-        inDefinedTermSet: string;
-
-        /**
-         * Color
-         */
-        name: string;
-
-        /**
-         * e.g. #454545
-         */
-        termCode: string;
-    };
-}
-export interface ClientCitation {
-    /**
-     * Must be "Claim"
-     */
-    '@type': string;
-
-    /**
-     * Required. Number and position of the citation.
-     */
-    position: string;
-    appearance: {
-        /**
-         * Required; Must be 'DigitalDocument'
-         */
-        '@type': string; // Required; Must be 'DigitalDocument'
-
-        /**
-         * Name of the document.
-         */
-        name: string;
-
-        /**
-         * Optional; ignored in Teams
-         */
-        text?: string;
-
-        /**
-         * URL of the document.
-         */
-        url: string;
-
-        /**
-         * Content of the citation. Should be clipped if longer than ~500 characters.
-         */
-        abstract: string;
-
-        /**
-         * Used for icon; for now it is ignored.
-         */
-        encodingFormat?: 'text/html';
-
-        /**
-         * For now ignored, later used for icon
-         */
-        image?: string;
-
-        /**
-         * Optional; set by developer
-         */
-        keywords?: string[];
-
-        /**
-         * Optional sensitivity content information.
-         */
-        usageInfo?: SensitivityUsageInfo; // Optional;
-    };
-}
-
-/**
  * AI System.
  * @remarks
  * The AI system is responsible for generating plans, moderating input and output, and
@@ -261,14 +109,14 @@ export interface ClientCitation {
  * @template TState Optional. Type of the turn state.
  */
 export class AI<TState extends TurnState = TurnState> {
-    private readonly _actions: Map<string, ActionEntry<TState>> = new Map();
+    private readonly _actions: Map<string, actions.ActionEntry<TState>> = new Map();
     private readonly _options: ConfiguredAIOptions<TState>;
 
     /**
      * A text string that can be returned from an action to stop the AI system from continuing
      * to execute the current plan.
      */
-    public static readonly StopCommandName = 'STOP';
+    public static readonly StopCommandName = actions.StopCommandName;
 
     /**
      * An action that will be called anytime an unknown action is predicted by the planner.
@@ -364,115 +212,14 @@ export class AI<TState extends TurnState = TurnState> {
             this._options.moderator = new DefaultModerator<TState>();
         }
 
-        // Register default UnknownAction handler
-        this.defaultAction(AI.UnknownActionName, (context, state, data, action?) => {
-            console.error(`An AI action named "${action}" was predicted but no handler was registered.`);
-            return Promise.resolve(AI.StopCommandName);
-        });
-
-        // Register default FlaggedInputAction handler
-        this.defaultAction(AI.FlaggedInputActionName, () => {
-            console.error(
-                `The users input has been moderated but no handler was registered for 'AI.FlaggedInputActionName'.`
-            );
-            return Promise.resolve(AI.StopCommandName);
-        });
-
-        // Register default FlaggedOutputAction handler
-        this.defaultAction(AI.FlaggedOutputActionName, () => {
-            console.error(
-                `The bots output has been moderated but no handler was registered for 'AI.FlaggedOutputActionName'.`
-            );
-            return Promise.resolve(AI.StopCommandName);
-        });
-
-        // Register default HttpErrorActionName
-        this.defaultAction(AI.HttpErrorActionName, (context, state, data, action) => {
-            throw new Error(`An AI http request failed`);
-        });
-
-        // Register default PlanReadyActionName
-        this.defaultAction<Plan>(AI.PlanReadyActionName, (context, state, plan) => {
-            const isValid = Array.isArray(plan.commands) && plan.commands.length > 0;
-            return Promise.resolve(!isValid ? AI.StopCommandName : '');
-        });
-
-        // Register default DoCommandActionName
-        this.defaultAction<PredictedDoCommandAndHandler<TState>>(
-            AI.DoCommandActionName,
-            async (context, state, data, action) => {
-                const { parameters: entities, handler } = data;
-                return await handler(context, state, entities, action);
-            }
-        );
-
-        // Register default SayCommandActionName
-        this.defaultAction<PredictedSayCommand>(AI.SayCommandActionName, async (context, state, data, action) => {
-            if (!data.response) {
-                return '';
-            }
-
-            let content = data.response.content || '';
-
-            if (context.activity.channelId === Channels.Msteams) {
-                content = content.split('\n').join('<br>');
-            }
-
-            // If the response from AI includes citations, those citations will be parsed and added to the SAY command.
-            let citations: ClientCitation[] | undefined = undefined;
-
-            if (data.response.context && data.response.context.citations.length > 0) {
-                citations = data.response.context!.citations.map((citation, i) => {
-                    return {
-                        '@type': 'Claim',
-                        position: `${i + 1}`,
-                        appearance: {
-                            '@type': 'DigitalDocument',
-                            name: citation.title,
-                            url: citation.url,
-                            abstract: Utilities.snippet(citation.content, 500)
-                        }
-                    };
-                });
-            }
-
-            await context.sendActivity({
-                type: ActivityTypes.Message,
-                // If there are citations, modify the content so that the sources are numbers instead of [doc1], [doc2], etc.
-                text: !citations ? content : Utilities.formatCitationsResponse(content),
-                channelData: {
-                    feedbackLoopEnabled: this._options.enable_feedback_loop
-                },
-                entities: [
-                    {
-                        type: 'https://schema.org/Message',
-                        '@type': 'Message',
-                        '@context': 'https://schema.org',
-                        /**
-                         * Must be left blank. This is for Bot Framework schema.
-                         */
-                        '@id': '',
-                        /**
-                         * Indicate that the content was generated by AI.
-                         */
-                        additionalType: ['AIGeneratedContent'],
-                        citation: citations
-                    }
-                ]
-            });
-
-            return '';
-        });
-
-        // Register default TooManyStepsActionName
-        this.defaultAction<TooManyStepsParameters>(AI.TooManyStepsActionName, async (context, state, data, action) => {
-            const { max_steps, step_count } = data;
-            if (step_count > max_steps) {
-                throw new Error(`The AI system has exceeded the maximum number of steps allowed.`);
-            } else {
-                throw new Error(`The AI system has exceeded the maximum amount of time allowed.`);
-            }
-        });
+        this.defaultAction(AI.UnknownActionName, actions.unknown());
+        this.defaultAction(AI.FlaggedInputActionName, actions.flaggedInput());
+        this.defaultAction(AI.FlaggedOutputActionName, actions.flaggedOutput());
+        this.defaultAction(AI.HttpErrorActionName, actions.httpError());
+        this.defaultAction<Plan>(AI.PlanReadyActionName, actions.planReady());
+        this.defaultAction(AI.DoCommandActionName, actions.doCommand());
+        this.defaultAction(AI.SayCommandActionName, actions.sayCommand(this._options.enable_feedback_loop));
+        this.defaultAction(AI.TooManyStepsActionName, actions.tooManySteps());
     }
 
     /**
@@ -509,16 +256,12 @@ export class AI<TState extends TurnState = TurnState> {
      * the AI class.
      * @template TParameters Optional. The type of parameters that the action handler expects.
      * @param {string | string[]} name Unique name of the action.
-     * @callback handler
-     * @param {Function} handler The code to execute when the action's name is triggered.
-     * @param {TurnContext} handler.context The current turn context for the handler callback.
-     * @param {TState} handler.state The current turn state for the handler callback.
-     * @param {TParameters} handler.parameters Optional. Entities to pass to the action.
+     * @param {actions.ActionHandler} handler The code to execute when the action's name is triggered.
      * @returns {this} The AI system instance for chaining purposes.
      */
     public action<TParameters extends Record<string, any> | undefined>(
         name: string | string[],
-        handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>
+        handler: actions.ActionHandler<TState, TParameters>
     ): this {
         (Array.isArray(name) ? name : [name]).forEach((n) => {
             if (!this._actions.has(n)) {
@@ -542,18 +285,15 @@ export class AI<TState extends TurnState = TurnState> {
     /**
      * Registers the default handler for a named action.
      * @remarks
+     * @param handler
      * Default handlers can be replaced by calling the action() method with the same name.
      * @template TParameters Optional. The type of parameters that the action handler expects.
      * @param {string | string[]} name Unique name of the action.
-     * @callback handler
-     * @param {Function} handler The code to execute when the action's name is triggered.
-     * @param {TurnContext} handler.context The current turn context for the handler callback.
-     * @param {TState} handler.state The current turn state for the handler callback.
      * @returns {this} The AI system instance for chaining purposes.
      */
     public defaultAction<TParameters extends Record<string, any> | undefined>(
         name: string | string[],
-        handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>
+        handler: actions.ActionHandler<TState, TParameters>
     ): this {
         (Array.isArray(name) ? name : [name]).forEach((n) => {
             this._actions.set(n, { handler, allowOverrides: true });
@@ -649,7 +389,7 @@ export class AI<TState extends TurnState = TurnState> {
             // Check for timeout
             if (Date.now() - start_time! > max_time || ++step_count! > max_steps) {
                 completed = false;
-                const parameters: TooManyStepsParameters = {
+                const parameters: actions.TooManyStepsParameters = {
                     max_steps,
                     max_time,
                     start_time: start_time!,
@@ -709,12 +449,4 @@ export class AI<TState extends TurnState = TurnState> {
             return completed;
         }
     }
-}
-
-/**
- * @private
- */
-interface ActionEntry<TState> {
-    handler: (context: TurnContext, state: TState, entities?: any, action?: string) => Promise<string>;
-    allowOverrides: boolean;
 }
