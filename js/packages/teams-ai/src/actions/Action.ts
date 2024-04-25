@@ -20,7 +20,9 @@ export const StopCommandName = 'STOP';
  * @name ActionHandler
  * @function
  * @param {TurnContext} context The current turn context for the handler callback.
+ * @template TState
  * @param {TState} state The current turn state for the handler callback.
+ * @template TData
  * @param {TData} data The action payload.
  * @param {string | undefined} action The action name.
  * @returns {Promise<string>}

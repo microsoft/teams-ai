@@ -285,10 +285,10 @@ export class AI<TState extends TurnState = TurnState> {
     /**
      * Registers the default handler for a named action.
      * @remarks
-     * @param handler
+     * @param {string | string[]} name - Unique name of the action.
+     * @template TParameters - Optional. The type of parameters that the action handler expects.
+     * @param {actions.ActionHandler<TState, TParameters>} handler - The code to execute when the action's name is triggered.
      * Default handlers can be replaced by calling the action() method with the same name.
-     * @template TParameters Optional. The type of parameters that the action handler expects.
-     * @param {string | string[]} name Unique name of the action.
      * @returns {this} The AI system instance for chaining purposes.
      */
     public defaultAction<TParameters extends Record<string, any> | undefined>(
