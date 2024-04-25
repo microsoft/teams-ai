@@ -216,7 +216,7 @@ export class AI<TState extends TurnState = TurnState> {
         this.defaultAction(AI.FlaggedInputActionName, actions.flaggedInput());
         this.defaultAction(AI.FlaggedOutputActionName, actions.flaggedOutput());
         this.defaultAction(AI.HttpErrorActionName, actions.httpError());
-        this.defaultAction<Plan>(AI.PlanReadyActionName, actions.planReady());
+        this.defaultAction(AI.PlanReadyActionName, actions.planReady());
         this.defaultAction(AI.DoCommandActionName, actions.doCommand());
         this.defaultAction(AI.SayCommandActionName, actions.sayCommand(this._options.enable_feedback_loop));
         this.defaultAction(AI.TooManyStepsActionName, actions.tooManySteps());
