@@ -750,3 +750,28 @@ class TestApp(IsolatedAsyncioTestCase):
         )
 
         on_file_consent_decline.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_handoff(self):
+        on_handoff = mock.AsyncMock()
+        self.app.handoff()(on_handoff)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="handoff/action",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={"continuation": "test"},
+                ),
+            )
+        )
+
+        on_handoff.assert_called_once()

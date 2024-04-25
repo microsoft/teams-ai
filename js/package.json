@@ -20,7 +20,7 @@
         "test:nyc:report": "npx rimraf coverage && yarn test:mocha && nyc report"
     },
     "dependencies": {
-        "botbuilder": "^4.22.1",
+        "botbuilder": "^4.22.2",
         "openai": "4.28.4"
     },
     "devDependencies": {
@@ -42,7 +42,7 @@
         "eslint-config-prettier": "^8.10.0",
         "eslint-plugin-import": "^2.29.1",
         "eslint-plugin-jsdoc": "^46.10.1",
-        "eslint-plugin-mocha": "^10.4.2",
+        "eslint-plugin-mocha": "^10.4.3",
         "eslint-plugin-only-warn": "^1.1.0",
         "eslint-plugin-prettier": "^5.1.3",
         "eslint": "^8.57.0",
@@ -64,7 +64,7 @@
         "sponge": "^0.1.0",
         "tinyify": "^4.0.0",
         "ts-node": "^10.9.2",
-        "typescript": "^5.4.4",
+        "typescript": "^5.4.5",
         "wsrun": "^5.2.4"
     }
 }

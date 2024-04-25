@@ -23,7 +23,7 @@
         "@microsoft/teams-ai": "~1.1.3",
         "@microsoft/teamsfx": "^2.3.1",
         "@microsoft/teams-js": "^2.22.0",
-        "botbuilder": "^4.22.1",
+        "botbuilder": "^4.22.2",
         "dotenv": "^16.4.5",
         "openai": "4.28.4",
         "replace": "~1.2.0",
@@ -41,6 +41,6 @@
         "prettier": "^3.2.5",
         "rimraf": "^5.0.5",
         "ts-node": "^10.9.2",
-        "typescript": "^5.4.4"
+        "typescript": "^5.4.5"
     }
 }

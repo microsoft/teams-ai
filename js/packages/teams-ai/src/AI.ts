@@ -83,7 +83,7 @@ export interface AIOptions<TState extends TurnState> {
      * Optional. If true, the AI system will enable the feedback loop in Teams that allows a user to give thumbs up or down to a response. Default is `false`.
      * NOTE: At this time, there is no activity handler support in the Teams AI Library to handle when a user gives feedback.
      */
-    enableFeedbackLoop?: boolean;
+    enable_feedback_loop?: boolean;
 }
 
 /**
@@ -119,7 +119,7 @@ export interface ConfiguredAIOptions<TState extends TurnState> {
     /**
      * If true, the AI system will enable the feedback loop in Teams that allows a user to give thumbs up or down to a response.
      */
-    enableFeedbackLoop: boolean;
+    enable_feedback_loop: boolean;
 }
 
 /**
@@ -354,7 +354,7 @@ export class AI<TState extends TurnState = TurnState> {
                 max_steps: 25,
                 max_time: 300000,
                 allow_looping: true,
-                enableFeedbackLoop: false
+                enable_feedback_loop: false
             },
             options
         ) as ConfiguredAIOptions<TState>;
@@ -441,7 +441,7 @@ export class AI<TState extends TurnState = TurnState> {
                 // If there are citations, modify the content so that the sources are numbers instead of [doc1], [doc2], etc.
                 text: !citations ? content : Utilities.formatCitationsResponse(content),
                 channelData: {
-                    feedbackLoopEnabled: this._options.enableFeedbackLoop
+                    feedbackLoopEnabled: this._options.enable_feedback_loop
                 },
                 entities: [
                     {
