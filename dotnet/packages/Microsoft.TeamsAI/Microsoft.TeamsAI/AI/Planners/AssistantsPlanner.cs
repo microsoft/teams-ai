@@ -205,7 +205,7 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             foreach (RequiredToolCall toolCall in submitToolOutputsAction.ToolCalls)
             {
                 RequiredFunctionToolCall? functionToolCall = toolCall as RequiredFunctionToolCall;
-                if (functionToolCall != null)
+                if (functionToolCall == null)
                 {
                     return plan;
                 }
