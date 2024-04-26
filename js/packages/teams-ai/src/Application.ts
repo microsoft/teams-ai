@@ -142,7 +142,7 @@ export interface ApplicationOptions<TState extends TurnState> {
 /**
  * Data returned when the thumbsup or thumbsdown button is clicked and response sent when enable_feedback_loop is set to true in the AI Module.
  */
-export interface feedbackLoopData {
+export interface FeedbackLoopData {
     actionName: 'feedback';
     actionValue: {
         /**
@@ -657,11 +657,11 @@ export class Application<TState extends TurnState = TurnState> {
     }
     /**
      * Registers a handler for feedbackloop events when a user clicks the thumbsup or thumbsdown button on a response from AI. enable_feedback_loop must be set to true in the AI Module.
-     * @param {(context: TurnContext, state: TState, feedbackLoopData: feedbackLoopData) => Promise<void>} handler - Function to call when the route is triggered
+     * @param {(context: TurnContext, state: TState, feedbackLoopData: FeedbackLoopData) => Promise<void>} handler - Function to call when the route is triggered
      * @returns {this} The application instance for chaining purposes.
      */
     public feedbackLoop(
-        handler: (context: TurnContext, state: TState, feedbackLoopData: feedbackLoopData) => Promise<void>
+        handler: (context: TurnContext, state: TState, feedbackLoopData: FeedbackLoopData) => Promise<void>
     ): this {
         const selector = (context: TurnContext): Promise<boolean> => {
             return Promise.resolve(
@@ -672,7 +672,7 @@ export class Application<TState extends TurnState = TurnState> {
         };
 
         const handlerWrapper = async (context: TurnContext, state: TState) => {
-            const feedback: feedbackLoopData = {
+            const feedback: FeedbackLoopData = {
                 ...context.activity.value,
                 replyToId: context.activity.replyToId
             };
