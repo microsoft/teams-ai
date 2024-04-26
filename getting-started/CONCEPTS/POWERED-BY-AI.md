@@ -88,7 +88,7 @@ This feature is set to false by default. When enabled, all SAY commands from the
     "text": // ...
     // ... other properties
     "channelData": {
-        "feedbackLoopEnabled":
+        "feedbackLoopEnabled": true
     }
 }
 ```
