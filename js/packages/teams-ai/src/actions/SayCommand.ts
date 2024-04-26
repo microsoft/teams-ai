@@ -66,7 +66,7 @@ export interface ClientCitation {
         /**
          * Optional sensitivity content information.
          */
-        usageInfo?: SensitivityUsageInfo; // Optional;
+        usageInfo?: SensitivityUsageInfo;
     };
 }
 
@@ -130,8 +130,9 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
         }
 
         let content = data.response.content;
+        const isTeamsChannel = context.activity.channelId === Channels.Msteams;
 
-        if (context.activity.channelId === Channels.Msteams) {
+        if (isTeamsChannel) {
             content = content.split('\n').join('<br>');
         }
 
@@ -157,9 +158,7 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
             type: ActivityTypes.Message,
             // If there are citations, modify the content so that the sources are numbers instead of [doc1], [doc2], etc.
             text: !citations ? content : Utilities.formatCitationsResponse(content),
-            channelData: {
-                feedbackLoopEnabled
-            },
+            channelData: isTeamsChannel ? { feedbackLoopEnabled } : undefined,
             entities: [
                 {
                     type: 'https://schema.org/Message',

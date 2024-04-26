@@ -5,7 +5,7 @@ import { Channels } from 'botbuilder';
 
 import { sayCommand } from './SayCommand';
 
-xdescribe('actions.sayCommand', () => {
+describe('actions.sayCommand', () => {
     let sandbox: sinon.SinonSandbox;
     const handler = sayCommand();
 
@@ -23,7 +23,7 @@ xdescribe('actions.sayCommand', () => {
             sendActivity: async () => {}
         };
 
-        const stub = sandbox.stub(context, 'sendActivity').callThrough();
+        const stub = sandbox.stub(context, 'sendActivity');
 
         const res = await handler(context as any, {} as any, {
             type: 'SAY',
@@ -37,6 +37,46 @@ xdescribe('actions.sayCommand', () => {
     it('should send a message activity', async () => {
         const context = {
             activity: { channelId: Channels.Msteams },
+            sendActivity: async (..._args: any[]) => {
+                console.log(JSON.stringify(_args));
+            }
+        };
+        const stub = sandbox.stub(context, 'sendActivity').callThrough();
+        const res = await handler(context as any, {} as any, {
+            type: 'SAY',
+            response: {
+                role: 'assistant',
+                content: 'testing123'
+            }
+        });
+
+        assert.equal(res, '');
+        assert(stub.calledOnce);
+        assert.equal(
+            stub.calledWith({
+                type: 'message',
+                text: 'testing123',
+                channelData: {
+                    feedbackLoopEnabled: false
+                },
+                entities: [
+                    {
+                        type: 'https://schema.org/Message',
+                        '@type': 'Message',
+                        '@context': 'https://schema.org',
+                        '@id': '',
+                        additionalType: ['AIGeneratedContent'],
+                        citation: undefined
+                    }
+                ]
+            }),
+            true
+        );
+    });
+
+    it('should send channelData as undefined if not Teams channel', async () => {
+        const context = {
+            activity: { channelId: 'not-teams' },
             sendActivity: async (..._args: any[]) => {}
         };
 
@@ -53,7 +93,18 @@ xdescribe('actions.sayCommand', () => {
         assert.equal(
             stub.calledOnceWith({
                 type: 'message',
-                text: 'testing123'
+                text: 'testing123',
+                channelData: undefined,
+                entities: [
+                    {
+                        type: 'https://schema.org/Message',
+                        '@type': 'Message',
+                        '@context': 'https://schema.org',
+                        '@id': '',
+                        additionalType: ['AIGeneratedContent'],
+                        citation: undefined
+                    }
+                ]
             }),
             true
         );
@@ -78,12 +129,24 @@ xdescribe('actions.sayCommand', () => {
         assert.equal(
             stub.calledOnceWith({
                 type: 'message',
-                text: '<br>testing123<br>'
+                text: '<br>testing123<br>',
+                channelData: {
+                    feedbackLoopEnabled: false
+                },
+                entities: [
+                    {
+                        type: 'https://schema.org/Message',
+                        '@type': 'Message',
+                        '@context': 'https://schema.org',
+                        '@id': '',
+                        additionalType: ['AIGeneratedContent'],
+                        citation: undefined
+                    }
+                ]
             }),
             true
         );
     });
-
     describe('citations', () => {
         it('should send a message activity with citations', async () => {
             const context = {
@@ -105,7 +168,7 @@ xdescribe('actions.sayCommand', () => {
                 type: 'SAY',
                 response: {
                     role: 'assistant',
-                    content: '\ntesting123\n',
+                    content: 'testing123',
                     context: {
                         intent: 'my intent',
                         citations
@@ -114,12 +177,12 @@ xdescribe('actions.sayCommand', () => {
             });
 
             assert.equal(res, '');
-            assert.equal(
-                stub.calledOnceWithExactly({
+            assert(
+                stub.calledOnceWith({
                     type: 'message',
-                    text: '<br>testing123<br>',
+                    text: 'testing123',
                     channelData: {
-                        feedbackLoopEnabled: true
+                        feedbackLoopEnabled: false
                     },
                     entities: [
                         {
@@ -128,11 +191,21 @@ xdescribe('actions.sayCommand', () => {
                             '@context': 'https://schema.org',
                             '@id': '',
                             additionalType: ['AIGeneratedContent'],
-                            citation: citations
+                            citation: [
+                                {
+                                    '@type': 'Claim',
+                                    position: '1',
+                                    appearance: {
+                                        '@type': 'DigitalDocument',
+                                        name: 'the title',
+                                        url: 'https://google.com',
+                                        abstract: 'some citation text...'
+                                    }
+                                }
+                            ]
                         }
                     ]
-                }),
-                true
+                })
             );
         });
     });
