@@ -109,10 +109,10 @@ The `feedbackLoopData` payload will contain the following properties:
 {
     "actionaName: "feedback",
     "actionValue": {
-        reaction: string, //"like" or "dislike"
-        feedback: string
+        "reaction": string, //"like" or "dislike"
+        "feedback": string
     },
-    replyToId: string
+    "replyToId": string
 }
 ```
 
