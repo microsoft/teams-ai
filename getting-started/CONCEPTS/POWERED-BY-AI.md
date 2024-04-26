@@ -82,7 +82,7 @@ export const app = new Application<ApplicationTurnState>({
 
 This feature is set to false by default. When enabled, all SAY commands from the AI will have the following added to the activity:
 
-```json
+```jsonc
 {
     "type": "message",
     "text": // ...
@@ -107,7 +107,7 @@ The `feedbackLoopData` payload will contain the following properties:
 
 ```jsonc
 {
-    "actionaName: "feedback",
+    "actionName: "feedback",
     "actionValue": {
         "reaction": string, //"like" or "dislike"
         "feedback": string
