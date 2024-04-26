@@ -17,23 +17,23 @@ builder.Services.AddHttpContextAccessor();
 
 // Load configuration
 var config = builder.Configuration.Get<ConfigOptions>()!;
-if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
+if (config.Azure == null || string.IsNullOrEmpty(config.Azure.OpenAIApiKey) || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
 {
-    throw new Exception("Missing OpenAI configuration.");
+    throw new Exception("Missing Azure configurations.");
 }
 
 // Missing Assistant ID, create new Assistant
-if (string.IsNullOrEmpty(config.OpenAI.AssistantId))
+if (string.IsNullOrEmpty(config.Azure.OpenAIAssistantId))
 {
     Console.WriteLine("No Assistant ID configured, creating new Assistant...");
-    AssistantCreationOptions assistantCreateParams = new("gpt-3.5-turbo")
+    AssistantCreationOptions assistantCreateParams = new("gpt-4")
     {
         Name = "Math Tutor",
         Instructions = "You are a personal math tutor. Write and run code to answer math questions."
     };
     assistantCreateParams.Tools.Add(new CodeInterpreterToolDefinition());
 
-    string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(config.OpenAI.ApiKey, assistantCreateParams, null).Result.Id;
+    string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(config.Azure.OpenAIApiKey, assistantCreateParams, config.Azure.OpenAIEndpoint).Result.Id;
     Console.WriteLine($"Created a new assistant with an ID of: {newAssistantId}");
     Console.WriteLine("Copy and save above ID, and set `OpenAI:AssistantId` in appsettings.Development.json.");
     Console.WriteLine("Press any key to exit.");

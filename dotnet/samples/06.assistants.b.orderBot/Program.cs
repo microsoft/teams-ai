@@ -3,11 +3,11 @@ using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Teams.AI;
 using Microsoft.Teams.AI.AI;
-using Microsoft.Teams.AI.AI.OpenAI.Models;
 using Microsoft.Teams.AI.AI.Planners.Experimental;
 using Microsoft.Teams.AI.AI.Planners;
 using OrderBot;
 using OrderBot.Models;
+using Azure.AI.OpenAI.Assistants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,16 +17,16 @@ builder.Services.AddHttpContextAccessor();
 
 // Load configuration
 var config = builder.Configuration.Get<ConfigOptions>()!;
-if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
+if (config.Azure == null || string.IsNullOrEmpty(config.Azure.OpenAIApiKey) || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
 {
-    throw new Exception("Missing OpenAI configuration.");
+    throw new Exception("Missing Azure configurations.");
 }
 
 // Missing Assistant ID, create new Assistant
-if (string.IsNullOrEmpty(config.OpenAI.AssistantId))
+if (string.IsNullOrEmpty(config.Azure.OpenAIAssistantId))
 {
     Console.WriteLine("No Assistant ID configured, creating new Assistant...");
-    string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(config.OpenAI.ApiKey, null, new()
+    AssistantCreationOptions assistantCreateParams = new("gpt-4")
     {
         Name = "Order Bot",
         Instructions = string.Join("\n", new[]
@@ -36,21 +36,11 @@ if (string.IsNullOrEmpty(config.OpenAI.AssistantId))
             "If the customer doesn't specify the type of pizza, beer, or salad they want ask them.",
             "Verify the order is complete and accurate before placing it with the place_order function."
         }),
-        Tools = new()
-        {
-            new()
-            {
-                Type = Tool.FUNCTION_CALLING_TYPE,
-                Function = new()
-                {
-                    Name = "place_order",
-                    Description = "Creates or updates a food order.",
-                    Parameters = OrderParameters.GetSchema()
-                }
-            }
-        },
-        Model = "gpt-3.5-turbo"
-    }).Result.Id;
+    };
+
+    assistantCreateParams.Tools.Add(new FunctionToolDefinition("place_order", "Creates or updates a food order.", new BinaryData(OrderParameters.GetSchema())));
+    string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(config.Azure.OpenAIApiKey, assistantCreateParams, config.Azure.OpenAIEndpoint).Result.Id;
+
     Console.WriteLine($"Created a new assistant with an ID of: {newAssistantId}");
     Console.WriteLine("Copy and save above ID, and set `OpenAI:AssistantId` in appsettings.Development.json.");
     Console.WriteLine("Press any key to exit.");

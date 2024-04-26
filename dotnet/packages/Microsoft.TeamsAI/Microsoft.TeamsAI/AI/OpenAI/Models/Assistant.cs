@@ -5,6 +5,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
     /// <summary>
     /// Model represents OpenAI Assistant
     /// </summary>
+    [Obsolete("This class has been replaced with `Azure.AI.OpenAI.Assistants.Assistant`")]
     public class Assistant
     {
         /// <summary>
@@ -75,6 +76,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
     /// <summary>
     /// Model represents parameters to create an Assistant.
     /// </summary>
+    [Obsolete("This class has been replaced with `Azure.AI.OpenAI.Assistants.AssistantCreationOptions`")]
     public class AssistantCreateParams
     {
         /// <summary>

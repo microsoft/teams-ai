@@ -53,7 +53,7 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>The created assistant.</returns>
-        public static async Task<Assistant> CreateAssistantAsync(string apiKey, AssistantCreationOptions request, string? endpoint, CancellationToken cancellationToken = default)
+        public static async Task<Assistant> CreateAssistantAsync(string apiKey, AssistantCreationOptions request, string? endpoint = null, CancellationToken cancellationToken = default)
         {
             Verify.ParamNotNull(apiKey);
             Verify.ParamNotNull(request);
@@ -210,6 +210,7 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
                     return plan;
                 }
 
+                // TODO: Potential bug if assistant predicts same tool twice.
                 toolMap[functionToolCall!.Name] = toolCall.Id;
                 plan.Commands.Add(new PredictedDoCommand
                 (
