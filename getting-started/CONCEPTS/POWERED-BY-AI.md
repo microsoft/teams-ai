@@ -64,11 +64,11 @@ To add this flag manually, you can use the following JSON in your activity:
 
 If you find it necessary to add this flag manually, please see the Modifying `PredictedSAYCommand` section below.
 
-## Feedback Loop
+## Feedback loop
 
 Feedback loop, when enabled, will add thumbs up and thumbs down buttons to the bot's activity on the Teams client. This can be used to gather feedback from the user on the AI system's responses. The thumbs up and thumbs down buttons will appear on the bottom right of the bot's activity in Teams.
 
-<img src="../assets/ai-generated.png">
+<img src="../assets/feedback-loop-buttons.png">
 
 To enable this feature, set the `enable_feedback_loop` property to `true` in the `AIOptions` object when creating the `AI` object.
 
