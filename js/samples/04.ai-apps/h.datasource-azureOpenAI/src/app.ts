@@ -81,8 +81,6 @@ app.error(async (context: TurnContext, err: any) => {
 });
 
 app.feedbackLoop(async (context, state, feedbackLoopData) => {
-    console.log(context.activity);
-    console.log(JSON.stringify(feedbackLoopData, null, 2));
     if (feedbackLoopData.actionValue.reaction === 'like') {
         console.log('👍');
     } else {
