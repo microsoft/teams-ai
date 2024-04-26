@@ -120,13 +120,13 @@ The `feedbackLoopData` payload will contain the following properties:
 
 <img src="../assets/citations-example.png">
 
-Citations are a feature that can be used to provide sources for the information the AI system provides. This can be important for providing sources for the information the AI system provides, especially when using a datasource like Azure Open AI On Your Data. To see citations in action, please check out the Azure OpenAI datasources sample(s).
+Citations are a feature that can be used to provide sources for the information the AI system provides. This can be from digital documents the LLM references, like when using a datasource like Azure Open AI On Your Data. To see citations in action, please check out the Azure OpenAI datasources sample(s).
 
 - JS: [Azure OpenAI datasources sample](https://github.com/microsoft/teams-ai/tree/main/js/samples/04.ai-apps/h.datasource-azureOpenAI)
 
-Citations that are detected in the AI response will be parsed and automatically added to th outgoing activity via the `PredictedSAYCommand` action.
+Citations that are detected in the AI response will be parsed and automatically added to the outgoing activity via the `PredictedSAYCommand` action.
 
-- In JS, the code that automatically parses and adds citations to the entities object within the activity can be found at `this.defaultAction<PredictedSayCommand>(AI.SayCommandActionName...` in `AI.ts`.
+- In JS, the code that automatically parses and adds citations to the entities object within the activity can be found at `SayCommand.ts`.
 
 If you find it necessary to modify the citations received from the AI response manually, please see the Modifying `PredictedSAYCommand` section below. When adding citations manually, please see the `ClientCitation` interface in the Teams AI library for the expected shape of the citation object.
 
