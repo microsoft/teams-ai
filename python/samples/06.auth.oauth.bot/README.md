@@ -1,22 +1,27 @@
-# Teams Echo Bot
+This sample shows how to incorporate a basic conversational SSO flow into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
 
-This sample shows how to incorporate a basic conversational flow into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
+This sample requires creating an OAuth Connection in Azure Bot Service, which provides a token store to store the token after sign-in.
+
+Note that this bot will only work in tenants where the following graph scopes are permitted:
+
+-   `User.Read`
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [Teams Echo Bot](#teams-echo-bot)
-  - [Interacting with the bot](#interacting-with-the-bot)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+-   [OAuth Bot](#oauth-bot)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
 ## Interacting with the bot
 
-You can interact with the bot by messaging it and it will echo that back to you.
+You can interact with this bot by sending it a message, which will echo back to you.
+
 
 ## Setting up the sample
 

@@ -15,10 +15,10 @@ class OAuthOptions(OAuthPromptSettings):
     "The settings for OAuthAuthentication."
 
     enable_sso: bool = False
-    "The token exchange uri for SSO in adaptive card auth scenario."
+    "Set to `true` to enable SSO when authenticating using Azure Active Directory (AAD)."
 
     token_exchange_url: Optional[str] = None
-    "Set to `true` to enable SSO when authenticating using Azure Active Directory (AAD)."
+    "The token exchange uri for SSO in adaptive card auth scenario."
 
     def __init__(
         self,
