@@ -66,8 +66,8 @@ async def on_sign_in_success(
 @app.auth.get("graph").on_sign_in_failure
 async def on_sign_in_failure(
     context: TurnContext,
-    state: TurnState[ConversationState, UserState, TempState],
-    res: SignInResponse,
+    _state: TurnState[ConversationState, UserState, TempState],
+    _res: SignInResponse,
 ):
     await context.send_activity("failed to login...")
 
