@@ -126,7 +126,7 @@ export class OpenAIModerator<TState extends TurnState = TurnState> implements Mo
                     const cmd = plan.commands[i];
                     if (cmd.type == 'SAY') {
                         const output = (cmd as PredictedSayCommand).response;
-                        const result = await this.createModeration(output, this._options.model);
+                        const result = await this.createModeration(output.content || '', this._options.model);
                         if (result) {
                             if (result.flagged) {
                                 // Output flagged

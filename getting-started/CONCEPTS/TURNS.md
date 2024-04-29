@@ -11,6 +11,7 @@
 - [Data Sources](./DATA-SOURCES.md)
 - [Moderator](./MODERATOR.md)
 - [Planner](./PLANNER.md)
+- [Powered by AI](./POWERED-BY-AI.md)
 - [Prompts](./PROMPTS.md)
 - [**Turns**](./TURNS.md)
 - [User Authentication](./USER-AUTH.md)
