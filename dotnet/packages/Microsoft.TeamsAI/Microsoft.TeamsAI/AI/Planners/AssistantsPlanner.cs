@@ -1,13 +1,16 @@
 ﻿using Azure.AI.OpenAI.Assistants;
 using Microsoft.Bot.Builder;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 // Assistants API is currently in beta and is subject to change.
 #pragma warning disable IDE0130 // Namespace does not match folder structure
+[assembly: InternalsVisibleTo("Microsoft.Teams.AI.Tests")]
 namespace Microsoft.Teams.AI.AI.Planners.Experimental
 #pragma warning restore IDE0130 // Namespace does not match folder structure
 {
@@ -39,7 +42,7 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
                 Organization = options.Organization,
                 PollingInterval = options.PollingInterval ?? DEFAULT_POLLING_INTERVAL
             };
-            _logger = loggerFactory.CreateLogger<AssistantsPlanner<TState>>();
+            _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<AssistantsPlanner<TState>>();
             _client = _CreateClient(options.ApiKey, options.Endpoint);
 
         }
@@ -49,7 +52,7 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
         /// </summary>
         /// <param name="apiKey">OpenAI or Azure OpenAI API key.</param>
         /// <param name="request">Definition of the assistant to create.</param>
-        /// <param name="endpoint">Azure OpenAI API Key.</param>
+        /// <param name="endpoint">Azure OpenAI API Endpoint.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>The created assistant.</returns>
@@ -59,7 +62,6 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             Verify.ParamNotNull(request);
 
             AssistantsClient client = _CreateClient(apiKey, endpoint);
-
 
             return await client.CreateAssistantAsync(request, cancellationToken);
         }
@@ -324,7 +326,7 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             }
         }
 
-        private static AssistantsClient _CreateClient(string apiKey, string? endpoint = null)
+        internal static AssistantsClient _CreateClient(string apiKey, string? endpoint = null)
         {
             Verify.ParamNotNull(apiKey);
 
