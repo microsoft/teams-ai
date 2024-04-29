@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import Dict, Generic, Optional, TypeVar, cast
 
 from botbuilder.core import TurnContext
-from botbuilder.schema import ActivityTypes, SignInConstants
+from botbuilder.schema import ActivityTypes, SignInConstants, Activity, InvokeResponse
 
 from ..state import TempState, TurnState
 from .auth import Auth
@@ -79,8 +79,16 @@ class AuthManager(Generic[StateT]):
                 self._exchanges[exchange_key] = cast(dict, context.activity.value)["id"]
                 token_res = await auth.exchange_token(context, state)
 
-                if token_res is not None:
+                if token_res is not None and hasattr(token_res, "token"):
                     token = token_res.token
+                else:
+                    # tell client to prompt for consent
+                    await context.send_activity(Activity(
+                        type=ActivityTypes.invoke_response,
+                        value=InvokeResponse(status=412)
+                    ))
+
+                    return res
 
                 del self._exchanges[exchange_key]
             elif self._is_verify_state_activity(context):
