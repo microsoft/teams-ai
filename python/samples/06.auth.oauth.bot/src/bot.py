@@ -37,12 +37,14 @@ app = Application[TurnState[ConversationState, UserState, TempState]](
     )
 )
 
+auth = app.auth.get("graph")
+
 
 @app.message("/signout")
 async def on_sign_out(
     context: TurnContext, state: TurnState[ConversationState, UserState, TempState]
 ):
-    await app.auth.get("graph").sign_out(context, state)
+    await auth.sign_out(context, state)
     await context.send_activity("you are now signed out...👋")
     return False
 
@@ -55,7 +57,7 @@ async def on_message(
     return False
 
 
-@app.auth.get("graph").on_sign_in_success
+@auth.on_sign_in_success
 async def on_sign_in_success(
     context: TurnContext, state: TurnState[ConversationState, UserState, TempState]
 ):
@@ -63,7 +65,7 @@ async def on_sign_in_success(
     await context.send_activity(f"token: {state.temp.auth_tokens['graph']}")
 
 
-@app.auth.get("graph").on_sign_in_failure
+@auth.on_sign_in_failure
 async def on_sign_in_failure(
     context: TurnContext,
     _state: TurnState[ConversationState, UserState, TempState],
