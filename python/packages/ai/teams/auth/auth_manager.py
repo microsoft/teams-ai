@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import Dict, Generic, Optional, TypeVar, cast
 
 from botbuilder.core import TurnContext
-from botbuilder.schema import ActivityTypes, SignInConstants, Activity, InvokeResponse
+from botbuilder.schema import Activity, ActivityTypes, InvokeResponse, SignInConstants
 
 from ..state import TempState, TurnState
 from .auth import Auth
@@ -83,10 +83,11 @@ class AuthManager(Generic[StateT]):
                     token = token_res.token
                 else:
                     # tell client to prompt for consent
-                    await context.send_activity(Activity(
-                        type=ActivityTypes.invoke_response,
-                        value=InvokeResponse(status=412)
-                    ))
+                    await context.send_activity(
+                        Activity(
+                            type=ActivityTypes.invoke_response, value=InvokeResponse(status=412)
+                        )
+                    )
 
                     return res
 
