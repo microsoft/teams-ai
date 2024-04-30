@@ -23,7 +23,7 @@ from teams.ai.tokenizers import Tokenizer
 from teams.state import MemoryBase
 
 from config import Config
-from state import AppTurnState
+from state import AppTurnState, ConversationState
 from responses import *
 
 config = Config()
@@ -32,12 +32,6 @@ if config.OPENAI_KEY is None and config.AZURE_OPENAI_KEY is None:
     raise RuntimeError(
         "Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set."
     )
-
-@dataclass
-class ConversationState:
-    secret_word: str
-    guess_count: int
-    remaining_guesses: int
 
 
 # Create AI components
@@ -64,13 +58,10 @@ app = Application[AppTurnState](
         bot_app_id=config.APP_ID,
         storage=storage,
         adapter=TeamsAdapter(config),
-        ai=AIOptions(planner=ActionPlanner(
-            ActionPlannerOptions(model=model, prompts=prompts, default_prompt="hint")
-        )),
+        ),
     )
-)
 
-planner = ActionPlanner(model=model, prompts=prompts, default_prompt='monologue')
+planner = ActionPlanner(ActionPlannerOptions(model=model, prompts=prompts, default_prompt="monologue"))
 
 @app.turn_state_factory
 async def turn_state_factory(context: TurnContext):
@@ -84,6 +75,11 @@ async def on_message(
     secret_word = state['conversation'].get('secret_word', '')
     guess_count = state['conversation'].get('guess_count', 0)
     remaining_guesses = state['conversation'].get('remaining_guesses', 20)
+
+    if context['activity']['text'].lower() == 'quit':
+        del state['conversation']
+        await context.send_activity(context, quit_game(secret_word))
+        return True
 
     if not secret_word:
         # Start new game
@@ -121,8 +117,13 @@ async def on_message(
     state['conversation']['guess_count'] = guess_count
     state['conversation']['remaining_guesses'] = remaining_guesses
 
+# @app.message("/quit")
+# async def on_reset(context: TurnContext, state: AppTurnState):
+#     del state.conversation
+#     await context.send_activity(quit_game(secret_word))
+#     return True
 
-async def get_hint(context: Dict[str, Any], state: Dict[str, Any]) -> str:
+async def get_hint(context: Dict[str, Any], state: AppTurnState) -> str:
     """
     Generates a hint for the user based on their input using OpenAI's GPT-3 API.
     Args:

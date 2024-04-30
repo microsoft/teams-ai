@@ -11,7 +11,7 @@ provision:
   - uses: teamsApp/create
     with:
       # Teams app name
-      name: MathBot-${{TEAMSFX_ENV}}
+      name: TwentyQuestions-${{TEAMSFX_ENV}}
     # Write the information of created resources into environment file for
     # the specified environment variable(s).
     writeToEnvironmentFile:
@@ -97,3 +97,4 @@ deploy:
       # You can replace it with your existing Azure Resource id
       # or add it to your environment variable file.
       resourceId: ${{BOT_AZURE_APP_SERVICE_RESOURCE_ID}}
+projectId: 87f5912f-6690-4e93-8db1-2f7bebb0ebaa
