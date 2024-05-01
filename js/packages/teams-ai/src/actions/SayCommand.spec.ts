@@ -37,9 +37,7 @@ describe('actions.sayCommand', () => {
     it('should send a message activity', async () => {
         const context = {
             activity: { channelId: Channels.Msteams },
-            sendActivity: async (..._args: any[]) => {
-                console.log(JSON.stringify(_args));
-            }
+            sendActivity: async (..._args: any[]) => {}
         };
         const stub = sandbox.stub(context, 'sendActivity').callThrough();
         const res = await handler(context as any, {} as any, {
@@ -65,8 +63,7 @@ describe('actions.sayCommand', () => {
                         '@type': 'Message',
                         '@context': 'https://schema.org',
                         '@id': '',
-                        additionalType: ['AIGeneratedContent'],
-                        citation: undefined
+                        additionalType: ['AIGeneratedContent']
                     }
                 ]
             }),
@@ -74,7 +71,7 @@ describe('actions.sayCommand', () => {
         );
     });
 
-    it('should send channelData as undefined if not Teams channel', async () => {
+    it('should not send channelData for feedbackLoop if not Teams channel', async () => {
         const context = {
             activity: { channelId: 'not-teams' },
             sendActivity: async (..._args: any[]) => {}
@@ -94,15 +91,13 @@ describe('actions.sayCommand', () => {
             stub.calledOnceWith({
                 type: 'message',
                 text: 'testing123',
-                channelData: undefined,
                 entities: [
                     {
                         type: 'https://schema.org/Message',
                         '@type': 'Message',
                         '@context': 'https://schema.org',
                         '@id': '',
-                        additionalType: ['AIGeneratedContent'],
-                        citation: undefined
+                        additionalType: ['AIGeneratedContent']
                     }
                 ]
             }),
@@ -139,8 +134,7 @@ describe('actions.sayCommand', () => {
                         '@type': 'Message',
                         '@context': 'https://schema.org',
                         '@id': '',
-                        additionalType: ['AIGeneratedContent'],
-                        citation: undefined
+                        additionalType: ['AIGeneratedContent']
                     }
                 ]
             }),
