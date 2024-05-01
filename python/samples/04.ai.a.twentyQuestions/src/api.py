@@ -5,6 +5,7 @@ Licensed under the MIT License.
 Description: initialize the api and route incoming messages
 to our app
 """
+
 from http import HTTPStatus
 
 from aiohttp import web

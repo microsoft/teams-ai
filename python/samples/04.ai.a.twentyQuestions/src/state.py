@@ -6,16 +6,18 @@ Licensed under the MIT License.
 from typing import Optional
 
 from botbuilder.core import Storage, TurnContext
-from teams.state import TurnState, UserState, TempState, ConversationState
+from teams.state import ConversationState, TempState, TurnState, UserState
 
 
 class AppConversationState(ConversationState):
-    secret_word: str
-    guess_count: int
-    remaining_guesses: int
+    secret_word: str = ""
+    guess_count: int = 0
+    remaining_guesses: int = 0
 
     @classmethod
-    async def load(cls, context: TurnContext, storage: Optional[Storage] = None) -> "AppConversationState":
+    async def load(
+        cls, context: TurnContext, storage: Optional[Storage] = None
+    ) -> "AppConversationState":
         state = await super().load(context, storage)
         return cls(**state)
 

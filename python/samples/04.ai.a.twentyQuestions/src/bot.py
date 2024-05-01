@@ -7,24 +7,26 @@ Description: initialize the app and listen for `message` activitys
 
 import os
 import sys
-from dataclasses import dataclass
-import time
 import traceback
-from typing import Any, Dict, List
+from typing import Optional
 
 from botbuilder.core import MemoryStorage, TurnContext
 from teams import Application, ApplicationOptions, TeamsAdapter
-from teams.ai import AIOptions
-from teams.ai.actions import ActionTurnContext
 from teams.ai.models import AzureOpenAIModelOptions, OpenAIModel, OpenAIModelOptions
 from teams.ai.planners import ActionPlanner, ActionPlannerOptions
-from teams.ai.prompts import PromptFunctions, PromptManager, PromptManagerOptions
-from teams.ai.tokenizers import Tokenizer
-from teams.state import MemoryBase
+from teams.ai.prompts import PromptManager, PromptManagerOptions
 
 from config import Config
-from state import AppTurnState, ConversationState
-from responses import *
+from responses import (
+    block_secret_word,
+    last_guess,
+    pick_secret_word,
+    quit_game,
+    start_game,
+    you_lose,
+    you_win,
+)
+from state import AppTurnState
 
 config = Config()
 
@@ -58,89 +60,96 @@ app = Application[AppTurnState](
         bot_app_id=config.APP_ID,
         storage=storage,
         adapter=TeamsAdapter(config),
-        ),
-    )
+    ),
+)
 
-planner = ActionPlanner(ActionPlannerOptions(model=model, prompts=prompts, default_prompt="monologue"))
+planner = ActionPlanner[AppTurnState](
+    ActionPlannerOptions(model=model, prompts=prompts, default_prompt="monologue")
+)
+
 
 @app.turn_state_factory
 async def turn_state_factory(context: TurnContext):
     return await AppTurnState.load(context, storage)
 
-@prompts.function("on_message")
+
+@app.activity("message")
 async def on_message(
     context: TurnContext,
     state: AppTurnState,
 ):
-    secret_word = state['conversation'].get('secret_word', '')
-    guess_count = state['conversation'].get('guess_count', 0)
-    remaining_guesses = state['conversation'].get('remaining_guesses', 20)
+    secret_word = state.conversation.secret_word
+    guess_count = state.conversation.guess_count
+    remaining_guesses = state.conversation.remaining_guesses
 
-    if context['activity']['text'].lower() == 'quit':
-        del state['conversation']
-        await context.send_activity(context, quit_game(secret_word))
-        return True
+    if secret_word and len(secret_word) < 1:
+        raise ValueError("No secret word is assigned.")
 
-    if not secret_word:
-        # Start new game
-        secret_word = pick_secret_word()
-        guess_count = 0
-        remaining_guesses = 20
-        await context.send_activity(context, start_game())
-    elif secret_word and len(secret_word) < 1:
-        raise Exception('No secret word is assigned.')
-    else:
+    if secret_word:
         guess_count += 1
         remaining_guesses -= 1
 
         # Check for correct guess
-        if secret_word.lower() in context['activity']['text'].lower():
-            await context.send_activity(context, you_win(secret_word))
-            secret_word = ''
+        if secret_word.lower() in context.activity.text.lower():
+            await context.send_activity(you_win(secret_word))
+            secret_word = ""
             guess_count = remaining_guesses = 0
         elif remaining_guesses == 0:
-            await context.send_activity(context, you_lose(secret_word))
-            secret_word = ''
+            await context.send_activity(you_lose(secret_word))
+            secret_word = ""
             guess_count = remaining_guesses = 0
         else:
             # Ask GPT for a hint
             response = await get_hint(context, state)
-            if secret_word.lower() in response.lower():
-                await context.send_activity(context, f'[{guess_count}] {block_secret_word()}')
+            if response and (secret_word.lower() in response.lower()):
+                await context.send_activity(f"[{guess_count}] {block_secret_word()}")
             elif remaining_guesses == 1:
-                await context.send_activity(context, f'[{guess_count}] {last_guess(response)}')
+                await context.send_activity(f"[{guess_count}] {last_guess(response)}")
             else:
-                await context.send_activity(context, f'[{guess_count}] {response}')
+                await context.send_activity(f"[{guess_count}] {response}")
+    else:
+        # Start new game
+        secret_word = pick_secret_word()
+        guess_count = 0
+        remaining_guesses = 20
+        await context.send_activity(start_game())
 
     # Save game state
-    state['conversation']['secret_word'] = secret_word
-    state['conversation']['guess_count'] = guess_count
-    state['conversation']['remaining_guesses'] = remaining_guesses
+    state.conversation.secret_word = secret_word
+    state.conversation.guess_count = guess_count
+    state.conversation.remaining_guesses = remaining_guesses
+    return True
 
-# @app.message("/quit")
-# async def on_reset(context: TurnContext, state: AppTurnState):
-#     del state.conversation
-#     await context.send_activity(quit_game(secret_word))
-#     return True
 
-async def get_hint(context: Dict[str, Any], state: AppTurnState) -> str:
+@app.message("/quit")
+async def on_quit(context: TurnContext, state: AppTurnState):
+    secret_word = state.conversation.secret_word
+    del state.conversation
+    await context.send_activity(quit_game(secret_word))
+    return True
+
+
+async def get_hint(context: TurnContext, state: AppTurnState) -> Optional[str]:
     """
-    Generates a hint for the user based on their input using OpenAI's GPT-3 API.
+    Generates a hint for the user based on their input.
     Args:
-        context (Dict[str, Any]): The current turn context.
-        state (Dict[str, Any]): The current turn state.
+        context (TurnContext): The current turn context.
+        state (AppTurnState): The current turn state.
     Returns:
         str: A string containing the generated hint.
     Raises:
-        Exception: If the request to OpenAI was rate limited.
+        Exception: If the request was rate limited.
     """
-    state['temp']['input'] = context['activity']['text']
-    result = await planner.complete_prompt(context, state, 'hint')
-    
-    if result['status'] != 'success':
-        raise Exception(result['error'])
+    state.temp.input = context.activity.text
+    result = await planner.complete_prompt(context, state, "hint")
 
-    return result['message']['content']
+    if result.status != "success":
+        raise ValueError(result.error)
+
+    if result.message and result.message.content:
+        return result.message.content
+
+    return ""
 
 
 @app.error

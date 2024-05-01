@@ -6,7 +6,7 @@ Welcome to the 20 Questions Bot: The Ultimate Guessing Game! This developer samp
 
 <!-- code_chunk_output -->
 
-- [Teams Twenty Questions](#teams-twenty-questions)
+- [AI in Microsoft Teams: Twenty Questions](#ai-in-microsoft-teams:-twenty-questions)
   - [Interacting with the bot](#interacting-with-the-bot)
   - [Setting up the sample](#setting-up-the-sample)
   - [Testing the sample](#testing-the-sample)
