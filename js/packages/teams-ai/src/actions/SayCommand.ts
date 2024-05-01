@@ -181,7 +181,7 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
                         name: citation.title,
                         abstract: Utilities.snippet(citation.content, 500)
                     }
-                };
+                } as ClientCitation;
             });
         }
 

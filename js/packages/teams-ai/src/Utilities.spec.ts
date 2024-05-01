@@ -69,5 +69,9 @@ describe('Utilities', () => {
             const result = Utilities.formatCitationsResponse('hello [doc1] world [docs2]');
             assert.equal(result, 'hello [1] world [2]');
         });
+        it('should replace citation tags with higher numbers', () => {
+            const result = Utilities.formatCitationsResponse('hello [doc19] world [docs200]');
+            assert.equal(result, 'hello [19] world [200]');
+        });
     });
 });

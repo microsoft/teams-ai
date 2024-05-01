@@ -61,12 +61,13 @@ export class Utilities {
         snippet += '...';
         return snippet;
     }
+
     /**
      * Convert citation tags `[doc(s)n]` to `[n]` where n is a number.
      * @param {string} text The text to format.
      * @returns {string} The formatted text.
      */
     public static formatCitationsResponse(text: string): string {
-        return text.replace(/\[docs?(\d)+\]/gi, '[$1]');
+        return text.replace(/\[docs?(\d+)\]/gi, '[$1]');
     }
 }
