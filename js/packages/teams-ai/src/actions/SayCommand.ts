@@ -185,10 +185,15 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
             });
         }
 
+        // If there are citations, modify the content so that the sources are numbers instead of [doc1], [doc2], etc.
+        const contentText = !citations ? content : Utilities.formatCitationsResponse(content);
+
+        // If there are citations, filter out the citations unused in content.
+        const referencedCitations = citations ? Utilities.getUsedCitations(content, citations) : undefined;
+
         await context.sendActivity({
             type: ActivityTypes.Message,
-            // If there are citations, modify the content so that the sources are numbers instead of [doc1], [doc2], etc.
-            text: !citations ? content : Utilities.formatCitationsResponse(content),
+            text: contentText,
             ...(isTeamsChannel ? { channelData: { feedbackLoopEnabled } } : {}),
             entities: [
                 {
@@ -197,7 +202,7 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
                     '@context': 'https://schema.org',
                     '@id': '',
                     additionalType: ['AIGeneratedContent'],
-                    ...(citations ? { citation: citations } : {})
+                    ...(referencedCitations ? { citation: referencedCitations } : {})
                 }
             ] as Entities[]
         });

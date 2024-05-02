@@ -143,6 +143,7 @@ describe('actions.sayCommand', () => {
     });
     describe('citations', () => {
         it('should send a message activity with citations', async () => {
+            const formattedContent = 'testing [1]';
             const context = {
                 activity: { channelId: Channels.Msteams },
                 sendActivity: async (..._args: any[]) => {}
@@ -162,7 +163,7 @@ describe('actions.sayCommand', () => {
                 type: 'SAY',
                 response: {
                     role: 'assistant',
-                    content: 'testing123',
+                    content: formattedContent,
                     context: {
                         intent: 'my intent',
                         citations
@@ -174,7 +175,7 @@ describe('actions.sayCommand', () => {
             assert(
                 stub.calledOnceWith({
                     type: 'message',
-                    text: 'testing123',
+                    text: formattedContent,
                     channelData: {
                         feedbackLoopEnabled: false
                     },
