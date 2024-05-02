@@ -1,7 +1,6 @@
 import assert from 'assert';
-import * as sinon from 'sinon';
-
 import { Channels } from 'botbuilder';
+import * as sinon from 'sinon';
 
 import { sayCommand } from './SayCommand';
 

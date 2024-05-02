@@ -8,8 +8,8 @@
 
 import { ActivityTypes, Channels, TurnContext } from 'botbuilder';
 
-import { TurnState } from '../TurnState';
 import { PredictedSayCommand } from '../planners';
+import { TurnState } from '../TurnState';
 import { Utilities } from '../Utilities';
 
 export interface Entities {

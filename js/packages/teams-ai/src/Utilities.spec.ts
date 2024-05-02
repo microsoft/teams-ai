@@ -1,7 +1,8 @@
 import { strict as assert } from 'assert';
-import { Utilities } from './Utilities';
-import { GPTTokenizer } from './tokenizers';
+
 import { ClientCitation } from './actions';
+import { GPTTokenizer } from './tokenizers';
+import { Utilities } from './Utilities';
 
 describe('Utilities', () => {
     const tokenizer = new GPTTokenizer();
