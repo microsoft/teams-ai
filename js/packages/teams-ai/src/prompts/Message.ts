@@ -96,6 +96,11 @@ export interface Citation {
      * The URL of the citation.
      */
     url: string;
+
+    /**
+     * The filepath of the document.
+     */
+    filepath: string;
 }
 
 export interface MessageContext {
@@ -105,7 +110,7 @@ export interface MessageContext {
     citations: Citation[];
 
     /**
-     * The intent of the message.
+     * The intent of the message (what the user wrote).
      */
     intent: string;
 }

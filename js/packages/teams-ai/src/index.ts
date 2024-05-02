@@ -29,3 +29,10 @@ export * from './TurnState';
 export * from './Utilities';
 export * from './authentication/TeamsBotSsoPrompt';
 export * from './TeamsAdapter';
+export {
+    ActionHandler,
+    ClientCitation,
+    PredictedDoCommandAndHandler,
+    SensitivityUsageInfo,
+    TooManyStepsParameters
+} from './actions';

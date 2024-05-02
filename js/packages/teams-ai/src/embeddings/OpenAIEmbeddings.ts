@@ -75,11 +75,8 @@ export interface OpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
  * Options for configuring an embeddings object that calls an `OpenAI` compliant endpoint.
  * @remarks
  * The endpoint should comply with the OpenAPI spec for OpenAI's API:
- *
  * https://github.com/openai/openai-openapi
- *
  * And an example of a compliant endpoint is LLaMA.cpp's reference server:
- *
  * https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md
  */
 export interface OpenAILikeEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {

@@ -181,7 +181,10 @@ describe('MonologueAugmentation', () => {
                     commands: [
                         {
                             type: 'SAY',
-                            response: 'hello world'
+                            response: {
+                                role: 'assistant',
+                                content: 'hello world'
+                            }
                         }
                     ]
                 });
