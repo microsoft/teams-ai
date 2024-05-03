@@ -56,7 +56,7 @@ describe('AdaptiveCards', () => {
                     adaptiveCards.actionExecute(verb, testHandler);
                 });
 
-                it('incomming activity is valid invoke type', async () => {
+                it('incoming activity is valid invoke type', async () => {
                     const activity = {
                         type: 'invoke',
                         name: 'adaptiveCard/action',

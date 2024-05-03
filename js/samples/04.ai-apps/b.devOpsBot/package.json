@@ -19,7 +19,7 @@
         "url": "https://github.com/microsoft/teams-ai"
     },
     "dependencies": {
-        "botbuilder": "^4.22.1",
+        "botbuilder": "^4.22.2",
         "@microsoft/teams-ai": "~1.1.3",
         "dotenv": "^16.4.5",
         "replace": "~1.2.0",
@@ -38,6 +38,6 @@
         "rimraf": "^5.0.5",
         "shx": "^0.3.4",
         "ts-node": "^10.9.2",
-        "typescript": "^5.4.4"
+        "typescript": "^5.4.5"
     }
 }
