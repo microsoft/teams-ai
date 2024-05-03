@@ -8,6 +8,7 @@ using Microsoft.Teams.AI.AI.Planners;
 using OrderBot;
 using OrderBot.Models;
 using Azure.AI.OpenAI.Assistants;
+using Microsoft.Teams.AI.AI.OpenAI.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,7 @@ if (config.Azure == null || string.IsNullOrEmpty(config.Azure.OpenAIApiKey) || s
 if (string.IsNullOrEmpty(config.Azure.OpenAIAssistantId))
 {
     Console.WriteLine("No Assistant ID configured, creating new Assistant...");
-    AssistantCreationOptions assistantCreateParams = new("gpt-4")
+    AssistantCreateParams assistantCreateParams = new()
     {
         Name = "Order Bot",
         Instructions = string.Join("\n", new[]
@@ -36,9 +37,22 @@ if (string.IsNullOrEmpty(config.Azure.OpenAIAssistantId))
             "If the customer doesn't specify the type of pizza, beer, or salad they want ask them.",
             "Verify the order is complete and accurate before placing it with the place_order function."
         }),
+        Tools = new()
+        {
+            new()
+            {
+                Type = Tool.FUNCTION_CALLING_TYPE,
+                Function = new()
+                {
+                    Name = "place_order",
+                    Description = "Creates or updates a food order.",
+                    Parameters = OrderParameters.GetSchema()
+                }
+            }
+        },
+        Model = "gpt-4"
     };
 
-    assistantCreateParams.Tools.Add(new FunctionToolDefinition("place_order", "Creates or updates a food order.", new BinaryData(OrderParameters.GetSchema())));
     string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(config.Azure.OpenAIApiKey, assistantCreateParams, config.Azure.OpenAIEndpoint).Result.Id;
 
     Console.WriteLine($"Created a new assistant with an ID of: {newAssistantId}");
@@ -64,7 +78,7 @@ builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<Team
 builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<TeamsAdapter>()!);
 
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
-builder.Services.AddSingleton(_ => new AssistantsPlannerOptions(config.OpenAI.ApiKey, config.OpenAI.AssistantId));
+builder.Services.AddSingleton(_ => new AssistantsPlannerOptions(config.Azure.OpenAIApiKey, config.Azure.OpenAIAssistantId, config.Azure.OpenAIEndpoint));
 
 // Create the Application.
 builder.Services.AddTransient<IBot>(sp =>

@@ -1,4 +1,4 @@
-﻿namespace OrderBot
+﻿namespace MathBot
 {
     public class ConfigOptions
     {
