@@ -647,75 +647,87 @@ class Application(Bot, Generic[StateT]):
 
     async def _on_turn(self, context: TurnContext):
         try:
-            if self._options.start_typing_timer:
-                await self.typing.start(context)
-
-            # remove @mentions
-            if self.options.remove_recipient_mention:
-                if context.activity.type == ActivityTypes.message:
-                    context.activity.text = context.remove_recipient_mention(context.activity)
-
-            state: StateT = cast(StateT, await TurnState.load(context, self._options.storage))
-
-            if self._turn_state_factory:
-                state = await self._turn_state_factory(context)
-
-            await state.load(context, self._options.storage)
-            state.temp.input = context.activity.text
-
-            # run before turn middleware
-            for before_turn in self._before_turn:
-                is_ok = await before_turn(context, state)
-
-                if not is_ok:
-                    await state.save(context, self._options.storage)
-                    return
-
-            # download input files
-            if (
-                self._options.file_downloaders is not None
-                and len(self._options.file_downloaders) > 0
-            ):
-                input_files = state.temp.input_files if state.temp.input_files is not None else []
-                for file_downloader in self._options.file_downloaders:
-                    files = await file_downloader.download_files(context)
-                    input_files.append(files)
-                state.temp.input_files = input_files
-
-            # run activity handlers
-            is_ok, matches = await self._on_activity(context, state)
-
-            if not is_ok:
-                await state.save(context, self._options.storage)
+            await self._start_typing(context)
+            await self._remove_mentions(context)
+            state = await self._initialize_state(context)
+            if not await self._run_before_turn_middleware(context, state):
                 return
 
-            # only run chain when no activity handlers matched
-            if (
-                matches == 0
-                and self._ai
-                and self._options.ai
-                and context.activity.type == ActivityTypes.message
-                and context.activity.text
-            ):
-                is_ok = await self._ai.run(context, state)
+            await self._handle_file_downloads(context, state)
+            is_ok, matches = await self._run_activity_handlers(context, state)
+            if not is_ok:
+                return
 
-                if not is_ok:
-                    await state.save(context, self._options.storage)
+            if matches == 0:
+                if not await self._run_ai_chain(context, state):
                     return
 
-            # run after turn middleware
-            for after_turn in self._after_turn:
-                is_ok = await after_turn(context, state)
+            if not await self._run_after_turn_middleware(context, state):
+                return
 
-                if not is_ok:
-                    await state.save(context, self._options.storage)
-                    return
-
-            await state.save(context, self._options.storage)
+            await self._save_state(context, state)
         except ApplicationError as err:
             await self._on_error(context, err)
         finally:
             self.typing.stop()
+
+    async def _start_typing(self, context: TurnContext):
+        if self._options.start_typing_timer:
+            await self.typing.start(context)
+
+    async def _remove_mentions(self, context: TurnContext):
+        if self.options.remove_recipient_mention and context.activity.type == ActivityTypes.message:
+            context.activity.text = context.remove_recipient_mention(context.activity.text)
+
+    async def _initialize_state(self, context: TurnContext):
+        if self._turn_state_factory:
+            state = await self._turn_state_factory(context)
+        else:
+            state = cast(StateT, await TurnState.load(context, self._options.storage))
+        await state.load(context, self._options.storage)
+        state.temp.input = context.activity.text
+        return state
+
+    async def _run_before_turn_middleware(self, context: TurnContext, state):
+        for before_turn in self._before_turn:
+            is_ok = await before_turn(context, state)
+            if not is_ok:
+                await self._save_state(context, state)
+                return False
+        return True
+
+    async def _handle_file_downloads(self, context: TurnContext, state):
+        if self._options.file_downloaders and len(self._options.file_downloaders) > 0:
+            input_files = state.temp.input_files if state.temp.input_files is not None else []
+            for file_downloader in self._options.file_downloaders:
+                files = await file_downloader.download_files(context)
+                input_files.append(files)
+            state.temp.input_files = input_files
+
+    async def _run_activity_handlers(self, context: TurnContext, state):
+        is_ok, matches = await self._on_activity(context, state)
+        if not is_ok:
+            await self._save_state(context, state)
+        return is_ok, matches
+
+    async def _run_ai_chain(self, context: TurnContext, state):
+        if self._ai and self._options.ai and context.activity.type == ActivityTypes.message and context.activity.text:
+            is_ok = await self._ai.run(context, state)
+            if not is_ok:
+                await self._save_state(context, state)
+                return False
+        return True
+
+    async def _run_after_turn_middleware(self, context: TurnContext, state):
+        for after_turn in self._after_turn:
+            is_ok = await after_turn(context, state)
+            if not is_ok:
+                await self._save_state(context, state)
+                return False
+        return True
+
+    async def _save_state(self, context: TurnContext, state):
+        await state.save(context, self._options.storage)
 
     async def _on_activity(self, context: TurnContext, state: StateT) -> Tuple[bool, int]:
         matches = 0
