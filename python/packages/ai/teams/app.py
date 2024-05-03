@@ -711,7 +711,12 @@ class Application(Bot, Generic[StateT]):
         return is_ok, matches
 
     async def _run_ai_chain(self, context: TurnContext, state):
-        if self._ai and self._options.ai and context.activity.type == ActivityTypes.message and context.activity.text:
+        if (
+            self._ai
+            and self._options.ai
+            and context.activity.type == ActivityTypes.message
+            and context.activity.text
+        ):
             is_ok = await self._ai.run(context, state)
             if not is_ok:
                 await self._save_state(context, state)
