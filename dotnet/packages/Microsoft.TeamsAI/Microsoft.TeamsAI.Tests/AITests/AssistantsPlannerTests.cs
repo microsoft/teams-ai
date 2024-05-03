@@ -22,7 +22,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 PollingInterval = TimeSpan.FromMilliseconds(100)
             });
-            planner.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
+            planner.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
             var turnContextMock = new Mock<ITurnContext>();
             var turnState = await _CreateAssistantsState();
             turnState.Temp!.Input = "hello";
@@ -53,7 +53,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 PollingInterval = TimeSpan.FromMilliseconds(100)
             });
-            planner.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
+            planner.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
             var turnContextMock = new Mock<ITurnContext>();
             var turnState = await _CreateAssistantsState();
             turnState.Temp!.Input = "hello";
@@ -85,7 +85,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 PollingInterval = TimeSpan.FromMilliseconds(100)
             });
-            planner.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
+            planner.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
             var turnContextMock = new Mock<ITurnContext>();
             var turnState = await _CreateAssistantsState();
             turnState.Temp!.Input = "hello";
@@ -121,7 +121,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 PollingInterval = TimeSpan.FromMilliseconds(100)
             });
-            planner.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
+            planner.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
             var turnContextMock = new Mock<ITurnContext>();
             var turnState = await _CreateAssistantsState();
             turnState.Temp!.Input = "hello";
@@ -150,7 +150,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 PollingInterval = TimeSpan.FromMilliseconds(100)
             });
-            planner.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
+            planner.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
             var turnContextMock = new Mock<ITurnContext>();
             var turnState = await _CreateAssistantsState();
             turnState.Temp!.Input = "hello";
@@ -181,7 +181,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 PollingInterval = TimeSpan.FromMilliseconds(100)
             });
-            planner.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
+            planner.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
             var turnContextMock = new Mock<ITurnContext>();
             var turnState = await _CreateAssistantsState();
             turnState.Temp!.Input = "hello";
@@ -210,7 +210,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 PollingInterval = TimeSpan.FromMilliseconds(100)
             });
-            planner.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
+            planner.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
             var turnContextMock = new Mock<ITurnContext>();
             var turnState = await _CreateAssistantsState();
             turnState.Temp!.Input = "hello";
@@ -271,7 +271,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 PollingInterval = TimeSpan.FromMilliseconds(100)
             });
-            planner.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
+            planner.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
             var turnContextMock = new Mock<ITurnContext>();
             var turnState = await _CreateAssistantsState();
             turnState.Temp!.Input = "hello";
@@ -334,7 +334,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 PollingInterval = TimeSpan.FromMilliseconds(100)
             });
-            planner.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
+            planner.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
             var turnContextMock = new Mock<ITurnContext>();
             var turnState = await _CreateAssistantsState();
             turnState.Temp!.Input = "hello";

@@ -1,11 +1,12 @@
-﻿using System.Text.Json.Serialization;
+﻿using Azure.AI.OpenAI.Assistants;
+using System.ClientModel.Primitives;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.Teams.AI.AI.OpenAI.Models
 {
     /// <summary>
     /// Model represents OpenAI Assistant
     /// </summary>
-    [Obsolete("This class has been replaced with `Azure.AI.OpenAI.Assistants.Assistant`")]
     public class Assistant
     {
         /// <summary>
@@ -45,7 +46,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
         /// </summary>
         [JsonPropertyName("metadata")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public Dictionary<string, object>? Metadata { get; set; }
+        public IReadOnlyDictionary<string, string>? Metadata { get; set; }
 
         /// <summary>
         /// ID of the model to use.
@@ -71,12 +72,16 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
         /// </summary>
         [JsonPropertyName("tools")]
         public List<Tool> Tools { get; set; } = new List<Tool>();
+
+        internal Azure.AI.OpenAI.Assistants.Assistant ToAssistant()
+        {
+            return ModelReaderWriter.Read<Azure.AI.OpenAI.Assistants.Assistant>(BinaryData.FromObjectAsJson(this))!;
+        }
     }
 
     /// <summary>
     /// Model represents parameters to create an Assistant.
     /// </summary>
-    [Obsolete("This class has been replaced with `Azure.AI.OpenAI.Assistants.AssistantCreationOptions`")]
     public class AssistantCreateParams
     {
         /// <summary>
@@ -111,7 +116,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
         /// </summary>
         [JsonPropertyName("metadata")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public Dictionary<string, object>? Metadata { get; set; }
+        public Dictionary<string, string>? Metadata { get; set; }
 
         /// <summary>
         /// Assistant name.
@@ -126,5 +131,10 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
         [JsonPropertyName("tools")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<Tool>? Tools { get; set; }
+
+        internal AssistantCreationOptions? ToAssistantCreationOptions()
+        {
+            return ModelReaderWriter.Read<AssistantCreationOptions>(BinaryData.FromObjectAsJson(this));
+        }
     }
 }

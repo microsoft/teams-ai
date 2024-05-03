@@ -4,9 +4,9 @@ using System.Runtime.CompilerServices;
 
 namespace Microsoft.Teams.AI.Tests.TestUtils
 {
-    internal sealed class TestAssistantsOpenAIClient : OpenAIClient
+    internal sealed class TestAssistantsOpenAIClient : OpenAIAssistantsClient
     {
-        public TestAssistantsOpenAIClient() : base(new("test-ket"))
+        public TestAssistantsOpenAIClient() : base(new("test-key"))
         {
         }
 

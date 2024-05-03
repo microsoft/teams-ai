@@ -5,7 +5,6 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
     /// <summary>
     /// Model represents Assistant tool.
     /// </summary>
-    [Obsolete("The AssistantsPlanner now uses the `Azure.AI.OpenAI.Assistants` library.")]
     public class Tool
     {
         /// <summary>
@@ -35,7 +34,6 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
     /// <summary>
     /// Model represent function of Assistant tool.
     /// </summary>
-    [Obsolete("The AssistantsPlanner now uses the `Azure.AI.OpenAI.Assistants` library.")]
     public class Function
     {
         /// <summary>
