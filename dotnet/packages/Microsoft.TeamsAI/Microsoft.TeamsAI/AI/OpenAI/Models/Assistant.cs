@@ -1,12 +1,11 @@
-﻿using Azure.AI.OpenAI.Assistants;
-using System.ClientModel.Primitives;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Microsoft.Teams.AI.AI.OpenAI.Models
 {
     /// <summary>
     /// Model represents OpenAI Assistant
     /// </summary>
+    [Obsolete("This type has been depecrated. Use Azure.AI.OpenAI.Assistants.Assistant instead.")]
     public class Assistant
     {
         /// <summary>
@@ -72,16 +71,12 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
         /// </summary>
         [JsonPropertyName("tools")]
         public List<Tool> Tools { get; set; } = new List<Tool>();
-
-        internal Azure.AI.OpenAI.Assistants.Assistant ToAssistant()
-        {
-            return ModelReaderWriter.Read<Azure.AI.OpenAI.Assistants.Assistant>(BinaryData.FromObjectAsJson(this))!;
-        }
     }
 
     /// <summary>
     /// Model represents parameters to create an Assistant.
     /// </summary>
+    [Obsolete("This type has been depecrated. Use Azure.AI.OpenAI.Assistants.AssistantCreationOptions instead.")]
     public class AssistantCreateParams
     {
         /// <summary>
@@ -131,10 +126,5 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
         [JsonPropertyName("tools")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<Tool>? Tools { get; set; }
-
-        internal AssistantCreationOptions? ToAssistantCreationOptions()
-        {
-            return ModelReaderWriter.Read<AssistantCreationOptions>(BinaryData.FromObjectAsJson(this));
-        }
     }
 }
