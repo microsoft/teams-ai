@@ -7,7 +7,7 @@ using Microsoft.Teams.AI.AI.Planners.Experimental;
 using Microsoft.Teams.AI.AI.Planners;
 
 using MathBot;
-using Microsoft.Teams.AI.AI.OpenAI.Models;
+using Azure.AI.OpenAI.Assistants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,19 +46,12 @@ else
 if (string.IsNullOrEmpty(assistantId))
 {
     Console.WriteLine("No Assistant ID configured, creating new Assistant...");
-    AssistantCreateParams assistantCreateParams = new()
+    AssistantCreationOptions assistantCreateParams = new("gpt-4")
     {
         Name = "Math Tutor",
-        Instructions = "You are a personal math tutor. Write and run code to answer math questions.",
-        Tools = new()
-        {
-            new()
-            {
-                Type = Tool.CODE_INTERPRETER_TYPE
-            }
-        },
-        Model = "gpt-4"
+        Instructions = "You are a personal math tutor. Write and run code to answer math questions."
     };
+    assistantCreateParams.Tools.Add(new CodeInterpreterToolDefinition());
 
     string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(apiKey, assistantCreateParams, endpoint).Result.Id;
     Console.WriteLine($"Created a new assistant with an ID of: {newAssistantId}");
