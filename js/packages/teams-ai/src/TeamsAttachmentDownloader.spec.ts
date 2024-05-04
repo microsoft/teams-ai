@@ -61,7 +61,7 @@ describe('TeamsAttachmentDownloader', () => {
             attachments: [attachment]
         } as Partial<Activity>;
         const [context, state] = await createTestTurnContextAndState(adapter, activity);
-        // const state = new TurnState();
+
         const result = await downloader.downloadFiles(context, state);
 
         assert.equal(postStub.calledOnce, true);
@@ -89,7 +89,7 @@ describe('TeamsAttachmentDownloader', () => {
             attachments: [attachment]
         } as Partial<Activity>;
         const [context, state] = await createTestTurnContextAndState(adapter, activity);
-        // const state = new TurnState();
+
         const result = await downloader.downloadFiles(context, state);
 
         assert.equal(postStub.calledOnce, true);
@@ -117,7 +117,7 @@ describe('TeamsAttachmentDownloader', () => {
             attachments: [attachment]
         } as Partial<Activity>;
         const [context, state] = await createTestTurnContextAndState(adapter, activity);
-        // const state = new TurnState();
+
         const result = await downloader.downloadFiles(context, state);
 
         assert.equal(postStub.calledOnce, true);
@@ -144,7 +144,7 @@ describe('TeamsAttachmentDownloader', () => {
             attachments: [attachment]
         } as Partial<Activity>;
         const [context, state] = await createTestTurnContextAndState(adapter, activity);
-        // const state = new TurnState();
+
         const result = await downloader.downloadFiles(context, state);
 
         assert.deepEqual(result, [
@@ -163,7 +163,7 @@ describe('TeamsAttachmentDownloader', () => {
             attachments: []
         } as Partial<Activity>;
         const [context, state] = await createTestTurnContextAndState(adapter, activity);
-        // const state = new TurnState();
+
         const result = await downloader.downloadFiles(context, state);
 
         assert.deepEqual(result, []);
@@ -211,7 +211,7 @@ describe('TeamsAttachmentDownloader', () => {
         });
 
         const [context, state] = await createTestTurnContextAndState(adapter, activity);
-        // const state = new TurnState();
+
         const result = await downloader.downloadFiles(context, state);
 
         assert.equal(postStub.calledOnce, true);
@@ -256,7 +256,7 @@ describe('TeamsAttachmentDownloader', () => {
         });
 
         const [context, state] = await createTestTurnContextAndState(adapter, activity);
-        // const state = new TurnState();
+
         const result = await downloader.downloadFiles(context, state);
 
         assert.equal(postStub.calledOnce, true);
@@ -300,7 +300,7 @@ describe('TeamsAttachmentDownloader', () => {
         });
 
         const [context, state] = await createTestTurnContextAndState(adapter, activity);
-        // const state = new TurnState();
+
         const result = await downloader.downloadFiles(context, state);
 
         assert.equal(postStub.calledOnce, true);

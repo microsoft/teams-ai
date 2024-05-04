@@ -4,6 +4,7 @@ import { GPTTokenizer } from './tokenizers';
 
 describe('Utilities', () => {
     const tokenizer = new GPTTokenizer();
+
     describe('toString', () => {
         it('should convert a number to a string', () => {
             const result = Utilities.toString(tokenizer, 1);
@@ -43,6 +44,30 @@ describe('Utilities', () => {
         it('should return an empty string for null', () => {
             const result = Utilities.toString(tokenizer, null);
             assert.equal(result, '');
+        });
+    });
+
+    describe('snippet', () => {
+        it('should return the text if it is shorter than the max length', () => {
+            const result = Utilities.snippet('hello world', 20);
+            assert.equal(result, 'hello world');
+        });
+
+        it('should clip the text to the max length', () => {
+            const result = Utilities.snippet('hello world', 5);
+            assert.equal(result, 'hell...');
+        });
+
+        it('should clip the text to the max length at the last whole word', () => {
+            const result = Utilities.snippet('hello world', 6);
+            assert.equal(result, 'hello...');
+        });
+    });
+
+    describe('formatCitationsResponse', () => {
+        it('should replace citation tags with numbers', () => {
+            const result = Utilities.formatCitationsResponse('hello [doc1] world [docs2]');
+            assert.equal(result, 'hello [1] world [2]');
         });
     });
 });

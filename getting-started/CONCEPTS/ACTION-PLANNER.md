@@ -11,6 +11,7 @@
 - [Data Sources](./DATA-SOURCES.md)
 - [Moderator](./MODERATOR.md)
 - [Planner](./PLANNER.md)
+- [Powered by AI](./POWERED-BY-AI.md)
 - [Prompts](./PROMPTS.md)
 - [Turns](./TURNS.md)
 - [User Authentication](./USER-AUTH.md)
@@ -18,7 +19,6 @@
 ---
 
 The Action Planner is a powerful planner that uses an LLM to generate plans. It can trigger parameterized actions and send text-based responses to the user. It supports the following advanced features:
-
 
 ### [Prompts](./PROMPTS.md)
 
