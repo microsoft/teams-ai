@@ -31,7 +31,7 @@ namespace Microsoft.Teams.AI.AI.Models
         /// <summary>
         /// The title of the citation.
         /// </summary>
-        public string Title {  get; set; }
+        public string Title { get; set; }
 
         /// <summary>
         /// The URL of the citation.

@@ -62,7 +62,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
             Assert.Equal("DO", plan.Commands[0].Type);
             Assert.Equal("test", (plan.Commands[0] as PredictedDoCommand)?.Action);
             Assert.Equal("SAY", plan.Commands[1].Type);
-            Assert.Equal("hello", (plan.Commands[1] as PredictedSayCommand)?.Response);
+            Assert.Equal("hello", (plan.Commands[1] as PredictedSayCommand)?.Response.Content);
         }
 
         [Fact]

@@ -267,7 +267,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
             Assert.NotNull(plan);
             Assert.Equal(1, plan.Commands.Count);
             Assert.Equal("SAY", plan.Commands[0].Type);
-            Assert.Equal("hello world", (plan.Commands[0] as PredictedSayCommand)?.Response);
+            Assert.Equal("hello world", (plan.Commands[0] as PredictedSayCommand)?.Response.Content);
         }
 
         [Fact]

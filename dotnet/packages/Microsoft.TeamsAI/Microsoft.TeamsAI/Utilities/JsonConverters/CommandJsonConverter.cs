@@ -83,7 +83,7 @@ namespace Microsoft.Teams.AI.Utilities.JsonConverters
 
                 writer.WritePropertyName(_responsePropertyName);
 
-                JsonSerializer.Serialize(writer, ((PredictedSayCommand)value).Response, options);
+                JsonSerializer.Serialize(writer, ((PredictedSayCommand)value).Response.Content, options);
             }
             else
             {
