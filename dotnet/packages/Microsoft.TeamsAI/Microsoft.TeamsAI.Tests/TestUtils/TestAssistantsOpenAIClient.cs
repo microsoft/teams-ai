@@ -67,7 +67,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return Task.FromResult(Response.FromValue(newThread, Mock.Of<Response>()));
         }
 
-        public override Task<Response<ThreadMessage>> CreateMessageAsync(string threadId, MessageRole role, string content, IEnumerable<string> fileIds = null, IDictionary<string, string> metadata = null, CancellationToken cancellationToken = default)
+        public override Task<Response<ThreadMessage>> CreateMessageAsync(string threadId, MessageRole role, string content, IEnumerable<string>? fileIds = null, IDictionary<string, string>? metadata = null, CancellationToken cancellationToken = default)
         {
             var annotations = new List<MessageTextAnnotation>() { AssistantsModelFactory.MessageTextAnnotation() };
             ThreadMessage newMessage = AssistantsModelFactory.ThreadMessage(
@@ -94,7 +94,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return Task.FromResult(Response.FromValue(newMessage, Mock.Of<Response>()));
         }
 
-        public override async Task<Response<PageableList<ThreadMessage>>> GetMessagesAsync(string threadId, int? limit = null, ListSortOrder? order = null, string after = null, string before = null, CancellationToken cancellationToken = default)
+        public override async Task<Response<PageableList<ThreadMessage>>> GetMessagesAsync(string threadId, int? limit = null, ListSortOrder? order = null, string? after = null, string? before = null, CancellationToken cancellationToken = default)
         {
             while (RemainingMessages.Count > 0)
             {
@@ -102,7 +102,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
                 await CreateMessageAsync(threadId, MessageRole.User, nextMessage);
             }
 
-            string lastMessageId = before;
+            string lastMessageId = before!;
             int i = Messages[threadId].FindIndex(m => m.Id == lastMessageId);
             int remainingItems = Messages[threadId].Count() - (i + 1);
             var filteredMessages = Messages[threadId].GetRange(i + 1, remainingItems);
@@ -174,7 +174,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return Task.FromResult(Response.FromValue(runWithUpdatedStatus, Mock.Of<Response>()));
         }
 
-        public override async Task<Response<PageableList<ThreadRun>>> GetRunsAsync(string threadId, int? limit = null, ListSortOrder? order = null, string after = null, string before = null, CancellationToken cancellationToken = default)
+        public override async Task<Response<PageableList<ThreadRun>>> GetRunsAsync(string threadId, int? limit = null, ListSortOrder? order = null, string? after = null, string? before = null, CancellationToken cancellationToken = default)
         {
             PageableList<ThreadRun> response;
 
