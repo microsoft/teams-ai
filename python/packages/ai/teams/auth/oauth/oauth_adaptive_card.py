@@ -20,7 +20,6 @@ from botbuilder.schema import (
 from botframework.connector.auth import TokenExchangeRequest
 from botframework.connector.models import (
     AdaptiveCardInvokeResponse,
-    AdaptiveCardInvokeValue,
     CardAction,
 )
 
@@ -45,28 +44,28 @@ class OAuthAdaptiveCard(Generic[StateT], AuthComponent[StateT]):
 
     async def sso_token_exchange(self, context: TurnContext) -> Optional[TokenResponse]:
         client = self._user_token_client(context)
-        value = context.activity.value
+        value = cast(dict, context.activity.value)
 
-        if value is None or not isinstance(value, AdaptiveCardInvokeValue):
+        if value is None or not "authentication" in value:
             return None
 
-        auth = value.authentication
+        auth = value["authentication"]
 
-        if auth is None or not isinstance(auth, TokenExchangeRequest):
+        if not "token" in auth:
             return None
 
         return await client.exchange_token(
             getattr(context.activity.from_property, "id"),
             self._options.connection_name,
             context.activity.channel_id,
-            auth,
+            TokenExchangeRequest(token=auth["token"]),
         )
 
     async def sign_in(self, context: TurnContext, state: StateT) -> Optional[str]:
         client = self._user_token_client(context)
         value = cast(dict, context.activity.value)
 
-        if "authentication" in value and "token" in value["authentication"]:
+        if "authentication" in value:
             res = await self.sso_token_exchange(context)
 
             if res is not None and res.token != "":

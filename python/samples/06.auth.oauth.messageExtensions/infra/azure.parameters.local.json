@@ -12,7 +12,7 @@
             "value": "${{SECRET_BOT_PASSWORD}}"
         },
         "botDisplayName": {
-            "value": "OAuthMessageExtensions-${{TEAMSFX_ENV}}"
+            "value": "OAuthMessageExtensionsInfra-${{TEAMSFX_ENV}}"
         },
         "botAppDomain": {
             "value": "${{BOT_DOMAIN}}"

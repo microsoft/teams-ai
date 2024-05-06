@@ -62,27 +62,27 @@ class OAuthMessageExtension(Generic[StateT], AuthComponent[StateT]):
 
     async def sso_token_exchange(self, context: TurnContext) -> Optional[TokenResponse]:
         client = self._user_token_client(context)
-        value = context.activity.value
+        value = cast(dict, context.activity.value)
 
-        if value is None or not hasattr(value, "authentication"):
+        if value is None or not "authentication" in value:
             return None
 
-        auth = value.authentication
+        auth = value["authentication"]
 
-        if auth is None or not isinstance(auth, TokenExchangeRequest):
+        if not "token" in auth:
             return None
 
         return await client.exchange_token(
             getattr(context.activity.from_property, "id"),
             self._options.connection_name,
             context.activity.channel_id,
-            auth,
+            TokenExchangeRequest(token=auth["token"]),
         )
 
     async def sign_in(self, context: TurnContext, state: StateT) -> Optional[str]:
         value = cast(dict, context.activity.value)
 
-        if "authentication" in value and "token" in value["authentication"]:
+        if "authentication" in value:
             res = await self.sso_token_exchange(context)
 
             if res is not None and res.token != "":
@@ -118,6 +118,7 @@ class OAuthMessageExtension(Generic[StateT], AuthComponent[StateT]):
                                             title=self._options.title,
                                             text=self._options.text,
                                             display_text=self._options.text,
+                                            value=await self.get_sign_in_link(context),
                                         )
                                     ],
                                 ),
