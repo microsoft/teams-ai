@@ -100,7 +100,7 @@ class OpenAIAssistantsOptions:
 
 
 class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
-    "A planner that uses the OpenAI Assistants API."
+    "A planner that uses the Assistants API."
 
     _options: Union[OpenAIAssistantsOptions, AzureOpenAIAssistantsOptions]
     _client: openai.AsyncOpenAI
