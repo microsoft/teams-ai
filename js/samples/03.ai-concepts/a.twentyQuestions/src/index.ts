@@ -82,7 +82,9 @@ interface ConversationState {
 type ApplicationTurnState = TurnState<ConversationState>;
 
 if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
-    throw new Error('Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set.');
+    throw new Error(
+        'Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY and AZURE_OPENAI_ENDPOINT is set.'
+    );
 }
 
 // Create AI components
@@ -93,7 +95,7 @@ const model = new OpenAIModel({
 
     // Azure OpenAI Support
     azureApiKey: process.env.AZURE_OPENAI_KEY!,
-    azureDefaultDeployment: 'gpt-3.5-turbo',
+    azureDefaultDeployment: 'gpt-35-turbo',
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
     azureApiVersion: '2023-03-15-preview',
 

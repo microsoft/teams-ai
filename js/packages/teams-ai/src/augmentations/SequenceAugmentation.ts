@@ -183,6 +183,22 @@ export class SequenceAugmentation implements Augmentation<Plan | undefined> {
         memory: Memory,
         response: PromptResponse<Plan | undefined>
     ): Promise<Plan> {
+        const plan = response.message!.content!;
+
+        plan.commands = plan.commands.map((c) => {
+            if (c.type === 'SAY') {
+                return {
+                    ...c,
+                    response: {
+                        role: 'assistant',
+                        content: (c as PredictedSayCommand).response as unknown as string
+                    }
+                };
+            }
+
+            return c;
+        });
+
         return Promise.resolve(response.message!.content!);
     }
 }
