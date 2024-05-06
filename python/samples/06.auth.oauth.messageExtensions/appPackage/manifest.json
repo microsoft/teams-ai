@@ -44,26 +44,6 @@
                     ]
                 },
                 {
-                    "id": "showProfile",
-                    "type": "action",
-                    "title": "Compose",
-                    "description": "Compose and send email",
-                    "initialRun": false,
-                    "fetchTask": true,
-                    "context": [
-                        "commandBox",
-                        "compose",
-                        "message"
-                    ],
-                    "parameters": [
-                        {
-                            "name": "param",
-                            "title": "param",
-                            "description": ""
-                        }
-                    ]
-                },
-                {
                     "id": "signOutCommand",
                     "type": "action",
                     "title": "Sign Out",
