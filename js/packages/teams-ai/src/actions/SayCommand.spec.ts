@@ -1,7 +1,6 @@
 import assert from 'assert';
-import * as sinon from 'sinon';
-
 import { Channels } from 'botbuilder';
+import * as sinon from 'sinon';
 
 import { sayCommand } from './SayCommand';
 
@@ -37,9 +36,7 @@ describe('actions.sayCommand', () => {
     it('should send a message activity', async () => {
         const context = {
             activity: { channelId: Channels.Msteams },
-            sendActivity: async (..._args: any[]) => {
-                console.log(JSON.stringify(_args));
-            }
+            sendActivity: async (..._args: any[]) => {}
         };
         const stub = sandbox.stub(context, 'sendActivity').callThrough();
         const res = await handler(context as any, {} as any, {
@@ -65,8 +62,7 @@ describe('actions.sayCommand', () => {
                         '@type': 'Message',
                         '@context': 'https://schema.org',
                         '@id': '',
-                        additionalType: ['AIGeneratedContent'],
-                        citation: undefined
+                        additionalType: ['AIGeneratedContent']
                     }
                 ]
             }),
@@ -74,7 +70,7 @@ describe('actions.sayCommand', () => {
         );
     });
 
-    it('should send channelData as undefined if not Teams channel', async () => {
+    it('should not send channelData for feedbackLoop if not Teams channel', async () => {
         const context = {
             activity: { channelId: 'not-teams' },
             sendActivity: async (..._args: any[]) => {}
@@ -94,15 +90,13 @@ describe('actions.sayCommand', () => {
             stub.calledOnceWith({
                 type: 'message',
                 text: 'testing123',
-                channelData: undefined,
                 entities: [
                     {
                         type: 'https://schema.org/Message',
                         '@type': 'Message',
                         '@context': 'https://schema.org',
                         '@id': '',
-                        additionalType: ['AIGeneratedContent'],
-                        citation: undefined
+                        additionalType: ['AIGeneratedContent']
                     }
                 ]
             }),
@@ -139,8 +133,7 @@ describe('actions.sayCommand', () => {
                         '@type': 'Message',
                         '@context': 'https://schema.org',
                         '@id': '',
-                        additionalType: ['AIGeneratedContent'],
-                        citation: undefined
+                        additionalType: ['AIGeneratedContent']
                     }
                 ]
             }),
@@ -149,6 +142,7 @@ describe('actions.sayCommand', () => {
     });
     describe('citations', () => {
         it('should send a message activity with citations', async () => {
+            const formattedContent = 'testing [1]';
             const context = {
                 activity: { channelId: Channels.Msteams },
                 sendActivity: async (..._args: any[]) => {}
@@ -158,7 +152,7 @@ describe('actions.sayCommand', () => {
             const citations = [
                 {
                     title: 'the title',
-                    url: 'https://google.com',
+                    url: '',
                     filepath: '',
                     content: 'some citation text...'
                 }
@@ -168,7 +162,7 @@ describe('actions.sayCommand', () => {
                 type: 'SAY',
                 response: {
                     role: 'assistant',
-                    content: 'testing123',
+                    content: formattedContent,
                     context: {
                         intent: 'my intent',
                         citations
@@ -180,7 +174,7 @@ describe('actions.sayCommand', () => {
             assert(
                 stub.calledOnceWith({
                     type: 'message',
-                    text: 'testing123',
+                    text: formattedContent,
                     channelData: {
                         feedbackLoopEnabled: false
                     },
@@ -198,7 +192,6 @@ describe('actions.sayCommand', () => {
                                     appearance: {
                                         '@type': 'DigitalDocument',
                                         name: 'the title',
-                                        url: 'https://google.com',
                                         abstract: 'some citation text...'
                                     }
                                 }
