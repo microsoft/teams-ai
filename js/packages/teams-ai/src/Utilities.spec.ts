@@ -1,6 +1,8 @@
 import { strict as assert } from 'assert';
-import { Utilities } from './Utilities';
+
+import { ClientCitation } from './actions';
 import { GPTTokenizer } from './tokenizers';
+import { Utilities } from './Utilities';
 
 describe('Utilities', () => {
     const tokenizer = new GPTTokenizer();
@@ -68,6 +70,42 @@ describe('Utilities', () => {
         it('should replace citation tags with numbers', () => {
             const result = Utilities.formatCitationsResponse('hello [doc1] world [docs2]');
             assert.equal(result, 'hello [1] world [2]');
+        });
+        it('should replace citation tags with higher numbers', () => {
+            const result = Utilities.formatCitationsResponse('hello [doc19] world [docs200]');
+            assert.equal(result, 'hello [19] world [200]');
+        });
+    });
+
+    describe('getUsedCitations', () => {
+        it('should return an empty array if there are no citations', () => {
+            const result = Utilities.getUsedCitations('hello world', []);
+            assert.equal(result, undefined);
+        });
+
+        it('should return an array of used citations', () => {
+            const citations = [
+                {
+                    '@type': 'Claim',
+                    position: '1',
+                    appearance: {
+                        '@type': 'DigitalDocument',
+                        name: 'the title',
+                        abstract: 'some citation text...'
+                    }
+                },
+                {
+                    '@type': 'Claim',
+                    position: '2',
+                    appearance: {
+                        '@type': 'DigitalDocument',
+                        name: 'the title',
+                        abstract: 'some citation other text...'
+                    }
+                }
+            ] as ClientCitation[];
+            const result = Utilities.getUsedCitations('hello [1] world', citations);
+            assert.deepEqual(result, [citations[0]]);
         });
     });
 });
