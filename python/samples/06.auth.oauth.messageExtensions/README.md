@@ -1,4 +1,4 @@
-# Teams Message Extension SSO Bot
+# Teams Message Extension Oauth Bot
 
 This sample shows how to incorporate a basic conversational flow into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
 
@@ -12,7 +12,7 @@ Note that this bot will only work in tenants where the following graph scopes ar
 
 <!-- code_chunk_output -->
 
--   [Teams Message Extension SSO Bot](#teams-message-extension-sso-bot)
+-   [Teams Message Extension Oauth Bot](#teams-message-extension-oauth-bot)
     -   [Interacting with the bot](#interacting-with-the-bot)
     -   [Setting up the sample](#setting-up-the-sample)
     -   [Testing the sample](#testing-the-sample)
@@ -32,7 +32,7 @@ Note that this bot will only work in tenants where the following graph scopes ar
     git clone https://github.com/Microsoft/teams-ai.git
     ```
 
-1. Follow below instructions to run the sample
+2. Duplicate the `sample.env`. Rename the file to .env and fill in the variables with your keys.
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below. To read about other options, skip to [Other ways to run the sample](#other-ways-to-run-the-sample).
 

@@ -1,3 +1,5 @@
+# OAuth Bot
+
 This sample shows how to incorporate a basic conversational SSO flow into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
 
 This sample requires creating an OAuth Connection in Azure Bot Service, which provides a token store to store the token after sign-in.
@@ -31,7 +33,7 @@ You can interact with this bot by sending it a message, which will echo back to 
     git clone https://github.com/Microsoft/teams-ai.git
     ```
 
-1. Follow below instructions to run the sample
+2. Duplicate the `sample.env`. Rename the file to .env and fill in the variables with your keys.
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below. To read about other options, skip to [Other ways to run the sample](#other-ways-to-run-the-sample).
 
