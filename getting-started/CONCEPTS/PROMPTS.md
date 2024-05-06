@@ -11,6 +11,7 @@
 - [Data Sources](./DATA-SOURCES.md)
 - [Moderator](./MODERATOR.md)
 - [Planner](./PLANNER.md)
+- [Powered by AI](./POWERED-BY-AI.md)
 - [**Prompts**](./PROMPTS.md)
 - [Turns](./TURNS.md)
 - [User Authentication](./USER-AUTH.md)
@@ -238,6 +239,7 @@ const prompts = new PromptManager({
 ```
 
 **Python**
+
 ```python
 prompts = PromptManager(PromptManagerOptions(
     prompts_folder=f"{os.getcwd()}/src/prompts"
@@ -253,4 +255,3 @@ prompts = PromptManager(PromptManagerOptions(
 - [QUICKSTART](../QUICKSTART.md)
 - [SAMPLES](../SAMPLES.md)
 - [OTHER](../OTHER/README.md)
-
