@@ -6,8 +6,10 @@
  * Licensed under the MIT License.
  */
 
-import { Tokenizer } from './tokenizers';
 import { stringify } from 'yaml';
+
+import { ClientCitation } from './actions';
+import { Tokenizer } from './tokenizers';
 
 /**
  * Utility functions for manipulating .
@@ -61,12 +63,36 @@ export class Utilities {
         snippet += '...';
         return snippet;
     }
+
     /**
      * Convert citation tags `[doc(s)n]` to `[n]` where n is a number.
      * @param {string} text The text to format.
      * @returns {string} The formatted text.
      */
     public static formatCitationsResponse(text: string): string {
-        return text.replace(/\[docs?(\d)+\]/gi, '[$1]');
+        return text.replace(/\[docs?(\d+)\]/gi, '[$1]');
+    }
+
+    /**
+     * Get the citations used in the text. This will remove any citations that are included in the citations array from the response but not referenced in the text.
+     * @param {string} text - The text to search for citation references, i.e. [1], [2], etc.
+     * @param {ClientCitation[]} citations - The list of citations to search for.
+     * @returns {ClientCitation[] | undefined} The list of citations used in the text.
+     */
+    public static getUsedCitations(text: string, citations: ClientCitation[]): ClientCitation[] | undefined {
+        const regex = /\[(\d+)\]/gi;
+        const matches = text.match(regex);
+
+        if (!matches) {
+            return undefined;
+        } else {
+            const usedCitations: ClientCitation[] = [];
+            matches.forEach((match) => {
+                citations.find((citation) => {
+                    `[${citation.position}]` === match && usedCitations.push(citation);
+                });
+            });
+            return usedCitations;
+        }
     }
 }
