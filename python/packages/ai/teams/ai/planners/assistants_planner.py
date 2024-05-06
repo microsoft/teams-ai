@@ -8,7 +8,8 @@ from __future__ import annotations
 import asyncio
 import json
 from dataclasses import dataclass
-from typing import Dict, Generic, List, Optional, TypeVar
+from importlib.metadata import version
+from typing import Dict, Generic, List, Optional, TypeVar, Union
 
 import openai
 from botbuilder.core import TurnContext
@@ -43,9 +44,40 @@ class AssistantsState(DataClassJsonMixin):
 
 
 @dataclass
-class AssistantsPlannerOptions:
+class AzureOpenAIAssistantsOptions:
     """
-    Options for configuring the AssistantsPlanner.
+    Options for configuring the AssistantsPlanner for AzureOpenAI.
+    """
+
+    api_key: str
+    "The AzureOpenAI API key."
+
+    default_model: str
+    "Default name of the Azure OpenAI deployment (model) to use."
+
+    assistant_id: str
+    "The ID of the assistant to use."
+
+    endpoint: str
+    "Deployment endpoint to use."
+
+    polling_interval: float = DEFAULT_POLLING_INTERVAL
+    "Optional. Polling interval in seconds. Defaults to 1 second"
+
+    assistants_state_variable: str = DEFAULT_ASSISTANTS_STATE_VARIABLE
+    "Optional. The state variable to use for storing the assistants state."
+
+    api_version: str = "2024-02-15-preview"
+    "Optional. Version of the API being called. Defaults to `2024-02-15-preview`."
+
+    organization: Optional[str] = None
+    "Optional. Organization to use when calling the API."
+
+
+@dataclass
+class OpenAIAssistantsOptions:
+    """
+    Options for configuring the AssistantsPlanner with OpenAI.
     """
 
     api_key: str
@@ -70,11 +102,11 @@ class AssistantsPlannerOptions:
 class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
     "A planner that uses the OpenAI Assistants API."
 
-    _options: AssistantsPlannerOptions
+    _options: Union[OpenAIAssistantsOptions, AzureOpenAIAssistantsOptions]
     _client: openai.AsyncOpenAI
 
     @property
-    def options(self) -> AssistantsPlannerOptions:
+    def options(self) -> Union[OpenAIAssistantsOptions, AzureOpenAIAssistantsOptions]:
         return self._options
 
     @property
@@ -82,7 +114,9 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
         return self._client
 
     def __init__(
-        self, options: AssistantsPlannerOptions, client: Optional[openai.AsyncOpenAI] = None
+        self,
+        options: Union[OpenAIAssistantsOptions, AzureOpenAIAssistantsOptions],
+        client: Optional[Union[openai.AsyncOpenAI, openai.AsyncAzureOpenAI]] = None,
     ) -> None:
         """
         Creates a new `AssistantsPlanner` instance.
@@ -94,16 +128,24 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
         """
 
         self._options = options
-        self._client = (
-            client
-            if client is not None
-            else openai.AsyncOpenAI(
+
+        if client:
+            self._client = client
+        elif isinstance(options, OpenAIAssistantsOptions):
+            self._client = openai.AsyncOpenAI(
                 api_key=options.api_key,
                 organization=options.organization,
                 default_headers={"User-Agent": self.user_agent},
                 base_url=options.endpoint,
             )
-        )
+        elif isinstance(options, AzureOpenAIAssistantsOptions):
+            self._client = openai.AsyncAzureOpenAI(
+                api_key=options.api_key,
+                api_version=options.api_version,
+                azure_endpoint=options.endpoint,
+                organization=options.organization if options.organization else None,
+                default_headers={"User-Agent": self.user_agent},
+            )
 
     async def begin_task(self, context: TurnContext, state: TurnState) -> Plan:
         """
@@ -157,6 +199,7 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
     @staticmethod
     async def create_assistant(
         api_key: str,
+        api_version: Optional[str],
         organization: Optional[str],
         endpoint: Optional[str],
         request: AssistantCreateParams,
@@ -173,13 +216,26 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
         Returns:
             Assistant: The assistant.
         """
-        openai_client = openai.AsyncOpenAI(
-            api_key=api_key,
-            organization=organization if organization else None,
-            base_url=endpoint if endpoint else None,
-        )
+        client: openai.AsyncOpenAI
 
-        return await openai_client.beta.assistants.create(
+        if endpoint:
+            # Use AzureOpenAI
+            user_agent = f"teamsai-py/{version('teams-ai')}"
+            client = openai.AsyncAzureOpenAI(
+                api_key=api_key,
+                api_version=api_version if api_version else "2024-02-15-preview",
+                azure_endpoint=endpoint,
+                organization=organization if organization else None,
+                default_headers={"User-Agent": user_agent},
+            )
+        else:
+            # Use OpenAI
+            client = openai.AsyncOpenAI(
+                api_key=api_key,
+                organization=organization,
+            )
+
+        return await client.beta.assistants.create(
             model=request.get("model", ""),
             description=request.get("description"),
             file_ids=request.get("file_ids", []),
