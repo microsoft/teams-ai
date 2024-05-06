@@ -141,7 +141,7 @@ Modifying `PredictedSAYCommand` will provide the developer with more granualar c
 ### JS
 
 ```typescript
-app.action<PredictedSayCommand>(AI.SayCommandActionName, async (context, state, data, action) => {
+app.ai.action<PredictedSayCommand>(AI.SayCommandActionName, async (context, state, data, action) => {
   // custom logic here...
   await context.sendActivity(data.content);
   return "";
