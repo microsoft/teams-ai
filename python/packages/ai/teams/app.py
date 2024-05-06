@@ -677,7 +677,7 @@ class Application(Bot, Generic[StateT]):
 
     async def _remove_mentions(self, context: TurnContext):
         if self.options.remove_recipient_mention and context.activity.type == ActivityTypes.message:
-            context.activity.text = context.remove_recipient_mention(context.activity.text)
+            context.activity.text = context.remove_recipient_mention(context.activity)
 
     async def _initialize_state(self, context: TurnContext):
         if self._turn_state_factory:
