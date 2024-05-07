@@ -26,7 +26,10 @@ describe('DefaultAugmentation', () => {
         commands: [
             {
                 type: 'SAY',
-                response: 'hello world'
+                response: {
+                    role: 'assistant',
+                    content: 'hello world'
+                }
             }
         ]
     });
@@ -85,7 +88,7 @@ describe('DefaultAugmentation', () => {
                 // Create plan from response
                 const plan = await augmentation.createPlanFromResponse(context, state, {
                     status: 'success',
-                    message: { role: 'assistant', content: validation.value }
+                    message: { role: 'assistant', content: validation.value ?? '' }
                 });
                 assert.notEqual(plan, undefined);
                 assert.deepEqual(plan, {
@@ -93,7 +96,10 @@ describe('DefaultAugmentation', () => {
                     commands: [
                         {
                             type: 'SAY',
-                            response: ''
+                            response: {
+                                role: 'assistant',
+                                content: ''
+                            }
                         }
                     ]
                 });

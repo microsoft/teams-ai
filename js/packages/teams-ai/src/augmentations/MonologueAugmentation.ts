@@ -209,7 +209,10 @@ export class MonologueAugmentation implements Augmentation<InnerMonologue | unde
         if (monologue.action.name == 'SAY') {
             command = {
                 type: 'SAY',
-                response: monologue.action.parameters!.text
+                response: {
+                    ...response.message,
+                    content: monologue.action.parameters?.text || ''
+                }
             } as PredictedSayCommand;
         } else {
             command = {

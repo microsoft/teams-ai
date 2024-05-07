@@ -226,7 +226,10 @@ describe('OpenAIModerator', () => {
                     commands: [
                         {
                             type: 'SAY',
-                            response: 'Self harm, violence, sexual'
+                            response: {
+                                role: 'assistant',
+                                content: 'Self harm, violence, sexual'
+                            }
                         } as PredictedSayCommand
                     ]
                 };
@@ -255,7 +258,10 @@ describe('OpenAIModerator', () => {
                     commands: [
                         {
                             type: 'SAY',
-                            response: 'Neutral'
+                            response: {
+                                role: 'assistant',
+                                content: 'Neutral'
+                            }
                         } as PredictedSayCommand
                     ]
                 };
@@ -282,7 +288,10 @@ describe('OpenAIModerator', () => {
                     commands: [
                         {
                             type: 'SAY',
-                            response: ''
+                            response: {
+                                role: 'assistant',
+                                content: ''
+                            }
                         } as PredictedSayCommand
                     ]
                 };
