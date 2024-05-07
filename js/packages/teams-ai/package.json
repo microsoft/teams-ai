@@ -29,6 +29,7 @@
         "openai": "4.28.4"
     },
     "dependencies": {
+        "@azure/openai-assistants": "1.0.0-beta.5",
         "@azure/msal-node": "^2.7.0",
         "axios": "^1.6.8",
         "botbuilder-dialogs": "^4.22.2",
