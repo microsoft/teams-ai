@@ -37,6 +37,7 @@
   <ItemGroup>
     <PackageReference Include="AdaptiveCards" Version="3.1.0" />
     <PackageReference Include="Azure.AI.ContentSafety" Version="1.0.0-beta.1" />
+    <PackageReference Include="Azure.AI.OpenAI.Assistants" Version="1.0.0-beta.3" />
     <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.15" />
     <PackageReference Include="JsonSchema.Net" Version="5.5.1" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />

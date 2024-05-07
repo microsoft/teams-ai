@@ -10,11 +10,20 @@ param botAadAppClientId string
 @description('Required by Bot Framework package in your bot project')
 param botAadAppClientSecret string
 
-@secure()
-param openAIApiKey string
+// @secure()
+// param openAIApiKey string
+
+// @secure()
+// param openAIAssistantId string
 
 @secure()
-param openAIAssistantId string
+param azureOpenAIApiKey string
+
+@secure()
+param azureOpenAIEndpoint string
+
+@secure()
+param azureOpenAIAssistantId string
 
 param webAppSKU string
 
@@ -67,12 +76,16 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
           value: botAadAppClientSecret
         }
         {
-          name: 'OpenAI__ApiKey'
-          value: openAIApiKey
+          name: 'Azure__OpenAIApiKey'
+          value: azureOpenAIApiKey
+        },
+        {
+          name: 'Azure__OpenAIEndpoint'
+          value: azureOpenAIEndpoint
         }
         {
-          name: 'OpenAI__AssistantId'
-          value: openAIAssistantId
+          name: 'Azure__OpenAIAssistantId'
+          value: azureOpenAIAssistantId
         }
       ]
       ftpsState: 'FtpsOnly'
