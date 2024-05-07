@@ -3,11 +3,11 @@ using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Teams.AI;
 using Microsoft.Teams.AI.AI;
-using Microsoft.Teams.AI.AI.OpenAI.Models;
 using Microsoft.Teams.AI.AI.Planners.Experimental;
 using Microsoft.Teams.AI.AI.Planners;
 
 using MathBot;
+using Azure.AI.OpenAI.Assistants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,28 +17,43 @@ builder.Services.AddHttpContextAccessor();
 
 // Load configuration
 var config = builder.Configuration.Get<ConfigOptions>()!;
-if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
+var isAzureCredentialsSet = config.Azure != null && !string.IsNullOrEmpty(config.Azure.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint);
+var isOpenAICredentialsSet = config.OpenAI != null && !string.IsNullOrEmpty(config.OpenAI.ApiKey);
+
+string apiKey = "";
+string? endpoint = null;
+string? assistantId = "";
+
+// If both credentials are set then the Azure credentials will be used.
+if (isAzureCredentialsSet)
 {
-    throw new Exception("Missing OpenAI configuration.");
+    apiKey = config.Azure!.OpenAIApiKey!;
+    endpoint = config.Azure.OpenAIEndpoint;
+    assistantId = config.Azure.OpenAIAssistantId;
+}
+else if (isOpenAICredentialsSet)
+{
+    apiKey = config.OpenAI!.ApiKey!;
+    assistantId = config.OpenAI.AssistantId;
+}
+else
+{
+    throw new Exception("Missing configurations. Set either Azure or OpenAI configurations");
+
 }
 
 // Missing Assistant ID, create new Assistant
-if (string.IsNullOrEmpty(config.OpenAI.AssistantId))
+if (string.IsNullOrEmpty(assistantId))
 {
     Console.WriteLine("No Assistant ID configured, creating new Assistant...");
-    string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(config.OpenAI.ApiKey, null, new()
+    AssistantCreationOptions assistantCreateParams = new("gpt-4")
     {
         Name = "Math Tutor",
-        Instructions = "You are a personal math tutor. Write and run code to answer math questions.",
-        Tools = new()
-        {
-            new()
-            {
-                Type = Tool.CODE_INTERPRETER_TYPE
-            }
-        },
-        Model = "gpt-3.5-turbo"
-    }).Result.Id;
+        Instructions = "You are a personal math tutor. Write and run code to answer math questions."
+    };
+    assistantCreateParams.Tools.Add(new CodeInterpreterToolDefinition());
+
+    string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(apiKey, assistantCreateParams, endpoint).Result.Id;
     Console.WriteLine($"Created a new assistant with an ID of: {newAssistantId}");
     Console.WriteLine("Copy and save above ID, and set `OpenAI:AssistantId` in appsettings.Development.json.");
     Console.WriteLine("Press any key to exit.");
@@ -62,7 +77,7 @@ builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<Team
 builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<TeamsAdapter>()!);
 
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
-builder.Services.AddSingleton(_ => new AssistantsPlannerOptions(config.OpenAI.ApiKey, config.OpenAI.AssistantId));
+builder.Services.AddSingleton(_ => new AssistantsPlannerOptions(apiKey, assistantId) { Endpoint = endpoint });
 
 // Create the Application.
 builder.Services.AddTransient<IBot>(sp =>

@@ -254,7 +254,15 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
                 Status = PromptResponseStatus.Success,
                 Message = new(ChatRole.Assistant)
                 {
-                    Content = JsonSerializer.Serialize(monologue)
+                    Content = JsonSerializer.Serialize(monologue),
+                    Context = new()
+                    {
+                        Intent = "test intent",
+                        Citations = new List<Citation>
+                        {
+                            new("content", "title", "url")
+                        }
+                    }
                 }
             };
 
@@ -267,7 +275,11 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
             Assert.NotNull(plan);
             Assert.Equal(1, plan.Commands.Count);
             Assert.Equal("SAY", plan.Commands[0].Type);
-            Assert.Equal("hello world", (plan.Commands[0] as PredictedSayCommand)?.Response);
+            Assert.Equal("hello world", (plan.Commands[0] as PredictedSayCommand)?.Response.Content);
+            Assert.Equal("test intent", (plan.Commands[0] as PredictedSayCommand)?.Response.Context?.Intent);
+            Assert.Equal("content", (plan.Commands[0] as PredictedSayCommand)?.Response.Context?.Citations[0].Content);
+            Assert.Equal("title", (plan.Commands[0] as PredictedSayCommand)?.Response.Context?.Citations[0].Title);
+            Assert.Equal("url", (plan.Commands[0] as PredictedSayCommand)?.Response.Context?.Citations[0].Url);
         }
 
         [Fact]

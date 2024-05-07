@@ -48,6 +48,24 @@ namespace Microsoft.Teams.AI.AI.Augmentations
             try
             {
                 Plan? plan = JsonSerializer.Deserialize<Plan>(response.Message?.Content ?? "");
+
+                if (plan != null)
+                {
+                    foreach (IPredictedCommand cmd in plan.Commands)
+                    {
+                        if (cmd is PredictedSayCommand say)
+                        {
+                            ChatMessage message = response.Message ?? new ChatMessage(ChatRole.Assistant)
+                            {
+                                Context = response.Message?.Context,
+                            };
+
+                            message.Content = say.Response.Content;
+                            say.Response = message;
+                        }
+                    }
+                }
+
                 return await Task.FromResult(plan);
             }
             catch (Exception)

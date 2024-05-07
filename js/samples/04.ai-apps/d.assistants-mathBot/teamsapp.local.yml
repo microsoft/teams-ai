@@ -73,6 +73,7 @@ deploy:
       name: install dependencies
       with:
           args: install --no-audit --workspaces=false
+
     # Provides the Teams Toolkit .env file values to the apps runtime so they can be accessed with `process.env`.
     - uses: file/createOrUpdateEnvironmentFile
       with:
@@ -81,5 +82,6 @@ deploy:
               BOT_ID: ${{BOT_ID}}
               BOT_PASSWORD: ${{SECRET_BOT_PASSWORD}}
               TEAMS_APP_TENANT_ID: ${{TEAMS_APP_TENANT_ID}}
-              OPENAI_KEY: ${{SECRET_OPENAI_KEY}}
-              ASSISTANT_ID: ${SECRET_ASSISTANT_ID}
+              # OPENAI_KEY: ${{SECRET_OPENAI_KEY}}
+              AZURE_OPENAI_KEY: ${{SECRET_AZURE_OPENAI_KEY}}
+              AZURE_OPENAI_ENDPOINT: ${{SECRET_AZURE_OPENAI_ENDPOINT}}
