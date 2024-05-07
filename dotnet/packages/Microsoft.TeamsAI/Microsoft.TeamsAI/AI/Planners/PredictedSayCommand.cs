@@ -1,5 +1,7 @@
 ﻿using Json.Schema;
 using System.Text.Json.Serialization;
+using Microsoft.Teams.AI.AI.Models;
+using Microsoft.Teams.AI.Utilities.JsonConverters;
 
 namespace Microsoft.Teams.AI.AI.Planners
 {
@@ -17,17 +19,26 @@ namespace Microsoft.Teams.AI.AI.Planners
         /// The response that the AI system should say.
         /// </summary>
         [JsonPropertyName("response")]
+        [JsonConverter(typeof(ChatMessageJsonConverter))]
         [JsonRequired]
-        public string Response { get; set; }
+        public ChatMessage Response { get; set; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="PredictedSayCommand"/> class.
         /// </summary>
         /// <param name="response">The response that the AI system should say.</param>
         [JsonConstructor]
-        public PredictedSayCommand(string response)
+        public PredictedSayCommand(ChatMessage response)
         {
             Response = response;
+        }
+
+        public PredictedSayCommand(string response)
+        {
+            Response = new ChatMessage(ChatRole.Assistant)
+            {
+                Content = response
+            };
         }
 
         /// <summary>

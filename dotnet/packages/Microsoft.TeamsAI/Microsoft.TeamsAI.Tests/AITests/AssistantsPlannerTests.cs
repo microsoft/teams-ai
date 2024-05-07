@@ -42,7 +42,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(plan.Commands);
             Assert.Single(plan.Commands);
             Assert.Equal(AIConstants.SayCommand, plan.Commands[0].Type);
-            Assert.Equal("welcome", ((PredictedSayCommand)plan.Commands[0]).Response);
+            Assert.Equal("welcome", ((PredictedSayCommand)plan.Commands[0]).Response.Content);
         }
 
         [Fact]
@@ -74,7 +74,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(plan.Commands);
             Assert.Single(plan.Commands);
             Assert.Equal(AIConstants.SayCommand, plan.Commands[0].Type);
-            Assert.Equal("welcome", ((PredictedSayCommand)plan.Commands[0]).Response);
+            Assert.Equal("welcome", ((PredictedSayCommand)plan.Commands[0]).Response.Content);
         }
 
         [Fact]
@@ -110,7 +110,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(plan.Commands);
             Assert.Single(plan.Commands);
             Assert.Equal(AIConstants.SayCommand, plan.Commands[0].Type);
-            Assert.Equal("welcome", ((PredictedSayCommand)plan.Commands[0]).Response);
+            Assert.Equal("welcome", ((PredictedSayCommand)plan.Commands[0]).Response.Content);
         }
 
         [Fact]
@@ -243,7 +243,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(plan2.Commands);
             Assert.Single(plan2.Commands);
             Assert.Equal(AIConstants.SayCommand, plan2.Commands[0].Type);
-            Assert.Equal("welcome", ((PredictedSayCommand)plan2.Commands[0]).Response);
+            Assert.Equal("welcome", ((PredictedSayCommand)plan2.Commands[0]).Response.Content);
             Assert.Single(turnState.SubmitToolMap);
             Assert.Equal("test-action", turnState.SubmitToolMap.First().Key);
             Assert.Equal("test-tool-id", turnState.SubmitToolMap.First().Value);
@@ -291,7 +291,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(plan2.Commands);
             Assert.Single(plan2.Commands);
             Assert.Equal(AIConstants.SayCommand, plan2.Commands[0].Type);
-            Assert.Equal("welcome", ((PredictedSayCommand)plan2.Commands[0]).Response);
+            Assert.Equal("welcome", ((PredictedSayCommand)plan2.Commands[0]).Response.Content);
             Assert.Single(turnState.SubmitToolMap);
             Assert.Equal("test-action", turnState.SubmitToolMap.First().Key);
             Assert.Equal("test-tool-id", turnState.SubmitToolMap.First().Value);
@@ -328,9 +328,9 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(plan.Commands);
             Assert.Equal(3, plan.Commands.Count);
             Assert.Equal(AIConstants.SayCommand, plan.Commands[0].Type);
-            Assert.Equal("welcome", ((PredictedSayCommand)plan.Commands[0]).Response);
-            Assert.Equal("message 1", ((PredictedSayCommand)plan.Commands[1]).Response);
-            Assert.Equal("message 2", ((PredictedSayCommand)plan.Commands[2]).Response);
+            Assert.Equal("welcome", ((PredictedSayCommand)plan.Commands[0]).Response.Content);
+            Assert.Equal("message 1", ((PredictedSayCommand)plan.Commands[1]).Response.Content);
+            Assert.Equal("message 2", ((PredictedSayCommand)plan.Commands[2]).Response.Content);
         }
 
         private static async Task<AssistantsState> _CreateAssistantsState()
