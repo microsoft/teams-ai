@@ -100,7 +100,7 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
      * @param {TurnContext} context - The turn context object.
      * @returns {Promise<boolean>} A promise that resolves to a boolean indicating whether the token exchange route should be processed by current class instance.
      */
-    protected async tokenExchangeRouteSelector(context: TurnContext): Promise<boolean> {
+    public async tokenExchangeRouteSelector(context: TurnContext): Promise<boolean> {
         return (
             (await super.tokenExchangeRouteSelector(context)) &&
             this._tokenExchangeIdRegex.test(context.activity.value.id)
