@@ -81,11 +81,11 @@ namespace Microsoft.Teams.AI.AI.Action
 
             if (turnContext.Activity.ChannelId == Channels.Msteams)
             {
-                await turnContext.SendActivityAsync(command.Response.Replace("\n", "<br>"), null, null, cancellationToken);
+                await turnContext.SendActivityAsync(command.Response.Content.Replace("\n", "<br>"), null, null, cancellationToken);
             }
             else
             {
-                await turnContext.SendActivityAsync(command.Response, null, null, cancellationToken);
+                await turnContext.SendActivityAsync(command.Response.Content, null, null, cancellationToken);
             };
 
             return string.Empty;

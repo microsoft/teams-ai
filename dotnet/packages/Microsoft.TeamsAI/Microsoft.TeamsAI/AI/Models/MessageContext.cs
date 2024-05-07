@@ -10,7 +10,7 @@ namespace Microsoft.Teams.AI.AI.Models
         /// <summary>
         /// Citations used in the message.
         /// </summary>
-        public IList<Citation> Citations { get; } = new List<Citation>();
+        public IList<Citation> Citations { get; set; } = new List<Citation>();
 
         /// <summary>
         /// The intent of the message.
@@ -31,7 +31,7 @@ namespace Microsoft.Teams.AI.AI.Models
         /// <summary>
         /// The title of the citation.
         /// </summary>
-        public string Title {  get; set; }
+        public string Title { get; set; }
 
         /// <summary>
         /// The URL of the citation.

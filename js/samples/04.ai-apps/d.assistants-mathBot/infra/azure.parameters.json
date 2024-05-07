@@ -17,8 +17,11 @@
         "botDisplayName": {
             "value": "MathBot"
         },
-        "openAIKey": {
-            "value": "${{SECRET_OPENAI_KEY}}"
+        "azureOpenAIKey": {
+            "value": "${{SECRET_AZURE_OPENAI_KEY}}"
+        },
+        "azureOpenAIEndpoint": {
+            "value": "${{SECRET_AZURE_OPENAI_ENDPOINT}}"
         },
         "assistantId": {
             "value": "${{SECRET_ASSISTANT_ID}}"
