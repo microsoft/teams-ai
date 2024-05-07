@@ -13,13 +13,8 @@ import { AI } from '../AI';
 import {
     Assistant,
     AssistantCreationOptions,
-    AssistantThread,
-    AssistantThreadCreationOptions,
     AssistantsClient,
     AzureKeyCredential,
-    CreateMessageOptions,
-    ListMessagesOptions,
-    ListResponseOf,
     OpenAIKeyCredential,
     RequiredAction,
     ThreadMessage,
@@ -87,8 +82,8 @@ export interface AssistantsPlannerOptions {
  */
 export class AssistantsPlanner<TState extends TurnState = TurnState> implements Planner<TState> {
     private readonly _options: AssistantsPlannerOptions;
-    private readonly _client: AssistantsClient;
-    private _assistant?: Assistant;
+    protected _client: AssistantsClient;
+    protected _assistant?: Assistant;
 
     /**
      * Creates a new `AssistantsPlanner` instance.
@@ -174,85 +169,6 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     /**
      * @private
      * Exposed for unit testing.
-     * @returns {Promise<Assistant>} - The assistant.
-     */
-    protected async retrieveAssistant(): Promise<Assistant> {
-        // Retrieve the assistant on first request
-        if (!this._assistant) {
-            this._assistant = await this._client.getAssistant(this._options.assistant_id);
-        }
-
-        return this._assistant;
-    }
-
-    /**
-     * @private
-     * Exposed for unit testing.
-     * @param {string} threadId - The thread id
-     * @param {string} role - The message role
-     * @param {string} content - The message content 
-     * @param {CreateMessageOptions} options - The message options
-     @returns {Promise<ThreadMessage>} The thread message.
-     */
-    protected async createMessage(
-        threadId: string,
-        role: string,
-        content: string,
-        options?: CreateMessageOptions
-    ): Promise<ThreadMessage> {
-        return await this._client.createMessage(threadId, role, content, options);
-    }
-
-    /**
-     * @private
-     * Exposed for unit testing.
-     * @param {AssistantThreadCreationOptions} options - The thread creation options
-     * @returns {Promise<AssistantThread>} The Thread.
-     */
-    protected async createThread(options: AssistantThreadCreationOptions): Promise<AssistantThread> {
-        return await this._client.createThread(options);
-    }
-
-    /**
-     * @private
-     * Exposed for unit testing.
-     * @param {string} thread_id - The current thread id
-     * @param {ListMessagesOptions} options - The message's listing options
-     * @returns {Promise<ThreadMessage>} The list of messages.
-     */
-    protected async listMessages(
-        thread_id: string,
-        options?: ListMessagesOptions
-    ): Promise<ListResponseOf<ThreadMessage>> {
-        return await this._client.listMessages(thread_id, options);
-    }
-
-    /**
-     * @private
-     * Exposed for unit testing.
-     * @param {string} thread_id - The thread id to create Run.
-     * @returns {Promise<ThreadRun>} The created run.
-     */
-    protected async createRun(thread_id: string): Promise<ThreadRun> {
-        return await this._client.createRun(thread_id, {
-            assistantId: this._options.assistant_id
-        });
-    }
-
-    /**
-     * @private
-     * Exposed for unit testing.
-     * @param {string} thread_id - The thread id to retrieve the run.
-     * @param {string} run_id - The run id to retrieve.
-     * @returns {ThreadRun} The retrieved run.
-     */
-    protected async retrieveRun(thread_id: string, run_id: string): Promise<ThreadRun> {
-        return await this._client.getRun(thread_id, run_id);
-    }
-
-    /**
-     * @private
-     * Exposed for unit testing.
      * @param {string} thread_id The thread id to retrieve the run.
      * @returns {Promise<ThreadRun | null>} The retrieved run.
      */
@@ -263,22 +179,6 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         }
 
         return null;
-    }
-
-    /**
-     * @private
-     * Exposed for unit testing.
-     * @param {string} thread_id - The current thread id.
-     * @param {string} run_id - The current run id.
-     * @param {ToolOutput[]} tool_outputs - The run's tool output parameters.
-     * @returns {Promise<ThreadRun>} The tool outputs.
-     */
-    protected async submitToolOutputs(
-        thread_id: string,
-        run_id: string,
-        tool_outputs: ToolOutput[]
-    ): Promise<ThreadRun> {
-        return await this._client.submitToolOutputsToRun(thread_id, run_id, tool_outputs);
     }
 
     /**
@@ -310,7 +210,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         while (true) {
             await new Promise((resolve) => setTimeout(resolve, this._options.polling_interval));
 
-            const run = await this.retrieveRun(thread_id, run_id);
+            const run = await this._client.getRun(thread_id, run_id);
             switch (run.status) {
                 case 'requires_action':
                     if (handleActions) {
@@ -351,7 +251,11 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         }
 
         // Submit the tool outputs
-        const run = await this.submitToolOutputs(assistants_state.thread_id!, assistants_state.run_id!, toolOutputs);
+        const run = await this._client.submitToolOutputsToRun(
+            assistants_state.thread_id!,
+            assistants_state.run_id!,
+            toolOutputs
+        );
 
         // Wait for the run to complete
         const results = await this.waitForRun(assistants_state.thread_id!, run.id, true);
@@ -388,10 +292,12 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         const thread_id = await this.ensureThreadCreated(state, context.activity.text);
 
         // Add the users input to the thread
-        const message = await this.createMessage(thread_id, 'user', state.temp.input);
+        const message = await this._client.createMessage(thread_id, 'user', state.temp.input);
 
         // Create a new run
-        const run = await this.createRun(thread_id);
+        const run = await this._client.createRun(thread_id, {
+            assistantId: this._options.assistant_id
+        });
 
         // Update state and wait for the run to complete
         this.updateAssistantsState(state, { thread_id, run_id: run.id, last_message_id: message.id ?? null });
@@ -446,7 +352,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
      */
     private async generatePlanFromMessages(thread_id: string, last_message_id: string): Promise<Plan> {
         // Find the new messages
-        const messages = await this.listMessages(thread_id);
+        const messages = await this._client.listMessages(thread_id);
         const newMessages: ThreadMessage[] = [];
         for (let i = 0; i < messages.data.length; i++) {
             const message = messages.data[i];
@@ -510,7 +416,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     private async ensureThreadCreated(state: TState, input: string): Promise<string> {
         const assistants_state = this.ensureAssistantsState(state);
         if (assistants_state.thread_id == null) {
-            const thread = await this.createThread({});
+            const thread = await this._client.createThread({});
             assistants_state.thread_id = thread.id;
             this.updateAssistantsState(state, assistants_state);
         }
@@ -526,7 +432,13 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     private async blockOnInProgressRuns(thread_id: string): Promise<void> {
         // We loop until we're told the last run is completed
         while (true) {
-            const run = await this.retrieveLastRun(thread_id);
+            const runs = await this._client.listRuns(thread_id, { limit: 1 });
+            if (runs.data.length == 0) {
+                return;
+            }
+
+            const run = runs.data[0];
+
             if (!run || this.isRunCompleted(run)) {
                 return;
             }
