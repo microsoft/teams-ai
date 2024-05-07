@@ -3,10 +3,19 @@ import { CardFactory, MemoryStorage, MessageFactory, TurnContext } from 'botbuil
 import { Order } from './foodOrderViewSchema';
 import { generateCardForOrder } from './foodOrderCard';
 
-if (!process.env.AZURE_OPENAI_KEY || !process.env.AZURE_OPENAI_ENDPOINT) {
+if (!(process.env.AZURE_OPENAI_KEY && process.env.AZURE_OPENAI_ENDPOINT) && !process.env.OPENAI_KEY) {
     throw new Error(
-        'Missing environment variables - please check that AZURE_OPENAI_KEY and AZURE_OPENAI_ENDPOINT is set.'
+        'Missing environment variables - please check that (AZURE_OPENAI_KEY and AZURE_OPENAI_ENDPOINT) or OPENAI_KEY is set.'
     );
+}
+
+let apiKey = '';
+let endpoint;
+if (process.env.AZURE_OPENAI_KEY) {
+    apiKey = process.env.AZURE_OPENAI_KEY;
+    endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+} else if (process.env.OPENAI_KEY) {
+    apiKey = process.env.OPENAI_KEY;
 }
 
 const { AssistantsPlanner } = preview;
@@ -15,7 +24,7 @@ const { AssistantsPlanner } = preview;
 if (!process.env.ASSISTANT_ID) {
     (async () => {
         const assistant = await AssistantsPlanner.createAssistant(
-            process.env.AZURE_OPENAI_KEY!,
+            apiKey,
             {
                 name: 'Order Bot',
                 instructions: [
@@ -36,7 +45,7 @@ if (!process.env.ASSISTANT_ID) {
                 ],
                 model: 'gpt-4'
             },
-            process.env.AZURE_OPENAI_ENDPOINT!
+            endpoint
         );
 
         console.log(`Created a new assistant with an ID of: ${assistant.id}`);
@@ -46,8 +55,8 @@ if (!process.env.ASSISTANT_ID) {
 
 // Create Assistant Planner
 const planner = new AssistantsPlanner({
-    apiKey: process.env.AZURE_OPENAI_KEY!,
-    endpoint: process.env.AZURE_OPENAI_ENDPOINT,
+    apiKey: apiKey,
+    endpoint: endpoint,
     assistant_id: process.env.ASSISTANT_ID!
 });
 
