@@ -30,6 +30,7 @@ import { TurnState } from './TurnState';
 import { InputFileDownloader } from './InputFileDownloader';
 import {
     deleteUserInSignInFlow,
+    setSettingNameInContextActivityValue,
     setTokenInState,
     setUserInSignInFlow,
     userInSignInFlow
@@ -724,6 +725,9 @@ export class Application<TState extends TurnState = TurnState> {
                         // user was not in a sign in flow, but auto-sign in is enabled
                         settingName = this.authentication.default;
                     }
+
+                    // Sets the setting name in the context object. It is used in `signIn/verifyState` & `signIn/tokenExchange` route selectors.
+                    setSettingNameInContextActivityValue(context, settingName);
 
                     const response = await this._authentication.signUserIn(context, state, settingName);
 

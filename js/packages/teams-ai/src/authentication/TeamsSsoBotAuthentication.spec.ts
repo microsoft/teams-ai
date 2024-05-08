@@ -106,7 +106,13 @@ describe('TeamsSsoBotAuthentication', () => {
             const msal = new ConfidentialClientApplication(settings.msalConfig);
             new TeamsSsoBotAuthentication(app, settings, settingName, msal);
 
-            const context = new TurnContext(adapter, { type: 'invoke', name: 'signin/verifyState' });
+            const context = new TurnContext(adapter, {
+                type: 'invoke',
+                name: 'signin/verifyState',
+                value: {
+                    settingName: settingName
+                }
+            });
 
             assert(await selectors[0](context)); // The first selector is for signin/verifyState
         });
@@ -128,7 +134,7 @@ describe('TeamsSsoBotAuthentication', () => {
             const context = new TurnContext(adapter, {
                 type: 'invoke',
                 name: 'signin/tokenExchange',
-                value: { id: `00000000-0000-0000-0000-000000000000-${settingName}` }
+                value: { id: `00000000-0000-0000-0000-000000000000-${settingName}`, settingName: settingName }
             });
 
             assert(await selectors[1](context)); // The second selector is for signin/tokenExchange

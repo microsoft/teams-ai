@@ -260,7 +260,13 @@ namespace Microsoft.Teams.AI.AI.Augmentations
                         }
                     }
 
-                    command = new PredictedSayCommand(text);
+                    ChatMessage message = response.Message ?? new ChatMessage(ChatRole.Assistant)
+                    {
+                        Context = response.Message?.Context,
+                    };
+
+                    message.Content = text;
+                    command = new PredictedSayCommand(message);
                 }
                 else
                 {

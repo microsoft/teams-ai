@@ -189,7 +189,7 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
         const contentText = !citations ? content : Utilities.formatCitationsResponse(content);
 
         // If there are citations, filter out the citations unused in content.
-        const referencedCitations = citations ? Utilities.getUsedCitations(content, citations) : undefined;
+        const referencedCitations = citations ? Utilities.getUsedCitations(contentText, citations) : undefined;
 
         await context.sendActivity({
             type: ActivityTypes.Message,
