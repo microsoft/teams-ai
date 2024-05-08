@@ -18,3 +18,5 @@ class Config:
     APP_PASSWORD = os.environ["BOT_PASSWORD"]
     OPENAI_KEY = os.environ.get("OPENAI_KEY", "")
     ASSISTANT_ID = os.environ.get("ASSISTANT_ID", "")
+    AZURE_OPENAI_KEY = os.environ.get("AZURE_OPENAI_KEY", "")
+    AZURE_OPENAI_ENDPOINT = os.environ.get("AZURE_OPENAI_ENDPOINT", "")
