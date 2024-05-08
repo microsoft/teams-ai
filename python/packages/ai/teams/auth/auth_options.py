@@ -10,6 +10,7 @@ from typing import Callable, Dict, Optional, Union
 
 from botbuilder.core import TurnContext
 
+from .sso import SsoOptions
 from .oauth import OAuthOptions
 
 
@@ -23,5 +24,5 @@ class AuthOptions:
     default: Optional[str] = None
     "Describes the setting the bot should use if the user does not specify a setting name."
 
-    settings: Dict[str, OAuthOptions] = field(default_factory=dict)
+    settings: Dict[str, Union[OAuthOptions, SsoOptions]] = field(default_factory=dict)
     "The authentication settings."

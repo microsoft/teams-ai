@@ -37,7 +37,7 @@ from .adaptive_cards.adaptive_cards import AdaptiveCards
 from .ai import AI
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
-from .auth import AuthManager, OAuth, OAuthOptions
+from .auth import AuthManager, OAuth, OAuthOptions, SsoAuth, SsoOptions
 from .meetings.meetings import Meetings
 from .message_extensions.message_extensions import MessageExtensions
 from .route import Route, RouteHandler
@@ -111,6 +111,8 @@ class Application(Bot, Generic[StateT]):
             for name, opts in options.auth.settings.items():
                 if isinstance(opts, OAuthOptions):
                     self._auth.set(name, OAuth[StateT](opts))
+                if isinstance(opts, SsoOptions):
+                    self._auth.set(name, SsoAuth[StateT](name=name, options=opts))
 
     @property
     def adapter(self) -> TeamsAdapter:

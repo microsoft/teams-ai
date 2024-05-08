@@ -3,6 +3,8 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 from typing import Generic, Optional, TypeVar, cast
 
 from botbuilder.core import TurnContext
@@ -57,6 +59,7 @@ class Dialog(ComponentDialog, Generic[StateT]):
         res = await ctx.continue_dialog()
 
         if res.status == DialogTurnStatus.Empty:
+            print("entered this block of empty status in dialog.py!")
             res = await ctx.begin_dialog(self.initial_dialog_id or "default", options)
 
         return res
