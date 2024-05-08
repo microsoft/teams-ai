@@ -73,11 +73,11 @@ This sample shows how to integrate your Azure AI Search index as a data source i
     {
         "type": "azure_search",
         "parameters": {
-            "endpoint": "", // The Azure AI Search service endpoint
-            "index_name": "", // The index that was created in the previous step.
+            "endpoint": "AZURE-AI-SEARCH-ENDPOINT",
+            "index_name": "nba",
             "authentication": {
                 "type": "api_key",
-                "key": "" // The api key for authentication.
+                "key": "AZURE-AI-SEARCH-KEY"
             }
         }
     }
