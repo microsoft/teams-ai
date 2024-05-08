@@ -10,7 +10,7 @@ from unittest import TestCase
 import yaml
 
 from teams.ai.tokenizers.gpt_tokenizer import GPTTokenizer
-from teams.ai.utilities import to_string
+from teams.ai.utilities import to_string, snippet, format_citations_response
 
 
 class TestUtilities(TestCase):
@@ -44,3 +44,15 @@ class TestUtilities(TestCase):
     def test_to_string_with_object_as_json(self):
         obj = {"key": "value", "key2": [1, 2, 3]}
         self.assertEqual(to_string(self.tokenizer, obj, as_json=True), json.dumps(obj))
+
+    def test_snippet(self):
+        text = "This is a test snippet"
+        self.assertEqual(snippet(text, 10), "This is a...")
+        self.assertEqual(snippet(text, 100), text)
+        hello = "hello world"
+        self.assertEqual(snippet(hello, 5), "hell...")
+        self.assertEqual(snippet(hello, 6), "hello...")
+
+    def test_format_citations_response(self):
+        result = format_citations_response('hello [doc1] world [docs2]')
+        self.assertEqual(result, 'hello [1] world [2]')

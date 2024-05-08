@@ -6,6 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 import json
+import re
 from typing import Any
 
 import yaml
@@ -50,3 +51,33 @@ def to_string(tokenizer: Tokenizer, value: Any, as_json: bool = False) -> str:
         return yaml_str
 
     return json_str
+
+def snippet(text: str, maxLength: int) -> str:
+    """
+    Clips the text to a maximum length in case it exceeds the limit.
+
+    Args:
+        text: str The text to clip.
+        maxLength The maximum length of the text to return, cutting off the last whole word.
+
+    Returns:
+        str: The modified text
+     """
+    if len(text) <= maxLength:
+        return text
+    snippet = text[:maxLength]
+    snippet = snippet[:max(snippet.rfind(' '), -1)]
+    snippet += '...'
+    return snippet
+
+
+
+def format_citations_response(text: str) -> str:
+    """
+    Convert citation tags `[doc(s)n]` to `[n]` where n is a number.
+    Args:
+        text: str The text to format.
+    Returns:
+        str: The modified text
+    """
+    return re.sub(r'\[docs?(\d+)\]', r'[\1]', text, flags=re.IGNORECASE)
