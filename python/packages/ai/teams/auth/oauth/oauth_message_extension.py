@@ -24,7 +24,7 @@ from botbuilder.schema.teams import (
 from botframework.connector.auth import TokenExchangeRequest
 from botframework.connector.models import CardAction
 
-from ...state import TurnState
+from ...state import TurnState, todict
 from ..auth_component import AuthComponent
 from .oauth_options import OAuthOptions
 
@@ -85,7 +85,7 @@ class OAuthMessageExtension(Generic[StateT], AuthComponent[StateT]):
         if "authentication" in value:
             res = await self.sso_token_exchange(context)
 
-            if res is not None and res.token != "":
+            if res is not None and hasattr(res, "token"):
                 return res.token
 
             await context.send_activity(
