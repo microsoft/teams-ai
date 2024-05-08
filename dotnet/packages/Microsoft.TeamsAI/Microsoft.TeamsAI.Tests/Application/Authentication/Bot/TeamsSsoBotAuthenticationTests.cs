@@ -185,7 +185,8 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         {
             JObject activityValue = new()
             {
-                ["id"] = $"{Guid.NewGuid()}-{settingName}"
+                ["id"] = $"{Guid.NewGuid()}-{settingName}",
+                ["settingName"] = settingName
             };
 
             return new TurnContext(new SimpleAdapter(), new Activity()
