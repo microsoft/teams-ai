@@ -116,7 +116,6 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
     def __init__(
         self,
         options: Union[OpenAIAssistantsOptions, AzureOpenAIAssistantsOptions],
-        client: Optional[Union[openai.AsyncOpenAI, openai.AsyncAzureOpenAI]] = None,
     ) -> None:
         """
         Creates a new `AssistantsPlanner` instance.
@@ -129,9 +128,7 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
 
         self._options = options
 
-        if client:
-            self._client = client
-        elif isinstance(options, OpenAIAssistantsOptions):
+        if isinstance(options, OpenAIAssistantsOptions):
             self._client = openai.AsyncOpenAI(
                 api_key=options.api_key,
                 organization=options.organization,
@@ -189,7 +186,7 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
             # Send the tool output to the assistant
             return await self._submit_action_results(state)
 
-        # Wait for any current runs to complete since you can'tadd messages
+        # Wait for any current runs to complete since you can't add messages
         # or start new runs if there's already one in progress
         await self._block_on_in_progress_runs(thread_id)
 
@@ -273,7 +270,7 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
         for action in action_outputs:
             output = action_outputs[action]
             if tool_map:
-                tool_call_id = tool_map[action]
+                tool_call_id = tool_map[action] if action in tool_map else None
                 if tool_call_id is not None:
                     # Add required output only
                     tool_outputs.append(ToolOutput(tool_call_id=tool_call_id, output=output))
@@ -302,11 +299,12 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
                 if results.status == "expired":
                     return Plan(commands=[PredictedDoCommand(action=ActionTypes.TOO_MANY_STEPS)])
 
-                if results.last_error:
-                    raise ApplicationError(
-                        f"Run failed {results.status}. ErrorCode: "
-                        + f"{results.last_error.code}. ErrorMessage: {results.last_error.message}"
-                    )
+                error_code = results.last_error.code if results.last_error is not None else ""
+                error_message = results.last_error.message if results.last_error is not None else ""
+                raise ApplicationError(
+                    f"Run failed {results.status}. ErrorCode: "
+                    + f"{error_code}. ErrorMessage: {error_message}"
+                )
         return Plan()
 
     async def _wait_for_run(
@@ -367,7 +365,13 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
     async def _block_on_in_progress_runs(self, thread_id: str) -> None:
         # We loop until we're told the last run is completed
         while True:
-            run = await self._retrieve_last_run(thread_id)
+            runs = await self._client.beta.threads.runs.list(thread_id, limit=1)
+
+            if len(runs.data) == 0:
+                return
+
+            run = runs.data[0]
+
             if not run:
                 return
             if self._is_run_completed(run):
@@ -426,10 +430,11 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
             if results.status == "expired":
                 return Plan(commands=[PredictedDoCommand(action=ActionTypes.TOO_MANY_STEPS)])
 
-            if results.last_error:
-                raise ApplicationError(
-                    f"Run failed {results.status}. ErrorCode: "
-                    + f"{results.last_error.code}. ErrorMessage: {results.last_error.message}"
-                )
+            error_code = results.last_error.code if results.last_error is not None else ""
+            error_message = results.last_error.message if results.last_error is not None else ""
+            raise ApplicationError(
+                f"Run failed {results.status}. ErrorCode: "
+                + f"{error_code}. ErrorMessage: {error_message}"
+            )
 
         return Plan()
