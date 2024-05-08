@@ -123,8 +123,8 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
     _section: ActionAugmentationSection
     _monologue_validator = JSONResponseValidator(
         InnerMonologueSchema,
-        """No valid JSON objects were found in the response. Return a 
-        valid JSON object with your thoughts and the next 
+        """No valid JSON objects were found in the response. Return a
+        valid JSON object with your thoughts and the next
         action to perform.""",
     )
     _action_validator: ActionResponseValidator
@@ -258,8 +258,8 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
 
             if monologue.action.name == "SAY":
                 params = monologue.action.parameters
-                response_val = cast(str, params.get("text")) if params else ""
-                command = PredictedSayCommand(response=response_val)
+                response_val = PredictedSayCommand(response=Message(role="assistant", content=params.get("text")) if params else "")
+                command = response_val
             else:
                 command = PredictedDoCommand(
                     action=monologue.action.name,

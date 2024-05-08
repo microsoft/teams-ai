@@ -9,6 +9,7 @@ from unittest import IsolatedAsyncioTestCase, mock
 from azure.core.exceptions import HttpResponseError
 from botbuilder.core import TurnContext
 
+from teams.ai.prompts.message import Message
 from teams import ApplicationError
 from teams.ai.actions import ActionTypes
 from teams.ai.moderators import (
@@ -128,7 +129,7 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         )
         context = self.create_mock_context()
         state = await TurnState[ConversationState, UserState, TempState].load(context)
-        plan = Plan(commands=[PredictedSayCommand(response="test")])
+        plan = Plan(commands=[PredictedSayCommand(response=Message(role= "assistant", content="test"))])
         output = await moderator.review_output(context=context, state=state, plan=plan)
         self.assertTrue(mock_async_openai.called)
         assert output is not None
@@ -147,7 +148,7 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         )
         context = self.create_mock_context()
         state = await TurnState[ConversationState, UserState, TempState].load(context)
-        plan = Plan(commands=[PredictedSayCommand(response="test")])
+        plan = Plan(commands=[PredictedSayCommand(response=Message(role= "assistant", content="test"))])
         output = await moderator.review_output(context=context, state=state, plan=plan)
         self.assertTrue(mock_async_openai.called)
         assert output is not None

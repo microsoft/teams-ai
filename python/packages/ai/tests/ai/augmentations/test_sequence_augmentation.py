@@ -122,7 +122,8 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
                 message=Message[str](
                     role="assistant",
                     content='{ "type": "plan", '
-                    + '"commands": [{ "type": "SAY", "response": ""}]}',
+                    + '"commands": [{ "type": "SAY"'
+                    + '}]}',
                 )
             ),
             3,
@@ -160,15 +161,16 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
             state,
             self.tokenizer,
             PromptResponse[str](
-                message=Message[str](
+                message=Message[Message](
                     role="assistant",
                     content='{"type":"plan","commands":[{"type":"DO",'
                     + '"action":"test1","parameters": { "foo": "bar" }}'
-                    + ',{"type":"SAY","response":"hello world"}]}',
+                    + ',{"type":"SAY","response": { "role": "assistant", "content": "hello world"}}]}',
                 )
             ),
             3,
         )
+        self.assertEqual(response.feedback, None)
         self.assertEqual(response.valid, True)
 
     async def test_create_plan_from_response(self):
@@ -183,27 +185,22 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
                     role="assistant",
                     content='{"type":"plan","commands":[{"type":"DO",'
                     + '"action":"test1","parameters": { "foo": "bar" }},'
-                    + '{"type":"SAY","response":"hello world"}]}',
+                    + '{"type":"SAY","response": { "role": "assistant", "content": "hello world"}}]}'
                 )
             ),
             3,
         )
-
         # Create plan from response
         plan = await self.sequence_augmentation.create_plan_from_response(
             cast(TurnContext, {}),
             state,
             PromptResponse(message=Message(role="assistant", content=validation.value)),
         )
-        self.assertEqual(
-            plan,
-            Plan.from_dict(
-                {
-                    "type": "plan",
-                    "commands": [
-                        {"type": "DO", "action": "test1", "parameters": {"foo": "bar"}},
-                        {"type": "SAY", "response": "hello world"},
-                    ],
-                }
-            ),
-        )
+        self.assertEqual(len(plan.commands), 2)
+        self.assertEqual(plan.commands[0].type, "DO")
+        self.assertEqual(plan.commands[0].action, "test1")
+        self.assertEqual(plan.commands[0].parameters, {"foo": "bar"})
+        self.assertEqual(plan.commands[1].type, "SAY")
+        self.assertEqual(plan.commands[1].response.role, "assistant")
+        self.assertEqual(plan.commands[1].response.content, "hello world")
+

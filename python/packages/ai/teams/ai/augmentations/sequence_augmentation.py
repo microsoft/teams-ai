@@ -36,7 +36,13 @@ PlanSchema: Optional[Dict[str, Any]] = {
                     "type": {"type": "string", "enum": ["DO", "SAY"]},
                     "action": {"type": "string"},
                     "parameters": {"type": "object"},
-                    "response": {"type": "string"},
+                    "response": {
+                        "type": "object",
+                        "properties": {
+                            "role": {"type": "string"},
+                            "content": {"type": "string"},
+                        }
+                    },
                 },
                 "required": ["type"],
             },
@@ -179,5 +185,9 @@ class SequenceAugmentation(Augmentation[Plan]):
             Plan: The created plan
         """
         if response.message and response.message.content:
-            return response.message.content
+            plan = response.message.content
+            plan.commands = [
+                 PredictedSayCommand(response=Message(role="assistant", content=command.response.content)) if command.type == "SAY" else command for command in plan.commands
+            ]
+            return plan
         return Plan()
