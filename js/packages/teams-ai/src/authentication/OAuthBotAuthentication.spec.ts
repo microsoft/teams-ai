@@ -88,7 +88,11 @@ describe('OAuthBotAuthentication', () => {
             it(`should register route to handle ${activityName}`, async () => {
                 const appSpy = sinon.stub(app, 'addRoute');
 
-                const context = new TurnContext(adapter, { type: 'invoke', name: activityName });
+                const context = new TurnContext(adapter, {
+                    type: 'invoke',
+                    name: activityName,
+                    value: { settingName: settingName }
+                });
 
                 // the selector function used to register the route
                 const selectorFunctionsUsed: RouteSelector[] = [];
@@ -373,6 +377,130 @@ describe('OAuthBotAuthentication', () => {
             assert(result.status == DialogTurnStatus.waiting);
 
             stub.restore();
+        });
+    });
+
+    describe('verifyStateRouteSelector', () => {
+        it('should return true if invoke activity name is `signin/verifyState` & the setting name matches', async () => {
+            const [context, _] = await createTurnContextAndState({
+                type: 'invoke',
+                name: 'signin/verifyState',
+                value: {
+                    settingName: settingName
+                }
+            });
+
+            const botAuth = new OAuthBotAuthentication(app, settings, settingName);
+            const response = await botAuth.verifyStateRouteSelector(context);
+
+            assert(response == true);
+        });
+
+        it(`should return false if it's not an invoke activity`, async () => {
+            const [context, _] = await createTurnContextAndState({
+                type: 'not invoke',
+                name: 'signIn/verifyState',
+                value: {
+                    settingName: settingName
+                }
+            });
+
+            const botAuth = new OAuthBotAuthentication(app, settings, settingName);
+            const response = await botAuth.verifyStateRouteSelector(context);
+
+            assert(response == false);
+        });
+
+        it(`should return false if it's not 'signIn/verifyState' invoke activity`, async () => {
+            const [context, _] = await createTurnContextAndState({
+                type: 'invoke',
+                name: 'not signin/verifyState',
+                value: {
+                    settingName: settingName
+                }
+            });
+
+            const botAuth = new OAuthBotAuthentication(app, settings, settingName);
+            const response = await botAuth.verifyStateRouteSelector(context);
+
+            assert(response == false);
+        });
+
+        it(`should return false if it's setting name is not set or is incorrect`, async () => {
+            const [context, _] = await createTurnContextAndState({
+                type: 'invoke',
+                name: 'signin/verifyState',
+                value: {
+                    settingName: 'incorrect setting name'
+                }
+            });
+
+            const botAuth = new OAuthBotAuthentication(app, settings, settingName);
+            const response = await botAuth.verifyStateRouteSelector(context);
+
+            assert(response == false);
+        });
+    });
+
+    describe('tokenExchangeRouteSelector', () => {
+        it('should return true if invoke activity name is `signin/tokenExchange` & the setting name matches', async () => {
+            const [context, _] = await createTurnContextAndState({
+                type: 'invoke',
+                name: 'signin/tokenExchange',
+                value: {
+                    settingName: settingName
+                }
+            });
+
+            const botAuth = new OAuthBotAuthentication(app, settings, settingName);
+            const response = await botAuth.tokenExchangeRouteSelector(context);
+
+            assert(response == true);
+        });
+
+        it(`should return false if it's not an invoke activity`, async () => {
+            const [context, _] = await createTurnContextAndState({
+                type: 'not invoke',
+                name: 'signin/tokenExchange',
+                value: {
+                    settingName: settingName
+                }
+            });
+
+            const botAuth = new OAuthBotAuthentication(app, settings, settingName);
+            const response = await botAuth.tokenExchangeRouteSelector(context);
+
+            assert(response == false);
+        });
+
+        it(`should return false if it's not 'signin/tokenExchange' invoke activity`, async () => {
+            const [context, _] = await createTurnContextAndState({
+                type: 'invoke',
+                name: 'not signin/tokenExchange',
+                value: {
+                    settingName: settingName
+                }
+            });
+
+            const botAuth = new OAuthBotAuthentication(app, settings, settingName);
+            const response = await botAuth.tokenExchangeRouteSelector(context);
+
+            assert(response == false);
+        });
+
+        it(`should return false if it's setting name is not set or is incorrect`, async () => {
+            const [context, _] = await createTurnContextAndState({
+                type: 'invoke',
+                name: 'signin/tokenExchange',
+                value: {
+                    settingName: 'incorrect setting name'
+                }
+            });
+
+            const botAuth = new OAuthBotAuthentication(app, settings, settingName);
+            const response = await botAuth.tokenExchangeRouteSelector(context);
+
+            assert(response == false);
         });
     });
 });
