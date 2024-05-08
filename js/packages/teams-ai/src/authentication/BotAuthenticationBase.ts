@@ -223,12 +223,20 @@ export abstract class BotAuthenticationBase<TState extends TurnState> {
         return (state.conversation as any)[userDialogStatePropertyName] as DialogState;
     }
 
-    protected async verifyStateRouteSelector(context: TurnContext): Promise<boolean> {
-        return context.activity.type === ActivityTypes.Invoke && context.activity.name === verifyStateOperationName;
+    public async verifyStateRouteSelector(context: TurnContext): Promise<boolean> {
+        return (
+            context.activity.type === ActivityTypes.Invoke &&
+            context.activity.name === verifyStateOperationName &&
+            this._settingName == context.activity.value['settingName']
+        );
     }
 
-    protected async tokenExchangeRouteSelector(context: TurnContext): Promise<boolean> {
-        return context.activity.type === ActivityTypes.Invoke && context.activity.name === tokenExchangeOperationName;
+    public async tokenExchangeRouteSelector(context: TurnContext): Promise<boolean> {
+        return (
+            context.activity.type === ActivityTypes.Invoke &&
+            context.activity.name === tokenExchangeOperationName &&
+            this._settingName == context.activity.value['settingName']
+        );
     }
 
     /**
@@ -256,6 +264,22 @@ export abstract class BotAuthenticationBase<TState extends TurnState> {
         state: TState,
         dialogStateProperty: string
     ): Promise<DialogTurnResult<TokenResponse>>;
+}
+
+/**
+ * Sets the setting name in the context.activity.value object.
+ * The setting name is needed in signIn/verifyState` and `signIn/tokenExchange` route selector to accurately route to the correct authentication setting.
+ * @param {TurnContext} context The turn context object
+ * @param {string} settingName The auth setting name
+ */
+export function setSettingNameInContextActivityValue(context: TurnContext, settingName: string) {
+    if (typeof context.activity.value == 'object') {
+        context.activity.value['settingName'] = settingName;
+    } else {
+        context.activity.value = {
+            settingName: settingName
+        };
+    }
 }
 
 /**
