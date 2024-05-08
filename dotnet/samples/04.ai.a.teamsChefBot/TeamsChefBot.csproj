@@ -11,8 +11,8 @@
   </ItemGroup>
 	
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bot.Builder" Version="4.22.2" />
-    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.2" />
+    <PackageReference Include="Microsoft.Bot.Builder" Version="4.22.3" />
+    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.3" />
     <PackageReference Include="Microsoft.Bot.Connector" Version="4.22.2" />
     <PackageReference Include="Microsoft.KernelMemory.AI.OpenAI" Version="0.26.240121.1" />
     <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.26.240121.1" />
