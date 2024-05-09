@@ -74,6 +74,7 @@ MessageContentParts = Union[TextContentPart, ImageContentPart]
 Represents part of the message's content
 """
 
+
 @dataclass
 class Citation:
     """
@@ -91,6 +92,7 @@ class Citation:
     url: str
     filepath: str
 
+
 @dataclass
 class MessageContext:
     """
@@ -100,5 +102,6 @@ class MessageContext:
         citations (list[Citation]): The citations in the message
         intent (str): The intent of the message
     """
+
     citations: list[Citation]
     intent: str

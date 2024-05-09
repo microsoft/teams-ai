@@ -8,6 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional
 
+
 @dataclass
 class ClientCitation:
     """
@@ -18,7 +19,8 @@ class ClientCitation:
         position (str): The number and position of the citation
         appearance (Appearance): The appearance object within Citation
     """
-    type_: str = field(default='Claim', metadata={'alias': '@type'}, init=False, repr=False )
+
+    type_: str = field(default="Claim", metadata={"alias": "@type"}, init=False, repr=False)
     position: str
     appearance: Appearance
 
@@ -39,15 +41,19 @@ class Appearance:
         keywords (list[str]): The optional keywords to the citation
         usageInfo (SensitivityUsageInfo): The optional sensitivity content information
     """
+
     name: str
     abstract: str
     usageInfo: Optional[SensitivityUsageInfo] = None
     keywords: Optional[list[str]] = None
-    type_: str = field(default='DigitalDocument', metadata={'alias': '@type'}, init=False, repr=False )
-    text: Optional[str] = ''
-    url: str = ''
-    encodingFormat: Optional[str] = 'text/html'
-    image: Optional[str] = ''
+    type_: str = field(
+        default="DigitalDocument", metadata={"alias": "@type"}, init=False, repr=False
+    )
+    text: Optional[str] = ""
+    url: str = ""
+    encodingFormat: Optional[str] = "text/html"
+    image: Optional[str] = ""
+
 
 @dataclass
 class SensitivityUsageInfo:
@@ -58,8 +64,9 @@ class SensitivityUsageInfo:
         type (str): Required; must be 'https://schema.org/Message'
 
     """
+
     name: str
-    type_: str = field(default='https://schema.org/Message', init=False, repr=False)
+    type_: str = field(default="https://schema.org/Message", init=False, repr=False)
     description: Optional[str]
     position: Optional[int]
     pattern: Optional[Pattern]
@@ -75,8 +82,8 @@ class Pattern:
         termCode (str): The color code e.g. #454545
 
     """
+
     inDefinedTermSet: str
     name: str
     termCode: str
-    type_: str = field(default='DefinedTerm', init=False, repr=False)
-
+    type_: str = field(default="DefinedTerm", init=False, repr=False)

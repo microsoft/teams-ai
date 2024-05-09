@@ -6,8 +6,9 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from dataclasses_json import DataClassJsonMixin, dataclass_json
 from typing import Any, Dict, List, Literal, Union
+
+from dataclasses_json import DataClassJsonMixin, dataclass_json
 
 from ..prompts.message import Message
 

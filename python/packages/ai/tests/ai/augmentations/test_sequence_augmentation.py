@@ -121,9 +121,7 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
             PromptResponse[str](
                 message=Message[str](
                     role="assistant",
-                    content='{ "type": "plan", '
-                    + '"commands": [{ "type": "SAY"'
-                    + '}]}',
+                    content='{ "type": "plan", ' + '"commands": [{ "type": "SAY"' + "}]}",
                 )
             ),
             3,
@@ -185,7 +183,7 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
                     role="assistant",
                     content='{"type":"plan","commands":[{"type":"DO",'
                     + '"action":"test1","parameters": { "foo": "bar" }},'
-                    + '{"type":"SAY","response": { "role": "assistant", "content": "hello world"}}]}'
+                    + '{"type":"SAY","response": { "role": "assistant", "content": "hello world"}}]}',
                 )
             ),
             3,
@@ -203,4 +201,3 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
         self.assertEqual(plan.commands[1].type, "SAY")
         self.assertEqual(plan.commands[1].response.role, "assistant")
         self.assertEqual(plan.commands[1].response.content, "hello world")
-

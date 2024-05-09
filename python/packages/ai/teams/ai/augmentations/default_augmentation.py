@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from typing import Union, TypeVar
+from typing import TypeVar, Union
 
 from botbuilder.core import TurnContext
 
@@ -19,6 +19,7 @@ from ..validators.validation import Validation
 from .augmentation import Augmentation
 
 ContentT = TypeVar("ContentT")
+
 
 class DefaultAugmentation(Augmentation[str]):
     """

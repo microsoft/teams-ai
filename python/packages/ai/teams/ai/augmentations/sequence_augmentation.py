@@ -41,7 +41,7 @@ PlanSchema: Optional[Dict[str, Any]] = {
                         "properties": {
                             "role": {"type": "string"},
                             "content": {"type": "string"},
-                        }
+                        },
                     },
                 },
                 "required": ["type"],
@@ -187,7 +187,14 @@ class SequenceAugmentation(Augmentation[Plan]):
         if response.message and response.message.content:
             plan = response.message.content
             plan.commands = [
-                 PredictedSayCommand(response=Message(role="assistant", content=command.response.content)) if command.type == "SAY" else command for command in plan.commands
+                (
+                    PredictedSayCommand(
+                        response=Message(role="assistant", content=command.response.content)
+                    )
+                    if command.type == "SAY"
+                    else command
+                )
+                for command in plan.commands
             ]
             return plan
         return Plan()

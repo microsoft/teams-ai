@@ -11,7 +11,12 @@ import yaml
 
 from teams.ai.citations.citations import Appearance, ClientCitation
 from teams.ai.tokenizers.gpt_tokenizer import GPTTokenizer
-from teams.ai.utilities import to_string, snippet, format_citations_response, get_used_citations
+from teams.ai.utilities import (
+    format_citations_response,
+    get_used_citations,
+    snippet,
+    to_string,
+)
 
 
 class TestUtilities(TestCase):
@@ -55,27 +60,21 @@ class TestUtilities(TestCase):
         self.assertEqual(snippet(hello, 6), "hello...")
 
     def test_format_citations_response(self):
-        result = format_citations_response('hello [doc1] world [docs2]')
-        self.assertEqual(result, 'hello [1] world [2]')
+        result = format_citations_response("hello [doc1] world [docs2]")
+        self.assertEqual(result, "hello [1] world [2]")
 
     def test_get_used_citations(self):
         citations = [
             ClientCitation(
-                position='1',
-                appearance=Appearance(
-                    name='the title',
-                    abstract='some citation text...'
-                )
+                position="1",
+                appearance=Appearance(name="the title", abstract="some citation text..."),
             ),
             ClientCitation(
-                position='2',
-                appearance=Appearance(
-                    name='the title',
-                    abstract='some citation other text...'
-                )
-            )
+                position="2",
+                appearance=Appearance(name="the title", abstract="some citation other text..."),
+            ),
         ]
-        text = 'hello [1] world'
+        text = "hello [1] world"
         result = get_used_citations(text, citations)
         self.assertEqual(len(result), 1)
         self.assertEqual(result, [citations[0]])
@@ -83,35 +82,23 @@ class TestUtilities(TestCase):
     def test_get_used_citations_longer(self):
         citations = [
             ClientCitation(
-                position='1',
-                appearance=Appearance(
-                    name='the title',
-                    abstract='some citation text...'
-                )
+                position="1",
+                appearance=Appearance(name="the title", abstract="some citation text..."),
             ),
             ClientCitation(
-                position='2',
-                appearance=Appearance(
-                    name='the title',
-                    abstract='some citation other text...'
-                )
+                position="2",
+                appearance=Appearance(name="the title", abstract="some citation other text..."),
             ),
             ClientCitation(
-                position='3',
-                appearance=Appearance(
-                    name='the title',
-                    abstract='some citation text...'
-                )
+                position="3",
+                appearance=Appearance(name="the title", abstract="some citation text..."),
             ),
             ClientCitation(
-                position='4',
-                appearance=Appearance(
-                    name='the title',
-                    abstract='some citation other text...'
-                )
-            )
+                position="4",
+                appearance=Appearance(name="the title", abstract="some citation other text..."),
+            ),
         ]
-        text = 'hello [1] world [3]'
+        text = "hello [1] world [3]"
         result = get_used_citations(text, citations)
         self.assertEqual(len(result), 2)
         self.assertEqual(result, [citations[0], citations[2]])

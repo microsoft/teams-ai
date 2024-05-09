@@ -53,6 +53,7 @@ def to_string(tokenizer: Tokenizer, value: Any, as_json: bool = False) -> str:
 
     return json_str
 
+
 def snippet(text: str, maxLength: int) -> str:
     """
     Clips the text to a maximum length in case it exceeds the limit.
@@ -63,14 +64,13 @@ def snippet(text: str, maxLength: int) -> str:
 
     Returns:
         str: The modified text
-     """
+    """
     if len(text) <= maxLength:
         return text
     snippet = text[:maxLength]
-    snippet = snippet[:max(snippet.rfind(' '), -1)]
-    snippet += '...'
+    snippet = snippet[: max(snippet.rfind(" "), -1)]
+    snippet += "..."
     return snippet
-
 
 
 def format_citations_response(text: str) -> str:
@@ -81,9 +81,12 @@ def format_citations_response(text: str) -> str:
     Returns:
         str: The modified text
     """
-    return re.sub(r'\[docs?(\d+)\]', r'[\1]', text, flags=re.IGNORECASE)
+    return re.sub(r"\[docs?(\d+)\]", r"[\1]", text, flags=re.IGNORECASE)
 
-def get_used_citations(text: str, citations: List[ClientCitation]) -> Optional[List[ClientCitation]]:
+
+def get_used_citations(
+    text: str, citations: List[ClientCitation]
+) -> Optional[List[ClientCitation]]:
     """
     Get the citations used in the text. This will remove any citations that are included in the citations array from the response but not referenced in the text.
     Args:

@@ -74,4 +74,7 @@ class TestDefaultAugmentation(IsolatedAsyncioTestCase):
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, "SAY")
         assert isinstance(plan.commands[0], PredictedSayCommand)
-        self.assertEqual(plan.commands[0].response, Message(role='assistant', content='', function_call=None, name=None))
+        self.assertEqual(
+            plan.commands[0].response,
+            Message(role="assistant", content="", function_call=None, name=None),
+        )
