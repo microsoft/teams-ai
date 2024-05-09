@@ -18,11 +18,11 @@
             {
                 "type": "azure_search",
                 "parameters": {
-                    "endpoint": "",
+                    "endpoint": "AZURE-AI-SEARCH-ENDPOINT",
                     "index_name": "nba",
                     "authentication": {
                         "type": "api_key",
-                        "key": ""
+                        "key": "AZURE-AI-SEARCH-KEY"
                     }
                 }
             }

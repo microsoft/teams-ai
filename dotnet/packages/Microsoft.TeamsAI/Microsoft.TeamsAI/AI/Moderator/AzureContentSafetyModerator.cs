@@ -56,7 +56,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
                     {
                         if (command is PredictedSayCommand sayCommand)
                         {
-                            string output = sayCommand.Response;
+                            string output = sayCommand.Response.Content;
 
                             // If plan is flagged it will be replaced
                             Plan? newPlan = await _HandleTextModeration(output, false);

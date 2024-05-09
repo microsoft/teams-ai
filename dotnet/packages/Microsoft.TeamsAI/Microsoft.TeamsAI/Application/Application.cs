@@ -916,6 +916,9 @@ namespace Microsoft.Teams.AI
                         settingName = this._authentication.Default;
                     }
 
+                    // Sets the setting name in the context object. It is used in `signIn/verifyState` & `signIn/tokenExchange` route selectors.
+                    BotAuthenticationBase<TState>.SetSettingNameInContextActivityValue(turnContext, settingName);
+
                     SignInResponse response = await this._authentication.SignUserInAsync(turnContext, turnState, settingName);
 
                     if (response.Status == SignInStatus.Complete)

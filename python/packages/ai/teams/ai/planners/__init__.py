@@ -8,7 +8,11 @@ from .action_planner import (
     ActionPlannerOptions,
     ActionPlannerPromptFactory,
 )
-from .assistants_planner import AssistantsPlanner, AssistantsPlannerOptions
+from .assistants_planner import (
+    AssistantsPlanner,
+    AzureOpenAIAssistantsOptions,
+    OpenAIAssistantsOptions,
+)
 from .plan import Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand
 from .planner import Planner
 
@@ -16,7 +20,8 @@ __all__ = [
     "ActionPlanner",
     "ActionPlannerOptions",
     "AssistantsPlanner",
-    "AssistantsPlannerOptions",
+    "OpenAIAssistantsOptions",
+    "AzureOpenAIAssistantsOptions",
     "ActionPlannerPromptFactory",
     "Plan",
     "PredictedCommand",

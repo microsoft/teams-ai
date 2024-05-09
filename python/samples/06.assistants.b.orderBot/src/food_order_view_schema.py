@@ -5,6 +5,7 @@ Licensed under the MIT License.
 
 from dataclasses import dataclass
 from typing import List, Literal, Optional, Union
+
 from dataclasses_json import DataClassJsonMixin, dataclass_json
 
 PizzaSize = Literal["small", "medium", "large", "extra_large"]

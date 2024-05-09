@@ -197,7 +197,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             [Action(AIConstants.SayCommandActionName)]
             public string SayCommand([ActionParameters] PredictedSayCommand command)
             {
-                SayActionRecord.Add(command.Response);
+                SayActionRecord.Add(command.Response.Content);
                 return string.Empty;
             }
         }

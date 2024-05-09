@@ -4,6 +4,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
 {
@@ -208,6 +209,81 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             // assert
             Assert.NotNull(authException);
             Assert.Equal("Unexpected error encountered while signing in: mocked error.\nIncoming activity details: type: message, name: ", authException.Message);
+        }
+
+        [Fact]
+        public void Test_SetSettingNameInContextActivityValue_NullContextActivityValue()
+        {
+            var context = MockTurnContext();
+
+            // act
+            BotAuthenticationBase<TurnState>.SetSettingNameInContextActivityValue(context, "settingNameValue");
+
+            // assert
+            Assert.NotNull(context.Activity.Value);
+            Assert.Equal(((JObject)context.Activity.Value).GetValue("settingName")!.ToString(), "settingNameValue");
+        }
+
+
+        [Fact]
+        public void Test_SetSettingNameInContextActivityValue_ExistingContextActivityValueObject()
+        {
+            var context = MockTurnContext();
+            context.Activity.Value = new JObject();
+            ((JObject)context.Activity.Value).Add("testKey", "testValue");
+
+            // act
+            BotAuthenticationBase<TurnState>.SetSettingNameInContextActivityValue(context, "settingNameValue");
+
+            // assert
+            Assert.NotNull(context.Activity.Value);
+
+            var v = (JObject)context.Activity.Value;
+            Assert.Equal(v.GetValue("settingName")!.ToString(), "settingNameValue");
+            Assert.Equal(v.GetValue("testKey")!.ToString(), "testValue");
+
+        }
+
+        [Fact]
+        public void Test_GetSettingNameFromContextActivityValue_NullContextActivityValue_ReturnsNull()
+        {
+            var context = MockTurnContext();
+            context.Activity.Value = null;
+
+            // act
+            var s = BotAuthenticationBase<TurnState>.GetSettingNameFromContextActivityValue(context);
+
+            // assert
+            Assert.Null(s);
+        }
+
+        [Fact]
+        public void Test_GetSettingNameFromContextActivityValue_MissingSettingName_ReturnsNull()
+        {
+            var context = MockTurnContext();
+            context.Activity.Value = new JObject();
+            ((JObject)context.Activity.Value).Add("INCORRECT settingName", "settingNameValue");
+
+            // act
+            var s = BotAuthenticationBase<TurnState>.GetSettingNameFromContextActivityValue(context);
+
+            // assert
+            Assert.Null(s);
+        }
+
+        [Fact]
+        public void Test_GetSettingNameFromContextActivityValue_ReturnsSettingName()
+        {
+            var context = MockTurnContext();
+            context.Activity.Value = new JObject();
+            ((JObject)context.Activity.Value).Add("settingName", "settingNameValue");
+
+            // act
+            var s = BotAuthenticationBase<TurnState>.GetSettingNameFromContextActivityValue(context);
+
+            // assert
+            Assert.NotNull(s);
+            Assert.Equal(s, "settingNameValue");
         }
 
         private static TurnContext MockTurnContext(string type = ActivityTypes.Message)
