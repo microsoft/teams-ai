@@ -57,7 +57,7 @@ This sample shows how to integrate your Azure AI Search index as a data source i
     npm start
     ```
 
-1. Duplicate the `sample.env` in the `teams-ai/js/samples/08.datasource.azureOpenAI/` folder. Rename the file to `.env`.
+1. Duplicate the `sample.env` in the `teams-ai/js/samples/<this-sample's>/<directory>` folder. Rename the file to `.env`.
 
 > [!NOTE]
 > Please note that at this time, this sample is only supported with Azure OpenAI.
