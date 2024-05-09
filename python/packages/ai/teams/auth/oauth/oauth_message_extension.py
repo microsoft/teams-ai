@@ -24,7 +24,7 @@ from botbuilder.schema.teams import (
 from botframework.connector.auth import TokenExchangeRequest
 from botframework.connector.models import CardAction
 
-from ...state import TurnState, todict
+from ...state import TurnState
 from ..auth_component import AuthComponent
 from .oauth_options import OAuthOptions
 
