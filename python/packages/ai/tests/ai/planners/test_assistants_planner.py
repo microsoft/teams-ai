@@ -15,17 +15,17 @@ from dataclasses_json import DataClassJsonMixin, dataclass_json
 from openai._base_client import AsyncPaginator
 from openai.pagination import AsyncCursorPage
 from openai.types import beta
-from openai.types.beta import Thread
+from openai.types.beta import AssistantTool, Thread
 from openai.types.beta.threads import (
+    Message,
     RequiredActionFunctionToolCall,
     Run,
-    ThreadMessage,
+    Text,
+    TextContentBlock,
     required_action_function_tool_call,
     run,
-    run_create_params,
     run_submit_tool_outputs_params,
 )
-from openai.types.beta.threads.message_content_text import MessageContentText, Text
 
 from teams.ai.actions.action_types import ActionTypes
 from teams.ai.planners.assistants_planner import (
@@ -42,7 +42,7 @@ from teams.state.user_state import UserState
 ASSISTANT_ID = "assistant_id"
 ASSISTANT_MODEL = "test model"
 ASSISTANT_INSTRUCTIONS = "instructions"
-ASSISTANT_TOOLS: List[run.Tool] = []
+ASSISTANT_TOOLS: List[AssistantTool] = []
 
 RunStatuses = Literal[
     "queued",
@@ -59,7 +59,7 @@ RunStatuses = Literal[
 @dataclass_json
 @dataclass
 class MockAsyncPaginator(DataClassJsonMixin):
-    data: Union[List[Run], List[ThreadMessage]]
+    data: Union[List[Run], List[Message]]
     first_id: str
     last_id: str
     has_more: bool
@@ -67,7 +67,7 @@ class MockAsyncPaginator(DataClassJsonMixin):
 
 class MockAsyncRuns:
     _threads: List[Thread]
-    _messages: Dict[str, List[ThreadMessage]]
+    _messages: Dict[str, List[Message]]
     _runs: Dict[str, List[Run]]
     remaining_actions: List[run.RequiredAction]
     remaining_run_status: List[RunStatuses]
@@ -76,7 +76,7 @@ class MockAsyncRuns:
     def __init__(
         self,
         shared_threads: List[Thread],
-        shared_messages: Dict[str, List[ThreadMessage]],
+        shared_messages: Dict[str, List[Message]],
         shared_runs: Dict[str, List[Run]],
         remaining_actions: List[run.RequiredAction],
         remaining_run_status: List[RunStatuses],
@@ -149,7 +149,7 @@ class MockAsyncRuns:
         metadata: Union[Optional[object], openai._types.NotGiven] = openai._types.NOT_GIVEN,
         model: Union[Optional[str], openai._types.NotGiven] = openai._types.NOT_GIVEN,
         tools: Union[
-            Optional[Iterable[run_create_params.Tool]], openai._types.NotGiven
+            Optional[Iterable[AssistantTool]], openai._types.NotGiven
         ] = openai._types.NOT_GIVEN,
         extra_headers: Optional[openai._types.Headers] = None,
         extra_query: Optional[openai._types.Query] = None,
@@ -173,7 +173,6 @@ class MockAsyncRuns:
             model=ASSISTANT_MODEL if ASSISTANT_MODEL else "test-model",
             instructions=ASSISTANT_INSTRUCTIONS if ASSISTANT_INSTRUCTIONS else "instructions",
             tools=ASSISTANT_TOOLS if ASSISTANT_TOOLS else [],
-            file_ids=[],
             created_at=235312,
             expires_at=2317312,
             started_at=2312812,
@@ -214,7 +213,7 @@ class MockAsyncRuns:
 
 class MockAsyncMessages:
     _threads: List[Thread]
-    _messages: Dict[str, List[ThreadMessage]]
+    _messages: Dict[str, List[Message]]
     _runs: Dict[str, List[Run]]
     remaining_actions: List[run.RequiredAction]
     remaining_run_status: List[RunStatuses]
@@ -223,7 +222,7 @@ class MockAsyncMessages:
     def __init__(
         self,
         shared_threads: List[Thread],
-        shared_messages: Dict[str, List[ThreadMessage]],
+        shared_messages: Dict[str, List[Message]],
         shared_runs: Dict[str, List[Run]],
         remaining_actions: List[run.RequiredAction],
         remaining_run_status: List[RunStatuses],
@@ -250,16 +249,16 @@ class MockAsyncMessages:
         timeout: Union[
             float, httpx.Timeout, None, openai._types.NotGiven
         ] = openai._types.NOT_GIVEN,
-    ) -> ThreadMessage:
+    ) -> Message:
         # pylint: disable=unused-argument
-        new_message = ThreadMessage(
+        new_message = Message(
             id=str(datetime.now()),
+            status="completed",
             created_at=123,
             thread_id=thread_id,
             role=role,
-            content=[MessageContentText(type="text", text=Text(annotations=[], value=content))],
+            content=[TextContentBlock(type="text", text=Text(annotations=[], value=content))],
             assistant_id=ASSISTANT_ID,
-            file_ids=file_ids if file_ids else [],
             object="thread.message",
         )
 
@@ -283,7 +282,7 @@ class MockAsyncMessages:
         timeout: Union[
             float, httpx.Timeout, None, openai._types.NotGiven
         ] = openai._types.NOT_GIVEN,
-    ) -> AsyncPaginator[ThreadMessage, AsyncCursorPage[ThreadMessage]]:
+    ) -> AsyncPaginator[Message, AsyncCursorPage[Message]]:
         # pylint: disable=unused-argument
         while len(self.remaining_messages) > 0:
             next_message = self.remaining_messages.pop(0)
@@ -313,7 +312,7 @@ class MockAsyncMessages:
 
 class MockAsyncAssistants:
     _threads: List[Thread]
-    _messages: Dict[str, List[ThreadMessage]]
+    _messages: Dict[str, List[Message]]
     _runs: Dict[str, List[Run]]
     remaining_actions: List[run.RequiredAction]
     remaining_run_status: List[RunStatuses]
@@ -322,7 +321,7 @@ class MockAsyncAssistants:
     def __init__(
         self,
         shared_threads: List[Thread],
-        shared_messages: Dict[str, List[ThreadMessage]],
+        shared_messages: Dict[str, List[Message]],
         shared_runs: Dict[str, List[Run]],
         remaining_actions: List[run.RequiredAction],
         remaining_run_status: List[RunStatuses],
@@ -344,9 +343,7 @@ class MockAsyncAssistants:
         instructions: Union[Optional[str], openai._types.NotGiven] = None,
         metadata: Union[Optional[object], openai._types.NotGiven] = openai._types.NotGiven,
         name: Union[Optional[str], openai._types.NotGiven] = "",
-        tools: Union[
-            Iterable[beta.assistant_create_params.Tool], openai._types.NotGiven
-        ] = openai._types.NOT_GIVEN,
+        tools: Union[Iterable[AssistantTool], openai._types.NotGiven] = openai._types.NOT_GIVEN,
         extra_headers: Optional[openai._types.Headers] = None,
         extra_query: Optional[openai._types.Query] = None,
         extra_body: Optional[openai._types.Body] = None,
@@ -359,7 +356,6 @@ class MockAsyncAssistants:
         return beta.Assistant(
             id=ASSISTANT_ID,
             created_at=3232,
-            file_ids=[],
             instructions=ASSISTANT_INSTRUCTIONS,
             model=ASSISTANT_MODEL,
             object="assistant",
@@ -371,7 +367,7 @@ class MockAsyncThreads:
     runs: MockAsyncRuns
     messages: MockAsyncMessages
     _threads: List[Thread]
-    _messages: Dict[str, List[ThreadMessage]]
+    _messages: Dict[str, List[Message]]
     _runs: Dict[str, List[Run]]
     remaining_actions: List[run.RequiredAction]
     remaining_run_status: List[RunStatuses]
@@ -380,7 +376,7 @@ class MockAsyncThreads:
     def __init__(
         self,
         shared_threads: List[Thread],
-        shared_messages: Dict[str, List[ThreadMessage]],
+        shared_messages: Dict[str, List[Message]],
         shared_runs: Dict[str, List[Run]],
         remaining_actions: List[run.RequiredAction],
         remaining_run_status: List[RunStatuses],
@@ -431,19 +427,19 @@ class MockAsyncThreads:
             metadata=metadata if metadata else None,
             object="thread",
         )
-        new_messages: List[ThreadMessage] = []
+        new_messages: List[Message] = []
 
         if isinstance(messages, Iterable):
             for message in messages:
-                new_message = ThreadMessage(
+                new_message = Message(
                     role=message["role"],
                     id=str(datetime.now()),
+                    status="completed",
                     created_at=23123,
                     thread_id=new_thread.id,
                     assistant_id=ASSISTANT_ID,
-                    file_ids=[],
                     content=[
-                        MessageContentText(
+                        TextContentBlock(
                             type="text", text=Text(annotations=[], value=message["content"])
                         )
                     ],
@@ -458,7 +454,7 @@ class MockAsyncThreads:
 
 class MockAsyncBeta:
     _threads: List[Thread]
-    _messages: Dict[str, List[ThreadMessage]]
+    _messages: Dict[str, List[Message]]
     _runs: Dict[str, List[Run]]
     remaining_actions: List[run.RequiredAction]
     remaining_run_status: List[RunStatuses]
@@ -469,7 +465,7 @@ class MockAsyncBeta:
     def __init__(
         self,
         shared_threads: List[Thread],
-        shared_messages: Dict[str, List[ThreadMessage]],
+        shared_messages: Dict[str, List[Message]],
         shared_runs: Dict[str, List[Run]],
         remaining_actions: List[run.RequiredAction],
         remaining_run_status: List[RunStatuses],
@@ -502,7 +498,7 @@ class MockAsyncBeta:
 class MockAsyncOpenAI:
     beta: MockAsyncBeta
     _threads: List[Thread]
-    _messages: Dict[str, List[ThreadMessage]]
+    _messages: Dict[str, List[Message]]
     _runs: Dict[str, List[Run]]
     remaining_actions: List[run.RequiredAction]
     remaining_run_status: List[RunStatuses]
@@ -511,7 +507,7 @@ class MockAsyncOpenAI:
     def __init__(
         self,
         shared_threads: List[Thread] = [],
-        shared_messages: Dict[str, List[ThreadMessage]] = {},
+        shared_messages: Dict[str, List[Message]] = {},
         shared_runs: Dict[str, List[Run]] = {},
         remaining_actions: List[run.RequiredAction] = [],
         remaining_run_status: List[RunStatuses] = [],
@@ -651,7 +647,6 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
                         status="in_progress",
                         created_at=233,
                         expires_at=23123,
-                        file_ids=[],
                         instructions=ASSISTANT_INSTRUCTIONS,
                         model=ASSISTANT_MODEL,
                         object="thread.run",
