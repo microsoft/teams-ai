@@ -23,10 +23,10 @@ jsonschema = "^4.21.1"
 types-pyyaml = "^6.0.12.12"
 pyyaml = "^6.0.1"
 dataclasses-json = "^0.6.4"
-openai = "^1.11.1"
 azure-ai-contentsafety = "^1.0.0"
 msal = "^1.28.0"
 botbuilder-dialogs = "^4.14.8"
+openai = "^1.27.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
