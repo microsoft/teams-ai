@@ -13,7 +13,7 @@ from .state import State, state
 
 
 @state
-class UserState(State[Any]):
+class UserState(State):
     """
     Default User State
     """
@@ -41,7 +41,7 @@ class UserState(State[Any]):
 
         if key in data:
             if isinstance(data[key], StoreItem):
-                return cls(__key__=key, **data[key].__dict__)
+                return cls(__key__=key, **vars(data[key]))
             return cls(__key__=key, **data[key])
 
         return cls(__key__=key, **data)

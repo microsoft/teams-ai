@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 from botbuilder.core import Storage, TurnContext
 
@@ -14,7 +14,7 @@ from .state import State, state
 
 
 @state
-class TempState(State[Any]):
+class TempState(State):
     """
     Default Temp State
     """
@@ -36,6 +36,9 @@ class TempState(State[Any]):
 
     duplicate_token_exchange: Optional[bool] = None
     "Flag indicating whether a token exchange event has already been processed"
+
+    async def save(self, _context: TurnContext, storage: Optional[Storage] = None) -> None:
+        return
 
     @classmethod
     async def load(cls, context: TurnContext, storage: Optional[Storage] = None) -> "TempState":

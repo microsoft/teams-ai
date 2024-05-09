@@ -47,7 +47,7 @@ class OtherState(State):
 
         if "other" in data:
             if isinstance(data["other"], StoreItem):
-                return cls(__key__="other", **data["other"].__dict__)
+                return cls(__key__="other", **vars(data["other"]))
             return cls(__key__="other", **data["other"])
         return cls(__key__="other")
 
@@ -156,7 +156,7 @@ class TestCustomTurnState(IsolatedAsyncioTestCase):
         storage = MemoryStorage()
         turn_state = await CustomTurnState.load(context, storage)
 
-        self.assertFalse("test" in turn_state.other)
+        self.assertTrue("test" in turn_state.other)
         turn_state.other.test = 100
 
         await turn_state.save(context, storage)
@@ -167,5 +167,8 @@ class TestCustomTurnState(IsolatedAsyncioTestCase):
         self.assertEqual(turn_state.other.test, 100)
         self.assertEqual(str(turn_state.other), '{"test": 100}')
         self.assertEqual(
-            str(turn_state), '{"conversation": {}, "user": {}, "temp": {}, "other": {"test": 100}}'
+            str(turn_state),
+            '{"conversation": {}, "user": {}, "temp": {"action_outputs": {}, "auth_tokens": {},'
+            ' "duplicate_token_exchange": null, "input": "", "input_files": [], "last_output": ""},'
+            ' "other": {"test": 100}}',
         )
