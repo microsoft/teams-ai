@@ -12,7 +12,7 @@ import { PredictedSayCommand } from '../planners';
 import { TurnState } from '../TurnState';
 import { Utilities } from '../Utilities';
 
-export interface Entities {
+export interface AIEntity {
     /**
      * Required as 'https://schema.org/Message'
      */
@@ -204,7 +204,7 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
                     additionalType: ['AIGeneratedContent'],
                     ...(referencedCitations ? { citation: referencedCitations } : {})
                 }
-            ] as Entities[]
+            ] as AIEntity[]
         });
 
         return '';
