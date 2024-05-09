@@ -39,15 +39,15 @@ class Appearance:
         keywords (list[str]): The optional keywords to the citation
         usageInfo (SensitivityUsageInfo): The optional sensitivity content information
     """
-    type_: str = field(default='DigitalDocument', metadata={'alias': '@type'}, init=False, repr=False )
     name: str
+    abstract: str
+    usageInfo: SensitivityUsageInfo
+    keywords: Optional[list[str]]
+    type_: str = field(default='DigitalDocument', metadata={'alias': '@type'}, init=False, repr=False )
     text: Optional[str] = ''
     url: str = ''
-    abstract: str
     encodingFormat: Optional[str] = 'text/html'
     image: Optional[str] = ''
-    keywords: Optional[list[str]]
-    usageInfo: SensitivityUsageInfo
 
 @dataclass
 class SensitivityUsageInfo:
@@ -58,9 +58,9 @@ class SensitivityUsageInfo:
         type (str): Required; must be 'https://schema.org/Message'
 
     """
+    name: str
     type_: str = field(default='https://schema.org/Message', init=False, repr=False)
     description: Optional[str]
-    name: str
     position: Optional[int]
     pattern: Optional[Pattern]
 
@@ -75,8 +75,8 @@ class Pattern:
         termCode (str): The color code e.g. #454545
 
     """
-    type_: str = field(default='DefinedTerm', init=False, repr=False)
     inDefinedTermSet: str
     name: str
     termCode: str
+    type_: str = field(default='DefinedTerm', init=False, repr=False)
 
