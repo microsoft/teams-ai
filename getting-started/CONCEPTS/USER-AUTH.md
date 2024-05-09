@@ -64,6 +64,31 @@ const app = new ApplicationBuilder<ApplicationTurnState>()
     .build();
 ```
 
+**Python**
+
+```python
+app = Application[TurnState[ConversationState, UserState, TempState]](
+    ApplicationOptions(
+        bot_app_id=config.APP_ID,
+        storage=MemoryStorage(),
+        adapter=TeamsAdapter(config),
+        auth=AuthOptions(
+            default="graph",
+            auto=True,
+            settings={
+                "graph": OAuthOptions(
+                    connection_name=config.OAUTH_CONNECTION_NAME,
+                    title="Sign In",
+                    text="please sign in",
+                    end_on_invalid_message=True,
+                    enable_sso=True,
+                ),
+            },
+        ),
+    )
+)
+```
+
 The `adapter` is the configured `BotAdapter` for the application. The second parameter in the `.withAuthentication` is the authentication options.
 
 The `settings` property is an object of all the different services that the user could be authenticated to, called _connections_. The above example has the `graph` connection which specifies configurations to authenticate the user to Microsoft Graph. The name `graph` is arbitrary and is used when specifying which service to sign the user in and out of.
