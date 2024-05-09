@@ -41,8 +41,8 @@ class Appearance:
     """
     name: str
     abstract: str
-    usageInfo: SensitivityUsageInfo
-    keywords: Optional[list[str]]
+    usageInfo: Optional[SensitivityUsageInfo] = None
+    keywords: Optional[list[str]] = None
     type_: str = field(default='DigitalDocument', metadata={'alias': '@type'}, init=False, repr=False )
     text: Optional[str] = ''
     url: str = ''
