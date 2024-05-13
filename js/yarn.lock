@@ -299,15 +299,15 @@
   resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-13.3.1.tgz#012465bf940d12375dc47387b754ccf9d6b92180"
   integrity sha512-Lrk1ozoAtaP/cp53May3v6HtcFSVxdFrg2Pa/1xu5oIvsIwhxW6zSPibKefCOVgd5osgykMi5jjcZHv8XkzZEQ==
 
+"@azure/msal-common@14.10.0":
+  version "14.10.0"
+  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-14.10.0.tgz#215449726717b53d549953db77562cad6cb8421c"
+  integrity sha512-Zk6DPDz7e1wPgLoLgAp0349Yay9RvcjPM5We/ehuenDNsz/t9QEFI7tRoHpp/e47I4p20XE3FiDlhKwAo3utDA==
+
 "@azure/msal-common@14.7.1":
   version "14.7.1"
   resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-14.7.1.tgz#b13443fbacc87ce2019a91e81a6582ea73847c75"
   integrity sha512-v96btzjM7KrAu4NSEdOkhQSTGOuNUIIsUdB8wlyB9cdgl5KqEKnTonHUZ8+khvZ6Ap542FCErbnTyDWl8lZ2rA==
-
-"@azure/msal-common@14.9.0":
-  version "14.9.0"
-  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-14.9.0.tgz#ce1895b4eefccaa0e6aaa39db869611eaec4e37f"
-  integrity sha512-yzBPRlWPnTBeixxLNI3BBIgF5/bHpbhoRVuuDBnYjCyWRavaPUsKAHUDYLqpGkBLDciA6TCc6GOxN4/S3WiSxg==
 
 "@azure/msal-common@^7.0.0":
   version "7.6.0"
@@ -323,12 +323,12 @@
     jsonwebtoken "^9.0.0"
     uuid "^8.3.0"
 
-"@azure/msal-node@^2.7.0":
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-2.7.0.tgz#8641ab846704dd4fcbeed30aef94544c5fecfa30"
-  integrity sha512-wXD8LkUvHICeSWZydqg6o8Yvv+grlBEcmLGu+QEI4FcwFendbTEZrlSygnAXXSOCVaGAirWLchca35qrgpO6Jw==
+"@azure/msal-node@^2.8.1":
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-2.8.1.tgz#aded28d37eea2e7278c9bd44f2016647390f239c"
+  integrity sha512-VcZZM+5VvCWRBTOF7SxMKaxrz+EXjntx2u5AQe7QE06e6FuPJElGBrImgNgCh5QmFaNCfVFO+3qNR7UoFD/Gfw==
   dependencies:
-    "@azure/msal-common" "14.9.0"
+    "@azure/msal-common" "14.10.0"
     jsonwebtoken "^9.0.0"
     uuid "^8.3.0"
 
@@ -969,11 +969,12 @@
   resolved "https://registry.yarnpkg.com/@microsoft/recognizers-text/-/recognizers-text-1.3.1.tgz#eda98a9148101ecdb04ed1424082d472b04aabd9"
   integrity sha512-HikLoRUgSzM4OKP3JVBzUUp3Q7L4wgI17p/3rERF01HVmopcujY3i6wgx8PenCwbenyTNxjr1AwSDSVuFlYedQ==
 
-"@microsoft/teams-js@^2.22.0":
-  version "2.22.0"
-  resolved "https://registry.yarnpkg.com/@microsoft/teams-js/-/teams-js-2.22.0.tgz#b224ea5f5e70c0d8719de3cb53a2d497ff7723a1"
-  integrity sha512-n1UVJbxOxoeY/ATS9R1J0UGx3xhw5PgF7e3RyHHctAansYUTmszbC1/qGPxXyjekBIpGabDCx20zWW+WHdlZlA==
+"@microsoft/teams-js@^2.23.0":
+  version "2.23.0"
+  resolved "https://registry.yarnpkg.com/@microsoft/teams-js/-/teams-js-2.23.0.tgz#98ce3c0e4951d9a4cb81091f57a87b2f9e4a74ad"
+  integrity sha512-KDJrREwAeILVo0t/89ItbAWoUeJ6QytrTeCFXLYp3T9r1K2LEAJ2aOEvTsW2rzlKReg9CeWPVWGseundrSfBCw==
   dependencies:
+    base64-js "^1.3.1"
     debug "^4.3.3"
 
 "@microsoft/teamsfx@^2.3.0", "@microsoft/teamsfx@^2.3.1":
