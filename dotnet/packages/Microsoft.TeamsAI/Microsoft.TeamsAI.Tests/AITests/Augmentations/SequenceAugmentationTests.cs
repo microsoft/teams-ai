@@ -49,7 +49,15 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
       ""response"": ""hello""
     }
   ]
-}"
+}",
+                    Context = new()
+                    {
+                        Intent = "test intent",
+                        Citations = new List<Citation>
+                        {
+                            new("content", "title", "url")
+                        }
+                    }
                 }
             };
 
@@ -63,6 +71,10 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
             Assert.Equal("test", (plan.Commands[0] as PredictedDoCommand)?.Action);
             Assert.Equal("SAY", plan.Commands[1].Type);
             Assert.Equal("hello", (plan.Commands[1] as PredictedSayCommand)?.Response.Content);
+            Assert.Equal("test intent", (plan.Commands[1] as PredictedSayCommand)?.Response.Context?.Intent);
+            Assert.Equal("content", (plan.Commands[1] as PredictedSayCommand)?.Response.Context?.Citations[0].Content);
+            Assert.Equal("title", (plan.Commands[1] as PredictedSayCommand)?.Response.Context?.Citations[0].Title);
+            Assert.Equal("url", (plan.Commands[1] as PredictedSayCommand)?.Response.Context?.Citations[0].Url);
         }
 
         [Fact]

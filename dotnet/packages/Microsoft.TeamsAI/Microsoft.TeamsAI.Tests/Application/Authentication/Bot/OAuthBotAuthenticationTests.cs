@@ -1,11 +1,8 @@
 ﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Builder.Integration.AspNet.Core;
-using Microsoft.Bot.Connector;
-using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
-using Moq;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
 {
@@ -35,6 +32,8 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
 
     public class OAuthBotAuthenticationTests
     {
+        private const string SETTING_NAME = "settingName";
+
         [Fact]
         public async void Test_CreateOAuthCard_WithSSOEnabled()
         {
@@ -108,6 +107,174 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             Assert.Null(card.TokenExchangeResource);
             Assert.NotNull(card.TokenPostResource);
             Assert.Equal(card.TokenPostResource.SasUrl, "sasUrl");
+        }
+
+        [Fact]
+        public async void Test_VerifyStateRouteSelector_ReturnsTrue()
+        {
+            // Arrange
+            var testAdapter = new SimpleAdapter();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            turnContext.Activity.Type = "invoke";
+            turnContext.Activity.Name = "signin/verifyState";
+            turnContext.Activity.Value = new JObject();
+            ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
+
+            var app = new TestApplication(new() { Adapter = testAdapter });
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+
+            // Act
+            var result = await botAuth.VerifyStateRouteSelector(turnContext, default);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async void Test_VerifyStateRouteSelector_IncorrectActivity_ReturnsFalse ()
+        {
+            // Arrange
+            var testAdapter = new SimpleAdapter();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            turnContext.Activity.Type = "NOT INVOKE";
+            turnContext.Activity.Name = "signin/verifyState";
+            turnContext.Activity.Value = new JObject();
+            ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
+
+            var app = new TestApplication(new() { Adapter = testAdapter });
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+
+            // Act
+            var result = await botAuth.VerifyStateRouteSelector(turnContext, default);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async void Test_VerifyStateRouteSelector_IncorrectInvokeName_ReturnsFalse()
+        {
+            // Arrange
+            var testAdapter = new SimpleAdapter();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            turnContext.Activity.Type = "invoke";
+            turnContext.Activity.Name = "NOT signin/verifyState";
+            turnContext.Activity.Value = new JObject();
+            ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
+
+            var app = new TestApplication(new() { Adapter = testAdapter });
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+
+            // Act
+            var result = await botAuth.VerifyStateRouteSelector(turnContext, default);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async void Test_VerifyStateRouteSelector_IncorrectSettingName_ReturnsFalse()
+        {
+            // Arrange
+            var testAdapter = new SimpleAdapter();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            turnContext.Activity.Type = "invoke";
+            turnContext.Activity.Name = "signin/verifyState";
+            turnContext.Activity.Value = new JObject();
+            ((JObject)turnContext.Activity.Value).Add("settingName", "NOT SETTING_NAME");
+
+            var app = new TestApplication(new() { Adapter = testAdapter });
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+
+            // Act
+            var result = await botAuth.VerifyStateRouteSelector(turnContext, default);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async void Test_TokenExchangeRouteSelector_ReturnsTrue()
+        {
+            // Arrange
+            var testAdapter = new SimpleAdapter();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            turnContext.Activity.Type = "invoke";
+            turnContext.Activity.Name = "signin/tokenExchange";
+            turnContext.Activity.Value = new JObject();
+            ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
+
+            var app = new TestApplication(new() { Adapter = testAdapter });
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+
+            // Act
+            var result = await botAuth.TokenExchangeRouteSelector(turnContext, default);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async void Test_TokenExchangeRouteSelector_IncorrectActivity_ReturnsFalse()
+        {
+            // Arrange
+            var testAdapter = new SimpleAdapter();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            turnContext.Activity.Type = "NOT invoke";
+            turnContext.Activity.Name = "signin/tokenExchange";
+            turnContext.Activity.Value = new JObject();
+            ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
+
+            var app = new TestApplication(new() { Adapter = testAdapter });
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+
+            // Act
+            var result = await botAuth.TokenExchangeRouteSelector(turnContext, default);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async void Test_TokenExchangeRouteSelector_IncorrectInvokeName_ReturnsFalse()
+        {
+            // Arrange
+            var testAdapter = new SimpleAdapter();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            turnContext.Activity.Type = "invoke";
+            turnContext.Activity.Name = "NOT signin/tokenExchange";
+            turnContext.Activity.Value = new JObject();
+            ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
+
+            var app = new TestApplication(new() { Adapter = testAdapter });
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+
+            // Act
+            var result = await botAuth.TokenExchangeRouteSelector(turnContext, default);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async void Test_TokenExchangeRouteSelector_IncorrectSettingName_ReturnsFalse()
+        {
+            // Arrange
+            var testAdapter = new SimpleAdapter();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            turnContext.Activity.Type = "invoke";
+            turnContext.Activity.Name = "signin/tokenExchange";
+            turnContext.Activity.Value = new JObject();
+            ((JObject)turnContext.Activity.Value).Add("settingName", "NOT SETTING_NAME");
+
+            var app = new TestApplication(new() { Adapter = testAdapter });
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+
+            // Act
+            var result = await botAuth.TokenExchangeRouteSelector(turnContext, default);
+
+            // Assert
+            Assert.False(result);
         }
     }
 }

@@ -11,10 +11,19 @@ param botAadAppClientId string
 param botAadAppClientSecret string
 
 @secure()
-param openAIApiKey string
+param azureOpenAIApiKey string
 
 @secure()
-param openAIAssistantId string
+param azureOpenAIEndpoint string
+
+@secure()
+param azureOpenAIAssistantId string
+
+// @secure()
+// param openAIApiKey string
+
+// @secure()
+// param openAIAssistantId string
 
 param webAppSKU string
 
@@ -66,13 +75,25 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
           name: 'BOT_PASSWORD'
           value: botAadAppClientSecret
         }
+        // {
+        //   name: 'OpenAI__ApiKey'
+        //   value: openAIApiKey
+        // }
+        // {
+        //   name: 'OpenAI__AssistantId'
+        //   value: openAIAssistantId
+        // }        
         {
-          name: 'OpenAI__ApiKey'
-          value: openAIApiKey
+          name: 'Azure__OpenAIApiKey'
+          value: azureOpenAIApiKey
         }
         {
-          name: 'OpenAI__AssistantId'
-          value: openAIAssistantId
+          name: 'Azure__OpenAIEndpoint'
+          value: azureOpenAIEndpoint
+        }
+        {
+          name: 'Azure__OpenAIAssistantId'
+          value: azureOpenAIAssistantId
         }
       ]
       ftpsState: 'FtpsOnly'

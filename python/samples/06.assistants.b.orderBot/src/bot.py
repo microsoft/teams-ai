@@ -11,13 +11,18 @@ import sys
 import traceback
 
 from botbuilder.core import MemoryStorage, MessageFactory, TurnContext
+from openai.types.beta import Assistant
 from openai.types.beta.assistant_create_params import AssistantCreateParams
 from openai.types.beta.function_tool_param import FunctionToolParam
 from openai.types.shared_params import FunctionDefinition
 from teams import Application, ApplicationOptions, TeamsAdapter
 from teams.ai import AIOptions
 from teams.ai.actions import ActionTurnContext
-from teams.ai.planners import AssistantsPlanner, AssistantsPlannerOptions
+from teams.ai.planners import (
+    AssistantsPlanner,
+    AzureOpenAIAssistantsOptions,
+    OpenAIAssistantsOptions,
+)
 
 from config import Config
 from food_order_card import generate_card_for_order
@@ -26,13 +31,28 @@ from state import AppTurnState
 
 config = Config()
 
-if config.OPENAI_KEY is None:
-    raise RuntimeError("Missing environment variables - please check that OPENAI_KEY is set.")
+if config.OPENAI_KEY is None and config.AZURE_OPENAI_KEY is None:
+    raise RuntimeError(
+        "Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set."
+    )
+
+planner: AssistantsPlanner
 
 # Create Assistant Planner
-planner = AssistantsPlanner[AppTurnState](
-    AssistantsPlannerOptions(api_key=config.OPENAI_KEY, assistant_id=config.ASSISTANT_ID)
-)
+if config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
+    planner = AssistantsPlanner[AppTurnState](
+        AzureOpenAIAssistantsOptions(
+            api_key=config.AZURE_OPENAI_KEY,
+            api_version="2024-02-15-preview",
+            endpoint=config.AZURE_OPENAI_ENDPOINT,
+            default_model="gpt-4",
+            assistant_id=config.ASSISTANT_ID,
+        )
+    )
+else:
+    planner = AssistantsPlanner[AppTurnState](
+        OpenAIAssistantsOptions(api_key=config.OPENAI_KEY, assistant_id=config.ASSISTANT_ID)
+    )
 
 # Define storage and application
 storage = MemoryStorage()
@@ -76,11 +96,27 @@ async def setup_assistant(context: TurnContext, state: AppTurnState):
                         ),
                     )
                 ],
-                model="gpt-4-1106-preview",
+                model="gpt-4",
             )
-            assistant = await AssistantsPlanner.create_assistant(
-                api_key=config.OPENAI_KEY, organization="", endpoint="", request=params
-            )
+
+            assistant: Assistant
+
+            if config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
+                assistant = await AssistantsPlanner.create_assistant(
+                    api_key=config.AZURE_OPENAI_KEY,
+                    api_version="",
+                    organization="",
+                    endpoint=config.AZURE_OPENAI_ENDPOINT,
+                    request=params,
+                )
+            else:
+                assistant = await AssistantsPlanner.create_assistant(
+                    api_key=config.OPENAI_KEY,
+                    api_version="",
+                    organization="",
+                    endpoint="",
+                    request=params,
+                )
             print(f"Create a new assistant with an id of:{assistant.id}")
             sys.exit()
         except Exception as e:

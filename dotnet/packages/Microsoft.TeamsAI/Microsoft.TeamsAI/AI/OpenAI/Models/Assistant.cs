@@ -5,6 +5,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
     /// <summary>
     /// Model represents OpenAI Assistant
     /// </summary>
+    [Obsolete("This type has been depecrated. Use Azure.AI.OpenAI.Assistants.Assistant instead.")]
     public class Assistant
     {
         /// <summary>
@@ -44,7 +45,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
         /// </summary>
         [JsonPropertyName("metadata")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public Dictionary<string, object>? Metadata { get; set; }
+        public IReadOnlyDictionary<string, string>? Metadata { get; set; }
 
         /// <summary>
         /// ID of the model to use.
@@ -75,6 +76,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
     /// <summary>
     /// Model represents parameters to create an Assistant.
     /// </summary>
+    [Obsolete("This type has been depecrated. Use Azure.AI.OpenAI.Assistants.AssistantCreationOptions instead.")]
     public class AssistantCreateParams
     {
         /// <summary>
@@ -109,7 +111,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
         /// </summary>
         [JsonPropertyName("metadata")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public Dictionary<string, object>? Metadata { get; set; }
+        public Dictionary<string, string>? Metadata { get; set; }
 
         /// <summary>
         /// Assistant name.

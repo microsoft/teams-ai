@@ -13,12 +13,12 @@ import { ConfigurationServiceClientCredentialFactory, TurnContext } from 'botbui
 
 import { TeamsAdapter } from '@microsoft/teams-ai';
 
-// Include the Teams AI custom component
-import * as bot from './bot';
-
 // Read botFilePath and botFileSecret from .env file.
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
+
+// Include the Teams AI custom component
+import * as bot from './bot';
 
 // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about how bots work.

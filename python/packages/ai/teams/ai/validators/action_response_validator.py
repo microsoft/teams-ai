@@ -94,8 +94,9 @@ class ActionResponseValidator(PromptResponseValidator):
 
             return Validation(
                 valid=False,
-                feedback=f"No {self._noun} was specified. "
-                f"Call a {self._noun} with valid arguments.",
+                feedback=(
+                    f"No {self._noun} was specified. Call a {self._noun} with valid arguments."
+                ),
             )
 
         if func.name is None:
@@ -107,8 +108,9 @@ class ActionResponseValidator(PromptResponseValidator):
         if not func.name in self._actions:
             return Validation(
                 valid=False,
-                feedback=f'Unknown {self._noun} named "{func.name}". '
-                f"Specify a valid {self._noun} name.",
+                feedback=(
+                    f'Unknown {self._noun} named "{func.name}". Specify a valid {self._noun} name.'
+                ),
             )
 
         params: Dict[str, Any] = {}
@@ -117,11 +119,15 @@ class ActionResponseValidator(PromptResponseValidator):
         if action.parameters is not None:
             validator = JSONResponseValidator(
                 schema=action.parameters,
-                missing_json_feedback=f"No arguments were sent with called {self._noun}. "
-                f'Call the "{func.name}" {self._noun} with required '
-                f"arguments as a valid JSON object.",
-                error_feedback=f"The {self._noun} arguments had errors. "
-                f'Apply these fixes and call "{func.name}" {self._noun} again:',
+                missing_json_feedback=(
+                    f"No arguments were sent with called {self._noun}. "
+                    f'Call the "{func.name}" {self._noun} with required '
+                    "arguments as a valid JSON object."
+                ),
+                error_feedback=(
+                    f"The {self._noun} arguments had errors. "
+                    f'Apply these fixes and call "{func.name}" {self._noun} again:'
+                ),
             )
 
             res = await validator.validate_response(

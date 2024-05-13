@@ -57,12 +57,12 @@ This sample shows how to integrate your Azure AI Search index as a data source i
     npm start
     ```
 
-1. Duplicate the `sample.env` in the `teams-ai/js/samples/08.datasource.azureOpenAI/` folder. Rename the file to `.env`.
+1. Duplicate the `sample.env` in the `teams-ai/js/samples/<this-sample's>/<directory>` folder. Rename the file to `.env`.
 
 > [!NOTE]
 > Please note that at this time, this sample is only supported with Azure OpenAI.
 
-1. Fill the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT`, `AZURE_SEARCH_KEY`, `AZURE_SEARCH_ENDPOINT` variables appropriately.
+1. Fill the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables appropriately.
 
 1. Follow the [use your data quickstart instructions](https://learn.microsoft.com/en-us/azure/ai-services/openai/use-your-data-quickstart?tabs=command-line%2Cpython-new&pivots=programming-language-studio#add-your-data-using-azure-openai-studio) to add your data using Azure OpenAI Studio. Select `Upload files` as the data source. You can upload the `nba.pdf` file. Take note of the index name.
 
@@ -73,11 +73,11 @@ This sample shows how to integrate your Azure AI Search index as a data source i
     {
         "type": "azure_search",
         "parameters": {
-            "endpoint": "", // The Azure AI Search service endpoint
-            "index_name": "", // The index that was created in the previous step.
+            "endpoint": "AZURE-AI-SEARCH-ENDPOINT",
+            "index_name": "nba",
             "authentication": {
                 "type": "api_key",
-                "key": "" // The api key for authentication.
+                "key": "AZURE-AI-SEARCH-KEY"
             }
         }
     }
@@ -88,7 +88,7 @@ This sample shows how to integrate your Azure AI Search index as a data source i
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
 
-1.  1. Fill the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT`, `AZURE_SEARCH_KEY`, `AZURE_SEARCH_ENDPOINT` in the `./env/.env.local.user` file.
+1.  1. Fill the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` in the `./env/.env.local.user` file.
 1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
 1. Copy this sample into a new folder outside of teams-ai

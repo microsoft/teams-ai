@@ -55,7 +55,11 @@ namespace Microsoft.Teams.AI.AI.Augmentations
                     {
                         if (cmd is PredictedSayCommand say)
                         {
-                            ChatMessage message = response.Message ?? new ChatMessage(ChatRole.Assistant);
+                            ChatMessage message = response.Message ?? new ChatMessage(ChatRole.Assistant)
+                            {
+                                Context = response.Message?.Context,
+                            };
+
                             message.Content = say.Response.Content;
                             say.Response = message;
                         }

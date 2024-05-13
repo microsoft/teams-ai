@@ -21,7 +21,7 @@ TempStateT = TypeVar("TempStateT", bound=TempState)
 
 
 @state
-class TurnState(MemoryBase, State[State[Any]], Generic[ConversationStateT, UserStateT, TempStateT]):
+class TurnState(MemoryBase, State, Generic[ConversationStateT, UserStateT, TempStateT]):
     """
     Default Turn State
     """

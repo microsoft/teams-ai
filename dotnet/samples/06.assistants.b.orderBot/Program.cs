@@ -3,11 +3,11 @@ using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Teams.AI;
 using Microsoft.Teams.AI.AI;
-using Microsoft.Teams.AI.AI.OpenAI.Models;
 using Microsoft.Teams.AI.AI.Planners.Experimental;
 using Microsoft.Teams.AI.AI.Planners;
 using OrderBot;
 using OrderBot.Models;
+using Azure.AI.OpenAI.Assistants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,16 +17,35 @@ builder.Services.AddHttpContextAccessor();
 
 // Load configuration
 var config = builder.Configuration.Get<ConfigOptions>()!;
-if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
+var isAzureCredentialsSet = config.Azure != null && !string.IsNullOrEmpty(config.Azure.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint);
+var isOpenAICredentialsSet = config.OpenAI != null && !string.IsNullOrEmpty(config.OpenAI.ApiKey);
+
+string apiKey = "";
+string? endpoint = null;
+string? assistantId = "";
+
+// If both credentials are set then the Azure credentials will be used.
+if (isAzureCredentialsSet)
 {
-    throw new Exception("Missing OpenAI configuration.");
+    apiKey = config.Azure!.OpenAIApiKey!;
+    endpoint = config.Azure.OpenAIEndpoint;
+    assistantId = config.Azure.OpenAIAssistantId;
+}
+else if (isOpenAICredentialsSet)
+{
+    apiKey = config.OpenAI!.ApiKey!;
+    assistantId = config.OpenAI.AssistantId;
+}
+else
+{
+    throw new Exception("Missing configurations. Set either Azure or OpenAI configurations");
+
 }
 
 // Missing Assistant ID, create new Assistant
-if (string.IsNullOrEmpty(config.OpenAI.AssistantId))
+if (string.IsNullOrEmpty(assistantId))
 {
-    Console.WriteLine("No Assistant ID configured, creating new Assistant...");
-    string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(config.OpenAI.ApiKey, null, new()
+    AssistantCreationOptions assistantCreationOptions = new("gpt-4")
     {
         Name = "Order Bot",
         Instructions = string.Join("\n", new[]
@@ -36,21 +55,12 @@ if (string.IsNullOrEmpty(config.OpenAI.AssistantId))
             "If the customer doesn't specify the type of pizza, beer, or salad they want ask them.",
             "Verify the order is complete and accurate before placing it with the place_order function."
         }),
-        Tools = new()
-        {
-            new()
-            {
-                Type = Tool.FUNCTION_CALLING_TYPE,
-                Function = new()
-                {
-                    Name = "place_order",
-                    Description = "Creates or updates a food order.",
-                    Parameters = OrderParameters.GetSchema()
-                }
-            }
-        },
-        Model = "gpt-3.5-turbo"
-    }).Result.Id;
+    };
+
+    assistantCreationOptions.Tools.Add(new FunctionToolDefinition("place_order", "Creates or updates a food order.", new BinaryData(OrderParameters.GetSchema())));
+
+    string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(apiKey, assistantCreationOptions, endpoint).Result.Id;
+
     Console.WriteLine($"Created a new assistant with an ID of: {newAssistantId}");
     Console.WriteLine("Copy and save above ID, and set `OpenAI:AssistantId` in appsettings.Development.json.");
     Console.WriteLine("Press any key to exit.");
@@ -74,7 +84,7 @@ builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<Team
 builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<TeamsAdapter>()!);
 
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
-builder.Services.AddSingleton(_ => new AssistantsPlannerOptions(config.OpenAI.ApiKey, config.OpenAI.AssistantId));
+builder.Services.AddSingleton(_ => new AssistantsPlannerOptions(apiKey, assistantId, endpoint));
 
 // Create the Application.
 builder.Services.AddTransient<IBot>(sp =>

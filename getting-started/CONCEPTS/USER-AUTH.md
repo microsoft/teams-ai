@@ -64,6 +64,31 @@ const app = new ApplicationBuilder<ApplicationTurnState>()
     .build();
 ```
 
+**Python**
+
+```python
+app = Application[TurnState[ConversationState, UserState, TempState]](
+    ApplicationOptions(
+        bot_app_id=config.APP_ID,
+        storage=MemoryStorage(),
+        adapter=TeamsAdapter(config),
+        auth=AuthOptions(
+            default="graph",
+            auto=True,
+            settings={
+                "graph": OAuthOptions(
+                    connection_name=config.OAUTH_CONNECTION_NAME,
+                    title="Sign In",
+                    text="please sign in",
+                    end_on_invalid_message=True,
+                    enable_sso=True,
+                ),
+            },
+        ),
+    )
+)
+```
+
 The `adapter` is the configured `BotAdapter` for the application. The second parameter in the `.withAuthentication` is the authentication options.
 
 The `settings` property is an object of all the different services that the user could be authenticated to, called _connections_. The above example has the `graph` connection which specifies configurations to authenticate the user to Microsoft Graph. The name `graph` is arbitrary and is used when specifying which service to sign the user in and out of.
@@ -105,6 +130,16 @@ options.AutoSignIn = (ITurnContext turnContext, CancellationToken cancellationTo
         return Promise.resolve(true);
     }
 })
+```
+
+**Python**
+
+```python
+auth=AuthOptions(
+    default="graph",
+    # type can be of bool or Callable[[TurnContext], bool]
+    auto=True,
+    settings={})
 ```
 
 The `autoSignIn` property takes a callback that triggers the sign in flow if it returns true. It depends on the turn context from which the incomming activity details can be extracted. In the above example, the library will not attempt to sign the user in if the incoming activity `commandId` is _"signOutCommand"_.
@@ -208,6 +243,27 @@ app.authentication
   });
 ```
 
+**Python**
+```python
+auth = app.auth.get("graph")
+
+@auth.on_sign_in_success
+async def on_sign_in_success(
+    context: TurnContext, state: TurnState[ConversationState, UserState, TempState]
+):
+    await context.send_activity("successfully logged in!")
+    await context.send_activity(f"token: {state.temp.auth_tokens['graph']}")
+
+
+@auth.on_sign_in_failure
+async def on_sign_in_failure(
+    context: TurnContext,
+    _state: TurnState[ConversationState, UserState, TempState],
+    _res: SignInResponse,
+):
+    await context.send_activity("failed to login...")
+```
+
 ## Sign out a user
 
 You can also sign a user out of connection:
@@ -222,6 +278,21 @@ await app.Authentication.SignOutUserAsync(context, state, "graph", cancellationT
 
 ```js
 await app.authentication.signOutUser(context, state, "graph");
+```
+
+**Python**
+
+```python
+
+auth = app.auth.get("graph")
+
+@app.message("/signout")
+async def on_sign_out(
+    context: TurnContext, state: TurnState[ConversationState, UserState, TempState]
+):
+    await auth.sign_out(context, state)
+    await context.send_activity("you are now signed out...👋")
+    return False
 ```
 
 ---

@@ -76,7 +76,7 @@ namespace Microsoft.Teams.AI
         /// <param name="context">The turn context</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>True if the activity should be handled by current authentication hanlder. Otherwise, false.</returns>
-        protected override async Task<bool> TokenExchangeRouteSelector(ITurnContext context, CancellationToken cancellationToken)
+        internal override async Task<bool> TokenExchangeRouteSelector(ITurnContext context, CancellationToken cancellationToken)
         {
             JObject? value = context.Activity.Value as JObject;
             JToken? id = value?["id"];

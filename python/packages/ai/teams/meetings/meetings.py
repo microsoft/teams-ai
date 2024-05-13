@@ -53,7 +53,7 @@ class Meetings(Generic[StateT]):
             )
 
         def __call__(
-            func: Callable[[TurnContext, StateT, MeetingStartEventDetails], Awaitable[None]]
+            func: Callable[[TurnContext, StateT, MeetingStartEventDetails], Awaitable[None]],
         ) -> Callable[[TurnContext, StateT, MeetingStartEventDetails], Awaitable[None]]:
             async def __handler__(context: TurnContext, state: StateT):
                 if not context.activity.value:
@@ -94,7 +94,7 @@ class Meetings(Generic[StateT]):
             )
 
         def __call__(
-            func: Callable[[TurnContext, StateT, MeetingEndEventDetails], Awaitable[None]]
+            func: Callable[[TurnContext, StateT, MeetingEndEventDetails], Awaitable[None]],
         ) -> Callable[[TurnContext, StateT, MeetingEndEventDetails], Awaitable[None]]:
             async def __handler__(context: TurnContext, state: StateT):
                 if not context.activity.value:

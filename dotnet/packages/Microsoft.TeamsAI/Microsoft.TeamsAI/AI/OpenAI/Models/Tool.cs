@@ -5,6 +5,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
     /// <summary>
     /// Model represents Assistant tool.
     /// </summary>
+    [Obsolete("This type has been depecrated. Use Azure.AI.OpenAI.Assistants.ToolOutput instead.")]
     public class Tool
     {
         /// <summary>
@@ -34,6 +35,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
     /// <summary>
     /// Model represent function of Assistant tool.
     /// </summary>
+    [Obsolete("This type has been depecrated. Use Azure.AI.OpenAI.Assistants.RequiredFunctionToolCall instead.")]
     public class Function
     {
         /// <summary>

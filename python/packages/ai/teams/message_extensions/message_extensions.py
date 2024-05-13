@@ -91,7 +91,7 @@ class MessageExtensions(Generic[StateT]):
             func: Callable[
                 [TurnContext, StateT, MessagingExtensionQuery],
                 Awaitable[MessagingExtensionResult],
-            ]
+            ],
         ) -> Callable[
             [TurnContext, StateT, MessagingExtensionQuery],
             Awaitable[MessagingExtensionResult],
@@ -148,7 +148,7 @@ class MessageExtensions(Generic[StateT]):
             func: Callable[
                 [TurnContext, StateT, str],
                 Awaitable[MessagingExtensionResult],
-            ]
+            ],
         ) -> Callable[
             [TurnContext, StateT, str],
             Awaitable[MessagingExtensionResult],
@@ -207,7 +207,7 @@ class MessageExtensions(Generic[StateT]):
             return self._activity_with_command_id(context.activity, command_id)
 
         def __call__(
-            func: Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]]
+            func: Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]],
         ) -> Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]]:
             async def __invoke__(context: TurnContext, state: StateT):
                 if not context.activity.value:
@@ -262,7 +262,7 @@ class MessageExtensions(Generic[StateT]):
             func: Callable[
                 [TurnContext, StateT],
                 Awaitable[MessagingExtensionResult],
-            ]
+            ],
         ) -> Callable[[TurnContext, StateT], Awaitable[MessagingExtensionResult]]:
             async def __invoke__(context: TurnContext, state: StateT):
                 res = await func(context, state)
@@ -304,7 +304,7 @@ class MessageExtensions(Generic[StateT]):
             return True
 
         def __call__(
-            func: Callable[[TurnContext, StateT, Any], Awaitable[None]]
+            func: Callable[[TurnContext, StateT, Any], Awaitable[None]],
         ) -> Callable[[TurnContext, StateT, Any], Awaitable[None]]:
             async def __invoke__(context: TurnContext, state: StateT):
                 value = {}
@@ -350,7 +350,7 @@ class MessageExtensions(Generic[StateT]):
             return True
 
         def __call__(
-            func: Callable[[TurnContext, StateT, Any], Awaitable[None]]
+            func: Callable[[TurnContext, StateT, Any], Awaitable[None]],
         ) -> Callable[[TurnContext, StateT, Any], Awaitable[None]]:
             async def __invoke__(context: TurnContext, state: StateT):
                 value = {}
@@ -428,7 +428,7 @@ class MessageExtensions(Generic[StateT]):
             func: Callable[
                 [TurnContext, StateT, Activity],
                 Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
-            ]
+            ],
         ) -> Callable[
             [TurnContext, StateT, Activity],
             Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
@@ -493,7 +493,7 @@ class MessageExtensions(Generic[StateT]):
             func: Callable[
                 [TurnContext, StateT],
                 Awaitable[Union[TaskModuleTaskInfo, str]],
-            ]
+            ],
         ) -> Callable[
             [TurnContext, StateT],
             Awaitable[Union[TaskModuleTaskInfo, str]],
@@ -542,7 +542,7 @@ class MessageExtensions(Generic[StateT]):
             func: Callable[
                 [TurnContext, StateT, Any],
                 Awaitable[MessagingExtensionResult],
-            ]
+            ],
         ) -> Callable[
             [TurnContext, StateT, Any],
             Awaitable[MessagingExtensionResult],
@@ -601,7 +601,7 @@ class MessageExtensions(Generic[StateT]):
             func: Callable[
                 [TurnContext, StateT, Any],
                 Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
-            ]
+            ],
         ) -> Callable[
             [TurnContext, StateT, Any],
             Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
