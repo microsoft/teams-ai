@@ -50,7 +50,7 @@
         "@types/express": "^4.17.21",
         "@types/jsonwebtoken": "^9.0.4",
         "@types/mocha": "^10.0.6",
-        "@types/node": "^20.12.10",
+        "@types/node": "^20.12.11",
         "@types/uuid": "^9.0.8",
         "botbuilder-core": "^4.22.1",
         "eslint": "^8.57.0",
@@ -58,7 +58,7 @@
         "jsonwebtoken": "^9.0.2",
         "mocha": "10.4.0",
         "nyc": "^15.1.0",
-        "rimraf": "5.0.5",
+        "rimraf": "5.0.7",
         "shx": "^0.3.4",
         "ts-mocha": "10.0.0",
         "typescript": "^5.4.5"
