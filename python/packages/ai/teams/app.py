@@ -665,7 +665,7 @@ class Application(Bot, Generic[StateT]):
             if not await self._run_after_turn_middleware(context, state):
                 return
 
-            await self._save_state(context, state)
+            await state.save(context, self._options.storage)
         except ApplicationError as err:
             await self._on_error(context, err)
         finally:
@@ -692,7 +692,7 @@ class Application(Bot, Generic[StateT]):
         for before_turn in self._before_turn:
             is_ok = await before_turn(context, state)
             if not is_ok:
-                await self._save_state(context, state)
+                await state.save(context, self._options.storage)
                 return False
         return True
 
@@ -707,7 +707,7 @@ class Application(Bot, Generic[StateT]):
     async def _run_activity_handlers(self, context: TurnContext, state):
         is_ok, matches = await self._on_activity(context, state)
         if not is_ok:
-            await self._save_state(context, state)
+            await state.save(context, self._options.storage)
         return is_ok, matches
 
     async def _run_ai_chain(self, context: TurnContext, state):
@@ -719,7 +719,7 @@ class Application(Bot, Generic[StateT]):
         ):
             is_ok = await self._ai.run(context, state)
             if not is_ok:
-                await self._save_state(context, state)
+                await state.save(context, self._options.storage)
                 return False
         return True
 
@@ -727,12 +727,9 @@ class Application(Bot, Generic[StateT]):
         for after_turn in self._after_turn:
             is_ok = await after_turn(context, state)
             if not is_ok:
-                await self._save_state(context, state)
+                await state.save(context, self._options.storage)
                 return False
         return True
-
-    async def _save_state(self, context: TurnContext, state):
-        await state.save(context, self._options.storage)
 
     async def _on_activity(self, context: TurnContext, state: StateT) -> Tuple[bool, int]:
         matches = 0
