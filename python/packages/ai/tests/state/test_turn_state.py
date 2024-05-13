@@ -100,7 +100,10 @@ class TestTurnState(IsolatedAsyncioTestCase):
         turn_state = await AppTurnState.load(context, storage)
 
         self.assertEqual(
-            str(turn_state), '{"conversation": {"hello": "world"}, "user": {}, "temp": {}}'
+            str(turn_state),
+            '{"conversation": {"hello": "world"}, "user": {}, "temp": {"action_outputs": {},'
+            ' "auth_tokens": {}, "duplicate_token_exchange": null, "input": "",'
+            ' "input_files": [], "last_output": ""}}',
         )
 
     async def test_has(self):

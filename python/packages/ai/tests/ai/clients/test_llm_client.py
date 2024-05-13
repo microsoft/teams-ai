@@ -193,7 +193,10 @@ class TestLLMClient(IsolatedAsyncioTestCase):
             remaining_attempts=2,
         )
 
-        expected_history = [Message(role="user"), Message(role="assistant", content="test")]
+        expected_history = [
+            Message(role="user", content=""),
+            Message(role="assistant", content="test"),
+        ]
 
         self.assertTrue(mock_async_openai.called)
 

@@ -86,11 +86,12 @@ class AdaptiveCards(Generic[StateT]):
             return False
 
         def __call__(
-            func: Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]]
+            func: Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]],
         ) -> Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]]:
             async def __handler__(context: TurnContext, state: StateT) -> bool:
                 result = await func(context, state, context.activity.value["action"]["data"])
-                if context.turn_state.get(ActivityTypes.invoke_response) is None:
+
+                if context.turn_state.get(context._INVOKE_RESPONSE_KEY) is None:
                     if isinstance(result, str):
                         response = AdaptiveCardInvokeResponse(
                             status_code=200,
@@ -162,7 +163,7 @@ class AdaptiveCards(Generic[StateT]):
             return False
 
         def __call__(
-            func: Callable[[TurnContext, StateT, dict], Awaitable[None]]
+            func: Callable[[TurnContext, StateT, dict], Awaitable[None]],
         ) -> Callable[[TurnContext, StateT, dict], Awaitable[None]]:
             async def __handler__(context: TurnContext, state: StateT) -> bool:
                 await func(context, state, context.activity.value)
@@ -229,7 +230,7 @@ class AdaptiveCards(Generic[StateT]):
             func: Callable[
                 [TurnContext, StateT, Query[AdaptiveCardsSearchParams]],
                 Awaitable[List[AdaptiveCardsSearchResult]],
-            ]
+            ],
         ) -> Callable[
             [TurnContext, StateT, Query[AdaptiveCardsSearchParams]],
             Awaitable[List[AdaptiveCardsSearchResult]],
@@ -254,7 +255,7 @@ class AdaptiveCards(Generic[StateT]):
                     ),
                 )
                 result = await func(context, state, query)
-                if context.turn_state.get(ActivityTypes.invoke_response) is None:
+                if context.turn_state.get(context._INVOKE_RESPONSE_KEY) is None:
                     # Format invoke response
                     response = {
                         "type": "application/vnd.microsoft.search.searchResponse",

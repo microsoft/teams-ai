@@ -65,7 +65,7 @@ class TaskModules(Generic[StateT]):
             )
 
         def __call__(
-            func: Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]]
+            func: Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]],
         ) -> Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]]:
             async def __handler__(context: TurnContext, state: StateT) -> bool:
                 # the selector already ensures data exists
@@ -111,7 +111,7 @@ class TaskModules(Generic[StateT]):
         def __call__(
             func: Callable[
                 [TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]
-            ]
+            ],
         ) -> Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]]:
             async def __handler__(context: TurnContext, state: StateT) -> bool:
                 # the selector already ensures data exists
@@ -147,7 +147,7 @@ class TaskModules(Generic[StateT]):
         return False
 
     async def _send_response(self, context: TurnContext, result):
-        if context.turn_state.get(ActivityTypes.invoke_response) is None:
+        if context.turn_state.get(context._INVOKE_RESPONSE_KEY) is None:
             if isinstance(result, str):
                 response = TaskModuleResponse(task=TaskModuleMessageResponse(value=result))
             elif isinstance(result, TaskModuleTaskInfo):

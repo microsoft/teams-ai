@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 from .conversation_state import ConversationState
 from .memory import Memory, MemoryBase
-from .state import State, state
+from .state import State, StatePropertyAccessor, state
 from .temp_state import TempState
 from .todict import todict
 from .turn_state import TurnState
@@ -17,6 +17,7 @@ __all__ = [
     "MemoryBase",
     "state",
     "State",
+    "StatePropertyAccessor",
     "TurnState",
     "UserState",
     "TempState",

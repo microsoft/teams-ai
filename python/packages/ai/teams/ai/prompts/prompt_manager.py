@@ -226,10 +226,8 @@ class PromptManager(PromptFunctions):
         """
         if prompt.name in self._prompts:
             raise ApplicationError(
-                (
-                    "The PromptManager.add_prompt() method was called with a "
-                    f"previously registered prompt named '{prompt.name}'."
-                )
+                "The PromptManager.add_prompt() method was called with a "
+                f"previously registered prompt named '{prompt.name}'."
             )
 
         # Clone and cache prompt
@@ -268,10 +266,8 @@ class PromptManager(PromptFunctions):
                     template_config = PromptTemplateConfig.from_dict(json.load(file))
             except Exception as e:
                 raise ApplicationError(
-                    (
-                        "PromptManager.get_prompt(): an error occurred while loading "
-                        f"'{config_file}'. The file is either invalid or missing."
-                    )
+                    "PromptManager.get_prompt(): an error occurred while loading "
+                    f"'{config_file}'. The file is either invalid or missing."
                 ) from e
 
             # Load prompt text
@@ -282,10 +278,8 @@ class PromptManager(PromptFunctions):
                     sections.append(TemplateSection(prompt, self._options.role))
             except Exception as e:
                 raise ApplicationError(
-                    (
-                        "PromptManager.get_prompt(): an error occurred while loading "
-                        f"'{prompt_file}'. The file is either invalid or missing."
-                    )
+                    "PromptManager.get_prompt(): an error occurred while loading "
+                    f"'{prompt_file}'. The file is either invalid or missing."
                 ) from e
 
             # Load optional actions

@@ -37,6 +37,7 @@ from .adaptive_cards.adaptive_cards import AdaptiveCards
 from .ai import AI
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
+from .auth import AuthManager, OAuth, OAuthOptions
 from .meetings.meetings import Meetings
 from .message_extensions.message_extensions import MessageExtensions
 from .route import Route, RouteHandler
@@ -46,6 +47,7 @@ from .teams_adapter import TeamsAdapter
 from .typing import Typing
 
 StateT = TypeVar("StateT", bound=TurnState)
+IN_SIGN_IN_KEY = "__InSignInFlow__"
 
 
 class Application(Bot, Generic[StateT]):
@@ -67,6 +69,7 @@ class Application(Bot, Generic[StateT]):
     _adaptive_card: AdaptiveCards[StateT]
     _options: ApplicationOptions
     _adapter: Optional[TeamsAdapter] = None
+    _auth: Optional[AuthManager[StateT]] = None
     _before_turn: List[RouteHandler[StateT]] = []
     _after_turn: List[RouteHandler[StateT]] = []
     _routes: List[Route[StateT]] = []
@@ -94,15 +97,20 @@ class Application(Bot, Generic[StateT]):
         self._meetings = Meetings[StateT](self._routes)
 
         if options.long_running_messages and (not options.adapter or not options.bot_app_id):
-            raise ApplicationError(
-                """
+            raise ApplicationError("""
                 The `ApplicationOptions.long_running_messages` property is unavailable because 
                 no adapter or `bot_app_id` was configured.
-                """
-            )
+                """)
 
         if options.adapter:
             self._adapter = options.adapter
+
+        if options.auth:
+            self._auth = AuthManager[StateT](default=options.auth.default)
+
+            for name, opts in options.auth.settings.items():
+                if isinstance(opts, OAuthOptions):
+                    self._auth.set(name, OAuth[StateT](opts))
 
     @property
     def adapter(self) -> TeamsAdapter:
@@ -111,12 +119,10 @@ class Application(Bot, Generic[StateT]):
         """
 
         if not self._adapter:
-            raise ApplicationError(
-                """
+            raise ApplicationError("""
                 The Application.adapter property is unavailable because it was 
                 not configured when creating the Application.
-                """
-            )
+                """)
 
         return self._adapter
 
@@ -128,13 +134,24 @@ class Application(Bot, Generic[StateT]):
         """
 
         if not self._ai:
-            raise ApplicationError(
-                """
+            raise ApplicationError("""
                 The `Application.ai` property is unavailable because no AI options were configured.
-                """
-            )
+                """)
 
         return self._ai
+
+    @property
+    def auth(self) -> AuthManager[StateT]:
+        """
+        The application's authentication manager
+        """
+        if not self._auth:
+            raise ApplicationError("""
+                The `Application.auth` property is unavailable because
+                no Auth options were configured.
+                """)
+
+        return self._auth
 
     @property
     def options(self) -> ApplicationOptions:
@@ -417,7 +434,7 @@ class Application(Bot, Generic[StateT]):
             )
 
         def __call__(
-            func: Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]
+            func: Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]],
         ) -> Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]:
             async def __handler__(context: TurnContext, state: StateT):
                 if not context.activity.value:
@@ -459,7 +476,7 @@ class Application(Bot, Generic[StateT]):
             )
 
         def __call__(
-            func: Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]
+            func: Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]],
         ) -> Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]:
             async def __handler__(context: TurnContext, state: StateT):
                 if not context.activity.value:
@@ -499,7 +516,7 @@ class Application(Bot, Generic[StateT]):
             )
 
         def __call__(
-            func: Callable[[TurnContext, StateT, O365ConnectorCardActionQuery], Awaitable[None]]
+            func: Callable[[TurnContext, StateT, O365ConnectorCardActionQuery], Awaitable[None]],
         ) -> Callable[[TurnContext, StateT, O365ConnectorCardActionQuery], Awaitable[None]]:
             async def __handler__(context: TurnContext, state: StateT):
                 if not context.activity.value:
@@ -539,7 +556,7 @@ class Application(Bot, Generic[StateT]):
             )
 
         def __call__(
-            func: Callable[[TurnContext, StateT, str], Awaitable[None]]
+            func: Callable[[TurnContext, StateT, str], Awaitable[None]],
         ) -> Callable[[TurnContext, StateT, str], Awaitable[None]]:
             async def __handler__(context: TurnContext, state: StateT):
                 if not context.activity.value:

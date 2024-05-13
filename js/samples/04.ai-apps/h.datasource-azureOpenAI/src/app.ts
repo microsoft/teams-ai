@@ -11,9 +11,7 @@ type ApplicationTurnState = TurnState<ConversationState>;
 
 if (
     !process.env.AZURE_OPENAI_KEY ||
-    !process.env.AZURE_OPENAI_ENDPOINT ||
-    !process.env.AZURE_SEARCH_ENDPOINT ||
-    !process.env.AZURE_SEARCH_KEY
+    !process.env.AZURE_OPENAI_ENDPOINT
 ) {
     throw new Error(
         'Missing environment variables - please check that AZURE_OPENAI_KEY, AZURE_OPENAI_ENDPOINT, AZURE_SEARCH_KEY, AZURE_SEARCH_ENDPOINT are all set.'
