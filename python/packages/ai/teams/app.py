@@ -665,14 +665,19 @@ class Application(Bot, Generic[StateT]):
     async def _on_turn(self, context: TurnContext):
         try:
             await self._start_typing(context)
-            await self._remove_mentions(context)
+            self._remove_mentions(context)
+
             state = await self._initialize_state(context)
+
             if not await self._run_before_turn_middleware(context, state):
                 return
 
             await self._handle_file_downloads(context, state)
-            is_ok, matches = await self._run_activity_handlers(context, state)
+
+            is_ok, matches = await self._on_activity(context, state)
+
             if not is_ok:
+                await state.save(context, self._options.storage)
                 return
 
             if matches == 0:
@@ -692,7 +697,7 @@ class Application(Bot, Generic[StateT]):
         if self._options.start_typing_timer:
             await self.typing.start(context)
 
-    async def _remove_mentions(self, context: TurnContext):
+    def _remove_mentions(self, context: TurnContext):
         if self.options.remove_recipient_mention and context.activity.type == ActivityTypes.message:
             context.activity.text = context.remove_recipient_mention(context.activity)
 
@@ -720,12 +725,6 @@ class Application(Bot, Generic[StateT]):
                 files = await file_downloader.download_files(context)
                 input_files.append(files)
             state.temp.input_files = input_files
-
-    async def _run_activity_handlers(self, context: TurnContext, state):
-        is_ok, matches = await self._on_activity(context, state)
-        if not is_ok:
-            await state.save(context, self._options.storage)
-        return is_ok, matches
 
     async def _run_ai_chain(self, context: TurnContext, state):
         if (
