@@ -12,7 +12,6 @@ from botbuilder.core import TurnContext
 from ...state import MemoryBase
 from ..models.prompt_response import PromptResponse
 from ..planners.plan import Plan, PredictedSayCommand
-from ..prompts.message import Message
 from ..prompts.sections.prompt_section import PromptSection
 from ..tokenizers.tokenizer import Tokenizer
 from ..validators.validation import Validation

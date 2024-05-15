@@ -33,7 +33,7 @@ __all__ = [
     "AssistantMessage",
     "AugmentationConfig",
     "CompletionConfig",
-    "Citation" "FunctionCall",
+    "Citation",
     "FunctionCallMessage",
     "FunctionResponseMessage",
     "ImageContentPart",

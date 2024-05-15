@@ -58,7 +58,8 @@ class Appearance:
 @dataclass
 class SensitivityUsageInfo:
     """
-    Represents the sensitivity usage info for content sent to the user. This is used to provide information about the content to the user.
+    Represents the sensitivity usage info for content sent to the user.
+    This is used to provide information about the content to the user.
 
     Attributes:
         type (str): Required; must be 'https://schema.org/Message'

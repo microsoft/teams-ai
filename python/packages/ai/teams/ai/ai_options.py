@@ -37,5 +37,6 @@ class AIOptions(Generic[StateT]):
 
     enable_feedback_loop: bool = False
     """
-    Optional. If true, the AI system will enable the feedback loop in Teams that allows a user to give thumbs up or down to a response.
+    Optional. If true, the AI system will enable the feedback loop in Teams that
+    allows a user to give thumbs up or down to a response.
     """

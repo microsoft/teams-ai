@@ -54,7 +54,7 @@ def to_string(tokenizer: Tokenizer, value: Any, as_json: bool = False) -> str:
     return json_str
 
 
-def snippet(text: str, maxLength: int) -> str:
+def snippet(text: str, max_length: int) -> str:
     """
     Clips the text to a maximum length in case it exceeds the limit.
 
@@ -65,9 +65,9 @@ def snippet(text: str, maxLength: int) -> str:
     Returns:
         str: The modified text
     """
-    if len(text) <= maxLength:
+    if len(text) <= max_length:
         return text
-    snippet = text[:maxLength]
+    snippet = text[:max_length]
     snippet = snippet[: max(snippet.rfind(" "), -1)]
     snippet += "..."
     return snippet
@@ -88,7 +88,8 @@ def get_used_citations(
     text: str, citations: List[ClientCitation]
 ) -> Optional[List[ClientCitation]]:
     """
-    Get the citations used in the text. This will remove any citations that are included in the citations array from the response but not referenced in the text.
+    Get the citations used in the text. This will remove any citations that are
+    included in the citations array from the response but not referenced in the text.
     Args:
         text: str The text to search for citations.
         citations: List[ClientCitation] The list of citations to search for.
@@ -100,11 +101,11 @@ def get_used_citations(
 
     if not matches:
         return None
-    else:
-        used_citations = []
-        for match in matches:
-            for citation in citations:
-                if citation.position == match:
-                    used_citations.append(citation)
-                    break
-        return used_citations
+
+    used_citations = []
+    for match in matches:
+        for citation in citations:
+            if citation.position == match:
+                used_citations.append(citation)
+                break
+    return used_citations
