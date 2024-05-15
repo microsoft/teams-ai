@@ -81,10 +81,10 @@ class SensitivityUsageInfo:
     }
 
     name: str
-    type_: str = field(default="https://schema.org/Message", metadata={"alias": "@type"})
     description: Optional[str]
     position: Optional[int]
     pattern: Optional[Pattern]
+    type_: str = field(default="https://schema.org/Message", metadata={"alias": "@type"})
 
 
 @dataclass
