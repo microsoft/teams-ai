@@ -57,6 +57,12 @@ namespace Microsoft.Teams.AI.AI
         public bool? AllowLooping { get; set; }
 
         /// <summary>
+        /// Optional. If true, the AI system will enable the feedback loop in Teams that allows a user to give thumbs up or down to a response.
+        /// Defaults to "false".
+        /// </summary>
+        public bool EnableFeedbackLoop { get; set; } = false;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AIOptions{TState}"/> class.
         /// </summary>
         /// <param name="planner">The planner to use for generating plans.</param>
