@@ -267,7 +267,8 @@ class AI(Generic[StateT]):
         if is_teams_channel:
             content = content.replace("\n", "<br>")
 
-        # If the response from AI includes citations, they will be parsed and added to the SAY command.
+        # If the response from AI includes citations,
+        # those citations will be parsed and added to the SAY command.
         citations = None
 
         if "citations" in content and len(content["citations"]) > 0:
@@ -283,8 +284,7 @@ class AI(Generic[StateT]):
                     )
                 )
 
-        # If there are citations, modify the content so that the sources are numbers
-        # instead of [doc1], [doc2], etc.
+        # If there are citations, modify the content so that the sources are numbers # instead of [doc1], [doc2], etc.
         content_text = content if not citations else format_citations_response(content)
 
         # If there are citations, filter out the citations unused in content.
