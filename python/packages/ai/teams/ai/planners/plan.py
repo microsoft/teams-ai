@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Literal, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from dataclasses_json import DataClassJsonMixin, dataclass_json
 
@@ -40,7 +40,7 @@ class PredictedSayCommand(DataClassJsonMixin):
     type: Literal["SAY"] = "SAY"
     "Type to indicate that a SAY command is being returned."
 
-    response: Message = None
+    response: Optional[Message] = None
     "The prompt response containing what the AI system should say."
 
 
