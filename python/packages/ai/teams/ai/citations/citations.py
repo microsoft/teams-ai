@@ -21,7 +21,7 @@ class ClientCitation:
     """
 
     _attribute_map = {
-        "type_": { "key": "@type", "type": "str" },
+        "type_": {"key": "@type", "type": "str"},
     }
 
     type_: str = field(default="Claim", metadata={"alias": "@type"}, init=False, repr=False)
@@ -47,9 +47,9 @@ class Appearance:
     """
 
     _attribute_map = {
-        "type_": { "key": "@type", "type": "str" },
-        "usage_info": { "key": "usageInfo", "type": "SensitivityUsageInfo" },
-        "encoding_format": { "key": "encodingFormat", "type": "str" },
+        "type_": {"key": "@type", "type": "str"},
+        "usage_info": {"key": "usageInfo", "type": "SensitivityUsageInfo"},
+        "encoding_format": {"key": "encodingFormat", "type": "str"},
     }
 
     name: str
@@ -58,9 +58,7 @@ class Appearance:
         default=None, metadata={"alias": "usageInfo"}, init=False, repr=False
     )
     keywords: Optional[list[str]] = None
-    type_: str = field(
-        default="DigitalDocument", metadata={"alias": "@type"}
-    )
+    type_: str = field(default="DigitalDocument", metadata={"alias": "@type"})
     text: Optional[str] = ""
     url: str = ""
     encoding_format: Optional[str] = "text/html"
@@ -77,8 +75,9 @@ class SensitivityUsageInfo:
         type (str): Required; must be 'https://schema.org/Message'
 
     """
+
     _attribute_map = {
-        "type_": { "key": "@type", "type": "str" },
+        "type_": {"key": "@type", "type": "str"},
     }
 
     name: str
@@ -100,10 +99,9 @@ class Pattern:
     """
 
     _attribute_map = {
-        "type_": { "key": "@type", "type": "str" },
-        "in_defined_term_set": { "key": "inDefinedTermSet", "type": "str" },
-        "term_code": { "key": "termCode", "type": "str" },
-
+        "type_": {"key": "@type", "type": "str"},
+        "in_defined_term_set": {"key": "inDefinedTermSet", "type": "str"},
+        "term_code": {"key": "termCode", "type": "str"},
     }
 
     in_defined_term_set: str
