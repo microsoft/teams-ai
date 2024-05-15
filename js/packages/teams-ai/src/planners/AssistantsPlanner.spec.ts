@@ -86,7 +86,7 @@ describe('AssistantsPlanner', () => {
             assert(plan.commands);
             assert.equal(plan.commands.length, 1);
             assert.equal(plan.commands[0].type, 'SAY');
-            assert.equal('welcome', (plan.commands[0] as PredictedSayCommand).response);
+            assert.equal('welcome', (plan.commands[0] as PredictedSayCommand).response.content);
         });
 
         it('waits for current run', async () => {
@@ -113,7 +113,7 @@ describe('AssistantsPlanner', () => {
             assert(plan.commands);
             assert.equal(plan.commands.length, 1);
             assert.equal(plan.commands[0].type, 'SAY');
-            assert.equal('welcome', (plan.commands[0] as PredictedSayCommand).response);
+            assert.equal('welcome', (plan.commands[0] as PredictedSayCommand).response.content);
         });
 
         it('waits for previous run', async () => {
@@ -144,7 +144,7 @@ describe('AssistantsPlanner', () => {
             assert(plan.commands);
             assert.equal(plan.commands.length, 1);
             assert.equal(plan.commands[0].type, 'SAY');
-            assert.equal('welcome', (plan.commands[0] as PredictedSayCommand).response);
+            assert.equal('welcome', (plan.commands[0] as PredictedSayCommand).response.content);
         });
 
         it('run cancelled', async () => {
@@ -274,7 +274,7 @@ describe('AssistantsPlanner', () => {
             assert(plan2);
             assert(plan2.commands);
             assert.equal(plan2.commands[0].type, 'SAY');
-            assert.equal((plan2.commands[0] as PredictedSayCommand).response, 'welcome');
+            assert.equal((plan2.commands[0] as PredictedSayCommand).response.content, 'welcome');
 
             const toolMap: { [key: string]: string } = state.getValue('temp.submit_tool_map');
             assert(toolMap);
@@ -332,7 +332,7 @@ describe('AssistantsPlanner', () => {
             assert(plan2);
             assert(plan2.commands);
             assert.equal(plan2.commands[0].type, 'SAY');
-            assert.equal((plan2.commands[0] as PredictedSayCommand).response, 'welcome');
+            assert.equal((plan2.commands[0] as PredictedSayCommand).response.content, 'welcome');
 
             const toolMap: { [key: string]: string } = state.getValue('temp.submit_tool_map');
             assert(toolMap);
@@ -367,9 +367,9 @@ describe('AssistantsPlanner', () => {
             assert(plan.commands);
             assert.equal(plan.commands.length, 3);
             assert.equal(plan.commands[0].type, 'SAY');
-            assert.equal((plan.commands[0] as PredictedSayCommand).response, 'message 2');
-            assert.equal((plan.commands[1] as PredictedSayCommand).response, 'message 1');
-            assert.equal((plan.commands[2] as PredictedSayCommand).response, 'welcome');
+            assert.equal((plan.commands[0] as PredictedSayCommand).response.content, 'message 2');
+            assert.equal((plan.commands[1] as PredictedSayCommand).response.content, 'message 1');
+            assert.equal((plan.commands[2] as PredictedSayCommand).response.content, 'welcome');
         });
     });
 });

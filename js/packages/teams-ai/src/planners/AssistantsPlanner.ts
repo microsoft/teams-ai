@@ -373,7 +373,19 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
                 if (content.type == 'text') {
                     plan.commands.push({
                         type: 'SAY',
-                        response: (content as any).text.value
+                        response: {
+                            role: 'assistant',
+                            content: content.text.value,
+                            context: {
+                                intent: '',
+                                citations: content.text.annotations.map(annotation => ({
+                                    title: '',
+                                    url: '',
+                                    filepath: '',
+                                    content: annotation.text
+                                }))
+                            }
+                        }
                     } as PredictedSayCommand);
                 }
             });
