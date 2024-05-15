@@ -20,6 +20,10 @@ class ClientCitation:
         appearance (Appearance): The appearance object within Citation
     """
 
+    _attribute_map = {
+        "type_": { "key": "@type", "type": "str" },
+    }
+
     type_: str = field(default="Claim", metadata={"alias": "@type"}, init=False, repr=False)
     position: str
     appearance: Appearance
@@ -42,16 +46,24 @@ class Appearance:
         usageInfo (SensitivityUsageInfo): The optional sensitivity content information
     """
 
+    _attribute_map = {
+        "type_": { "key": "@type", "type": "str" },
+        "usage_info": { "key": "usageInfo", "type": "SensitivityUsageInfo" },
+        "encoding_format": { "key": "encodingFormat", "type": "str" },
+    }
+
     name: str
     abstract: str
-    usageInfo: Optional[SensitivityUsageInfo] = None
+    usage_info: Optional[SensitivityUsageInfo] = field(
+        default=None, metadata={"alias": "usageInfo"}, init=False, repr=False
+    )
     keywords: Optional[list[str]] = None
     type_: str = field(
-        default="DigitalDocument", metadata={"alias": "@type"}, init=False, repr=False
+        default="DigitalDocument", metadata={"alias": "@type"}
     )
     text: Optional[str] = ""
     url: str = ""
-    encodingFormat: Optional[str] = "text/html"
+    encoding_format: Optional[str] = "text/html"
     image: Optional[str] = ""
 
 
@@ -65,9 +77,12 @@ class SensitivityUsageInfo:
         type (str): Required; must be 'https://schema.org/Message'
 
     """
+    _attribute_map = {
+        "type_": { "key": "@type", "type": "str" },
+    }
 
     name: str
-    type_: str = field(default="https://schema.org/Message", init=False, repr=False)
+    type_: str = field(default="https://schema.org/Message" metadata={"alias": "@type"})
     description: Optional[str]
     position: Optional[int]
     pattern: Optional[Pattern]
@@ -84,7 +99,14 @@ class Pattern:
 
     """
 
-    inDefinedTermSet: str
+    _attribute_map = {
+        "type_": { "key": "@type", "type": "str" },
+        "in_defined_term_set": { "key": "inDefinedTermSet", "type": "str" },
+        "term_code": { "key": "termCode", "type": "str" },
+
+    }
+
+    in_defined_term_set: str
     name: str
-    termCode: str
-    type_: str = field(default="DefinedTerm", init=False, repr=False)
+    term_code: str
+    type_: str = field(default="DefinedTerm", metadata={"alias": "@type"})
