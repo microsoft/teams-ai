@@ -238,7 +238,19 @@ describe('SequenceAugmentation', () => {
                 // Create plan from response
                 const plan = await augmentation.createPlanFromResponse(context, state, {
                     status: 'success',
-                    message: { role: 'assistant', content: validation.value }
+                    message: {
+                        role: 'assistant',
+                        content: validation.value,
+                        context: {
+                            intent: 'to test citations',
+                            citations: [{
+                                url: '',
+                                title: '',
+                                filepath: '',
+                                content: 'my citation content...'
+                            }]
+                        }
+                    }
                 });
                 assert.notEqual(plan, undefined);
                 assert.deepEqual(plan, {
@@ -255,7 +267,16 @@ describe('SequenceAugmentation', () => {
                             type: 'SAY',
                             response: {
                                 role: 'assistant',
-                                content: 'hello world'
+                                content: 'hello world',
+                                context: {
+                                    intent: 'to test citations',
+                                    citations: [{
+                                        url: '',
+                                        title: '',
+                                        filepath: '',
+                                        content: 'my citation content...'
+                                    }]
+                                }
                             }
                         }
                     ]
