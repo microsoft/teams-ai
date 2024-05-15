@@ -34,6 +34,7 @@ __all__ = [
     "AugmentationConfig",
     "CompletionConfig",
     "Citation",
+    "FunctionCall",
     "FunctionCallMessage",
     "FunctionResponseMessage",
     "ImageContentPart",

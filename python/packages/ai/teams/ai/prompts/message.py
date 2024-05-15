@@ -27,6 +27,7 @@ class Message(Generic[T]):
 
     role: str
     content: Optional[T] = None
+    context: Optional[MessageContext] = None
     function_call: Optional[FunctionCall] = None
     name: Optional[str] = None
 

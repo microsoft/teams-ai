@@ -259,7 +259,10 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
             if monologue.action.name == "SAY":
                 params = monologue.action.parameters
                 response_val = PredictedSayCommand(
-                    response=Message(role="assistant", content=params.get("text")) if params else ""
+                    response=Message(
+                        role="assistant",
+                        context=response.message.context,
+                        content=params.get("text")) if params else ""
                 )
                 command = response_val
             else:
