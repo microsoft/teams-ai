@@ -10,15 +10,18 @@ from logging import Logger
 from typing import Callable, Dict, Generic, Optional, TypeVar
 
 from botbuilder.core import TurnContext
+from botbuilder.schema import Activity, ActivityTypes
 from botframework.connector import Channels
 
 from ..app_error import ApplicationError
 from ..state import TurnState
 from .actions import ActionEntry, ActionHandler, ActionTurnContext, ActionTypes
 from .ai_options import AIOptions
+from .citations.citations import Appearance, ClientCitation
 from .moderators.moderator import Moderator
 from .planners.plan import Plan, PredictedDoCommand, PredictedSayCommand
 from .planners.planner import Planner
+from .utilities import format_citations_response, get_used_citations, snippet
 
 StateT = TypeVar("StateT", bound=TurnState)
 
@@ -111,7 +114,7 @@ class AI(Generic[StateT]):
 
             if existing and not existing.allow_overrides:
                 raise ApplicationError(f"""
-                    The AI.action() method was called with a previously 
+                    The AI.action() method was called with a previously
                     registered action named \"{action_name}\".
                     """)
 
@@ -255,15 +258,62 @@ class AI(Generic[StateT]):
         context: ActionTurnContext[PredictedSayCommand],
         _state: StateT,
     ) -> str:
-        response = context.data.response
+        content = context.data.response.content
+        is_teams_channel = context.activity.channel_id == Channels.ms_teams
 
-        if not response:
+        if not content:
             return ""
 
-        if context.activity.channel_id == Channels.ms_teams:
-            await context.send_activity(response.replace("\n", "<br>"))
-        else:
-            await context.send_activity(response)
+        if is_teams_channel:
+            content = content.replace("\n", "<br>")
+
+        # If the response from AI includes citations, those citations will be parsed and added to the SAY command.
+        citations = None
+
+        if "citations" in content and len(content["citations"]) > 0:
+            citations = []
+            for i, citation in enumerate(content["citations"]):
+                citations.append(
+                    ClientCitation(
+                        position=f"[{i + 1}]",
+                        appearance=Appearance(
+                            name=citation["title"],
+                            abstract=snippet(citation["abstract"], 500),
+                        ),
+                    )
+                )
+
+        # If there are citations, modify the content so that the sources are numbers instead of [doc1], [doc2], etc.
+        content_text = content if not citations else format_citations_response(content)
+
+        # If there are citations, filter out the citations unused in content.
+        referenced_citations = get_used_citations(content_text, citations)
+
+        await context.send_activity(
+            Activity(
+                type=ActivityTypes.message,
+                text=content_text,
+                **(
+                    {"channelData": {"feedbackLoopEnabled": self._options.enable_feedback_loop}}
+                    if is_teams_channel
+                    else {}
+                ),
+                entities=[
+                    {
+                        "type": "https://schema.org/Message",
+                        "@type": "Message",
+                        "@context": "https://schema.org",
+                        "@id": "",
+                        "additionalType": ["AIGeneratedContent"],
+                        **(
+                            {"citation": [citation.__dict__ for citation in referenced_citations]}
+                            if referenced_citations
+                            else {}
+                        ),
+                    }
+                ],
+            )
+        )
 
         return ""
 
