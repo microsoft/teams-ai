@@ -190,6 +190,7 @@ export class SequenceAugmentation implements Augmentation<Plan | undefined> {
                 return {
                     ...c,
                     response: {
+                        ...response.message,
                         role: 'assistant',
                         content: (c as PredictedSayCommand).response as unknown as string
                     }
