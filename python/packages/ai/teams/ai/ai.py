@@ -15,13 +15,14 @@ from botframework.connector import Channels
 
 from ..app_error import ApplicationError
 from ..state import TurnState
+from ..utils import snippet
+from ..utils.citations import format_citations_response, get_used_citations
 from .actions import ActionEntry, ActionHandler, ActionTurnContext, ActionTypes
 from .ai_options import AIOptions
 from .citations.citations import Appearance, ClientCitation
 from .moderators.moderator import Moderator
 from .planners.plan import Plan, PredictedDoCommand, PredictedSayCommand
 from .planners.planner import Planner
-from .utilities import format_citations_response, get_used_citations, snippet
 
 StateT = TypeVar("StateT", bound=TurnState)
 
