@@ -51,7 +51,8 @@ class TestDefaultAugmentation(IsolatedAsyncioTestCase):
             message=Message(
                 role="assistant",
                 content='{ "type": "plan", '
-                + '"commands": [{ "type": "SAY", "response": { "role": "assistant", "content": "hello world"}}]}',
+                + '"commands": [{ "type": "SAY", "response": { "role": "assistant", "content":'
+                ' "hello world"}}]}',
             )
         )
         validation = await self.default_augmentation.validate_response(
