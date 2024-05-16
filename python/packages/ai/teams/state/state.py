@@ -96,7 +96,7 @@ class State(dict, ABC):
 
         if not storage or self.__key__ == "":
             return
-        
+
         data = self.copy()
         del data["__key__"]
 
