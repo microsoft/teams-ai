@@ -112,7 +112,9 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         moderator = AzureContentSafetyModerator(
             options=AzureContentSafetyModeratorOptions(api_key="", moderate="input", endpoint="")
         )
-        plan = Plan(commands=[PredictedSayCommand(response="test")])
+        plan = Plan(
+            commands=[PredictedSayCommand(response=Message[str](role="assistant", content="test"))]
+        )
         output = await moderator.review_output(
             context=cast(TurnContext, {}), state=TurnState(), plan=plan
         )
@@ -130,7 +132,7 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         context = self.create_mock_context()
         state = await TurnState[ConversationState, UserState, TempState].load(context)
         plan = Plan(
-            commands=[PredictedSayCommand(response=Message(role="assistant", content="test"))]
+            commands=[PredictedSayCommand(response=Message[str](role="assistant", content="test"))]
         )
         output = await moderator.review_output(context=context, state=state, plan=plan)
         self.assertTrue(mock_async_openai.called)
@@ -151,7 +153,7 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         context = self.create_mock_context()
         state = await TurnState[ConversationState, UserState, TempState].load(context)
         plan = Plan(
-            commands=[PredictedSayCommand(response=Message(role="assistant", content="test"))]
+            commands=[PredictedSayCommand(response=Message[str](role="assistant", content="test"))]
         )
         output = await moderator.review_output(context=context, state=state, plan=plan)
         self.assertTrue(mock_async_openai.called)

@@ -11,6 +11,7 @@ from botbuilder.core import TurnContext
 from teams.ai.augmentations.sequence_augmentation import SequenceAugmentation
 from teams.ai.models.chat_completion_action import ChatCompletionAction
 from teams.ai.models.prompt_response import PromptResponse
+from teams.ai.planners.plan import PredictedDoCommand, PredictedSayCommand
 from teams.ai.prompts.message import Message
 from teams.ai.prompts.prompt_functions import PromptFunctions
 from teams.ai.tokenizers.gpt_tokenizer import GPTTokenizer
@@ -158,7 +159,7 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
             state,
             self.tokenizer,
             PromptResponse[str](
-                message=Message[Message](
+                message=Message[str](
                     role="assistant",
                     content='{"type":"plan","commands":[{"type":"DO",'
                     + '"action":"test1","parameters": { "foo": "bar" }}'
@@ -195,10 +196,15 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
             state,
             PromptResponse(message=Message(role="assistant", content=validation.value)),
         )
+        command0 = cast(PredictedDoCommand, plan.commands[0])
+        command1 = cast(PredictedSayCommand, plan.commands[1])
+
         self.assertEqual(len(plan.commands), 2)
-        self.assertEqual(plan.commands[0].type, "DO")
-        self.assertEqual(plan.commands[0].action, "test1")
-        self.assertEqual(plan.commands[0].parameters, {"foo": "bar"})
-        self.assertEqual(plan.commands[1].type, "SAY")
-        self.assertEqual(plan.commands[1].response.role, "assistant")
-        self.assertEqual(plan.commands[1].response.content, "hello world")
+        self.assertEqual(command0.type, "DO")
+        self.assertEqual(command0.action, "test1")
+        self.assertEqual(command0.parameters, {"foo": "bar"})
+
+        self.assertEqual(command1.type, "SAY")
+        assert command1.response is not None
+        self.assertEqual(command1.response.role, "assistant")
+        self.assertEqual(command1.response.content, "hello world")

@@ -23,7 +23,9 @@ class TestGetUsedCitations(TestCase):
         ]
         text = "hello [1] world"
         result = get_used_citations(text, citations)
+        assert result is not None
         self.assertEqual(len(result), 1)
+
         self.assertEqual(result, [citations[0]])
 
     def test_get_used_citations_longer(self):
@@ -47,5 +49,8 @@ class TestGetUsedCitations(TestCase):
         ]
         text = "hello [1] world [3]"
         result = get_used_citations(text, citations)
-        self.assertEqual(len(result), 2)
+        if result is not None:
+            self.assertEqual(len(result), 2)
+        else:
+            self.fail("Result is None")
         self.assertEqual(result, [citations[0], citations[2]])

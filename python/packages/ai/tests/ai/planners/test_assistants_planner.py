@@ -605,7 +605,11 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
         self.assertNotEqual(plan, None)
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, "SAY")
-        self.assertEqual("welcome", cast(PredictedSayCommand, plan.commands[0]).response.content)
+        commands = cast(List[PredictedSayCommand], plan.commands)
+        if commands[0].response is not None:
+            self.assertEqual("welcome", commands[0].response.content)
+        else:
+            self.fail("commands[0].response is None")
 
     @mock.patch(
         "openai.AsyncOpenAI",
@@ -631,7 +635,9 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
         self.assertNotEqual(plan, None)
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, "SAY")
-        self.assertEqual("welcome", cast(PredictedSayCommand, plan.commands[0]).response.content)
+        commands = cast(List[PredictedSayCommand], plan.commands)
+        assert commands[0].response is not None
+        self.assertEqual("welcome", commands[0].response.content)
 
     @mock.patch(
         "openai.AsyncOpenAI",
@@ -678,7 +684,9 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
         self.assertNotEqual(plan, None)
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, "SAY")
-        self.assertEqual("welcome", cast(PredictedSayCommand, plan.commands[0]).response.content)
+        commands = cast(List[PredictedSayCommand], plan.commands)
+        assert commands[0].response is not None
+        self.assertEqual("welcome", commands[0].response.content)
 
     @mock.patch(
         "openai.AsyncOpenAI",
@@ -793,17 +801,25 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
         plan1 = await assistants_planner.continue_task(context, state)
         state.temp.action_outputs["test-action"] = "test-output"
         plan2 = await assistants_planner.continue_task(context, state)
+        commands1 = cast(List[PredictedDoCommand], plan1.commands)
+        commands2 = cast(List[PredictedSayCommand], plan2.commands)
 
         self.assertTrue(mock_async_openai.called)
         self.assertNotEqual(plan1, None)
         self.assertEqual(len(plan1.commands), 1)
         self.assertEqual(plan1.commands[0].type, "DO")
-        self.assertEqual("test-action", cast(PredictedDoCommand, plan1.commands[0]).action)
+        if commands1[0].action is not None:
+            self.assertEqual("test-action", commands1[0].action)
+        else:
+            self.fail("commands1[0].action is None")
 
         self.assertNotEqual(plan2, None)
         self.assertEqual(len(plan2.commands), 1)
         self.assertEqual(plan2.commands[0].type, "SAY")
-        self.assertEqual("welcome", cast(PredictedSayCommand, plan2.commands[0]).response.content)
+        if commands2[0].response is not None:
+            self.assertEqual("welcome", commands2[0].response.content)
+        else:
+            self.fail("commands2[0].response is None")
 
         tool_map = state.get("temp.submit_tool_map")
         if tool_map:
@@ -859,7 +875,9 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
         self.assertNotEqual(plan2, None)
         self.assertEqual(len(plan2.commands), 1)
         self.assertEqual(plan2.commands[0].type, "SAY")
-        self.assertEqual("welcome", cast(PredictedSayCommand, plan2.commands[0]).response.content)
+        commands = cast(List[PredictedSayCommand], plan2.commands)
+        assert commands[0].response is not None
+        self.assertEqual("welcome", commands[0].response.content)
 
         tool_map = state.get("temp.submit_tool_map")
         if tool_map:
@@ -887,11 +905,20 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
         )
 
         plan = await assistants_planner.continue_task(context, state)
+        commands = cast(List[PredictedSayCommand], plan.commands)
 
         self.assertTrue(mock_async_openai.called)
         self.assertNotEqual(plan, None)
-        self.assertEqual(len(plan.commands), 3)
-        self.assertEqual(plan.commands[0].type, "SAY")
-        self.assertEqual("message 2", cast(PredictedSayCommand, plan.commands[0]).response.content)
-        self.assertEqual("message 1", cast(PredictedSayCommand, plan.commands[1]).response.content)
-        self.assertEqual("welcome", cast(PredictedSayCommand, plan.commands[2]).response.content)
+        self.assertEqual(len(commands), 3)
+
+        self.assertEqual(commands[0].type, "SAY")
+        assert commands[0].response is not None
+        self.assertEqual("message 2", commands[0].response.content)
+
+        assert commands[1].type == "SAY"
+        assert commands[1].response is not None
+        self.assertEqual("message 1", commands[1].response.content)
+
+        assert commands[2].type == "SAY"
+        assert commands[2].response is not None
+        self.assertEqual("welcome", commands[2].response.content)

@@ -189,10 +189,10 @@ class SequenceAugmentation(Augmentation[Plan]):
             plan.commands = [
                 (
                     PredictedSayCommand(
-                        response=Message(
+                        response=Message[str](
                             role="assistant",
                             context=response.message.context,
-                            content=command.response.content if command.response else None,
+                            content=command.response['content'] if command.response else None,
                         )
                     )
                     if command.type == "SAY"
