@@ -605,7 +605,7 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
         self.assertNotEqual(plan, None)
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, "SAY")
-        self.assertEqual("welcome", cast(PredictedSayCommand, plan.commands[0]).response)
+        self.assertEqual("welcome", cast(PredictedSayCommand, plan.commands[0]).response.content)
 
     @mock.patch(
         "openai.AsyncOpenAI",
@@ -631,7 +631,7 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
         self.assertNotEqual(plan, None)
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, "SAY")
-        self.assertEqual("welcome", cast(PredictedSayCommand, plan.commands[0]).response)
+        self.assertEqual("welcome", cast(PredictedSayCommand, plan.commands[0]).response.content)
 
     @mock.patch(
         "openai.AsyncOpenAI",
@@ -678,7 +678,7 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
         self.assertNotEqual(plan, None)
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, "SAY")
-        self.assertEqual("welcome", cast(PredictedSayCommand, plan.commands[0]).response)
+        self.assertEqual("welcome", cast(PredictedSayCommand, plan.commands[0]).response.content)
 
     @mock.patch(
         "openai.AsyncOpenAI",
@@ -803,7 +803,7 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
         self.assertNotEqual(plan2, None)
         self.assertEqual(len(plan2.commands), 1)
         self.assertEqual(plan2.commands[0].type, "SAY")
-        self.assertEqual("welcome", cast(PredictedSayCommand, plan2.commands[0]).response)
+        self.assertEqual("welcome", cast(PredictedSayCommand, plan2.commands[0]).response.content)
 
         tool_map = state.get("temp.submit_tool_map")
         if tool_map:
@@ -859,7 +859,7 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
         self.assertNotEqual(plan2, None)
         self.assertEqual(len(plan2.commands), 1)
         self.assertEqual(plan2.commands[0].type, "SAY")
-        self.assertEqual("welcome", cast(PredictedSayCommand, plan2.commands[0]).response)
+        self.assertEqual("welcome", cast(PredictedSayCommand, plan2.commands[0]).response.content)
 
         tool_map = state.get("temp.submit_tool_map")
         if tool_map:
@@ -892,6 +892,6 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
         self.assertNotEqual(plan, None)
         self.assertEqual(len(plan.commands), 3)
         self.assertEqual(plan.commands[0].type, "SAY")
-        self.assertEqual("message 2", cast(PredictedSayCommand, plan.commands[0]).response)
-        self.assertEqual("message 1", cast(PredictedSayCommand, plan.commands[1]).response)
-        self.assertEqual("welcome", cast(PredictedSayCommand, plan.commands[2]).response)
+        self.assertEqual("message 2", cast(PredictedSayCommand, plan.commands[0]).response.content)
+        self.assertEqual("message 1", cast(PredictedSayCommand, plan.commands[1]).response.content)
+        self.assertEqual("welcome", cast(PredictedSayCommand, plan.commands[2]).response.content)
