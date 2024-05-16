@@ -24,6 +24,8 @@ from ...app_error import ApplicationError
 from ...state import TurnState
 from ...user_agent import _UserAgent
 from ..actions.action_types import ActionTypes
+from ..citations import ClientCitation
+from ..prompts.message import Message, MessageContext
 from .plan import Plan, PredictedDoCommand, PredictedSayCommand
 from .planner import Planner
 
@@ -357,7 +359,24 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
         for message in new_messages:
             for content in message.content:
                 if content.type == "text":
-                    plan.commands.append(PredictedSayCommand(response=content.text.value))
+                    annotations = content.text.annotations if content.text.annotations else None
+                    plan.commands.append(
+                        PredictedSayCommand(
+                            response=Message(
+                                role="assistant",
+                                content=content.text.value,
+                                context=MessageContext(
+                                    intent="",
+                                    citations=ClientCitation(
+                                        title="",
+                                        url="",
+                                        filepath="",
+                                        content=[annotation.text for annotation in annotations],
+                                    ),
+                                ),
+                            )
+                        )
+                    )
 
         return plan
 
