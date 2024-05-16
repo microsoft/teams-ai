@@ -285,7 +285,8 @@ class AI(Generic[StateT]):
                     )
                 )
 
-        # If there are citations, modify the content so that the sources are numbers # instead of [doc1], [doc2], etc.
+        # If there are citations, modify the content so that the sources are numbers
+        # instead of [doc1], [doc2], etc.
         content_text = content if not citations else format_citations_response(content)
 
         # If there are citations, filter out the citations unused in content.
