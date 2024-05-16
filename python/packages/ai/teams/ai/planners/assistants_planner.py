@@ -366,15 +366,18 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
                                 content=content.text.value,
                                 context=MessageContext(
                                     intent="",
-                                    citations=Citation(
-                                        title="",
-                                        url="",
-                                        filepath="",
-                                        content=(
-                                            [annotation.text for annotation in annotations]
-                                            if annotations
-                                            else None
-                                        ),
+                                    citations=(
+                                        [
+                                            Citation(
+                                                title="",
+                                                url="",
+                                                filepath="",
+                                                content=annotation.text,
+                                            )
+                                            for annotation in annotations
+                                        ]
+                                        if annotations
+                                        else []
                                     ),
                                 ),
                             )

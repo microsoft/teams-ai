@@ -259,7 +259,16 @@ class AI(Generic[StateT]):
         context: ActionTurnContext[PredictedSayCommand],
         _state: StateT,
     ) -> str:
-        content = context.data.response.content
+        content = (
+            context.data.response.content
+            if context.data.response and context.data.response.content
+            else ""
+        )
+        msg_context = (
+            context.data.response.context
+            if context.data.response and context.data.response.context
+            else None
+        )
         is_teams_channel = context.activity.channel_id == Channels.ms_teams
 
         if not content:
@@ -270,11 +279,15 @@ class AI(Generic[StateT]):
 
         # If the response from AI includes citations,
         # those citations will be parsed and added to the SAY command.
-        citations = None
+        citations = []
 
-        if "citations" in content and len(content["citations"]) > 0:
-            citations = []
-            for i, citation in enumerate(content["citations"]):
+        if (
+            msg_context
+            and isinstance(msg_context, dict)
+            and "citations" in msg_context
+            and len(msg_context["citations"]) > 0
+        ):
+            for i, citation in enumerate(context["citations"]):
                 citations.append(
                     ClientCitation(
                         position=f"[{i + 1}]",

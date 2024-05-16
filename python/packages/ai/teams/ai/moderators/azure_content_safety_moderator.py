@@ -149,7 +149,11 @@ class AzureContentSafetyModerator(Generic[StateT], Moderator[StateT]):
                 try:
                     res = self._client.analyze_text(
                         options=models.AnalyzeTextOptions(
-                            text=cmd.response.content or "",
+                            text=(
+                                cmd.response.content
+                                if cmd.response and cmd.response.content is not None
+                                else ""
+                            ),
                             categories=self._options.categories,
                             blocklist_names=self._options.blocklist_names,
                         )

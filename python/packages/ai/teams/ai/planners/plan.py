@@ -40,7 +40,7 @@ class PredictedSayCommand(DataClassJsonMixin):
     type: Literal["SAY"] = "SAY"
     "Type to indicate that a SAY command is being returned."
 
-    response: Optional[Message] = None
+    response: Optional[Message[str]] = None
     "The prompt response containing what the AI system should say."
 
 

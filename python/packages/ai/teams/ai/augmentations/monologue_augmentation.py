@@ -266,7 +266,7 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
                             content=params.get("text"),
                         )
                         if params
-                        else ""
+                        else None
                     )
                 )
                 command = response_val
