@@ -8,13 +8,16 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Generic, Literal, Optional, TypeVar, Union
 
+from dataclasses_json import DataClassJsonMixin, dataclass_json
+
 from .function_call import FunctionCall
 
 T = TypeVar("T")
 
 
+@dataclass_json
 @dataclass
-class Message(Generic[T]):
+class Message(Generic[T], DataClassJsonMixin):
     """
     A message object sent to or received from an LLM.
 

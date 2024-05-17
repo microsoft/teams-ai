@@ -13,7 +13,12 @@ from botbuilder.core import TurnContext
 from ...state import MemoryBase
 from ..models.chat_completion_action import ChatCompletionAction
 from ..models.prompt_response import PromptResponse
-from ..planners.plan import Plan, PredictedDoCommand, PredictedSayCommand
+from ..planners.plan import (
+    Plan,
+    PredictedCommand,
+    PredictedDoCommand,
+    PredictedSayCommand,
+)
 from ..prompts.function_call import FunctionCall
 from ..prompts.message import Message
 from ..prompts.sections.action_augmentation_section import ActionAugmentationSection
@@ -39,7 +44,7 @@ PlanSchema: Optional[Dict[str, Any]] = {
                     "response": {
                         "type": "object",
                         "properties": {
-                            "role": {"type": "string"},
+                            "role": {"type": "string", "enum": ["assistant"]},
                             "content": {"type": "string"},
                         },
                     },
@@ -160,6 +165,9 @@ class SequenceAugmentation(Augmentation[Plan]):
                             feedback='The plan JSON is missing the SAY "response" '
                             + f"for command[{index}]. Return the response to SAY.",
                         )
+
+                    if isinstance(command.response, dict):
+                        command.response = Message[str].from_dict(command.response)
                 else:
                     return Validation(
                         valid=False,
@@ -184,25 +192,30 @@ class SequenceAugmentation(Augmentation[Plan]):
         Returns:
             Plan: The created plan
         """
+
         if response.message and response.message.content:
             plan = response.message.content
-            plan.commands = [
-                (
-                    PredictedSayCommand(
-                        response=Message[str](
-                            role="assistant",
-                            context=response.message.context,
-                            content=(
-                                cast(str, command.response.content)
-                                if command.response and command.response.content
-                                else None
-                            ),
+            commands: List[PredictedCommand] = []
+
+            for command in plan.commands:
+                if command.type == "SAY":
+                    print(command.response)
+                    commands.append(
+                        PredictedSayCommand(
+                            response=Message[str](
+                                role="assistant",
+                                context=response.message.context,
+                                content=(
+                                    command.response.content
+                                    if command.response and command.response.content
+                                    else None
+                                ),
+                            )
                         )
                     )
-                    if command.type == "SAY"
-                    else command
-                )
-                for command in plan.commands
-            ]
+                else:
+                    commands.append(command)
+
+            plan.commands = commands
             return plan
         return Plan()
