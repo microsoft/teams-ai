@@ -199,7 +199,6 @@ class SequenceAugmentation(Augmentation[Plan]):
 
             for command in plan.commands:
                 if command.type == "SAY":
-                    print(command.response)
                     commands.append(
                         PredictedSayCommand(
                             response=Message[str](
