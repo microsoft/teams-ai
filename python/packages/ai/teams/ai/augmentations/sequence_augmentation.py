@@ -192,7 +192,11 @@ class SequenceAugmentation(Augmentation[Plan]):
                         response=Message[str](
                             role="assistant",
                             context=response.message.context,
-                            content=command.response['content'] if command.response else None,
+                            content=(
+                                cast(str, command.response.content)
+                                if command.response and command.response.content
+                                else None
+                            ),
                         )
                     )
                     if command.type == "SAY"
