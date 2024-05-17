@@ -8,9 +8,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional
 
+from msrest.serialization import Model
+
 
 @dataclass
-class ClientCitation:
+class ClientCitation(Model):
     """
     Represents the citations payload to be sent to the client.
 
@@ -30,7 +32,7 @@ class ClientCitation:
 
 
 @dataclass
-class Appearance:
+class Appearance(Model):
     """
     Represents how the citation will be rendered
 
@@ -66,7 +68,7 @@ class Appearance:
 
 
 @dataclass
-class SensitivityUsageInfo:
+class SensitivityUsageInfo(Model):
     """
     Represents the sensitivity usage info for content sent to the user.
     This is used to provide information about the content to the user.
@@ -88,7 +90,7 @@ class SensitivityUsageInfo:
 
 
 @dataclass
-class Pattern:
+class Pattern(Model):
     """
     Attributes:
         type (str): Required; must be 'DefinedTerm'
