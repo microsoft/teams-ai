@@ -13,7 +13,7 @@
         "ai"
     ],
     "engines": {
-        "node": "18.x"
+        "node": ">=18.x"
     },
     "bugs": {
         "url": "https://github.com/microsoft/teams-ai/issues"
@@ -26,7 +26,7 @@
     "types": "./lib/index.d.ts",
     "peerDependencies": {
         "botbuilder": "^4.22.1",
-        "openai": "4.28.4"
+        "openai": "^4.41.0"
     },
     "dependencies": {
         "@azure/openai-assistants": "1.0.0-beta.5",
@@ -39,6 +39,7 @@
         "gpt-tokenizer": "^2.1.2",
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
+        "openai": "^4.41.0",
         "uuid": "^9.0.1",
         "yaml": "^2.4.2"
     },

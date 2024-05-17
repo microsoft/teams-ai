@@ -6,7 +6,12 @@
  * Licensed under the MIT License.
  */
 
-import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
+import { ClientOptions, AzureOpenAI, OpenAI } from 'openai';
+import { 
+    ChatCompletionCreateParams, 
+    ChatCompletionMessageParam
+} from 'openai/resources';
+import { AxiosRequestConfig } from 'axios';
 import { Message, PromptFunctions, PromptTemplate } from '../prompts';
 import { PromptCompletionModel, PromptResponse } from './PromptCompletionModel';
 import {
@@ -39,17 +44,32 @@ export interface BaseOpenAIModelOptions {
     responseFormat?: { type: 'json_object' };
 
     /**
+     * @deprecated
      * Optional. Retry policy to use when calling the OpenAI API.
      * @remarks
-     * The default retry policy is `[2000, 5000]` which means that the first retry will be after
-     * 2 seconds and the second retry will be after 5 seconds.
+     * Use `maxRetries` instead.
      */
     retryPolicy?: number[];
 
     /**
+     * Optional. Maximum number of retries to use when calling the OpenAI API.
+     * @remarks
+     * The default is to retry twice.
+     */
+    maxRetries?: number;
+
+    /**
+     * @deprecated
      * Optional. Request options to use when calling the OpenAI API.
+     * @abstract
+     * Use `clientOptions` instead.
      */
     requestConfig?: AxiosRequestConfig;
+
+    /**
+     * Optional. Custom client options to use when calling the OpenAI API.
+     */
+    clientOptions?: ClientOptions;
 
     /**
      * Optional. A static seed to use when making model calls.
@@ -66,6 +86,16 @@ export interface BaseOpenAIModelOptions {
      * prompt to be sent as `user` messages instead.
      */
     useSystemMessages?: boolean;
+<<<<<<< Updated upstream
+=======
+
+    /**
+     * Optional. Whether the models responses should be streamed back using Server Sent Events (SSE.)
+     * @remarks
+     * Defaults to `false`.
+     */
+    stream?: boolean;
+>>>>>>> Stashed changes
 }
 
 /**
@@ -98,34 +128,6 @@ export interface OpenAIModelOptions extends BaseOpenAIModelOptions {
 }
 
 /**
- * Options for configuring a model that calls and `OpenAI` compliant endpoint.
- * @remarks
- * The endpoint should comply with the OpenAPI spec for OpenAI's API:
- *
- * https://github.com/openai/openai-openapi
- *
- * And an example of a compliant endpoint is LLaMA.cpp's reference server:
- *
- * https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md
- */
-export interface OpenAILikeModelOptions extends BaseOpenAIModelOptions {
-    /**
-     * Endpoint of the model server to call.
-     */
-    endpoint: string;
-
-    /**
-     * Default model to use for completions.
-     */
-    defaultModel: string;
-
-    /**
-     * Optional. API key to use when calling the models endpoint.
-     */
-    apiKey?: string;
-}
-
-/**
  * Options for configuring an `OpenAIModel` to call an Azure OpenAI hosted model.
  */
 export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
@@ -154,7 +156,7 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
  * A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
  */
 export class OpenAIModel implements PromptCompletionModel {
-    private readonly _httpClient: AxiosInstance;
+    private readonly _client: OpenAI;
     private readonly _useAzure: boolean;
 
     private readonly UserAgent = '@microsoft/teams-ai-v1';
@@ -162,20 +164,33 @@ export class OpenAIModel implements PromptCompletionModel {
     /**
      * Options the client was configured with.
      */
-    public readonly options: OpenAIModelOptions | AzureOpenAIModelOptions | OpenAILikeModelOptions;
+    public readonly options: OpenAIModelOptions | AzureOpenAIModelOptions;
 
     /**
      * Creates a new `OpenAIModel` instance.
      * @param {OpenAIModelOptions} options - Options for configuring the model client.
      */
-    public constructor(options: OpenAIModelOptions | AzureOpenAIModelOptions | OpenAILikeModelOptions) {
+    public constructor(options: OpenAIModelOptions | AzureOpenAIModelOptions) {
+        // Handle deprecated options
+        if (options.maxRetries == undefined && options.retryPolicy != undefined) {
+            console.warn(`OpenAIModel: The 'retryPolicy' option is deprecated. Use 'maxRetries' instead.`);
+            options.maxRetries = options.retryPolicy.length;
+        }
+        if (options.clientOptions == undefined && options.requestConfig != undefined) {
+            console.warn(`OpenAIModel: The 'requestConfig' option is deprecated. Use 'clientOptions' instead.`);
+            options.clientOptions = {
+                timeout: options.requestConfig.timeout,
+                httpAgent: options.requestConfig.httpsAgent ?? options.requestConfig.httpAgent,
+                defaultHeaders: options.requestConfig.headers as any 
+            };
+        }
+
         // Check for azure config
         if ((options as AzureOpenAIModelOptions).azureApiKey) {
-            this._useAzure = true;
+            // Initialize options
             this.options = Object.assign(
                 {
                     completion_type: 'chat',
-                    retryPolicy: [2000, 5000],
                     azureApiVersion: '2023-05-15',
                     useSystemMessages: false
                 },
@@ -193,24 +208,41 @@ export class OpenAIModel implements PromptCompletionModel {
                     `Model created with an invalid endpoint of '${endpoint}'. The endpoint must be a valid HTTPS url.`
                 );
             }
-
             this.options.azureEndpoint = endpoint;
+
+            // Create client
+            this._useAzure = true;
+            this._client = new AzureOpenAI(Object.assign(
+                {}, 
+                this.options.clientOptions, 
+                { 
+                    apiKey: this.options.azureApiKey,
+                    endpoint: this.options.azureEndpoint,
+                    apiVersion: this.options.azureApiVersion 
+                }
+            ));
         } else {
-            this._useAzure = false;
+            // Initialize options
             this.options = Object.assign(
                 {
                     completion_type: 'chat',
-                    retryPolicy: [2000, 5000],
                     useSystemMessages: false
                 },
                 options
             ) as OpenAIModelOptions;
-        }
 
-        // Create client
-        this._httpClient = axios.create({
-            validateStatus: (status) => status < 400 || status == 429
-        });
+            // Create client
+            this._useAzure = false;
+            this._client = new OpenAI(Object.assign(
+                {},
+                this.options.clientOptions,
+                {
+                    apiKey: this.options.apiKey,
+                    baseURL: this.options.endpoint,
+                    organization: this.options.organization,
+                }
+            ));
+        }
     }
 
     /**
@@ -236,6 +268,12 @@ export class OpenAIModel implements PromptCompletionModel {
             (this._useAzure
                 ? (this.options as AzureOpenAIModelOptions).azureDefaultDeployment
                 : (this.options as OpenAIModelOptions).defaultModel);
+        
+        // Check for legacy completion type  
+        if (template.config.type == 'completion') {
+            throw new Error(`The completion type 'completion' is no longer supported. Only 'chat' based models are supported.`);
+        }
+
         // Render prompt
         const result = await template.prompt.renderAsMessages(context, memory, functions, tokenizer, max_input_tokens);
         if (result.tooLong) {
@@ -263,10 +301,16 @@ export class OpenAIModel implements PromptCompletionModel {
             input = result.output[last];
         }
 
-        // Initialize chat completion request
-        const request: CreateChatCompletionRequest = this.copyOptionsToRequest<CreateChatCompletionRequest>(
+        const stream = await this._client.chat.completions.create({stream: true});
+        const iterator = stream[Symbol.asyncIterator]();
+
+        for await (const chunk of stream) {
+        }
+
+        // Initialize chat completion params
+        const params: ChatCompletionCreateParams = this.copyOptionsToRequest<ChatCompletionCreateParams>(
             {
-                messages: result.output as ChatCompletionRequestMessage[]
+                messages: result.output as ChatCompletionMessageParam[]
             },
             template.config.completion,
             [
@@ -276,27 +320,43 @@ export class OpenAIModel implements PromptCompletionModel {
                 'n',
                 'stream',
                 'logprobs',
-                'echo',
+                'top_logprobs',
                 'stop',
                 'presence_penalty',
                 'frequency_penalty',
-                'best_of',
                 'logit_bias',
                 'user',
                 'functions',
                 'function_call',
+<<<<<<< Updated upstream
                 'data_sources'
+=======
+                'data_sources',
+                'response_format',
+                'seed',
+                'tool_choice',
+                'tools'
+>>>>>>> Stashed changes
             ]
         );
         if (this.options.responseFormat) {
-            request.response_format = this.options.responseFormat;
+            params.response_format = this.options.responseFormat;
         }
         if (this.options.seed !== undefined) {
-            request.seed = this.options.seed;
+            params.seed = this.options.seed;
         }
+        if (this.options.stream) {
+            params.stream = true;
+        }
+        params.model = model;
 
         // Call chat completion API
-        const response = await this.createChatCompletion(request, model);
+        const response = await this._client.chat.completions.create(params);
+        if (params.stream) {
+
+        } else {
+
+        }
         if (this.options.logRequests) {
             console.log(Colorize.title('CHAT RESPONSE:'));
             console.log(Colorize.value('status', response.status));
@@ -418,6 +478,26 @@ export class OpenAIModel implements PromptCompletionModel {
             return this.post(url, body, retryCount + 1);
         } else {
             return response;
+        }
+    }
+
+    private createClient(options: OpenAIModelOptions | AzureOpenAIModelOptions | OpenAILikeModelOptions): OpenAI {
+        return new OpenAI()
+        if (this._useAzure) {
+            const azureOptions = options as AzureOpenAIModelOptions;
+            return new OpenAI({
+                apiKey: azureOptions.azureApiKey,
+                endpoint: azureOptions.azureEndpoint,
+                organization: azureOptions.azureDefaultDeployment
+            });
+        } else {
+            const openAIOptions = options as OpenAIModelOptions;
+            return new OpenAI({
+                apiKey: openAIOptions.apiKey,
+                defaultModel: openAIOptions.defaultModel,
+                organization: openAIOptions.organization,
+                endpoint: openAIOptions.endpoint
+            });
         }
     }
 }
