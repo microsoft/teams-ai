@@ -8,6 +8,7 @@ using Microsoft.Teams.AI.Application;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
+using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
@@ -772,6 +773,47 @@ namespace Microsoft.Teams.AI
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
+            AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
+            return this;
+        }
+
+        /// <summary>
+        /// Registers a handler for feedback loop events when a user clicks the thumbsup or thumbsdown button on a response sent from the AI module.
+        /// <see cref="AIOptions{TState}.EnableFeedbackLoop"/> must be set to true.
+        /// </summary>
+        /// <param name="handler">Function to cal lwhen the route is triggered</param>
+        /// <returns></returns>
+        public Application<TState> OnFeedbackLoop(FeedbackLoopHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+
+            RouteSelectorAsync routeSelector = (context, _) =>
+            {
+
+                string? actionName = (context.Activity.Value as JObject)?.GetValue("actionName")?.Value<string>();
+                return Task.FromResult
+                (
+                    context.Activity.Type == ActivityTypes.Invoke
+                    && context.Activity.Name == "message/submitAction"
+                    && actionName == "feedback"
+                );
+            };
+
+            RouteHandler<TState> routeHandler = async (turnContext, turnState, cancellationToken) =>
+            {
+                FeedbackLoopData feedbackLoopData = ActivityUtilities.GetTypedValue<FeedbackLoopData>(turnContext.Activity)!;
+                feedbackLoopData.ReplyToId = turnContext.Activity.ReplyToId;
+
+                await handler(turnContext, turnState, feedbackLoopData, cancellationToken);
+
+                // Check to see if an invoke response has already been added
+                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
+                {
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity();
+                    await turnContext.SendActivityAsync(activity, cancellationToken);
+                }
+            };
+
             AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
             return this;
         }
