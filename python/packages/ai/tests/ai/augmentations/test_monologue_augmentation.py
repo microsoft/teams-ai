@@ -148,7 +148,9 @@ class TestMonologueAugmentation(IsolatedAsyncioTestCase):
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, "SAY")
         assert isinstance(plan.commands[0], PredictedSayCommand)
-        self.assertEqual(plan.commands[0].response, "hello world")
+        assert plan.commands[0].response is not None
+        self.assertEqual(plan.commands[0].response.role, "assistant")
+        self.assertEqual(plan.commands[0].response.content, "hello world")
 
     async def test_create_plan_with_do_command(self):
         state = TurnState()

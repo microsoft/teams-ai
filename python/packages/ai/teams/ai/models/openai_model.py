@@ -135,7 +135,7 @@ class OpenAIModel(PromptCompletionModel):
             return PromptResponse[str](
                 status="too_long",
                 error=f"""
-                the generated chat completion prompt had a length of {res.length} tokens 
+                the generated chat completion prompt had a length of {res.length} tokens
                 which exceeded the max_input_tokens of {max_tokens}
                 """,
             )
@@ -212,7 +212,7 @@ class OpenAIModel(PromptCompletionModel):
             return PromptResponse[str](
                 status="error",
                 error=f"""
-                The chat completion API returned an error 
+                The chat completion API returned an error
                 status of {err.code}: {err.message}
                 """,
             )

@@ -11,7 +11,7 @@ from botbuilder.core import TurnContext
 from teams.ai.augmentations.sequence_augmentation import SequenceAugmentation
 from teams.ai.models.chat_completion_action import ChatCompletionAction
 from teams.ai.models.prompt_response import PromptResponse
-from teams.ai.planners import Plan
+from teams.ai.planners.plan import PredictedDoCommand, PredictedSayCommand
 from teams.ai.prompts.message import Message
 from teams.ai.prompts.prompt_functions import PromptFunctions
 from teams.ai.tokenizers.gpt_tokenizer import GPTTokenizer
@@ -121,8 +121,7 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
             PromptResponse[str](
                 message=Message[str](
                     role="assistant",
-                    content='{ "type": "plan", '
-                    + '"commands": [{ "type": "SAY", "response": ""}]}',
+                    content='{ "type": "plan", ' + '"commands": [{ "type": "SAY"' + "}]}",
                 )
             ),
             3,
@@ -164,11 +163,13 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
                     role="assistant",
                     content='{"type":"plan","commands":[{"type":"DO",'
                     + '"action":"test1","parameters": { "foo": "bar" }}'
-                    + ',{"type":"SAY","response":"hello world"}]}',
+                    + ',{"type":"SAY","response": { "role": "assistant", "content": "hello'
+                    ' world"}}]}',
                 )
             ),
             3,
         )
+        self.assertEqual(response.feedback, None)
         self.assertEqual(response.valid, True)
 
     async def test_create_plan_from_response(self):
@@ -183,27 +184,27 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
                     role="assistant",
                     content='{"type":"plan","commands":[{"type":"DO",'
                     + '"action":"test1","parameters": { "foo": "bar" }},'
-                    + '{"type":"SAY","response":"hello world"}]}',
+                    + '{"type":"SAY","response": { "role": "assistant", "content": "hello'
+                    ' world"}}]}',
                 )
             ),
             3,
         )
-
         # Create plan from response
         plan = await self.sequence_augmentation.create_plan_from_response(
             cast(TurnContext, {}),
             state,
             PromptResponse(message=Message(role="assistant", content=validation.value)),
         )
-        self.assertEqual(
-            plan,
-            Plan.from_dict(
-                {
-                    "type": "plan",
-                    "commands": [
-                        {"type": "DO", "action": "test1", "parameters": {"foo": "bar"}},
-                        {"type": "SAY", "response": "hello world"},
-                    ],
-                }
-            ),
-        )
+        command0 = cast(PredictedDoCommand, plan.commands[0])
+        command1 = cast(PredictedSayCommand, plan.commands[1])
+
+        self.assertEqual(len(plan.commands), 2)
+        self.assertEqual(command0.type, "DO")
+        self.assertEqual(command0.action, "test1")
+        self.assertEqual(command0.parameters, {"foo": "bar"})
+
+        self.assertEqual(command1.type, "SAY")
+        assert command1.response is not None
+        self.assertEqual(command1.response.role, "assistant")
+        self.assertEqual(command1.response.content, "hello world")
