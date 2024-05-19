@@ -287,7 +287,7 @@ class AI(Generic[StateT]):
             and "citations" in msg_context
             and len(msg_context["citations"]) > 0
         ):
-            for i, citation in enumerate(context["citations"]):
+            for i, citation in enumerate(msg_context["citations"]):
                 citations.append(
                     ClientCitation(
                         position=f"[{i + 1}]",
@@ -304,16 +304,16 @@ class AI(Generic[StateT]):
 
         # If there are citations, filter out the citations unused in content.
         referenced_citations = get_used_citations(content_text, citations)
+        channel_data = {}
+
+        if is_teams_channel:
+            channel_data["feedbackLoopEnabled"] = self._options.enable_feedback_loop
 
         await context.send_activity(
             Activity(
                 type=ActivityTypes.message,
                 text=content_text,
-                **(
-                    {"channelData": {"feedbackLoopEnabled": self._options.enable_feedback_loop}}
-                    if is_teams_channel
-                    else {}
-                ),
+                channel_data=channel_data,
                 entities=[
                     {
                         "type": "https://schema.org/Message",

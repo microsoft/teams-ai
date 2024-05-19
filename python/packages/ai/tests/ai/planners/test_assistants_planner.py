@@ -440,7 +440,8 @@ class MockAsyncThreads:
                     assistant_id=ASSISTANT_ID,
                     content=[
                         TextContentBlock(
-                            type="text", text=Text(annotations=[], value=message["content"])
+                            type="text",
+                            text=Text(annotations=[], value=cast(str, message["content"])),
                         )
                     ],
                     object="thread.message",
