@@ -15,7 +15,7 @@ from botbuilder.core import TurnContext
 from openai.types import chat
 
 from ...state import MemoryBase
-from ..prompts.message import Message
+from ..prompts.message import Message, MessageContext
 from ..prompts.prompt_functions import PromptFunctions
 from ..prompts.prompt_template import PromptTemplate
 from ..tokenizers import Tokenizer
@@ -178,6 +178,9 @@ class OpenAIModel(PromptCompletionModel):
             messages.append(param)
 
         try:
+            extra_body = {}
+            if template.config.completion.data_sources is not None:
+                extra_body["data_sources"] = template.config.completion.data_sources
             completion = await self._client.chat.completions.create(
                 messages=messages,
                 model=model,
@@ -186,6 +189,7 @@ class OpenAIModel(PromptCompletionModel):
                 top_p=template.config.completion.top_p,
                 temperature=template.config.completion.temperature,
                 max_tokens=max_tokens,
+                extra_body=extra_body,
             )
 
             if self._options.logger is not None:
@@ -203,6 +207,7 @@ class OpenAIModel(PromptCompletionModel):
                 message=Message(
                     role=completion.choices[0].message.role,
                     content=completion.choices[0].message.content,
+                    context=MessageContext.from_dict(completion.choices[0].message.context) if hasattr(completion.choices[0].message, 'context') else None,
                 ),
             )
         except openai.APIError as err:

@@ -78,9 +78,9 @@ MessageContentParts = Union[TextContentPart, ImageContentPart]
 Represents part of the message's content
 """
 
-
+@dataclass_json
 @dataclass
-class Citation:
+class Citation(DataClassJsonMixin):
     """
     Represents a citation returned by the model
 
@@ -96,9 +96,9 @@ class Citation:
     url: str
     filepath: str
 
-
+dataclass_json
 @dataclass
-class MessageContext:
+class MessageContext(DataClassJsonMixin):
     """
     Represents the message context containing a citation
 
