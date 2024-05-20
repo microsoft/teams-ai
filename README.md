@@ -19,7 +19,7 @@ The SDK is currently available for JavaScript/TypeScript applications in the [`j
 
 > ### 🖇️ Jump right in❗️ 📎
 >
-> If you want to jump immediately into AI, try out the [04.ai.a.teamsChefbot](./js/samples/04.ai.a.teamsChefBot) sample. This sample is a simple bot that uses the OpenAI GPT model to build a Teams app. Just load it up in Visual Studio Code, rename the sample.env file to .env, add in your OpenAI key or Azure OpenAI key and endpoint in the .env file, and hit F5! 🎉
+> If you want to jump immediately into AI, try out the [04.ai.a.teamsChefbot](./js/samples/04.ai-apps/a.teamsChefBot) sample. This sample is a simple bot that uses the OpenAI GPT model to build a Teams app. Just load it up in Visual Studio Code, rename the sample.env file to .env, add in your OpenAI key or Azure OpenAI key and endpoint in the .env file, and hit F5! 🎉
 
 ### Start with our getting started guides
 
