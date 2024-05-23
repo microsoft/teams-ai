@@ -23,6 +23,7 @@ export * from './ApplicationBuilder';
 export * from './InputFileDownloader';
 export * from './MemoryFork';
 export * from './MessageExtensions';
+export * from './StreamingResponse';
 export * from './TaskModules';
 export * from './TeamsAttachmentDownloader';
 export * from './TurnState';
