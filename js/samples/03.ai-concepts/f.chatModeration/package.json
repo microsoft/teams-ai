@@ -20,7 +20,7 @@
     },
     "dependencies": {
         "@microsoft/teams-ai": "~1.2.1",
-        "axios": "^1.6.8",
+        "axios": "^1.7.1",
         "botbuilder": "^4.22.2",
         "dotenv": "^16.4.5",
         "jsonwebtoken": "^9.0.2",
@@ -29,7 +29,7 @@
         "restify": "~11.1.0"
     },
     "devDependencies": {
-        "@types/node": "^20.12.11",
+        "@types/node": "^20.12.12",
         "@types/restify": "^8.5.12",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
