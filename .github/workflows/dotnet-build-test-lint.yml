@@ -43,7 +43,7 @@ jobs:
       - name: Test
         run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.Teams.AI.Tests.csproj --no-restore --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration Release
       - name: Coverage
-        uses: danielpalme/ReportGenerator-GitHub-Action@6b06171d1a131e7fd85121120a1c00c1ed03e033 # 5.3.0
+        uses: danielpalme/ReportGenerator-GitHub-Action@9f1033dc04b18a7dfa51aeefeb18540e8939021f # 5.3.4
         with:
           reports: ${{ env.SOLUTION_DIR }}TestResults/*/coverage.cobertura.xml
           targetdir: ${{ env.SOLUTION_DIR }}TestResults/coverage
@@ -55,6 +55,6 @@ jobs:
           name: testresults-dotnet-${{ matrix.dotnet-version }}
           path: ${{ env.SOLUTION_DIR }}TestResults
       - name: Harden Runner
-        uses: step-security/harden-runner@a4aa98b93cab29d9b1101a6143fb8bce00e2eac4 # v2.7.1
+        uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
         with:
           egress-policy: audit
