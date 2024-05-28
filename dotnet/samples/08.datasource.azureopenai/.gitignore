@@ -9,4 +9,4 @@ appsettings.TestTool.json
 **/env/
 bin/Debug/
 obj/
-appPackage/
+appPackage/build/**

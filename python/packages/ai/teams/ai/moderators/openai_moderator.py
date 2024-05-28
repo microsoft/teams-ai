@@ -110,7 +110,8 @@ class OpenAIModerator(Generic[StateT], Moderator[StateT]):
             if isinstance(cmd, PredictedSayCommand):
                 try:
                     res = await self._client.moderations.create(
-                        input=cmd.response, model=self._options.model
+                        input=cmd.response.content if cmd.response and cmd.response.content else "",
+                        model=self._options.model,
                     )
 
                     for result in res.results:

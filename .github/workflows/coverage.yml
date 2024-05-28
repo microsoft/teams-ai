@@ -32,7 +32,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - name: Setup NodeJS ${{ env.node-version }}
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
@@ -63,7 +63,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - name: Setup .NET ${{ env.dotnet-version }}
         uses: actions/setup-dotnet@4d6c8fcf3c8f7a60068d26b594648e99df24cee3 # v4.0.0
         with:
@@ -71,7 +71,7 @@ jobs:
       - name: Test
         run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.Teams.AI.Tests.csproj --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration Release
       - name: Coverage
-        uses: danielpalme/ReportGenerator-GitHub-Action@2a2d60ea1c7e811f54684179af6ac1ae8c1ce69a # 5.2.5
+        uses: danielpalme/ReportGenerator-GitHub-Action@6b06171d1a131e7fd85121120a1c00c1ed03e033 # 5.3.0
         with:
           reports: ${{ env.SOLUTION_DIR }}TestResults/*/coverage.cobertura.xml
           targetdir: ${{ env.SOLUTION_DIR }}TestResults/coverage
@@ -102,7 +102,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - name: Setup Python ${{ env.python-version }}
         uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
         with:

@@ -19,7 +19,7 @@
         "url": "https://github.com/microsoft/teams-ai"
     },
     "dependencies": {
-        "@microsoft/teams-ai": "~1.2.0",
+        "@microsoft/teams-ai": "~1.2.1",
         "botbuilder": "^4.22.2",
         "botbuilder-dialogs": "^4.22.2",
         "dotenv": "^16.4.5",
@@ -29,7 +29,7 @@
         "shx": "^0.3.4"
     },
     "devDependencies": {
-        "@types/node": "^20.12.11",
+        "@types/node": "^20.12.12",
         "@types/jsonwebtoken": "^8.5.4",
         "@types/restify": "8.5.12",
         "@typescript-eslint/eslint-plugin": "^6.21.0",

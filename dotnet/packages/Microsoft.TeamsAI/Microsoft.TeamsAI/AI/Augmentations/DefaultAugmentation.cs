@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
+using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
@@ -30,12 +31,22 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         /// <inheritdoc />
         public async Task<Plan?> CreatePlanFromResponseAsync(ITurnContext context, IMemory memory, PromptResponse response, CancellationToken cancellationToken = default)
         {
+            PredictedSayCommand say = new(response.Message?.Content ?? "");
+
+            if (response.Message != null)
+            {
+                ChatMessage message = new(ChatRole.Assistant)
+                {
+                    Context = response.Message!.Context,
+                    Content = response.Message.Content
+                };
+
+                say.Response = message;
+            }
+
             return await Task.FromResult(new Plan()
             {
-                Commands =
-                {
-                    new PredictedSayCommand(response.Message?.Content ?? "")
-                }
+                Commands = { say }
             });
         }
 
