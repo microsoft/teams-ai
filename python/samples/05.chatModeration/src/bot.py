@@ -62,8 +62,7 @@ elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
 
 prompts = PromptManager(
     PromptManagerOptions(
-        prompts_folder=f"{os.getcwd()}/src/prompts"
-        )
+        prompts_folder=f"{os.path.dirname(os.path.abspath(__file__))}/prompts")
     )
 
 planner = ActionPlanner(
