@@ -719,11 +719,9 @@ class Application(Bot, Generic[StateT]):
                 isinstance(self.options.auth.auto, bool) and self.options.auth.auto
             ) or (callable(self.options.auth.auto) and self.options.auth.auto(context))
             user_in_sign_in = IN_SIGN_IN_KEY in state.user
-            print(auth_condition, user_in_sign_in)
             if auth_condition or user_in_sign_in:
                 key = state.user.get(IN_SIGN_IN_KEY, self.options.auth.default)
                 res = await self._auth.sign_in(context, state, key=key)
-                print(res)
                 if res.status == "complete":
                     del state.user[IN_SIGN_IN_KEY]
 
