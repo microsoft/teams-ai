@@ -668,6 +668,10 @@ class Application(Bot, Generic[StateT]):
             self._remove_mentions(context)
 
             state = await self._initialize_state(context)
+            # print(state.user)
+            # if not await self._authenticate_user(context, state):
+            #     print("auth failed")
+            #     return
 
             if not await self._run_before_turn_middleware(context, state):
                 return
@@ -709,6 +713,31 @@ class Application(Bot, Generic[StateT]):
         await state.load(context, self._options.storage)
         state.temp.input = context.activity.text
         return state
+    
+    async def _authenticate_user(self, context: TurnContext, state):
+        if self.options.auth and self._auth:
+            auth_condition = (
+                (isinstance(self.options.auth.auto, bool) and self.options.auth.auto) or
+                (callable(self.options.auth.auto) and self.options.auth.auto(context))
+            )
+            user_in_sign_in = IN_SIGN_IN_KEY in state.user
+            print(auth_condition, user_in_sign_in)
+            if auth_condition or user_in_sign_in:
+                key = state.user.get(IN_SIGN_IN_KEY, self.options.auth.default)
+                res = await self._auth.sign_in(context, state, key=key)
+                print(res)
+                if res.status == "complete":
+                    del state.user[IN_SIGN_IN_KEY]
+
+                if res.status == "pending":
+                    await state.save(context, self._options.storage)
+                    return False
+
+                if res.status == "error" and res.reason != "invalid-activity":
+                    del state.user[IN_SIGN_IN_KEY]
+                    raise ApplicationError(f"[{res.reason}] => {res.message}")
+                    
+        return True
 
     async def _run_before_turn_middleware(self, context: TurnContext, state):
         for before_turn in self._before_turn:
