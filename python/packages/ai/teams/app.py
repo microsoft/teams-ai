@@ -678,7 +678,7 @@ class Application(Bot, Generic[StateT]):
 
             # if self._turn_state_factory:
             #     state = await self._turn_state_factory(context)
- 
+
             # await state.load(context, self._options.storage)
             # state.temp.input = context.activity.text
             state = await self._initialize_state(context)
@@ -803,13 +803,12 @@ class Application(Bot, Generic[StateT]):
         await state.load(context, self._options.storage)
         state.temp.input = context.activity.text
         return state
-    
+
     async def _authenticate_user(self, context: TurnContext, state):
         if self.options.auth and self._auth:
             auth_condition = (
-                (isinstance(self.options.auth.auto, bool) and self.options.auth.auto) or
-                (callable(self.options.auth.auto) and self.options.auth.auto(context))
-            )
+                isinstance(self.options.auth.auto, bool) and self.options.auth.auto
+            ) or (callable(self.options.auth.auto) and self.options.auth.auto(context))
             user_in_sign_in = IN_SIGN_IN_KEY in state.user
             print(auth_condition, user_in_sign_in)
             if auth_condition or user_in_sign_in:
@@ -826,7 +825,7 @@ class Application(Bot, Generic[StateT]):
                 if res.status == "error" and res.reason != "invalid-activity":
                     del state.user[IN_SIGN_IN_KEY]
                     raise ApplicationError(f"[{res.reason}] => {res.message}")
-                    
+
         return True
 
     async def _run_before_turn_middleware(self, context: TurnContext, state):
