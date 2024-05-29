@@ -63,13 +63,6 @@ export interface AIOptions<TState extends TurnState> {
      * At this time, there is no activity handler support in the Teams AI Library to handle when a user gives feedback.
      */
     enable_feedback_loop?: boolean;
-
-    /**
-     * Optional. If true, the AI system will stream responses to the client.
-     * @remarks
-     * The default value is `false`.
-     */
-    enable_streaming?: boolean;
 }
 
 /**
@@ -106,11 +99,6 @@ export interface ConfiguredAIOptions<TState extends TurnState> {
      * If true, the AI system will enable the feedback loop in Teams that allows a user to give thumbs up or down to a response.
      */
     enable_feedback_loop: boolean;
-
-    /**
-     * If true, the AI system will stream responses to the client.
-     */
-    enable_streaming: boolean;
 }
 
 /**
