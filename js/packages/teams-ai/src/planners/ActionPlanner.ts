@@ -14,10 +14,10 @@ import { PromptTemplate, PromptManager } from '../prompts';
 import { PromptCompletionModel, PromptResponse } from '../models';
 import { PromptResponseValidator } from '../validators';
 import { Memory } from '../MemoryFork';
-import { LLMClient } from './LLMClient';
 import { Tokenizer } from '../tokenizers';
 import { Utilities } from '../Utilities';
 import { DefaultAugmentation } from '../augmentations';
+import { StreamingLLMClient } from './StreamingLLMClient';
 
 /**
  * Factory function used to create a prompt template.
@@ -77,6 +77,11 @@ export interface ActionPlannerOptions<TState extends TurnState = TurnState> {
      * The default value is false.
      */
     logRepairs?: boolean;
+
+    /**
+     * Optional message to send a client at the start of a streaming response.
+     */
+    startStreamingMessage?: string;
 }
 
 /**
@@ -180,8 +185,15 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
             throw result.error!;
         }
 
-        // Return plan
-        return await augmentation.createPlanFromResponse(context, state, result);
+        // Check to see if we have a response
+        // - when a streaming response is used the response message will be undefined.
+        if (result.message) {
+            // Return plan
+            return await augmentation.createPlanFromResponse(context, state, result);
+        } else {
+            // Return an empty plan
+            return { type: 'plan', commands: [] };
+        }
     }
 
     /**
@@ -234,7 +246,7 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
         const input_variable = `temp.input`;
 
         // Create LLM client
-        const client = new LLMClient<TContent>({
+        const client = new StreamingLLMClient<TContent>({
             model,
             template,
             history_variable,
@@ -243,7 +255,8 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
             tokenizer: this._options.tokenizer,
             max_history_messages: this.prompts.options.max_history_messages,
             max_repair_attempts: this._options.max_repair_attempts,
-            logRepairs: this._options.logRepairs
+            logRepairs: this._options.logRepairs,
+            startStreamingMessage: this._options.startStreamingMessage
         });
 
         // Complete prompt

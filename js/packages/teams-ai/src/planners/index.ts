@@ -12,3 +12,4 @@ import * as preview from './AssistantsPlanner';
 export { preview };
 export * from './LLMClient';
 export * from './Planner';
+export * from './StreamingLLMClient';

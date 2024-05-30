@@ -45,6 +45,20 @@ export interface PromptCompletionModelEvents {
     responseReceived: (context: TurnContext, memory: Memory, response: PromptResponse<string>) => void;
 }
 
+/**
+ * Type signature for the `beforeCompletion` event of a `PromptCompletionModel`.
+ */
+export type PromptCompletionModelBeforeCompletionEvent = (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate, streaming: boolean) => void;
+
+/**
+ * Type signature for the `chunkReceived` event of a `PromptCompletionModel`.
+ */
+export type PromptCompletionModelChunkReceivedEvent = (context: TurnContext, memory: Memory, chunk: PromptChunk) => void;
+
+/**
+ * Type signature for the `responseReceived` event of a `PromptCompletionModel`.
+ */
+export type PromptCompletionModelResponseReceivedEvent = (context: TurnContext, memory: Memory, response: PromptResponse<string>) => void;
 
 /**
  * Helper type that strongly types the the EventEmitter for a PromptCOmpletionModel instance.
