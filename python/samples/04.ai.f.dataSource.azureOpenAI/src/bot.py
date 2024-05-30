@@ -12,7 +12,7 @@ from typing import Optional
 
 from botbuilder.core import MemoryStorage, TurnContext
 from teams import Application, ApplicationOptions, TeamsAdapter
-from teams.ai.models import AzureOpenAIModelOptions, OpenAIModel, OpenAIModelOptions
+from teams.ai.models import AzureOpenAIModelOptions, OpenAIModel
 from teams.ai.planners import ActionPlanner, ActionPlannerOptions
 from teams.ai.prompts import PromptManager, PromptManagerOptions
 
@@ -29,19 +29,14 @@ if config.AZURE_OPENAI_KEY is None:
 # Create AI components
 model: OpenAIModel
 
-if config.OPENAI_KEY:
-    model = OpenAIModel(
-        OpenAIModelOptions(api_key=config.OPENAI_KEY, default_model="gpt-3.5-turbo")
+model = OpenAIModel(
+    AzureOpenAIModelOptions(
+        api_key=config.AZURE_OPENAI_KEY,
+        default_model="gpt-35-turbo",
+        api_version="2023-03-15-preview",
+        endpoint=config.AZURE_OPENAI_ENDPOINT,
     )
-elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
-    model = OpenAIModel(
-        AzureOpenAIModelOptions(
-            api_key=config.AZURE_OPENAI_KEY,
-            default_model="gpt-35-turbo",
-            api_version="2023-03-15-preview",
-            endpoint=config.AZURE_OPENAI_ENDPOINT,
-        )
-    )
+)
 
 prompts = PromptManager(PromptManagerOptions(prompts_folder=f"{os.path.dirname(os.path.abspath(__file__))}/prompts"))
 storage = MemoryStorage()
