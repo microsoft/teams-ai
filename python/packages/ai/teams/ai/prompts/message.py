@@ -96,7 +96,7 @@ class Citation(DataClassJsonMixin):
     url: str
     filepath: str
 
-dataclass_json
+@dataclass_json
 @dataclass
 class MessageContext(DataClassJsonMixin):
     """
