@@ -10,9 +10,6 @@ from teams.state import ConversationState, TempState, TurnState, UserState
 
 
 class AppConversationState(ConversationState):
-    secret_word: str = ""
-    guess_count: int = 0
-    remaining_guesses: int = 0
 
     @classmethod
     async def load(
