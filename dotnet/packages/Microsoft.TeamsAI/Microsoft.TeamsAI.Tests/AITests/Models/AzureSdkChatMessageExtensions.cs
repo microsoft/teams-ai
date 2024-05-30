@@ -35,7 +35,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             Assert.Equal($"Invalid ChatCompletionsToolCall type: {nameof(InvalidToolCall)}", ex.Message);
         }
 
-        private class InvalidToolCall : Azure.AI.OpenAI.ChatCompletionsToolCall
+        private sealed class InvalidToolCall : Azure.AI.OpenAI.ChatCompletionsToolCall
         {
             public InvalidToolCall() : base("test-id")
             {

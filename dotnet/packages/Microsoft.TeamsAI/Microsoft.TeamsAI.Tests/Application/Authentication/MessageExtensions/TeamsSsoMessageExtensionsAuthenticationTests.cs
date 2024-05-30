@@ -16,7 +16,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
         private const string AuthStartPage = "https://localhost/auth-start.html";
         private const string AccessToken = "test token";
 
-        private class TeamsSsoMessageExtensionsAuthenticationMock : TeamsSsoMessageExtensionsAuthentication
+        private sealed class TeamsSsoMessageExtensionsAuthenticationMock : TeamsSsoMessageExtensionsAuthentication
         {
             public TeamsSsoMessageExtensionsAuthenticationMock(TeamsSsoSettings settings, IConfidentialClientApplicationAdapter msalAdapterMock) : base(settings)
             {
