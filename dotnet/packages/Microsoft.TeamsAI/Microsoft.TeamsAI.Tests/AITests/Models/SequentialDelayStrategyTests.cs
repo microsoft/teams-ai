@@ -31,7 +31,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
     }
 
-    internal class TestSequentialDelayStrategy : SequentialDelayStrategy
+    internal sealed class TestSequentialDelayStrategy : SequentialDelayStrategy
     {
         public TestSequentialDelayStrategy(List<TimeSpan> delays) : base(delays)
         {
