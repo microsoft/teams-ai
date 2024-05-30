@@ -41,13 +41,7 @@ PlanSchema: Optional[Dict[str, Any]] = {
                     "type": {"type": "string", "enum": ["DO", "SAY"]},
                     "action": {"type": "string"},
                     "parameters": {"type": "object"},
-                    "response": {
-                        "type": "object",
-                        "properties": {
-                            "role": {"type": "string", "enum": ["assistant"]},
-                            "content": {"type": "string"},
-                        },
-                    },
+                    "response": {"type": "string"},
                 },
                 "required": ["type"],
             },
@@ -125,6 +119,12 @@ class SequenceAugmentation(Augmentation[Plan]):
 
         # Validate that the plan is structurally correct
         if validation_result.value:
+            commands: List[Dict[str, Any]] = validation_result.value["commands"]
+
+            for cmd in commands:
+                if cmd["type"] == "SAY":
+                    cmd["response"] = Message[str](role="assistant", content=cmd["response"])
+
             plan = Plan.from_dict(validation_result.value)
             validation_result.value = plan
 
@@ -204,11 +204,7 @@ class SequenceAugmentation(Augmentation[Plan]):
                             response=Message[str](
                                 role="assistant",
                                 context=response.message.context,
-                                content=(
-                                    command.response.content
-                                    if command.response and command.response.content
-                                    else None
-                                ),
+                                content=command.response.content if command.response else None,
                             )
                         )
                     )
