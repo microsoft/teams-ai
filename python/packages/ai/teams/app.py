@@ -716,22 +716,25 @@ class Application(Bot, Generic[StateT]):
     async def _authenticate_user(self, context: TurnContext, state):
         if self.options.auth and self._auth:
             auth_condition = (
-                isinstance(self.options.auth.auto, bool) and self.options.auth.auto
-            ) or (callable(self.options.auth.auto) and self.options.auth.auto(context))
+                isinstance(self.options.auth.auto, bool)
+            ) or (callable(self.options.auth.auto))
             user_in_sign_in = IN_SIGN_IN_KEY in state.user
             if auth_condition or user_in_sign_in:
-                key = state.user.get(IN_SIGN_IN_KEY, self.options.auth.default)
-                res = await self._auth.sign_in(context, state, key=key)
-                if res.status == "complete":
-                    del state.user[IN_SIGN_IN_KEY]
+                key: Optional[str] = state.user.get(IN_SIGN_IN_KEY, self.options.auth.default)
 
-                if res.status == "pending":
-                    await state.save(context, self._options.storage)
-                    return False
+                if key is not None:
+                    state.user[IN_SIGN_IN_KEY] = key
+                    res = await self._auth.sign_in(context, state, key=key)
+                    if res.status == "complete":
+                        del state.user[IN_SIGN_IN_KEY]
 
-                if res.status == "error" and res.reason != "invalid-activity":
-                    del state.user[IN_SIGN_IN_KEY]
-                    raise ApplicationError(f"[{res.reason}] => {res.message}")
+                    if res.status == "pending":
+                        await state.save(context, self._options.storage)
+                        return False
+
+                    if res.status == "error" and res.reason != "invalid-activity":
+                        del state.user[IN_SIGN_IN_KEY]
+                        raise ApplicationError(f"[{res.reason}] => {res.message}")
 
         return True
 
