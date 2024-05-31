@@ -123,6 +123,8 @@ class SequenceAugmentation(Augmentation[Plan]):
 
             for cmd in commands:
                 if cmd["type"] == "SAY":
+                    if cmd["response"] not in cmd:
+                        cmd["response"] = None
                     cmd["response"] = Message[str](role="assistant", content=cmd["response"])
 
             plan = Plan.from_dict(validation_result.value)
