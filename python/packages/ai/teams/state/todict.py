@@ -17,9 +17,6 @@ def todict(value: Any) -> Any:
     if isinstance(value, dict):
         data = {}
         for key, val in value.items():
-            if isinstance(key, str) and key.startswith("__"):
-                continue
-
             data[key] = todict(val)
         return data
 

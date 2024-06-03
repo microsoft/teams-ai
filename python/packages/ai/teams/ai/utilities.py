@@ -10,7 +10,7 @@ from typing import Any
 
 import yaml
 
-from ..ai.tokenizers import Tokenizer
+from .tokenizers import Tokenizer
 
 
 def to_string(tokenizer: Tokenizer, value: Any, as_json: bool = False) -> str:

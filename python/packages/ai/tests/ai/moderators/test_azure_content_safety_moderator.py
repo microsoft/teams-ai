@@ -16,7 +16,6 @@ from teams.ai.moderators import (
     AzureContentSafetyModeratorOptions,
 )
 from teams.ai.planners import Plan, PredictedDoCommand, PredictedSayCommand
-from teams.ai.prompts.message import Message
 from teams.state import ConversationState, TempState, TurnState, UserState
 
 
@@ -112,9 +111,7 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         moderator = AzureContentSafetyModerator(
             options=AzureContentSafetyModeratorOptions(api_key="", moderate="input", endpoint="")
         )
-        plan = Plan(
-            commands=[PredictedSayCommand(response=Message[str](role="assistant", content="test"))]
-        )
+        plan = Plan(commands=[PredictedSayCommand(response="test")])
         output = await moderator.review_output(
             context=cast(TurnContext, {}), state=TurnState(), plan=plan
         )
@@ -131,9 +128,7 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         )
         context = self.create_mock_context()
         state = await TurnState[ConversationState, UserState, TempState].load(context)
-        plan = Plan(
-            commands=[PredictedSayCommand(response=Message[str](role="assistant", content="test"))]
-        )
+        plan = Plan(commands=[PredictedSayCommand(response="test")])
         output = await moderator.review_output(context=context, state=state, plan=plan)
         self.assertTrue(mock_async_openai.called)
         assert output is not None
@@ -152,9 +147,7 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         )
         context = self.create_mock_context()
         state = await TurnState[ConversationState, UserState, TempState].load(context)
-        plan = Plan(
-            commands=[PredictedSayCommand(response=Message[str](role="assistant", content="test"))]
-        )
+        plan = Plan(commands=[PredictedSayCommand(response="test")])
         output = await moderator.review_output(context=context, state=state, plan=plan)
         self.assertTrue(mock_async_openai.called)
         assert output is not None

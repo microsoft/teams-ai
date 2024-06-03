@@ -72,7 +72,7 @@ class State(dict, ABC):
 
     def __init__(self, *args, **kwargs) -> None:  # pylint: disable=unused-argument
         super().__init__()
-        self.__key__ = ""
+        self.__key__ = kwargs["__key__"] if "__key__" in kwargs else ""
         self.__deleted__ = []
 
         # copy public attributes that are not functions
@@ -83,7 +83,8 @@ class State(dict, ABC):
                 self[name] = deepcopy(value)
 
         for key, value in kwargs.items():
-            self[key] = value
+            if not key in ("__key__", "__deleted__"):
+                self[key] = value
 
     async def save(self, _context: TurnContext, storage: Optional[Storage] = None) -> None:
         """
@@ -93,17 +94,13 @@ class State(dict, ABC):
             context (TurnContext): the turn context.
             storage (Optional[Storage]): storage to save to.
         """
-
         if not storage or self.__key__ == "":
             return
-
-        data = self.copy()
-        del data["__key__"]
 
         await storage.delete(self.__deleted__)
         await storage.write(
             {
-                self.__key__: data,
+                self.__key__: self.copy(),
             }
         )
 

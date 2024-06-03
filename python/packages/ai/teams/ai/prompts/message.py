@@ -8,16 +8,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Generic, Literal, Optional, TypeVar, Union
 
-from dataclasses_json import DataClassJsonMixin, dataclass_json
-
 from .function_call import FunctionCall
 
 T = TypeVar("T")
 
 
-@dataclass_json
 @dataclass
-class Message(Generic[T], DataClassJsonMixin):
+class Message(Generic[T]):
     """
     A message object sent to or received from an LLM.
 
@@ -30,7 +27,6 @@ class Message(Generic[T], DataClassJsonMixin):
 
     role: str
     content: Optional[T] = None
-    context: Optional[MessageContext] = None
     function_call: Optional[FunctionCall] = None
     name: Optional[str] = None
 
@@ -77,35 +73,3 @@ MessageContentParts = Union[TextContentPart, ImageContentPart]
 """
 Represents part of the message's content
 """
-
-
-@dataclass
-class Citation:
-    """
-    Represents a citation returned by the model
-
-    Attributes:
-        content (str): The content of the citation
-        title (str): The title of the citation
-        url (str): The url of the citation
-        filepath (str): The filepath of the citation
-    """
-
-    content: str
-    title: str
-    url: str
-    filepath: str
-
-
-@dataclass
-class MessageContext:
-    """
-    Represents the message context containing a citation
-
-    Attributes:
-        citations (list[Citation]): The citations in the message
-        intent (str): The intent of the message
-    """
-
-    citations: list[Citation]
-    intent: str

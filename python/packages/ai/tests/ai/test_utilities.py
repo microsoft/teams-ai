@@ -10,10 +10,10 @@ from unittest import TestCase
 import yaml
 
 from teams.ai.tokenizers.gpt_tokenizer import GPTTokenizer
-from teams.utils import to_string
+from teams.ai.utilities import to_string
 
 
-class TestToString(TestCase):
+class TestUtilities(TestCase):
     def setUp(self):
         self.tokenizer = GPTTokenizer()
 

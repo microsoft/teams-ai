@@ -21,7 +21,7 @@
     },
     "dependencies": {
         "@microsoft/teams-ai": "~1.2.1",
-        "@microsoft/teamsfx": "^2.3.2",
+        "@microsoft/teamsfx": "^2.3.1",
         "@microsoft/teams-js": "^2.23.0",
         "botbuilder": "^4.22.2",
         "dotenv": "^16.4.5",
@@ -32,7 +32,7 @@
     },
     "devDependencies": {
         "@types/jsonwebtoken": "^9.0.6",
-        "@types/node": "^20.12.12",
+        "@types/node": "^20.12.11",
         "@types/restify": "^8.5.12",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",

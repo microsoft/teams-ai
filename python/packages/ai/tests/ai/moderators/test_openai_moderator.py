@@ -13,7 +13,6 @@ from botbuilder.core import TurnContext
 from teams.ai.actions import ActionTypes
 from teams.ai.moderators import OpenAIModerator, OpenAIModeratorOptions
 from teams.ai.planners import Plan, PredictedDoCommand, PredictedSayCommand
-from teams.ai.prompts.message import Message
 from teams.state import ConversationState, TempState, TurnState, UserState
 
 
@@ -179,9 +178,7 @@ class TestOpenAIModerator(IsolatedAsyncioTestCase):
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
     async def test_should_not_review_output(self, mock_async_openai):
         moderator = OpenAIModerator(options=OpenAIModeratorOptions(api_key="", moderate="input"))
-        plan = Plan(
-            commands=[PredictedSayCommand(response=Message[str](role="assistant", content="test"))]
-        )
+        plan = Plan(commands=[PredictedSayCommand(response="test")])
         output = await moderator.review_output(
             context=cast(TurnContext, {}), state=TurnState(), plan=plan
         )
@@ -193,9 +190,7 @@ class TestOpenAIModerator(IsolatedAsyncioTestCase):
         moderator = OpenAIModerator(options=OpenAIModeratorOptions(api_key="", moderate="output"))
         context = self.create_mock_context()
         state = await TurnState[ConversationState, UserState, TempState].load(context)
-        plan = Plan(
-            commands=[PredictedSayCommand(response=Message[str](role="assistant", content="test"))]
-        )
+        plan = Plan(commands=[PredictedSayCommand(response="test")])
         output = await moderator.review_output(context=context, state=state, plan=plan)
         self.assertTrue(mock_async_openai.called)
         assert output is not None
@@ -209,9 +204,7 @@ class TestOpenAIModerator(IsolatedAsyncioTestCase):
         moderator = OpenAIModerator(options=OpenAIModeratorOptions(api_key="", moderate="both"))
         context = self.create_mock_context()
         state = await TurnState[ConversationState, UserState, TempState].load(context)
-        plan = Plan(
-            commands=[PredictedSayCommand(response=Message[str](role="assistant", content="test"))]
-        )
+        plan = Plan(commands=[PredictedSayCommand(response="test")])
         output = await moderator.review_output(context=context, state=state, plan=plan)
         self.assertTrue(mock_async_openai.called)
         assert output is not None

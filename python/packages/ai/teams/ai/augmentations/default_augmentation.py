@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from typing import TypeVar, Union
+from typing import Union
 
 from botbuilder.core import TurnContext
 
@@ -16,8 +16,6 @@ from ..prompts.sections.prompt_section import PromptSection
 from ..tokenizers.tokenizer import Tokenizer
 from ..validators.validation import Validation
 from .augmentation import Augmentation
-
-ContentT = TypeVar("ContentT")
 
 
 class DefaultAugmentation(Augmentation[str]):
@@ -65,11 +63,13 @@ class DefaultAugmentation(Augmentation[str]):
 
         Args:
             turn_context (TurnContext): Context for the current turn of conversation.
-            memory (MemoryBase): Interface for accessing state variables.
+            memory (MemoryBase):  Interface for accessing state variables.
             response (PromptResponse[str]): The validated and transformed response for the prompt.
 
         Returns:
             Plan: The created plan.
         """
-        say_response = response.message
+        say_response = ""
+        if response.message and response.message.content:
+            say_response = response.message.content
         return Plan(commands=[PredictedSayCommand(response=say_response)])
