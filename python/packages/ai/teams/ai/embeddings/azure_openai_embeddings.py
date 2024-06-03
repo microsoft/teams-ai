@@ -51,12 +51,6 @@ class AzureOpenAIEmbeddings(EmbeddingsModel):
         if endpoint[-1] == "/":
             endpoint = endpoint[0 : (len(endpoint) - 1)]
 
-        if not endpoint.lower().startswith("https://"):
-            raise ValueError(f"""
-                Client created with an invalid endpoint of \"{endpoint}\".
-                The endpoint must be a valid HTTPS url.
-                """)
-
         self.options.azure_endpoint = endpoint
 
     async def create_embeddings(

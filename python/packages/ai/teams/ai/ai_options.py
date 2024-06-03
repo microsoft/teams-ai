@@ -25,7 +25,7 @@ class AIOptions(Generic[StateT]):
 
     moderator: Moderator = field(default_factory=DefaultModerator)
     """
-    Optional. The moderator to use for moderating input passed to 
+    Optional. The moderator to use for moderating input passed to
     the model and the output return by the model.
     """
 
@@ -33,4 +33,10 @@ class AIOptions(Generic[StateT]):
     """
     Optional. If true, the AI system will allow the planner to loop.
     Default `True`
+    """
+
+    enable_feedback_loop: bool = False
+    """
+    Optional. If true, the AI system will enable the feedback loop in Teams that
+    allows a user to give thumbs up or down to a response.
     """
