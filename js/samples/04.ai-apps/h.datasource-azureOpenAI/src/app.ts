@@ -1,4 +1,5 @@
 import { OpenAIModel, PromptManager, ActionPlanner, Application, TurnState, TeamsAdapter } from '@microsoft/teams-ai';
+import { DefaultAzureCredential, getBearerTokenProvider } from '@azure/identity';
 import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
 import path from 'path';
 import debug from 'debug';
@@ -9,17 +10,22 @@ error.log = console.log.bind(console);
 interface ConversationState {}
 type ApplicationTurnState = TurnState<ConversationState>;
 
-if (!process.env.AZURE_OPENAI_KEY || !process.env.AZURE_OPENAI_ENDPOINT) {
-    throw new Error('Missing environment variables - please check that AZURE_OPENAI_KEY and AZURE_OPENAI_ENDPOINT');
-}
-
 // Create AI components
 const model = new OpenAIModel({
     // Azure OpenAI Support
-    azureApiKey: process.env.AZURE_OPENAI_KEY!,
-    azureDefaultDeployment: 'gpt-35-turbo',
+    azureDefaultDeployment: 'gpt-4o',
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
-    azureApiVersion: '2024-02-15-preview',
+    azureApiVersion: '2023-03-15-preview',
+    azureADTokenProvider: async () => {
+        const res = await getBearerTokenProvider(
+            new DefaultAzureCredential({  }),
+            'https://cognitiveservices.azure.com/.default'
+        )();
+
+        error(res);
+
+        return res;
+    },
 
     // Request logging
     logRequests: true
