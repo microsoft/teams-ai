@@ -22,7 +22,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         private const string AuthStartPage = "https://localhost/auth-start.html";
         private const string AccessToken = "test token";
 
-        private class TeamsSsoPromptMock : TeamsSsoPrompt
+        private sealed class TeamsSsoPromptMock : TeamsSsoPrompt
         {
             public TeamsSsoPromptMock(string dialogId, string name, TeamsSsoSettings settings, IConfidentialClientApplicationAdapter msalAdapterMock) : base(dialogId, name, settings)
             {

@@ -45,7 +45,7 @@ class AzureContentSafetyModeratorOptions(OpenAIModeratorOptions):
 
     blocklist_names: Optional[List[str]] = None
     """
-    Text blocklist Name. Only support following characters: 0-9 A-Z a-z - . _ ~. 
+    Text blocklist Name. Only support following characters: 0-9 A-Z a-z - . _ ~.
     You could attach multiple lists name here.
     """
 
@@ -149,7 +149,11 @@ class AzureContentSafetyModerator(Generic[StateT], Moderator[StateT]):
                 try:
                     res = self._client.analyze_text(
                         options=models.AnalyzeTextOptions(
-                            text=cmd.response,
+                            text=(
+                                cmd.response.content
+                                if cmd.response and cmd.response.content is not None
+                                else ""
+                            ),
                             categories=self._options.categories,
                             blocklist_names=self._options.blocklist_names,
                         )
