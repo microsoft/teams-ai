@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { LLMClient } from './LLMClient';
+import { StreamingLLMClient } from './StreamingLLMClient';
 import { TestModel } from '../models/TestModel';
 import { TestAdapter } from 'botbuilder-core';
 import { TestPromptManager } from '../internals/testing/TestPromptManager';
@@ -8,7 +8,7 @@ import { Prompt, PromptTemplate, PromptTemplateConfig, UserMessage } from '../pr
 import { JSONResponseValidator } from '../validators';
 import { TestTurnState } from '../internals/testing/TestTurnState';
 
-describe('LLMClient', function() {
+describe('StreamingLLMClient', function() {
     const functions = new TestPromptManager();
     const tokenizer = new GPTTokenizer();
     const validator = new JSONResponseValidator();
@@ -21,10 +21,11 @@ describe('LLMClient', function() {
     };
     const model = TestModel.returnContent('hi! how are you?');
     const errorModel = TestModel.returnError(new Error('some error occurred!'));
+    const streamingModel = TestModel.streamTextChunks(['hi!', ' how are you?']);
 
     describe('constructor()', () => {
         it('should create a new instance with defaults', async () => {
-            const client = new LLMClient({
+            const client = new StreamingLLMClient({
                 model,
                 template
             });
@@ -34,7 +35,7 @@ describe('LLMClient', function() {
         });
 
         it('should create a new instance with custom options', async () => {
-            const client = new LLMClient({
+            const client = new StreamingLLMClient({
                 model,
                 template,
                 history_variable: 'my_history',
@@ -63,11 +64,12 @@ describe('LLMClient', function() {
             const adapter = new TestAdapter();
             await adapter.sendTextToBot('hello', async (context) => {
                 const state = await TestTurnState.create(context);
-                const client = new LLMClient({
+                const client = new StreamingLLMClient({
                     model,
                     template
                 });
                 const response = await client.completePrompt(context, state, functions);
+                assert.equal(adapter.activeQueue.length, 0, 'adapter should have 0 messages in the queue');
                 assert(response, 'response should not be null');
                 assert.equal(response.status, 'success', 'response status should be success');
                 assert(response.message, 'response message should not be null');
@@ -80,15 +82,50 @@ describe('LLMClient', function() {
             const adapter = new TestAdapter();
             await adapter.sendTextToBot('hello', async (context) => {
                 const state = await TestTurnState.create(context);
-                const client = new LLMClient({
+                const client = new StreamingLLMClient({
                     model: errorModel,
                     template
                 });
                 const response = await client.completePrompt(context, state, functions);
+                assert.equal(adapter.activeQueue.length, 0, 'adapter should have 0 messages in the queue');
                 assert(response, 'response should not be null');
                 assert.equal(response.status, 'error', 'response status should be error');
                 assert(response.error, 'response error should not be null');
                 assert.equal(response.error.message, 'some error occurred!', 'response error message should match');
+            });
+        });
+
+        it('should successfully complete a streaming prompt', async () => {
+            const adapter = new TestAdapter();
+            await adapter.sendTextToBot('hello', async (context) => {
+                const state = await TestTurnState.create(context);
+                const client = new StreamingLLMClient({
+                    model: streamingModel,
+                    template
+                });
+                const response = await client.completePrompt(context, state, functions);
+                assert.equal(adapter.activeQueue.length, 3, 'adapter should have 3 messages in the queue');
+                assert(response, 'response should not be null');
+                assert.equal(response.status, 'success', 'response status should be success');
+                assert(response.message == undefined, 'response message should be null');
+            });
+        });
+
+        it('should send a startStreamingMessage', async () => {
+            const adapter = new TestAdapter();
+            await adapter.sendTextToBot('hello', async (context) => {
+                const state = await TestTurnState.create(context);
+                const client = new StreamingLLMClient({
+                    model: streamingModel,
+                    template,
+                    startStreamingMessage: 'start'
+                });
+                const response = await client.completePrompt(context, state, functions);
+                assert.equal(adapter.activeQueue.length, 4, 'adapter should have 4 messages in the queue');
+                assert.equal(adapter.activeQueue[0].text, 'start', 'adapter should have a start message in the queue');
+                assert(response, 'response should not be null');
+                assert.equal(response.status, 'success', 'response status should be success');
+                assert(response.message == undefined, 'response message should be null');
             });
         });
     });
