@@ -176,7 +176,7 @@ export class OpenAIModel implements PromptCompletionModel {
      */
     public constructor(options: OpenAIModelOptions | AzureOpenAIModelOptions | OpenAILikeModelOptions) {
         // Check for azure config
-        if ((options as AzureOpenAIModelOptions).azureApiKey) {
+        if ('azureApiKey' in options || 'azureADTokenProvider' in options) {
             this._useAzure = true;
             this.options = Object.assign(
                 {

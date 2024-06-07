@@ -1,6 +1,7 @@
 import { OpenAIModel, PromptManager, ActionPlanner, Application, TurnState, TeamsAdapter } from '@microsoft/teams-ai';
 import { DefaultAzureCredential, getBearerTokenProvider } from '@azure/identity';
 import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
+import axios from 'axios';
 import path from 'path';
 import debug from 'debug';
 
@@ -18,7 +19,7 @@ const model = new OpenAIModel({
     azureApiVersion: '2023-03-15-preview',
     azureADTokenProvider: async () => {
         const res = await getBearerTokenProvider(
-            new DefaultAzureCredential({  }),
+            new DefaultAzureCredential(),
             'https://cognitiveservices.azure.com/.default'
         )();
 
@@ -64,7 +65,12 @@ app.error(async (context: TurnContext, err: any) => {
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
     error(`[onTurnError] unhandled error: ${err}`);
-    error(err);
+
+    if (err instanceof axios.AxiosError) {
+        error(err.toJSON())
+    } else {
+        error(err);
+    }
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
