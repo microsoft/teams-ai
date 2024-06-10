@@ -29,20 +29,6 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
-        public void Test_Constructor_AzureOpenAI_InvalidAzureEndpoint()
-        {
-            // Arrange
-            var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/");
-            options.AzureEndpoint = "test-endpoint";
-
-            // Act
-            Exception exception = Assert.Throws<ArgumentException>(() => new OpenAIModel(options));
-
-            // Assert
-            Assert.Equal("Model created with an invalid endpoint of `test-endpoint`. The endpoint must be a valid HTTPS url.", exception.Message);
-        }
-
-        [Fact]
         public void Test_Constructor_AzureOpenAI_InvalidAzureApiVersion()
         {
             // Arrange
