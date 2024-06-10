@@ -14,10 +14,6 @@ describe('OpenAIClient', () => {
     const options: OpenAIClientOptions = {
         apiKey: 'mock-key'
     };
-    const optionsWithInvalidEndpoint: OpenAIClientOptions = {
-        apiKey: 'mock-key',
-        endpoint: 'www.'
-    };
     const optionsWithEmptyAPIKey: OpenAIClientOptions = {
         apiKey: ''
     };
