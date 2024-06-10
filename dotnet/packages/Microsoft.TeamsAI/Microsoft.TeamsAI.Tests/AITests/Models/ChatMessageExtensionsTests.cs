@@ -194,7 +194,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             Assert.Equal("Invalid tool type: invalidToolType", ex.Message);
         }
 
-        private class InvalidToolCall : AI.Models.ChatCompletionsToolCall
+        private sealed class InvalidToolCall : AI.Models.ChatCompletionsToolCall
         {
             public InvalidToolCall() : base("invalidToolType", "test-id")
             {
