@@ -22,7 +22,7 @@
     "dependencies": {
         "@microsoft/teams-ai": "~1.2.1",
         "@microsoft/teamsfx": "^2.3.2",
-        "@microsoft/teams-js": "^2.23.0",
+        "@microsoft/teams-js": "^2.24.0",
         "botbuilder": "^4.22.2",
         "dotenv": "^16.4.5",
         "openai": "4.28.4",
