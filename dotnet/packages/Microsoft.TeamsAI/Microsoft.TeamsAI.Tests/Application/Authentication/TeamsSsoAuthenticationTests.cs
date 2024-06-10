@@ -17,7 +17,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
         private const string AuthStartPage = "https://localhost/auth-start.html";
         private const string AccessToken = "test token";
 
-        private class TeamsSsoAuthenticationMock<TState> : TeamsSsoAuthentication<TState>
+        private sealed class TeamsSsoAuthenticationMock<TState> : TeamsSsoAuthentication<TState>
             where TState : TurnState, new()
         {
             public TeamsSsoAuthenticationMock(Application<TState> app, string name, TeamsSsoSettings settings, IConfidentialClientApplicationAdapter msalAdapterMock) : base(app, name, settings, null)
