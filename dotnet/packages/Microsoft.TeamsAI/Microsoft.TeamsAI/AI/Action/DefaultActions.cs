@@ -83,12 +83,12 @@ namespace Microsoft.Teams.AI.AI.Action
             Verify.ParamNotNull(command);
             Verify.ParamNotNull(command.Response);
 
-            if (command.Response.Content == null || command.Response.Content == string.Empty)
+            if (command.Response.Content == null || command.Response.GetContent<string>() == string.Empty)
             {
                 return "";
             }
 
-            string content = command.Response.Content;
+            string content = command.Response.GetContent<string>();
 
             bool isTeamsChannel = turnContext.Activity.ChannelId == Channels.Msteams;
 

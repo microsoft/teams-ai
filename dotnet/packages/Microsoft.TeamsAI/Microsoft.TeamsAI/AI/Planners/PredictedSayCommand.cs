@@ -33,6 +33,10 @@ namespace Microsoft.Teams.AI.AI.Planners
             Response = response;
         }
 
+        /// <summary>
+        /// Create a predicted say command object.
+        /// </summary>
+        /// <param name="response"></param>
         public PredictedSayCommand(string response)
         {
             Response = new ChatMessage(ChatRole.Assistant)

@@ -3,7 +3,6 @@ using Azure.AI.OpenAI;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Microsoft.Bot.Builder;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Teams.AI.AI.Prompts;
@@ -132,6 +131,8 @@ namespace Microsoft.Teams.AI.AI.Models
         {
             DateTime startTime = DateTime.UtcNow;
             int maxInputTokens = promptTemplate.Configuration.Completion.MaxInputTokens;
+
+
             if (_options.CompletionType == CompletionType.Text)
             {
                 // Render prompt
@@ -231,6 +232,15 @@ namespace Microsoft.Teams.AI.AI.Models
                     _logger.LogTrace(JsonSerializer.Serialize(prompt.Output, _serializerOptions));
                 }
 
+                // Get input message
+                // - we're doing this here because the input message can be complex and include images.
+                ChatMessage? input = null;
+                int last = prompt.Output.Count - 1;
+                if (last >= 0 && prompt.Output[last].Role == "user")
+                {
+                    input = prompt.Output[last];
+                }
+
                 // Call chat completion API
                 IEnumerable<ChatRequestMessage> chatMessages = prompt.Output.Select(chatMessage => chatMessage.ToChatRequestMessage());
                 ChatCompletionsOptions chatCompletionsOptions = new(_deploymentName, chatMessages)
@@ -254,6 +264,7 @@ namespace Microsoft.Teams.AI.AI.Models
                     rawResponse = chatCompletionsResponse.GetRawResponse();
                     promptResponse.Status = PromptResponseStatus.Success;
                     promptResponse.Message = chatCompletionsResponse.Value.Choices[0].Message.ToChatMessage();
+                    promptResponse.Input = input;
                 }
                 catch (RequestFailedException e)
                 {

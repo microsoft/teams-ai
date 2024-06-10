@@ -14,6 +14,11 @@ namespace Microsoft.Teams.AI.AI.Prompts
         public PromptResponseStatus Status { get; set; }
 
         /// <summary>
+        /// User input message sent to the model. null if no input was sent.
+        /// </summary>
+        public ChatMessage? Input { get; set; }
+
+        /// <summary>
         /// Message returned.
         /// </summary>
         public ChatMessage? Message { get; set; }
