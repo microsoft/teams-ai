@@ -57,12 +57,6 @@ export class OpenAIClient {
             if (options.endpoint.endsWith('/')) {
                 options.endpoint = options.endpoint.substring(0, options.endpoint.length - 1);
             }
-
-            if (!options.endpoint.toLowerCase().startsWith('https://')) {
-                throw new Error(
-                    `OpenAIClient initialized with an invalid endpoint of '${options.endpoint}'. The endpoint must be a valid HTTPS url.`
-                );
-            }
         }
 
         // Validate API key
