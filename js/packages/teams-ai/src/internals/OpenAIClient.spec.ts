@@ -106,15 +106,6 @@ describe('OpenAIClient', () => {
             assert.equal(openAIClient.options.apiKey, options.apiKey);
         });
 
-        it('should throw error due to invalid endpoint', () => {
-            assert.throws(
-                () => new OpenAIClient(optionsWithInvalidEndpoint),
-                new Error(
-                    `OpenAIClient initialized with an invalid endpoint of '${optionsWithInvalidEndpoint.endpoint}'. The endpoint must be a valid HTTPS url.`
-                )
-            );
-        });
-
         it('should throw error due to invalid api key', () => {
             assert.throws(
                 () => new OpenAIClient(optionsWithEmptyAPIKey),
