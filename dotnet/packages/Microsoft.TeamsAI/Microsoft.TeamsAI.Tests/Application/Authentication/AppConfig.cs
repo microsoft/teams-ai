@@ -3,7 +3,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace Microsoft.Teams.AI.Tests.Application.Authentication
 {
-    internal class AppConfig : IAppConfig
+    internal sealed class AppConfig : IAppConfig
     {
 #pragma warning disable CS8618 // This class is for test purpose only
         public AppConfig(string clientId, string tenantId)
