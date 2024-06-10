@@ -12,8 +12,8 @@ from botbuilder.core import TurnContext
 
 from ....app_error import ApplicationError
 from ....state import MemoryBase
+from ....utils.to_string import to_string
 from ...tokenizers import Tokenizer
-from ...utilities import to_string
 from ..message import Message
 from ..prompt_functions import PromptFunctions
 from ..rendered_prompt_section import RenderedPromptSection

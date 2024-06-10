@@ -48,7 +48,7 @@ elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
         )
     )
 
-prompts = PromptManager(PromptManagerOptions(prompts_folder=f"{os.getcwd()}/src/prompts"))
+prompts = PromptManager(PromptManagerOptions(prompts_folder=f"{os.path.dirname(os.path.abspath(__file__))}/prompts"))
 storage = MemoryStorage()
 app = Application[AppTurnState](
     ApplicationOptions(
@@ -66,10 +66,6 @@ app = Application[AppTurnState](
 async def turn_state_factory(context: TurnContext):
     return await AppTurnState.load(context, storage)
 
-@app.after_turn
-async def on_after_turn(context: TurnContext, state: AppTurnState):
-    print(state)
-    return True
 
 @prompts.function("get_light_status")
 async def on_get_light_status(

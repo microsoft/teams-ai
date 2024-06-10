@@ -51,7 +51,7 @@ namespace Microsoft.Teams.AI.Utilities
             }
             else
             {
-                List<ClientCitation> usedCitations = [];
+                List<ClientCitation> usedCitations = new();
                 foreach (Match match in matches)
                 {
                     citations.Find((citation) =>

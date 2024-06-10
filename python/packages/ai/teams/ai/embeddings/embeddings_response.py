@@ -24,7 +24,7 @@ class EmbeddingsResponse:
     status: EmbeddingsResponseStatus
     "Status of the embeddings response."
 
-    output: Optional[Union[List[List[int]], str]] = None
+    output: Optional[Union[List[List[float]], str]] = None
     "Optional. Embeddings for the given inputs or the error string."
 
     message: Optional[str] = None

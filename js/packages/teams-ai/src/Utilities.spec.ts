@@ -107,5 +107,48 @@ describe('Utilities', () => {
             const result = Utilities.getUsedCitations('hello [1] world', citations);
             assert.deepEqual(result, [citations[0]]);
         });
+
+        it('should return a longer array of used citations', () => {
+            const citations = [
+                {
+                    '@type': 'Claim',
+                    position: '1',
+                    appearance: {
+                        '@type': 'DigitalDocument',
+                        name: 'the title',
+                        abstract: 'some citation text...'
+                    }
+                },
+                {
+                    '@type': 'Claim',
+                    position: '2',
+                    appearance: {
+                        '@type': 'DigitalDocument',
+                        name: 'the title',
+                        abstract: 'some citation other text...'
+                    }
+                },
+                {
+                    '@type': 'Claim',
+                    position: '3',
+                    appearance: {
+                        '@type': 'DigitalDocument',
+                        name: 'the title',
+                        abstract: 'some citation text...'
+                    }
+                },
+                {
+                    '@type': 'Claim',
+                    position: '4',
+                    appearance: {
+                        '@type': 'DigitalDocument',
+                        name: 'the title',
+                        abstract: 'some citation other text...'
+                    }
+                }
+            ] as ClientCitation[];
+            const result = Utilities.getUsedCitations('hello [1] world [3]', citations);
+            assert.deepEqual(result, [citations[0], citations[2]]);
+        });
     });
 });
