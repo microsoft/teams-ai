@@ -21,7 +21,7 @@ namespace Microsoft.Teams.AI.AI.Clients
     /// model. At least not without it being flagged as an `invalid_response`.
     ///
     /// Using the <see cref="JsonResponseValidator"/>, for example, guarantees that you only ever get a valid
-    /// object back from <see cref="CompletePromptAsync(ITurnContext, IMemory, IPromptFunctions{List{string}}, string?, CancellationToken)"/>. In fact, you'll get back a fully parsed object and any
+    /// object back from <see cref="CompletePromptAsync(ITurnContext, IMemory, IPromptFunctions{List{string}}, CancellationToken)"/>. In fact, you'll get back a fully parsed object and any
     /// additional response text from the model will be dropped. If you give the <see cref="JsonResponseValidator"/>
     /// a JSON Schema, you will get back a strongly typed and validated instance of an object in
     /// the returned `response.message.content`.
@@ -135,26 +135,15 @@ namespace Microsoft.Teams.AI.AI.Clients
         /// <param name="context">Current turn context.</param>
         /// <param name="memory">An interface for accessing state values.</param>
         /// <param name="functions">Functions to use when rendering the prompt.</param>
-        /// <param name="input">Input to use when completing the prompt.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>A `PromptResponse` with the status and message.</returns>
         public async Task<PromptResponse> CompletePromptAsync(
             ITurnContext context,
             IMemory memory,
             IPromptFunctions<List<string>> functions,
-            string? input = null,
             CancellationToken cancellationToken = default
         )
         {
-            if (input != null)
-            {
-                memory.SetValue(this.Options.InputVariable, input);
-            }
-            else
-            {
-                input = memory.GetValue(this.Options.InputVariable)?.ToString() ?? string.Empty;
-            }
-
             try
             {
                 PromptResponse response = await this.Options.Model.CompletePromptAsync(
@@ -169,6 +158,16 @@ namespace Microsoft.Teams.AI.AI.Clients
                 if (response.Status != PromptResponseStatus.Success)
                 {
                     return response;
+                }
+
+                // Get input message
+                string inputVariable = Options.InputVariable;
+                ChatMessage? inputMsg = response.Input;
+                if (inputMsg == null)
+                {
+                    object? content = memory.GetValue(inputVariable);
+                    inputMsg = new ChatMessage(ChatRole.User);
+                    inputMsg.Content = content;
                 }
 
                 Validation validation = await this.Options.Validator.ValidateResponseAsync(
@@ -187,7 +186,7 @@ namespace Microsoft.Teams.AI.AI.Clients
                         response.Message.Content = validation.Value.ToString();
                     }
 
-                    this.AddInputToHistory(memory, this.Options.HistoryVariable, input);
+                    this.AddInputToHistory(memory, this.Options.HistoryVariable, inputMsg);
 
                     if (response.Message != null)
                     {
@@ -207,7 +206,7 @@ namespace Microsoft.Teams.AI.AI.Clients
                 if (this.Options.LogRepairs)
                 {
                     this._logger.LogInformation("REPAIRING RESPONSE:");
-                    this._logger.LogInformation(response.Message?.Content ?? string.Empty);
+                    this._logger.LogInformation(response.Message?.Content?.ToString() ?? string.Empty);
                 }
 
                 PromptResponse repairResponse = await this.RepairResponseAsync(
@@ -227,7 +226,7 @@ namespace Microsoft.Teams.AI.AI.Clients
 
                 if (repairResponse.Status == PromptResponseStatus.Success)
                 {
-                    this.AddInputToHistory(memory, this.Options.HistoryVariable, input);
+                    this.AddInputToHistory(memory, this.Options.HistoryVariable, inputMsg);
 
                     if (repairResponse.Message != null)
                     {
@@ -247,19 +246,16 @@ namespace Microsoft.Teams.AI.AI.Clients
             }
         }
 
-        private void AddInputToHistory(IMemory memory, string variable, string input)
+        private void AddInputToHistory(IMemory memory, string variable, ChatMessage input)
         {
-            if (variable == string.Empty || input == string.Empty)
+            if (variable == null)
             {
                 return;
             }
 
             List<ChatMessage> history = (List<ChatMessage>?)memory.GetValue(variable) ?? new() { };
 
-            history.Insert(0, new(ChatRole.User)
-            {
-                Content = input
-            });
+            history.Insert(0, input);
 
             if (history.Count > this.Options.MaxHistoryMessages)
             {
@@ -300,7 +296,7 @@ namespace Microsoft.Teams.AI.AI.Clients
         {
             string feedback = validation.Feedback ?? "The response was invalid. Try another strategy.";
 
-            this.AddInputToHistory(fork, $"{this.Options.HistoryVariable}-repair", feedback);
+            this.AddInputToHistory(fork, $"{this.Options.HistoryVariable}-repair", new(ChatRole.User) { Content = feedback });
 
             if (response.Message != null)
             {

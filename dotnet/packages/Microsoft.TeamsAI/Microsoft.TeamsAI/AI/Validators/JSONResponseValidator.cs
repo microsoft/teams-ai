@@ -45,7 +45,7 @@ namespace Microsoft.Teams.AI.AI.Validators
         /// <inheritdoc />
         public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts, CancellationToken cancellationToken = default)
         {
-            string text = response.Message?.Content ?? "";
+            string text = response.Message?.GetContent<string>() ?? "";
             List<Dictionary<string, JsonElement>> jsonObjects = ResponseJsonParsers.ParseAllObjects(text);
 
             if (jsonObjects.Count == 0)

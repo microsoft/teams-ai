@@ -173,7 +173,26 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <returns>the parsed message text</returns>
         protected string GetMessageText(ChatMessage message)
         {
-            string text = message.Content ?? "";
+            string text = string.Empty;
+
+            if (message.Content is IEnumerable<MessageContentParts>)
+            {
+                IList<MessageContentParts>? contentParts = message.GetContent<IList<MessageContentParts>>();
+                foreach (MessageContentParts part in contentParts)
+                {
+                    if (part is TextContentPart textPart)
+                    {
+                        text += " " + textPart.Text;
+                    }
+
+                    // Remove the leading " "
+                    text = text.TrimStart();
+                }
+            }
+            else if (message.Content is string)
+            {
+                text = message.Content.ToString();
+            }
 
             if (message.FunctionCall != null)
             {

@@ -1,0 +1,34 @@
+[
+  {
+    "name": "SendCard",
+    "description": "Sends an adaptive card to the user",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "card": {
+          "type": "object",
+          "description": "The adaptive card to send"
+        }
+      },
+      "required": [
+        "card"
+      ]
+    }
+  },
+  {
+    "name": "ShowCardJSON",
+    "description": "Shows the user the JSON for an adaptive card",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "card": {
+          "type": "object",
+          "description": "The adaptive card JSON to show"
+        }
+      },
+      "required": [
+        "card"
+      ]
+    }
+  }
+]

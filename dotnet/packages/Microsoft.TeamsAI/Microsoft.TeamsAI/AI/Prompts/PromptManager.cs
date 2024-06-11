@@ -131,7 +131,11 @@ namespace Microsoft.Teams.AI.AI.Prompts
                     ));
                 }
 
-                if (template.Configuration.Completion.IncludeInput)
+                if (template.Configuration.Completion.IncludeImages)
+                {
+                    template.Prompt.AddSection(new UserInputMessageSection(Options.MaxInputTokens));
+                }
+                else if (template.Configuration.Completion.IncludeInput)
                 {
                     template.Prompt.AddSection(new UserMessageSection(
                         "{{$temp.input}}",
