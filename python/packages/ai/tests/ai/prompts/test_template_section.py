@@ -123,7 +123,9 @@ class TestTemplateSection(IsolatedAsyncioTestCase):
         result = await template_section.render_as_text(
             self.context, self.memory, self.functions, self.tokenizer, 100
         )
-        self.assertEqual(result.output, 'Hello "user_test_value" "conversation_test_value" "temp_input"')
+        self.assertEqual(
+            result.output, 'Hello "user_test_value" "conversation_test_value" "temp_input"'
+        )
         self.assertEqual(result.length, 15)
         self.assertFalse(result.too_long)
 
