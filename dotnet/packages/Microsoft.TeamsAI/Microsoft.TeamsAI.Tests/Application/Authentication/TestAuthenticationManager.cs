@@ -3,7 +3,7 @@ using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.Tests.Application.Authentication
 {
-    internal class TestAuthenticationManager : AuthenticationManager<TurnState>
+    internal sealed class TestAuthenticationManager : AuthenticationManager<TurnState>
     {
         public TestAuthenticationManager(AuthenticationOptions<TurnState> options, Application<TurnState> app, IStorage? storage = null) : base(app, options, storage)
         {

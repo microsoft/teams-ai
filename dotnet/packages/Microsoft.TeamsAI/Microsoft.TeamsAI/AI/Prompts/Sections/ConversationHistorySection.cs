@@ -98,7 +98,6 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             messages.Reverse();
 
             // Populate history and stay under the token budget
-
             int tokens = 0;
             int budget = this.Tokens > 1 ? Math.Min(this.Tokens, maxTokens) : maxTokens;
             List<ChatMessage> output = new();
@@ -106,6 +105,13 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             foreach (ChatMessage message in messages)
             {
                 int length = tokenizer.Encode(this.GetMessageText(message)).Count;
+
+                // Add length of any image parts
+                // This accounts for low detail images but not high detail images.
+                if (message.Content is IList<MessageContentParts> contentParts)
+                {
+                    length += contentParts.Where((part) => part is ImageContentPart).Count() * 85;
+                }
 
                 // Stop if we're over the token budget
                 if (tokens + length > budget)

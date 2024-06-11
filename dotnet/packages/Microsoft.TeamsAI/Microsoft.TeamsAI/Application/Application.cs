@@ -763,7 +763,7 @@ namespace Microsoft.Teams.AI
             );
             RouteHandler<TState> routeHandler = async (turnContext, turnState, cancellationToken) =>
             {
-                string token = turnContext.Activity.Value.GetType().GetProperty("Continuation").GetValue(turnContext.Activity.Value) as string;
+                string token = turnContext.Activity.Value.GetType().GetProperty("Continuation").GetValue(turnContext.Activity.Value) as string ?? "";
                 await handler(turnContext, turnState, token, cancellationToken);
 
                 // Check to see if an invoke response has already been added
@@ -902,7 +902,7 @@ namespace Microsoft.Teams.AI
                 _typingTimer = new TypingTimer(_typingTimerDelay);
             }
 
-            if (_typingTimer.IsRunning() == false)
+            if (!_typingTimer.IsRunning())
             {
                 _typingTimer.Start(turnContext);
             }
@@ -999,7 +999,19 @@ namespace Microsoft.Teams.AI
                 // Populate {{$temp.input}}
                 if ((turnState.Temp.Input == null || turnState.Temp.Input.Length == 0) && turnContext.Activity.Text != null)
                 {
+                    // Use the received activity text
                     turnState.Temp.Input = turnContext.Activity.Text;
+                }
+
+                // Download any input files
+                IList<IInputFileDownloader<TState>>? fileDownloaders = this.Options.FileDownloaders;
+                if (fileDownloaders != null && fileDownloaders.Count > 0)
+                {
+                    foreach (IInputFileDownloader<TState> downloader in fileDownloaders)
+                    {
+                        List<InputFile> files = await downloader.DownloadFilesAsync(turnContext, turnState);
+                        turnState.Temp.InputFiles.AddRange(files);
+                    }
                 }
 
                 bool eventHandlerCalled = false;

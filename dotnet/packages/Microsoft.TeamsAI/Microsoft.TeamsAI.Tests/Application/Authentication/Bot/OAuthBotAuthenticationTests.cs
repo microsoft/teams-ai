@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
 {
-    internal class TestOAuthBotAuthentication : OAuthBotAuthentication<TurnState>
+    internal sealed class TestOAuthBotAuthentication : OAuthBotAuthentication<TurnState>
     {
         public TestOAuthBotAuthentication(Application<TurnState> app, OAuthSettings oauthSettings, string settingName, IStorage? storage = null) : base(app, oauthSettings, settingName, storage)
         {

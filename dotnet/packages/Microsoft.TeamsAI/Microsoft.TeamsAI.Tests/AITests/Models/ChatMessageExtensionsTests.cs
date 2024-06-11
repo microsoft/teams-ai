@@ -10,7 +10,10 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         public void Test_InvalidRole_ToAzureSdkChatMessage()
         {
             // Arrange
-            var chatMessage = new ChatMessage(new AI.Models.ChatRole("InvalidRole"));
+            var chatMessage = new ChatMessage(new AI.Models.ChatRole("InvalidRole"))
+            {
+                Content = "test"
+            };
 
             // Act
             var ex = Assert.Throws<TeamsAIException>(() => chatMessage.ToChatRequestMessage());
@@ -20,7 +23,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
-        public void Test_UserRole_ToAzureSdkChatMessage()
+        public void Test_UserRole_StringContent_ToAzureSdkChatMessage()
         {
             // Arrange
             var chatMessage = new ChatMessage(AI.Models.ChatRole.User)
@@ -37,6 +40,32 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             Assert.Equal(typeof(ChatRequestUserMessage), result.GetType());
             Assert.Equal("test-content", ((ChatRequestUserMessage)result).Content);
             Assert.Equal("author", ((ChatRequestUserMessage)result).Name);
+        }
+
+        [Fact]
+        public void Test_UserRole_MultiModalContent_ToAzureSdkChatMessage()
+        {
+            // Arrange
+            var messageContentParts = new List<MessageContentParts>() { new TextContentPart() { Text = "test" }, new ImageContentPart { ImageUrl = "https://www.testurl.com" } };
+            var chatMessage = new ChatMessage(AI.Models.ChatRole.User)
+            {
+                Content = messageContentParts,
+                Name = "author"
+            };
+
+            // Act
+            var result = chatMessage.ToChatRequestMessage();
+
+            // Assert
+            Assert.Equal(Azure.AI.OpenAI.ChatRole.User, result.Role);
+            Assert.Equal(typeof(ChatRequestUserMessage), result.GetType());
+
+            var userMessage = (ChatRequestUserMessage)result;
+
+            Assert.Equal(null, userMessage.Content);
+            Assert.Equal("test", ((ChatMessageTextContentItem)userMessage.MultimodalContentItems[0]).Text);
+            Assert.Equal(typeof(ChatMessageImageContentItem), userMessage.MultimodalContentItems[1].GetType());
+            Assert.Equal("author", userMessage.Name);
         }
 
         [Fact]
@@ -165,7 +194,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             Assert.Equal("Invalid tool type: invalidToolType", ex.Message);
         }
 
-        private class InvalidToolCall : AI.Models.ChatCompletionsToolCall
+        private sealed class InvalidToolCall : AI.Models.ChatCompletionsToolCall
         {
             public InvalidToolCall() : base("invalidToolType", "test-id")
             {

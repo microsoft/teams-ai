@@ -44,10 +44,6 @@ namespace Microsoft.Teams.AI.AI.Models
             Verify.ParamNotNull(azureEndpoint);
 
             azureEndpoint = azureEndpoint.Trim();
-            if (!azureEndpoint.StartsWith("https://"))
-            {
-                throw new ArgumentException($"Model created with an invalid endpoint of `{azureEndpoint}`. The endpoint must be a valid HTTPS url.");
-            }
 
             this.AzureApiKey = azureApiKey;
             this.AzureDefaultDeployment = azureDefaultDeployment;
