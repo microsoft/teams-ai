@@ -24,7 +24,8 @@ const model = new OpenAIModel({
     ),
 
     // Request logging
-    logRequests: true
+    logRequests: true,
+    useSystemMessages: true
 });
 
 const prompts = new PromptManager({
@@ -79,6 +80,10 @@ export const app = new Application<ApplicationTurnState>({
             MicrosoftAppType: 'MultiTenant'
         })
     )
+});
+
+app.conversationUpdate('membersAdded', async (context) => {
+    await context.sendActivity('Welcome! I\'m a conversational bot that can tell you about your data. You can also type `/clear` to clear the conversation history.');
 });
 
 app.message('/clear', async (context, state) => {
