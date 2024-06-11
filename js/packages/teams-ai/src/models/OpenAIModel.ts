@@ -132,7 +132,7 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
     /**
      * API key to use when making requests to Azure OpenAI.
      */
-    azureApiKey: string;
+    azureApiKey?: string;
 
     /**
      * Default name of the Azure OpenAI deployment (model) to use.
@@ -148,6 +148,12 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
      * Optional. Version of the API being called. Defaults to `2023-05-15`.
      */
     azureApiVersion?: string;
+
+    /**
+     * Optional. A function that returns an access token for Microsoft Entra (formerly known as Azure Active Directory),
+     * which will be invoked on every request.
+     */
+    azureADTokenProvider?: () => Promise<string>;
 }
 
 /**
@@ -170,7 +176,7 @@ export class OpenAIModel implements PromptCompletionModel {
      */
     public constructor(options: OpenAIModelOptions | AzureOpenAIModelOptions | OpenAILikeModelOptions) {
         // Check for azure config
-        if ((options as AzureOpenAIModelOptions).azureApiKey) {
+        if ('azureApiKey' in options || 'azureADTokenProvider' in options) {
             this._useAzure = true;
             this.options = Object.assign(
                 {
@@ -377,41 +383,57 @@ export class OpenAIModel implements PromptCompletionModel {
         // Initialize request config
         const requestConfig: AxiosRequestConfig = Object.assign({}, this.options.requestConfig);
 
-        // Initialize request headers
         if (!requestConfig.headers) {
             requestConfig.headers = {};
         }
+
         if (!requestConfig.headers['Content-Type']) {
             requestConfig.headers['Content-Type'] = 'application/json';
         }
+
         if (!requestConfig.headers['User-Agent']) {
             requestConfig.headers['User-Agent'] = this.UserAgent;
         }
-        if (this._useAzure) {
-            const options = this.options as AzureOpenAIModelOptions;
-            requestConfig.headers['api-key'] = options.azureApiKey;
-        } else if ((this.options as OpenAIModelOptions).apiKey) {
-            const options = this.options as OpenAIModelOptions;
-            requestConfig.headers['Authorization'] = `Bearer ${options.apiKey}`;
-            if (options.organization) {
-                requestConfig.headers['OpenAI-Organization'] = options.organization;
-            }
+
+        if ('apiKey' in this.options) {
+            requestConfig.headers['api-key'] = this.options.apiKey || '';
         }
 
-        // Send request
-        const response = await this._httpClient.post(url, body, requestConfig);
+        if ('azureApiKey' in this.options || 'azureADTokenProvider' in this.options) {
+            let apiKey = this.options.azureApiKey;
 
-        // Check for rate limit error
-        if (
-            response.status == 429 &&
-            Array.isArray(this.options.retryPolicy) &&
-            retryCount < this.options.retryPolicy.length
-        ) {
-            const delay = this.options.retryPolicy[retryCount];
-            await new Promise((resolve) => setTimeout(resolve, delay));
-            return this.post(url, body, retryCount + 1);
-        } else {
-            return response;
+            if (!apiKey && this.options.azureADTokenProvider) {
+                apiKey = await this.options.azureADTokenProvider();
+            }
+
+            requestConfig.headers['Authorization'] = `Bearer ${apiKey}`;
+        }
+
+        if ('organization' in this.options && this.options.organization) {
+            requestConfig.headers['OpenAI-Organization'] = this.options.organization;
+        }
+
+        try {
+            const res = await this._httpClient.post(url, body, requestConfig);
+
+            // Check for rate limit error
+            if (
+                res.status == 429 &&
+                Array.isArray(this.options.retryPolicy) &&
+                retryCount < this.options.retryPolicy.length
+            ) {
+                const delay = this.options.retryPolicy[retryCount];
+                await new Promise((resolve) => setTimeout(resolve, delay));
+                return this.post(url, body, retryCount + 1);
+            }
+
+            return res;
+        } catch (err) {
+            if (this.options.logRequests) {
+                console.error(Colorize.error(err as Error));
+            }
+
+            throw err;
         }
     }
 }

@@ -113,3 +113,4 @@ env/.env.local
 appPackage/build
 .deployment
 devTools/
+build
