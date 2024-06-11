@@ -1,6 +1,7 @@
 # Azure OpenAI On Your Data
 
-The following is a conversational bot that uses the Azure OpenAI Chat Completions API `Azure OpenAI on Your Data` feature to facilitate RAG (retrieval augmentation) using Azure AI Search as the Azure data source.
+The following is a custom copilot that uses the Azure OpenAI Chat Completions API ‘Azure OpenAI On Your Data’ feature to facilitate RAG (retrieval augmented generation).
+You can chat with your data in Azure AI Search, Azure Blob Storage, URL/web address, Azure Cosmos DB for MongoDB vCore, uploaded files, and Elasticsearch.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
@@ -17,7 +18,7 @@ The following is a conversational bot that uses the Azure OpenAI Chat Completion
 
 ## Summary
 
-This sample shows how to integrate your Azure AI Search index as a data source into prompt templates through the Azure Chat Completions API.
+This sample shows how to integrate your search index as a data source into prompt templates through the Azure Chat Completions API.
 
 > Note: this sample uses managed identity, ensure your Azure OpenAI and AI Search services are configured properly https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/use-your-data-securely
 
