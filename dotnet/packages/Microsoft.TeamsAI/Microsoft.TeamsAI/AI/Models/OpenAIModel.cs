@@ -91,10 +91,6 @@ namespace Microsoft.Teams.AI.AI.Models
             Verify.ParamNotNull(options.AzureApiKey, "AzureOpenAIModelOptions.AzureApiKey");
             Verify.ParamNotNull(options.AzureDefaultDeployment, "AzureOpenAIModelOptions.AzureDefaultDeployment");
             Verify.ParamNotNull(options.AzureEndpoint, "AzureOpenAIModelOptions.AzureEndpoint");
-            if (!options.AzureEndpoint.StartsWith("https://"))
-            {
-                throw new ArgumentException($"Model created with an invalid endpoint of `{options.AzureEndpoint}`. The endpoint must be a valid HTTPS url.");
-            }
             string apiVersion = options.AzureApiVersion ?? "2024-02-15-preview";
             ServiceVersion? serviceVersion = ConvertStringToServiceVersion(apiVersion);
             if (serviceVersion == null)
