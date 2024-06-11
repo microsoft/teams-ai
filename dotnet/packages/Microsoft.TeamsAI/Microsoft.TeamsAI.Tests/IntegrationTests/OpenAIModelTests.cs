@@ -66,7 +66,7 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
 
             // Assert
             Assert.Equal(PromptResponseStatus.Success, result.Status);
-            Assert.Contains(expectedAnswer, result.Message!.Content);
+            Assert.Contains(expectedAnswer, result.Message!.GetContent<string>());
         }
     }
 }

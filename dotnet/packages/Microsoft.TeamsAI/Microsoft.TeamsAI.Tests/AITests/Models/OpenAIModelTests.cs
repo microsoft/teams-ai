@@ -142,7 +142,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             // Assert
             Assert.Equal(PromptResponseStatus.Error, result.Status);
             Assert.NotNull(result.Error);
-            Assert.Equal("The text completion API returned an error status of InternalServerError: Service request failed.\r\nStatus: 500 (exception)\r\n\r\nHeaders:\r\n", result.Error.Message);
+            Assert.True(result.Error.Message.StartsWith("The text completion API returned an error status of InternalServerError: Service request failed.\r\nStatus: 500 (exception)"));
         }
 
         [Fact]
@@ -273,7 +273,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             // Assert
             Assert.Equal(PromptResponseStatus.Error, result.Status);
             Assert.NotNull(result.Error);
-            Assert.Equal("The chat completion API returned an error status of InternalServerError: Service request failed.\r\nStatus: 500 (exception)\r\n\r\nHeaders:\r\n", result.Error.Message);
+            Assert.True(result.Error.Message.StartsWith("The chat completion API returned an error status of InternalServerError: Service request failed.\r\nStatus: 500 (exception)"));
         }
 
         [Fact]

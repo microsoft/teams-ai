@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI.Utilities.JsonConverters
 
         public override void Write(Utf8JsonWriter writer, ChatMessage value, JsonSerializerOptions options)
         {
-            writer.WriteStringValue(value.Content);
+            writer.WriteStringValue(value.GetContent<string>());
             writer.Flush();
         }
     }

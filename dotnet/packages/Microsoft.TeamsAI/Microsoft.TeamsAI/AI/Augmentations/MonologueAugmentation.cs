@@ -237,7 +237,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         {
             try
             {
-                InnerMonologue? monologue = JsonSerializer.Deserialize<InnerMonologue>(response.Message?.Content ?? "");
+                InnerMonologue? monologue = JsonSerializer.Deserialize<InnerMonologue>(response.Message?.GetContent<string>() ?? "");
 
                 if (monologue == null)
                 {

@@ -47,7 +47,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         {
             try
             {
-                Plan? plan = JsonSerializer.Deserialize<Plan>(response.Message?.Content ?? "");
+                Plan? plan = JsonSerializer.Deserialize<Plan>(response.Message?.GetContent<string>() ?? "");
 
                 if (plan != null)
                 {
