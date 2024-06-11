@@ -11,6 +11,7 @@ from typing import Any
 import yaml
 
 from ..ai.tokenizers import Tokenizer
+from ..state import todict
 
 
 def to_string(tokenizer: Tokenizer, value: Any, as_json: bool = False) -> str:
@@ -30,15 +31,10 @@ def to_string(tokenizer: Tokenizer, value: Any, as_json: bool = False) -> str:
     """
     if value is None:
         return ""
-
-    if hasattr(value, "__dict__"):
-        value = value.__dict__
-
-    if isinstance(value, str):
-        return value
     if hasattr(value, "isoformat") and callable(value.isoformat):
         # Used when the value is a datetime object
         return value.isoformat()
+    value = todict(value)
 
     if as_json:
         return json.dumps(value, default=lambda o: o.__dict__)

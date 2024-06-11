@@ -123,7 +123,10 @@ class SequenceAugmentation(Augmentation[Plan]):
 
             for cmd in commands:
                 if cmd["type"] == "SAY":
-                    cmd["response"] = Message[str](role="assistant", content=cmd["response"])
+                    try:
+                        cmd["response"] = Message[str](role="assistant", content=cmd["response"])
+                    except KeyError as e:
+                        cmd["response"] = Message[str](role="assistant")
 
             plan = Plan.from_dict(validation_result.value)
             validation_result.value = plan
@@ -159,7 +162,7 @@ class SequenceAugmentation(Augmentation[Plan]):
                         return cast(Any, action_validation)
                 elif isinstance(command, PredictedSayCommand):
                     # Ensure that the model specified a response
-                    if not command.response:
+                    if not command.response or command.response.content != "" or command.response.content is None:
                         return Validation(
                             valid=False,
                             feedback='The plan JSON is missing the SAY "response" '
