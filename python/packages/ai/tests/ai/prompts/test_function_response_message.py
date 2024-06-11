@@ -43,7 +43,7 @@ class TestFunctionResponseMessage(IsolatedAsyncioTestCase):
             self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 100
         )
         self.assertEqual(rendered.output[0].role, "function")
-        self.assertEqual(rendered.output[0].content, "bar")
+        self.assertEqual(rendered.output[0].content, '"bar"')
         self.assertEqual(rendered.output[0].name, "foo")
-        self.assertEqual(rendered.length, 2)
+        self.assertEqual(rendered.length, 4)
         self.assertFalse(rendered.too_long)
