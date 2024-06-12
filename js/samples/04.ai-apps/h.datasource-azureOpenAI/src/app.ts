@@ -41,23 +41,27 @@ const planner = new ActionPlanner({
         prompt.config.completion.model = 'gpt-4o';
 
         if (process.env.AZURE_SEARCH_ENDPOINT) {
-            (prompt.config.completion as any).data_sources = [{
-                type: 'azure_search',
-                parameters: {
-                    endpoint: process.env.AZURE_SEARCH_ENDPOINT,
-                    index_name: process.env.AZURE_SEARCH_INDEX,
-                    semantic_configuration: 'default',
-                    query_type: 'simple',
-                    fields_mapping: { },
-                    in_scope: true,
-                    strictness: 3,
-                    top_n_documents: 5,
-                    role_information: fs.readFileSync(path.join(__dirname, '../src/prompts/chat/skprompt.txt')).toString('utf-8'),
-                    authentication: {
-                        type: 'system_assigned_managed_identity'
+            (prompt.config.completion as any).data_sources = [
+                {
+                    type: 'azure_search',
+                    parameters: {
+                        endpoint: process.env.AZURE_SEARCH_ENDPOINT,
+                        index_name: process.env.AZURE_SEARCH_INDEX,
+                        semantic_configuration: 'default',
+                        query_type: 'simple',
+                        fields_mapping: {},
+                        in_scope: true,
+                        strictness: 3,
+                        top_n_documents: 5,
+                        role_information: fs
+                            .readFileSync(path.join(__dirname, '../src/prompts/chat/skprompt.txt'))
+                            .toString('utf-8'),
+                        authentication: {
+                            type: 'system_assigned_managed_identity'
+                        }
                     }
                 }
-            }];
+            ];
         }
 
         return prompt;
@@ -83,12 +87,14 @@ export const app = new Application<ApplicationTurnState>({
 });
 
 app.conversationUpdate('membersAdded', async (context) => {
-    await context.sendActivity('Welcome! I\'m a conversational bot that can tell you about your data. You can also type `/clear` to clear the conversation history.');
+    await context.sendActivity(
+        "Welcome! I'm a conversational bot that can tell you about your data. You can also type `/clear` to clear the conversation history."
+    );
 });
 
 app.message('/clear', async (context, state) => {
     state.deleteConversationState();
-    await context.sendActivity('New chat session started: Previous messages won\'t be used as context for new queries.');
+    await context.sendActivity("New chat session started: Previous messages won't be used as context for new queries.");
 });
 
 app.error(async (context: TurnContext, err: any) => {
