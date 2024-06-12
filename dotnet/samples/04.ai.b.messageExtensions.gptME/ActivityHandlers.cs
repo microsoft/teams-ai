@@ -165,7 +165,7 @@ namespace GPT
                     throw new Exception($"The LLM request had the following error: {res?.Error?.Message}");
                 }
 
-                return res?.Message?.Content ?? string.Empty;
+                return res?.Message?.GetContent<string>() ?? string.Empty;
             }
             catch (HttpOperationException e) when (e.StatusCode == HttpStatusCode.TooManyRequests)
             {
