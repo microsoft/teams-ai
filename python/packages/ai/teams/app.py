@@ -715,9 +715,9 @@ class Application(Bot, Generic[StateT]):
 
     async def _authenticate_user(self, context: TurnContext, state):
         if self.options.auth and self._auth:
-            auth_condition = (isinstance(self.options.auth.auto, bool)) or (
-                callable(self.options.auth.auto)
-            )
+            auth_condition = (
+                isinstance(self.options.auth.auto, bool) and self.options.auth.auto
+            ) or (callable(self.options.auth.auto) and self.options.auth.auto(context))
             user_in_sign_in = IN_SIGN_IN_KEY in state.user
             if auth_condition or user_in_sign_in:
                 key: Optional[str] = state.user.get(IN_SIGN_IN_KEY, self.options.auth.default)
