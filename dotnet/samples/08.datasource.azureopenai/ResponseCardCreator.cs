@@ -39,7 +39,7 @@ namespace AzureOpenAIBot
                 });
             }
 
-            var formattedText = FormatResponse(response.Message!.Content);
+            var formattedText = FormatResponse(response.Message!.GetContent<string>());
 
             var adaptiveCard = new AdaptiveCard(new AdaptiveSchemaVersion(1, 5))
             {
