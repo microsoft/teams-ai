@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
+using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
@@ -19,6 +20,16 @@ namespace Microsoft.Teams.AI
         /// The Http Client Factory
         /// </summary>
         public IHttpClientFactory HttpClientFactory { get; }
+
+        /// <summary>
+        /// The Configuration
+        /// </summary>
+        internal IConfiguration? Configuration { get; }
+
+        /// <summary>
+        /// The Service Client Credentials Factory
+        /// </summary>
+        internal ServiceClientCredentialsFactory? CredentialsFactory { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TeamsAdapter"/> class. (Public cloud. No auth. For testing.)
@@ -43,6 +54,8 @@ namespace Microsoft.Teams.AI
                 logger)
         {
             HttpClientFactory = new TeamsHttpClientFactory(httpClientFactory);
+            Configuration = configuration;
+            CredentialsFactory = new ConfigurationServiceClientCredentialFactory(configuration);
         }
 
         /// <inheritdoc />

@@ -157,12 +157,6 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
                 endpoint = endpoint.substring(0, endpoint.length - 1);
             }
 
-            if (!endpoint.toLowerCase().startsWith('https://')) {
-                throw new Error(
-                    `Client created with an invalid endpoint of '${endpoint}'. The endpoint must be a valid HTTPS url.`
-                );
-            }
-
             this.options.azureEndpoint = endpoint;
         } else {
             this._useAzure = false;

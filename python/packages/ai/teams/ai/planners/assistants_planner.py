@@ -8,7 +8,8 @@ from __future__ import annotations
 import asyncio
 import json
 from dataclasses import dataclass
-from typing import Dict, Generic, List, Optional, TypeVar
+from importlib.metadata import version
+from typing import Dict, Generic, List, Optional, TypeVar, Union
 
 import openai
 from botbuilder.core import TurnContext
@@ -23,6 +24,7 @@ from ...app_error import ApplicationError
 from ...state import TurnState
 from ...user_agent import _UserAgent
 from ..actions.action_types import ActionTypes
+from ..prompts.message import Citation, Message, MessageContext
 from .plan import Plan, PredictedDoCommand, PredictedSayCommand
 from .planner import Planner
 
@@ -43,9 +45,40 @@ class AssistantsState(DataClassJsonMixin):
 
 
 @dataclass
-class AssistantsPlannerOptions:
+class AzureOpenAIAssistantsOptions:
     """
-    Options for configuring the AssistantsPlanner.
+    Options for configuring the AssistantsPlanner for AzureOpenAI.
+    """
+
+    api_key: str
+    "The AzureOpenAI API key."
+
+    default_model: str
+    "Default name of the Azure OpenAI deployment (model) to use."
+
+    assistant_id: str
+    "The ID of the assistant to use."
+
+    endpoint: str
+    "Deployment endpoint to use."
+
+    polling_interval: float = DEFAULT_POLLING_INTERVAL
+    "Optional. Polling interval in seconds. Defaults to 1 second"
+
+    assistants_state_variable: str = DEFAULT_ASSISTANTS_STATE_VARIABLE
+    "Optional. The state variable to use for storing the assistants state."
+
+    api_version: str = "2024-02-15-preview"
+    "Optional. Version of the API being called. Defaults to `2024-02-15-preview`."
+
+    organization: Optional[str] = None
+    "Optional. Organization to use when calling the API."
+
+
+@dataclass
+class OpenAIAssistantsOptions:
+    """
+    Options for configuring the AssistantsPlanner with OpenAI.
     """
 
     api_key: str
@@ -68,13 +101,13 @@ class AssistantsPlannerOptions:
 
 
 class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
-    "A planner that uses the OpenAI Assistants API."
+    "A planner that uses the Assistants API."
 
-    _options: AssistantsPlannerOptions
+    _options: Union[OpenAIAssistantsOptions, AzureOpenAIAssistantsOptions]
     _client: openai.AsyncOpenAI
 
     @property
-    def options(self) -> AssistantsPlannerOptions:
+    def options(self) -> Union[OpenAIAssistantsOptions, AzureOpenAIAssistantsOptions]:
         return self._options
 
     @property
@@ -82,7 +115,8 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
         return self._client
 
     def __init__(
-        self, options: AssistantsPlannerOptions, client: Optional[openai.AsyncOpenAI] = None
+        self,
+        options: Union[OpenAIAssistantsOptions, AzureOpenAIAssistantsOptions],
     ) -> None:
         """
         Creates a new `AssistantsPlanner` instance.
@@ -94,16 +128,22 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
         """
 
         self._options = options
-        self._client = (
-            client
-            if client is not None
-            else openai.AsyncOpenAI(
+
+        if isinstance(options, OpenAIAssistantsOptions):
+            self._client = openai.AsyncOpenAI(
                 api_key=options.api_key,
                 organization=options.organization,
                 default_headers={"User-Agent": self.user_agent},
                 base_url=options.endpoint,
             )
-        )
+        elif isinstance(options, AzureOpenAIAssistantsOptions):
+            self._client = openai.AsyncAzureOpenAI(
+                api_key=options.api_key,
+                api_version=options.api_version,
+                azure_endpoint=options.endpoint,
+                organization=options.organization if options.organization else None,
+                default_headers={"User-Agent": self.user_agent},
+            )
 
     async def begin_task(self, context: TurnContext, state: TurnState) -> Plan:
         """
@@ -147,7 +187,7 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
             # Send the tool output to the assistant
             return await self._submit_action_results(state)
 
-        # Wait for any current runs to complete since you can'tadd messages
+        # Wait for any current runs to complete since you can't add messages
         # or start new runs if there's already one in progress
         await self._block_on_in_progress_runs(thread_id)
 
@@ -157,6 +197,7 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
     @staticmethod
     async def create_assistant(
         api_key: str,
+        api_version: Optional[str],
         organization: Optional[str],
         endpoint: Optional[str],
         request: AssistantCreateParams,
@@ -173,13 +214,26 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
         Returns:
             Assistant: The assistant.
         """
-        openai_client = openai.AsyncOpenAI(
-            api_key=api_key,
-            organization=organization if organization else None,
-            base_url=endpoint if endpoint else None,
-        )
+        client: openai.AsyncOpenAI
 
-        return await openai_client.beta.assistants.create(
+        if endpoint:
+            # Use AzureOpenAI
+            user_agent = f"teamsai-py/{version('teams-ai')}"
+            client = openai.AsyncAzureOpenAI(
+                api_key=api_key,
+                api_version=api_version if api_version else "2024-02-15-preview",
+                azure_endpoint=endpoint,
+                organization=organization if organization else None,
+                default_headers={"User-Agent": user_agent},
+            )
+        else:
+            # Use OpenAI
+            client = openai.AsyncOpenAI(
+                api_key=api_key,
+                organization=organization,
+            )
+
+        return await client.beta.assistants.create(
             model=request.get("model", ""),
             description=request.get("description"),
             instructions=request.get("instructions"),
@@ -216,7 +270,7 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
         for action in action_outputs:
             output = action_outputs[action]
             if tool_map:
-                tool_call_id = tool_map[action]
+                tool_call_id = tool_map[action] if action in tool_map else None
                 if tool_call_id is not None:
                     # Add required output only
                     tool_outputs.append(ToolOutput(tool_call_id=tool_call_id, output=output))
@@ -245,11 +299,12 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
                 if results.status == "expired":
                     return Plan(commands=[PredictedDoCommand(action=ActionTypes.TOO_MANY_STEPS)])
 
-                if results.last_error:
-                    raise ApplicationError(
-                        f"Run failed {results.status}. ErrorCode: "
-                        + f"{results.last_error.code}. ErrorMessage: {results.last_error.message}"
-                    )
+                error_code = results.last_error.code if results.last_error is not None else ""
+                error_message = results.last_error.message if results.last_error is not None else ""
+                raise ApplicationError(
+                    f"Run failed {results.status}. ErrorCode: "
+                    + f"{error_code}. ErrorMessage: {error_message}"
+                )
         return Plan()
 
     async def _wait_for_run(
@@ -303,14 +358,44 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
         for message in new_messages:
             for content in message.content:
                 if content.type == "text":
-                    plan.commands.append(PredictedSayCommand(response=content.text.value))
+                    annotations = content.text.annotations if content.text.annotations else None
+                    plan.commands.append(
+                        PredictedSayCommand(
+                            response=Message(
+                                role="assistant",
+                                content=content.text.value,
+                                context=MessageContext(
+                                    intent="",
+                                    citations=(
+                                        [
+                                            Citation(
+                                                title="",
+                                                url="",
+                                                filepath="",
+                                                content=annotation.text,
+                                            )
+                                            for annotation in annotations
+                                        ]
+                                        if annotations
+                                        else []
+                                    ),
+                                ),
+                            )
+                        )
+                    )
 
         return plan
 
     async def _block_on_in_progress_runs(self, thread_id: str) -> None:
         # We loop until we're told the last run is completed
         while True:
-            run = await self._retrieve_last_run(thread_id)
+            runs = await self._client.beta.threads.runs.list(thread_id, limit=1)
+
+            if len(runs.data) == 0:
+                return
+
+            run = runs.data[0]
+
             if not run:
                 return
             if self._is_run_completed(run):
@@ -369,10 +454,11 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
             if results.status == "expired":
                 return Plan(commands=[PredictedDoCommand(action=ActionTypes.TOO_MANY_STEPS)])
 
-            if results.last_error:
-                raise ApplicationError(
-                    f"Run failed {results.status}. ErrorCode: "
-                    + f"{results.last_error.code}. ErrorMessage: {results.last_error.message}"
-                )
+            error_code = results.last_error.code if results.last_error is not None else ""
+            error_message = results.last_error.message if results.last_error is not None else ""
+            raise ApplicationError(
+                f"Run failed {results.status}. ErrorCode: "
+                + f"{error_code}. ErrorMessage: {error_message}"
+            )
 
         return Plan()

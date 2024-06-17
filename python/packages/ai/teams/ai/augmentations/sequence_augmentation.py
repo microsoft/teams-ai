@@ -13,7 +13,12 @@ from botbuilder.core import TurnContext
 from ...state import MemoryBase
 from ..models.chat_completion_action import ChatCompletionAction
 from ..models.prompt_response import PromptResponse
-from ..planners.plan import Plan, PredictedDoCommand, PredictedSayCommand
+from ..planners.plan import (
+    Plan,
+    PredictedCommand,
+    PredictedDoCommand,
+    PredictedSayCommand,
+)
 from ..prompts.function_call import FunctionCall
 from ..prompts.message import Message
 from ..prompts.sections.action_augmentation_section import ActionAugmentationSection
@@ -114,6 +119,15 @@ class SequenceAugmentation(Augmentation[Plan]):
 
         # Validate that the plan is structurally correct
         if validation_result.value:
+            commands: List[Dict[str, Any]] = validation_result.value["commands"]
+
+            for cmd in commands:
+                if cmd["type"] == "SAY":
+                    try:
+                        cmd["response"] = Message[str](role="assistant", content=cmd["response"])
+                    except KeyError:
+                        cmd["response"] = Message[str](role="assistant")
+
             plan = Plan.from_dict(validation_result.value)
             validation_result.value = plan
 
@@ -148,12 +162,19 @@ class SequenceAugmentation(Augmentation[Plan]):
                         return cast(Any, action_validation)
                 elif isinstance(command, PredictedSayCommand):
                     # Ensure that the model specified a response
-                    if not command.response:
+                    if (
+                        not command.response
+                        or command.response.content == ""
+                        or command.response.content is None
+                    ):
                         return Validation(
                             valid=False,
                             feedback='The plan JSON is missing the SAY "response" '
                             + f"for command[{index}]. Return the response to SAY.",
                         )
+
+                    if isinstance(command.response, dict):
+                        command.response = Message[str].from_dict(command.response)
                 else:
                     return Validation(
                         valid=False,
@@ -178,6 +199,25 @@ class SequenceAugmentation(Augmentation[Plan]):
         Returns:
             Plan: The created plan
         """
+
         if response.message and response.message.content:
-            return response.message.content
+            plan = response.message.content
+            commands: List[PredictedCommand] = []
+
+            for command in plan.commands:
+                if command.type == "SAY":
+                    commands.append(
+                        PredictedSayCommand(
+                            response=Message[str](
+                                role="assistant",
+                                context=response.message.context,
+                                content=command.response.content if command.response else None,
+                            )
+                        )
+                    )
+                else:
+                    commands.append(command)
+
+            plan.commands = commands
+            return plan
         return Plan()

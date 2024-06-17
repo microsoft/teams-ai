@@ -3,6 +3,7 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Teams.AI
 {
@@ -200,10 +201,15 @@ namespace Microsoft.Teams.AI
         /// <param name="context">The turn context</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>True if the activity should be handled by current authentication handler. Otherwise, false.</returns>
-        protected virtual Task<bool> VerifyStateRouteSelector(ITurnContext context, CancellationToken cancellationToken)
+        internal virtual Task<bool> VerifyStateRouteSelector(ITurnContext context, CancellationToken cancellationToken)
         {
-            return Task.FromResult(context.Activity.Type == ActivityTypes.Invoke
-                && context.Activity.Name == SignInConstants.VerifyStateOperationName);
+            string? settingName = GetSettingNameFromContextActivityValue(context);
+
+            return Task.FromResult(
+                context.Activity.Type == ActivityTypes.Invoke &&
+                context.Activity.Name == SignInConstants.VerifyStateOperationName &&
+                this._name == settingName
+            );
         }
 
         /// <summary>
@@ -212,10 +218,45 @@ namespace Microsoft.Teams.AI
         /// <param name="context">The turn context</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>True if the activity should be handled by current authentication handler. Otherwise, false.</returns>
-        protected virtual Task<bool> TokenExchangeRouteSelector(ITurnContext context, CancellationToken cancellationToken)
+        internal virtual Task<bool> TokenExchangeRouteSelector(ITurnContext context, CancellationToken cancellationToken)
         {
-            return Task.FromResult(context.Activity.Type == ActivityTypes.Invoke
-                && context.Activity.Name == SignInConstants.TokenExchangeOperationName);
+            string? settingName = GetSettingNameFromContextActivityValue(context);
+
+            return Task.FromResult(context.Activity.Type == ActivityTypes.Invoke &&
+                context.Activity.Name == SignInConstants.TokenExchangeOperationName &&
+                this._name == settingName
+            );
+        }
+
+        static internal void SetSettingNameInContextActivityValue(ITurnContext context, string settingName)
+        {
+            JObject value;
+            if (context.Activity.Value != null)
+            {
+                value = JObject.FromObject(context.Activity.Value);
+            }
+            else
+            {
+                value = new();
+            }
+
+            value.Add("settingName", settingName);
+            context.Activity.Value = value;
+
+            return;
+        }
+
+        static internal string? GetSettingNameFromContextActivityValue(ITurnContext context)
+        {
+            if (context.Activity.Value == null)
+            {
+                return null;
+            }
+
+            JObject value = JObject.FromObject(context.Activity.Value);
+            JToken? settingName = value.GetValue("settingName");
+
+            return settingName != null ? settingName.ToString() : null;
         }
 
         private string GetUserAuthStatePropertyName(ITurnContext context)

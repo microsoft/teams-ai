@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
 {
     public class TeamsSsoBotAuthenticationTests
     {
-        internal class MockTeamsSsoBotAuthentication<TState> : TeamsSsoBotAuthentication<TState>
+        internal sealed class MockTeamsSsoBotAuthentication<TState> : TeamsSsoBotAuthentication<TState>
             where TState : TurnState, new()
         {
             public MockTeamsSsoBotAuthentication(Application<TState> app, string name, TeamsSsoSettings settings, TeamsSsoPrompt? mockPrompt = null) : base(app, name, settings, null)
@@ -185,7 +185,8 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         {
             JObject activityValue = new()
             {
-                ["id"] = $"{Guid.NewGuid()}-{settingName}"
+                ["id"] = $"{Guid.NewGuid()}-{settingName}",
+                ["settingName"] = settingName
             };
 
             return new TurnContext(new SimpleAdapter(), new Activity()

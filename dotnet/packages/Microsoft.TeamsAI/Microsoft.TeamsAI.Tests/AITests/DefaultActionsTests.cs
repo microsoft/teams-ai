@@ -171,7 +171,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>();
             var turnContextMock = new Mock<ITurnContext>();
             turnContextMock.Setup(tc => tc.Activity).Returns(new Activity { Type = ActivityTypes.Message });
-            turnContextMock.Setup(tc => tc.SendActivityAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new ResourceResponse()));
+            turnContextMock.Setup(tc => tc.SendActivityAsync(It.IsAny<Activity>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new ResourceResponse()));
             var turnState = new TurnState();
             var command = new PredictedSayCommand("hello");
 
@@ -182,7 +182,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             // Assert
             Assert.Equal(string.Empty, result);
-            turnContextMock.Verify(tc => tc.SendActivityAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+            turnContextMock.Verify(tc => tc.SendActivityAsync(It.IsAny<Activity>(), It.IsAny<CancellationToken>()), Times.Once);
             Assert.NotNull(exception);
             Assert.Equal("Value cannot be null. (Parameter 'command')", exception.Message);
         }

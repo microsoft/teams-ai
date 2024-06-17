@@ -90,17 +90,17 @@ export interface Citation {
     /**
      * The title of the citation.
      */
-    title: string;
+    title: string | null;
 
     /**
      * The URL of the citation.
      */
-    url: string;
+    url: string | null;
 
     /**
      * The filepath of the document.
      */
-    filepath: string;
+    filepath: string | null;
 }
 
 export interface MessageContext {

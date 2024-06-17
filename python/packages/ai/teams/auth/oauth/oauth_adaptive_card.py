@@ -18,10 +18,7 @@ from botbuilder.schema import (
     TokenResponse,
 )
 from botframework.connector.auth import TokenExchangeRequest
-from botframework.connector.models import (
-    AdaptiveCardInvokeResponse,
-    CardAction,
-)
+from botframework.connector.models import AdaptiveCardInvokeResponse, CardAction
 
 from ...state import TurnState
 from ..auth_component import AuthComponent

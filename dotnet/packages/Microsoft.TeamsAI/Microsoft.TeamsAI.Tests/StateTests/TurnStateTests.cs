@@ -184,8 +184,10 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             {
                 await state.SaveStateAsync(turnContext, null);
             }
+#pragma warning disable CA1031
             catch (Exception)
             {
+#pragma warning restore CA1031
                 // Ignore the exception, this is the expected behavior is state is not loaded.
             }
 

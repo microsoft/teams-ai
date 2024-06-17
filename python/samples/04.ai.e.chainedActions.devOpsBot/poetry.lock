@@ -111,6 +111,16 @@ files = [
 frozenlist = ">=1.1.0"
 
 [[package]]
+name = "aiounittest"
+version = "1.3.0"
+description = "Test asyncio code more easily."
+optional = false
+python-versions = "*"
+files = [
+    {file = "aiounittest-1.3.0.tar.gz", hash = "sha256:e847482b85c2b01fa8c99ffc9606811257448899707b7c7ec06e0f11c019603f"},
+]
+
+[[package]]
 name = "annotated-types"
 version = "0.6.0"
 description = "Reusable constraint types to use with typing.Annotated"
@@ -230,6 +240,20 @@ typing-extensions = ">=4.6.0"
 aio = ["aiohttp (>=3.0)"]
 
 [[package]]
+name = "babel"
+version = "2.9.1"
+description = "Internationalization utilities"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+files = [
+    {file = "Babel-2.9.1-py2.py3-none-any.whl", hash = "sha256:ab49e12b91d937cd11f0b67cb259a57ab4ad2b59ac7a3b41d6c06c0ac5b0def9"},
+    {file = "Babel-2.9.1.tar.gz", hash = "sha256:bc0c176f9f6a994582230df350aa6e05ba2ebe4b3ac317eab29d9be5d2768da0"},
+]
+
+[package.dependencies]
+pytz = ">=2015.7"
+
+[[package]]
 name = "black"
 version = "24.4.0"
 description = "The uncompromising code formatter."
@@ -290,6 +314,30 @@ botbuilder-schema = "4.15.0"
 botframework-connector = "4.15.0"
 botframework-streaming = "4.15.0"
 jsonpickle = ">=1.2,<1.5"
+
+[[package]]
+name = "botbuilder-dialogs"
+version = "4.15.0"
+description = "Microsoft Bot Framework Bot Builder"
+optional = false
+python-versions = "*"
+files = [
+    {file = "botbuilder_dialogs-4.15.0-py3-none-any.whl", hash = "sha256:195b089e248b9d2f049780edc1a1657f0b3d72ae2a58bdb89587842182c1b795"},
+]
+
+[package.dependencies]
+aiounittest = "1.3.0"
+babel = "2.9.1"
+botbuilder-core = "4.15.0"
+botbuilder-schema = "4.15.0"
+botframework-connector = "4.15.0"
+emoji = "1.7.0"
+recognizers-text = ">=1.0.2a1"
+recognizers-text-choice = ">=1.0.2a1"
+recognizers-text-date-time = ">=1.0.2a1"
+recognizers-text-number = ">=1.0.2a1"
+recognizers-text-number-with-unit = ">=1.0.2a1"
+regex = ">=2022.1.18"
 
 [[package]]
 name = "botbuilder-integration-aiohttp"
@@ -688,6 +736,17 @@ marshmallow = ">=3.18.0,<4.0.0"
 typing-inspect = ">=0.4.0,<1"
 
 [[package]]
+name = "datedelta"
+version = "1.4"
+description = "Like datetime.timedelta, for date arithmetic."
+optional = false
+python-versions = ">=3.6,<4.0"
+files = [
+    {file = "datedelta-1.4-py3-none-any.whl", hash = "sha256:9f7a8a2bd80d29d6cfe1036990979ea404c8e1ddbc5a73cff74d283186d12b4d"},
+    {file = "datedelta-1.4.tar.gz", hash = "sha256:3f1ef319ead642a76a3cab731917bf14a0ced0d91943f33ff57ae615837cab97"},
+]
+
+[[package]]
 name = "dill"
 version = "0.3.8"
 description = "serialize all of Python"
@@ -712,6 +771,19 @@ files = [
     {file = "distro-1.9.0-py3-none-any.whl", hash = "sha256:7bffd925d65168f85027d8da9af6bddab658135b840670a223589bc0c8ef02b2"},
     {file = "distro-1.9.0.tar.gz", hash = "sha256:2fa77c6fd8940f116ee1d6b94a2f90b13b5ea8d019b98bc8bafdcabcdd9bdbed"},
 ]
+
+[[package]]
+name = "emoji"
+version = "1.7.0"
+description = "Emoji for Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "emoji-1.7.0.tar.gz", hash = "sha256:65c54533ea3c78f30d0729288998715f418d7467de89ec258a31c0ce8660a1d1"},
+]
+
+[package.extras]
+dev = ["coverage", "coveralls", "pytest"]
 
 [[package]]
 name = "exceptiongroup"
@@ -812,6 +884,19 @@ files = [
     {file = "frozenlist-1.4.1-py3-none-any.whl", hash = "sha256:04ced3e6a46b4cfffe20f9ae482818e34eba9b5fb0ce4056e4cc9b6e212d09b7"},
     {file = "frozenlist-1.4.1.tar.gz", hash = "sha256:c037a86e8513059a2613aaba4d817bb90b9d9b6b69aace3ce9c877e8c8ed402b"},
 ]
+
+[[package]]
+name = "grapheme"
+version = "0.6.0"
+description = "Unicode grapheme helpers"
+optional = false
+python-versions = "*"
+files = [
+    {file = "grapheme-0.6.0.tar.gz", hash = "sha256:44c2b9f21bbe77cfb05835fec230bd435954275267fea1858013b102f8603cca"},
+]
+
+[package.extras]
+test = ["pytest", "sphinx", "sphinx-autobuild", "twine", "wheel"]
 
 [[package]]
 name = "h11"
@@ -1207,6 +1292,17 @@ files = [
 ]
 
 [[package]]
+name = "multipledispatch"
+version = "1.0.0"
+description = "Multiple dispatch"
+optional = false
+python-versions = "*"
+files = [
+    {file = "multipledispatch-1.0.0-py3-none-any.whl", hash = "sha256:0c53cd8b077546da4e48869f49b13164bebafd0c2a5afceb6bb6a316e7fb46e4"},
+    {file = "multipledispatch-1.0.0.tar.gz", hash = "sha256:5c839915465c68206c3e9c473357908216c28383b425361e5d144594bf85a7e0"},
+]
+
+[[package]]
 name = "mypy"
 version = "1.9.0"
 description = "Optional static typing for Python"
@@ -1282,13 +1378,13 @@ signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
 
 [[package]]
 name = "openai"
-version = "1.22.0"
+version = "1.27.0"
 description = "The official Python library for the openai API"
 optional = false
 python-versions = ">=3.7.1"
 files = [
-    {file = "openai-1.22.0-py3-none-any.whl", hash = "sha256:8f1d73c992f3558636661ba6681cdad75db30b5266ba19d938b1b5e0633f4bf7"},
-    {file = "openai-1.22.0.tar.gz", hash = "sha256:6e6f287a41f98fc36f65a0237845525cfdeb4db8d3e3f6f26efd0a00c7c345c1"},
+    {file = "openai-1.27.0-py3-none-any.whl", hash = "sha256:1183346fae6e63cb3a9134e397c0067690dc9d94ceb36eb0eb2c1bb9a1542aca"},
+    {file = "openai-1.27.0.tar.gz", hash = "sha256:498adc80ba81a95324afdfd11a71fa43a37e1d94a5ca5f4542e52fe9568d995b"},
 ]
 
 [package.dependencies]
@@ -1609,6 +1705,17 @@ files = [
 cli = ["click (>=5.0)"]
 
 [[package]]
+name = "pytz"
+version = "2024.1"
+description = "World timezone definitions, modern and historical"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pytz-2024.1-py2.py3-none-any.whl", hash = "sha256:328171f4e3623139da4983451950b28e95ac706e13f3f2630a879749e7a8b319"},
+    {file = "pytz-2024.1.tar.gz", hash = "sha256:2a29735ea9c18baf14b448846bde5a48030ed267578472d8955cd0e7443a9812"},
+]
+
+[[package]]
 name = "pyyaml"
 version = "6.0.1"
 description = "YAML parser and emitter for Python"
@@ -1667,6 +1774,86 @@ files = [
     {file = "PyYAML-6.0.1-cp39-cp39-win_amd64.whl", hash = "sha256:510c9deebc5c0225e8c96813043e62b680ba2f9c50a08d3724c7f28a747d1486"},
     {file = "PyYAML-6.0.1.tar.gz", hash = "sha256:bfdf460b1736c775f2ba9f6a92bca30bc2095067b8a9d77876d1fad6cc3b4a43"},
 ]
+
+[[package]]
+name = "recognizers-text"
+version = "1.0.2a2"
+description = "recognizers-text README"
+optional = false
+python-versions = "*"
+files = [
+    {file = "recognizers-text-1.0.2a2.tar.gz", hash = "sha256:866cb469c9d5bcc1d230bd31cb684bd5577bdda3c732f5e17817e515c9d69d7c"},
+    {file = "recognizers_text-1.0.2a2-py3-none-any.whl", hash = "sha256:0679d60e952fa3c55b1d459da8f7881425900b0aad29fdfd9291d053168f86af"},
+]
+
+[package.dependencies]
+emoji = "*"
+multipledispatch = "*"
+
+[[package]]
+name = "recognizers-text-choice"
+version = "1.0.2a2"
+description = "recognizers-text-choice README"
+optional = false
+python-versions = "*"
+files = [
+    {file = "recognizers-text-choice-1.0.2a2.tar.gz", hash = "sha256:fbae3ccf5dc3689055c15e3633767bc9ed0478058bd09c71000550c5684af69d"},
+    {file = "recognizers_text_choice-1.0.2a2-py3-none-any.whl", hash = "sha256:129f78009a81b66e90bd51099ba9af018e282c8dccdeec9999039aea636a8f11"},
+]
+
+[package.dependencies]
+grapheme = "*"
+recognizers-text = ">=1.0.2.a2"
+regex = "*"
+
+[[package]]
+name = "recognizers-text-date-time"
+version = "1.0.2a2"
+description = "recognizers-text-date-time README"
+optional = false
+python-versions = "*"
+files = [
+    {file = "recognizers-text-date-time-1.0.2a2.tar.gz", hash = "sha256:e27b98b4f426ffa17eccff5fa1bcda7c4e00c1fbbd079a693c9838925bf59501"},
+    {file = "recognizers_text_date_time-1.0.2a2-py3-none-any.whl", hash = "sha256:701819711f4c23c33f5748fc2135c0e65dc2ad27356b20479cccb1d49da9f627"},
+]
+
+[package.dependencies]
+datedelta = "*"
+recognizers-text = ">=1.0.2.a2"
+recognizers-text-number = ">=1.0.2.a2"
+recognizers-text-number-with-unit = ">=1.0.2.a2"
+regex = "*"
+
+[[package]]
+name = "recognizers-text-number"
+version = "1.0.2a2"
+description = "recognizers-text-number README"
+optional = false
+python-versions = "*"
+files = [
+    {file = "recognizers-text-number-1.0.2a2.tar.gz", hash = "sha256:06d41a87989e874eda3926ca02f800773a7c522f237403241a0183baa0b426d6"},
+    {file = "recognizers_text_number-1.0.2a2-py3-none-any.whl", hash = "sha256:b6b098dee2333362e4ba5a410550eef77019940a8f6dbd32aa7342c53359700e"},
+]
+
+[package.dependencies]
+recognizers-text = ">=1.0.2.a2"
+regex = "*"
+
+[[package]]
+name = "recognizers-text-number-with-unit"
+version = "1.0.2a2"
+description = "recognizers-text-number-with-unit README"
+optional = false
+python-versions = "*"
+files = [
+    {file = "recognizers-text-number-with-unit-1.0.2a2.tar.gz", hash = "sha256:6b8aa9efcfa13f701932dfbc9f10cabcae0d7cff76ca8da1461878f53e2ec404"},
+    {file = "recognizers_text_number_with_unit-1.0.2a2-py3-none-any.whl", hash = "sha256:c7b118cfcbc4435fefec0ecc17a0954fe37e7248648a50953912dac12240058a"},
+]
+
+[package.dependencies]
+recognizers-text = ">=1.0.2.a2"
+recognizers-text-number = ">=1.0.2.a2"
+regex = "*"
 
 [[package]]
 name = "referencing"
@@ -1787,13 +1974,13 @@ files = [
 
 [[package]]
 name = "requests"
-version = "2.31.0"
+version = "2.32.0"
 description = "Python HTTP for Humans."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "requests-2.31.0-py3-none-any.whl", hash = "sha256:58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f"},
-    {file = "requests-2.31.0.tar.gz", hash = "sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"},
+    {file = "requests-2.32.0-py3-none-any.whl", hash = "sha256:f2c3881dddb70d056c5bd7600a4fae312b2a300e39be6a118d30b90bd27262b5"},
+    {file = "requests-2.32.0.tar.gz", hash = "sha256:fa5490319474c82ef1d2c9bc459d3652e3ae4ef4c4ebdd18a21145a47ca4b6b8"},
 ]
 
 [package.dependencies]
@@ -1956,24 +2143,26 @@ files = [
 
 [[package]]
 name = "teams-ai"
-version = "1.0.1"
+version = "1.1.0"
 description = "SDK focused on building AI based applications for Microsoft Teams."
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "teams_ai-1.0.1-py3-none-any.whl", hash = "sha256:db8f96d16eaea31e9bf7db1a74d792c47f25071e576955186e1408392e0d69a0"},
-    {file = "teams_ai-1.0.1.tar.gz", hash = "sha256:d9cd582599feb4ad994379227b9609cec3108ee443bbc938f0e2afb90f9714d4"},
+    {file = "teams_ai-1.1.0-py3-none-any.whl", hash = "sha256:934d1bfb7524845714a4e70a9679b5266c79b1817a4f977174d0cdd66301540f"},
+    {file = "teams_ai-1.1.0.tar.gz", hash = "sha256:8ca81dbdc4ddff1b576d23aecb52209c45b022657659bfd6002ad87eb5bd49c0"},
 ]
 
 [package.dependencies]
 aiohttp = ">=3.8.5,<4.0.0"
 azure-ai-contentsafety = ">=1.0.0,<2.0.0"
-botbuilder-core = ">=4.14.8,<5.0.0"
-botbuilder-integration-aiohttp = ">=4.14.8,<5.0.0"
-botframework-connector = ">=4.14.8,<5.0.0"
+botbuilder-core = ">=4.15.0,<5.0.0"
+botbuilder-dialogs = ">=4.14.8,<5.0.0"
+botbuilder-integration-aiohttp = ">=4.15.0,<5.0.0"
+botframework-connector = ">=4.15.0,<5.0.0"
 dataclasses-json = ">=0.6.4,<0.7.0"
 jsonschema = ">=4.21.1,<5.0.0"
-openai = ">=1.11.1,<2.0.0"
+msal = ">=1.28.0,<2.0.0"
+openai = ">=1.27.0,<2.0.0"
 pyyaml = ">=6.0.1,<7.0.0"
 tiktoken = ">=0.4.0,<0.5.0"
 types-pyyaml = ">=6.0.12.12,<7.0.0.0"
@@ -2318,4 +2507,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "a78b9f0fae26bc65e445d73e8a700c549ddbaf126b79070a9848c668503d83cf"
+content-hash = "419b7e1b675b7ac4c8c69c24f13e50d7b506b1cfaed7e482583947bddf807486"

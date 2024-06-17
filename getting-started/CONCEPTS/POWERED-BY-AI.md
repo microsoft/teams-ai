@@ -72,6 +72,7 @@ Feedback loop, when enabled, will add thumbs up and thumbs down buttons to the b
 
 To enable this feature, set the `enable_feedback_loop` property to `true` in the `AIOptions` object when creating the `AI` object.
 
+### JS
 ```typescript
 export const app = new Application<ApplicationTurnState>({
     ai: {
@@ -79,6 +80,17 @@ export const app = new Application<ApplicationTurnState>({
         enable_feedback_loop: true
     },
 ```
+
+### C#
+```csharp
+AIOptions<TurnState> options = new(planner);
+options.EnableFeedbackLoop = true; // setting `EnableFeedbackLoop`
+
+Application<TurnState> app = new ApplicationBuilder<TurnState>()
+    .WithAIOptions(options)
+    .Build();
+```
+
 
 This feature is set to false by default. When enabled, all SAY commands from the AI will have the following added to the activity:
 
@@ -97,9 +109,18 @@ If the user presses either of the feedback buttons, they will be prompted to pro
 
 Use the `app.feedbackLoop` method to register a feedback loop handler. This method will be called when the user provides feedback on the AI system's response. It is up to the developer to store and process the feedback.
 
+### JS
 ```typescript
 app.feedbackLoop(async (context, state, feedbackLoopData) => {
   // custom logic here...
+});
+```
+
+### C#
+```csharp
+app.OnFeedbackLoop(async (turnContext, turnState, feedbackLoopData, cancellationToken) =>
+{
+    // custom logic here...
 });
 ```
 
@@ -141,9 +162,26 @@ Modifying `PredictedSAYCommand` will provide the developer with more granualar c
 ### JS
 
 ```typescript
-app.action<PredictedSayCommand>(AI.SayCommandActionName, async (context, state, data, action) => {
+app.ai.action<PredictedSayCommand>(AI.SayCommandActionName, async (context, state, data, action) => {
   // custom logic here...
   await context.sendActivity(data.content);
   return "";
 });
+```
+
+### C#
+```csharp
+// AIActions.cs
+public class AIActions
+{
+    [Action(AIConstants.SayCommandActionName, isDefault: false)]
+    public async Task<string> SayCommandAsync([ActionTurnContext] ITurnContext turnContext, [ActionParameters] PredictedSayCommand command, CancellationToken cancellationToken = default)
+    {
+        // Custom logic here...
+        return "";
+    }
+}
+
+// Program.cs
+app.AI.ImportActions(new AIActions());
 ```

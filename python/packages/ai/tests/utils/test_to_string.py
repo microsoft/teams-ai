@@ -10,10 +10,10 @@ from unittest import TestCase
 import yaml
 
 from teams.ai.tokenizers.gpt_tokenizer import GPTTokenizer
-from teams.ai.utilities import to_string
+from teams.utils import to_string
 
 
-class TestUtilities(TestCase):
+class TestToString(TestCase):
     def setUp(self):
         self.tokenizer = GPTTokenizer()
 
@@ -21,7 +21,7 @@ class TestUtilities(TestCase):
         self.assertEqual(to_string(self.tokenizer, None), "")
 
     def test_to_string_with_string(self):
-        self.assertEqual(to_string(self.tokenizer, "test"), "test")
+        self.assertEqual(to_string(self.tokenizer, "test"), '"test"')
 
     def test_to_string_with_number(self):
         self.assertEqual(to_string(self.tokenizer, 123), "123")

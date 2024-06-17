@@ -85,7 +85,7 @@ class OAuthMessageExtension(Generic[StateT], AuthComponent[StateT]):
         if "authentication" in value:
             res = await self.sso_token_exchange(context)
 
-            if res is not None and res.token != "":
+            if res is not None and hasattr(res, "token"):
                 return res.token
 
             await context.send_activity(

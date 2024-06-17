@@ -75,10 +75,7 @@ namespace Microsoft.Teams.AI.AI.Embeddings
             Verify.ParamNotNull(options.AzureApiKey, "AzureOpenAIEmbeddingsOptions.AzureApiKey");
             Verify.ParamNotNull(options.AzureDeployment, "AzureOpenAIEmbeddingsOptions.AzureDeployment");
             Verify.ParamNotNull(options.AzureEndpoint, "AzureOpenAIEmbeddingsOptions.AzureEndpoint");
-            if (!options.AzureEndpoint.StartsWith("https://"))
-            {
-                throw new ArgumentException($"Model created with an invalid endpoint of `{options.AzureEndpoint}`. The endpoint must be a valid HTTPS url.");
-            }
+
             string apiVersion = options.AzureApiVersion ?? "2023-05-15";
             ServiceVersion? serviceVersion = ConvertStringToServiceVersion(apiVersion);
             if (serviceVersion == null)

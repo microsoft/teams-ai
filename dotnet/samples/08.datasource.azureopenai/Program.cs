@@ -9,6 +9,7 @@ using Microsoft.Teams.AI;
 using AzureOpenAIBot;
 using Microsoft.Bot.Schema;
 using AdaptiveCards;
+using Microsoft.Teams.AI.AI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -93,7 +94,11 @@ builder.Services.AddTransient<IBot>(sp =>
         loggerFactory: loggerFactory
     );
 
+    AIOptions<TurnState> options = new(planner);
+    options.EnableFeedbackLoop = true;
+
     Application<TurnState> app = new ApplicationBuilder<TurnState>()
+        .WithAIOptions(options)
         .WithStorage(sp.GetService<IStorage>()!)
         .Build();
 
@@ -103,17 +108,18 @@ builder.Services.AddTransient<IBot>(sp =>
         await turnContext.SendActivityAsync("The conversation state has been reset");
     });
 
-    app.OnActivity(ActivityTypes.Message, async (turnContext, turnState, _) =>
+    app.OnFeedbackLoop((turnContext, turnState, feedbackLoopData, _) =>
     {
-        PromptTemplate template = prompts.GetPrompt("Chat");
-        PromptResponse response = await planner.CompletePromptAsync(turnContext, turnState, template, null);
-
-        Attachment card = new Attachment()
+        if (feedbackLoopData.ActionValue?.Reaction == "like")
         {
-            ContentType = AdaptiveCard.ContentType,
-            Content = ResponseCardCreator.CreateResponseCard(response)
-        };
-        await turnContext.SendActivityAsync(MessageFactory.Attachment(card));
+            Console.WriteLine("Like");
+        }
+        else
+        {
+            Console.WriteLine("Dislike");
+        }
+
+        return Task.CompletedTask;
     });
 
     return app;

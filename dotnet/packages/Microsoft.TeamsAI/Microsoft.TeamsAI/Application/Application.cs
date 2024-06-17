@@ -8,6 +8,7 @@ using Microsoft.Teams.AI.Application;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
+using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
@@ -762,7 +763,7 @@ namespace Microsoft.Teams.AI
             );
             RouteHandler<TState> routeHandler = async (turnContext, turnState, cancellationToken) =>
             {
-                string token = turnContext.Activity.Value.GetType().GetProperty("Continuation").GetValue(turnContext.Activity.Value) as string;
+                string token = turnContext.Activity.Value.GetType().GetProperty("Continuation").GetValue(turnContext.Activity.Value) as string ?? "";
                 await handler(turnContext, turnState, token, cancellationToken);
 
                 // Check to see if an invoke response has already been added
@@ -772,6 +773,47 @@ namespace Microsoft.Teams.AI
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
+            AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
+            return this;
+        }
+
+        /// <summary>
+        /// Registers a handler for feedback loop events when a user clicks the thumbsup or thumbsdown button on a response sent from the AI module.
+        /// <see cref="AIOptions{TState}.EnableFeedbackLoop"/> must be set to true.
+        /// </summary>
+        /// <param name="handler">Function to cal lwhen the route is triggered</param>
+        /// <returns></returns>
+        public Application<TState> OnFeedbackLoop(FeedbackLoopHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+
+            RouteSelectorAsync routeSelector = (context, _) =>
+            {
+
+                string? actionName = (context.Activity.Value as JObject)?.GetValue("actionName")?.Value<string>();
+                return Task.FromResult
+                (
+                    context.Activity.Type == ActivityTypes.Invoke
+                    && context.Activity.Name == "message/submitAction"
+                    && actionName == "feedback"
+                );
+            };
+
+            RouteHandler<TState> routeHandler = async (turnContext, turnState, cancellationToken) =>
+            {
+                FeedbackLoopData feedbackLoopData = ActivityUtilities.GetTypedValue<FeedbackLoopData>(turnContext.Activity)!;
+                feedbackLoopData.ReplyToId = turnContext.Activity.ReplyToId;
+
+                await handler(turnContext, turnState, feedbackLoopData, cancellationToken);
+
+                // Check to see if an invoke response has already been added
+                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
+                {
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity();
+                    await turnContext.SendActivityAsync(activity, cancellationToken);
+                }
+            };
+
             AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
             return this;
         }
@@ -860,7 +902,7 @@ namespace Microsoft.Teams.AI
                 _typingTimer = new TypingTimer(_typingTimerDelay);
             }
 
-            if (_typingTimer.IsRunning() == false)
+            if (!_typingTimer.IsRunning())
             {
                 _typingTimer.Start(turnContext);
             }
@@ -916,6 +958,9 @@ namespace Microsoft.Teams.AI
                         settingName = this._authentication.Default;
                     }
 
+                    // Sets the setting name in the context object. It is used in `signIn/verifyState` & `signIn/tokenExchange` route selectors.
+                    BotAuthenticationBase<TState>.SetSettingNameInContextActivityValue(turnContext, settingName);
+
                     SignInResponse response = await this._authentication.SignUserInAsync(turnContext, turnState, settingName);
 
                     if (response.Status == SignInStatus.Complete)
@@ -954,7 +999,19 @@ namespace Microsoft.Teams.AI
                 // Populate {{$temp.input}}
                 if ((turnState.Temp.Input == null || turnState.Temp.Input.Length == 0) && turnContext.Activity.Text != null)
                 {
+                    // Use the received activity text
                     turnState.Temp.Input = turnContext.Activity.Text;
+                }
+
+                // Download any input files
+                IList<IInputFileDownloader<TState>>? fileDownloaders = this.Options.FileDownloaders;
+                if (fileDownloaders != null && fileDownloaders.Count > 0)
+                {
+                    foreach (IInputFileDownloader<TState> downloader in fileDownloaders)
+                    {
+                        List<InputFile> files = await downloader.DownloadFilesAsync(turnContext, turnState);
+                        turnState.Temp.InputFiles.AddRange(files);
+                    }
                 }
 
                 bool eventHandlerCalled = false;

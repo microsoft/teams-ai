@@ -9,7 +9,14 @@ from .completion_config import CompletionConfig
 from .function_call import FunctionCall
 from .function_call_message import FunctionCallMessage
 from .function_response_message import FunctionResponseMessage
-from .message import ImageContentPart, ImageUrl, Message, TextContentPart
+from .message import (
+    Citation,
+    ImageContentPart,
+    ImageUrl,
+    Message,
+    MessageContext,
+    TextContentPart,
+)
 from .prompt import Prompt
 from .prompt_functions import PromptFunction, PromptFunctions
 from .prompt_manager import PromptManager
@@ -26,12 +33,14 @@ __all__ = [
     "AssistantMessage",
     "AugmentationConfig",
     "CompletionConfig",
+    "Citation",
     "FunctionCall",
     "FunctionCallMessage",
     "FunctionResponseMessage",
     "ImageContentPart",
     "ImageUrl",
     "Message",
+    "MessageContext",
     "TextContentPart",
     "Prompt",
     "PromptFunction",

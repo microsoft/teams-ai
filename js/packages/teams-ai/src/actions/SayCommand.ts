@@ -12,7 +12,7 @@ import { PredictedSayCommand } from '../planners';
 import { TurnState } from '../TurnState';
 import { Utilities } from '../Utilities';
 
-export interface Entities {
+export interface AIEntity {
     /**
      * Required as 'https://schema.org/Message'
      */
@@ -173,15 +173,17 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
 
         if (data.response.context && data.response.context.citations.length > 0) {
             citations = data.response.context!.citations.map((citation, i) => {
-                return {
+                const clientCitation: ClientCitation = {
                     '@type': 'Claim',
                     position: `${i + 1}`,
                     appearance: {
                         '@type': 'DigitalDocument',
-                        name: citation.title,
+                        name: citation.title || `Document #${i + 1}`,
                         abstract: Utilities.snippet(citation.content, 500)
                     }
-                } as ClientCitation;
+                };
+
+                return clientCitation;
             });
         }
 
@@ -189,7 +191,7 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
         const contentText = !citations ? content : Utilities.formatCitationsResponse(content);
 
         // If there are citations, filter out the citations unused in content.
-        const referencedCitations = citations ? Utilities.getUsedCitations(content, citations) : undefined;
+        const referencedCitations = citations ? Utilities.getUsedCitations(contentText, citations) : undefined;
 
         await context.sendActivity({
             type: ActivityTypes.Message,
@@ -204,7 +206,7 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
                     additionalType: ['AIGeneratedContent'],
                     ...(referencedCitations ? { citation: referencedCitations } : {})
                 }
-            ] as Entities[]
+            ] as AIEntity[]
         });
 
         return '';
