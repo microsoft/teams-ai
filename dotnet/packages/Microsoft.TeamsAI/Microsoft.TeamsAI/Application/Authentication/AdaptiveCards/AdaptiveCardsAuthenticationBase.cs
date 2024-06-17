@@ -13,10 +13,12 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <returns>The sign in response</returns>
+#pragma warning disable 1998  // Await call for non-implemented method
         public async Task<SignInResponse> AuthenticateAsync(ITurnContext context)
         {
             throw new NotImplementedException();
         }
+#pragma warning restore 1998
 
         /// <summary>
         /// Whether the current activity is a valid activity that supports authentication

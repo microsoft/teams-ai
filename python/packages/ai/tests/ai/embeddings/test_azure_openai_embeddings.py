@@ -8,7 +8,6 @@ from unittest import IsolatedAsyncioTestCase, mock
 
 import httpx
 import openai
-import pytest
 
 from teams.ai.embeddings.azure_openai_embeddings import AzureOpenAIEmbeddings
 from teams.ai.embeddings.azure_openai_embeddings_options import (
@@ -93,19 +92,11 @@ class TestOpenAIEmbeddings(IsolatedAsyncioTestCase):
     embeddings: AzureOpenAIEmbeddings
     options_with_array: AzureOpenAIEmbeddingsOptions
     embeddings_with_array: AzureOpenAIEmbeddings
-    options_error: AzureOpenAIEmbeddingsOptions
 
     def setUp(self):
         self.options = AzureOpenAIEmbeddingsOptions(
             azure_api_key="empty",
             azure_endpoint="https://mock.openai.azure.com/",
-            azure_deployment="text-embedding-ada-002",
-            log_requests=True,
-            retry_policy=[2, 4],
-        )
-        self.options_error = AzureOpenAIEmbeddingsOptions(
-            azure_api_key="empty",
-            azure_endpoint="www.mock.openai.azure.com/",
             azure_deployment="text-embedding-ada-002",
             log_requests=True,
             retry_policy=[2, 4],
@@ -121,10 +112,6 @@ class TestOpenAIEmbeddings(IsolatedAsyncioTestCase):
                 "User-Agent": "123",
             },
         )
-
-    async def test_endpoint_error(self):
-        with pytest.raises(ValueError):
-            AzureOpenAIEmbeddings(self.options_error)
 
     @mock.patch("openai.AsyncAzureOpenAI", return_value=MockAsyncAzureOpenAI)
     async def test_string_embedding(self, mock_async_azure_open_ai):

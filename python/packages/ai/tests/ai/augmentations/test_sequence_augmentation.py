@@ -162,9 +162,8 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
                 message=Message[str](
                     role="assistant",
                     content='{"type":"plan","commands":[{"type":"DO",'
-                    + '"action":"test1","parameters": { "foo": "bar" }}'
-                    + ',{"type":"SAY","response": { "role": "assistant", "content": "hello'
-                    ' world"}}]}',
+                    + '"action":"test1","parameters": { "foo": "bar" }},'
+                    + '{"type":"SAY","response": "hello world"}]}',
                 )
             ),
             3,
@@ -184,12 +183,12 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
                     role="assistant",
                     content='{"type":"plan","commands":[{"type":"DO",'
                     + '"action":"test1","parameters": { "foo": "bar" }},'
-                    + '{"type":"SAY","response": { "role": "assistant", "content": "hello'
-                    ' world"}}]}',
+                    + '{"type":"SAY","response": "hello world"}]}',
                 )
             ),
             3,
         )
+
         # Create plan from response
         plan = await self.sequence_augmentation.create_plan_from_response(
             cast(TurnContext, {}),

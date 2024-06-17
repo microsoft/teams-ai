@@ -91,7 +91,7 @@ namespace TwentyQuestions
             if (response.Status == PromptResponseStatus.Success && response.Message != null)
             {
                 // Prompt completed successfully
-                return response.Message.Content!;
+                return response.Message.GetContent<string>()!;
             }
 
             throw new Exception($"An error occured when trying to make a call to the AI service: {response.Error}");

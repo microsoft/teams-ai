@@ -347,106 +347,116 @@ export class AI<TState extends TurnState = TurnState> {
      * @returns {Promise<boolean>} True if the plan was completely executed, otherwise false.
      */
     public async run(context: TurnContext, state: TState, start_time?: number, step_count?: number): Promise<boolean> {
-        // Initialize start time and action count
-        const { max_steps, max_time } = this._options;
-        if (start_time === undefined) {
-            start_time = Date.now();
-        }
-        if (step_count === undefined) {
-            step_count = 0;
-        }
-
-        // Review input on first loop
-        let plan: Plan | undefined =
-            step_count == 0 ? await this._options.moderator.reviewInput(context, state) : undefined;
-
-        // Generate plan
-        if (!plan) {
-            if (step_count == 0) {
-                plan = await this._options.planner.beginTask(context, state, this);
-            } else {
-                plan = await this._options.planner.continueTask(context, state, this);
+        try {
+            // Initialize start time and action count
+            const { max_steps, max_time } = this._options;
+            if (start_time === undefined) {
+                start_time = Date.now();
+            }
+            if (step_count === undefined) {
+                step_count = 0;
             }
 
-            // Review the plans output
-            plan = await this._options.moderator.reviewOutput(context, state, plan);
-        }
+            // Review input on first loop
+            let plan: Plan | undefined =
+                step_count == 0 ? await this._options.moderator.reviewInput(context, state) : undefined;
 
-        // Process generated plan
-        let completed = false;
-        const response = await this._actions
-            .get(AI.PlanReadyActionName)!
-            .handler(context, state, plan, AI.PlanReadyActionName);
-        if (response == AI.StopCommandName) {
-            return false;
-        }
+            // Generate plan
+            if (!plan) {
+                if (step_count == 0) {
+                    plan = await this._options.planner.beginTask(context, state, this);
+                } else {
+                    plan = await this._options.planner.continueTask(context, state, this);
+                }
 
-        // Run predicted commands
-        // - If the plan ends on a SAY command then the plan is considered complete, otherwise we'll loop
-        completed = true;
-        let should_loop = false;
-        for (let i = 0; i < plan.commands.length; i++) {
-            // Check for timeout
-            if (Date.now() - start_time! > max_time || ++step_count! > max_steps) {
-                completed = false;
-                const parameters: actions.TooManyStepsParameters = {
-                    max_steps,
-                    max_time,
-                    start_time: start_time!,
-                    step_count: step_count!
-                };
-                await this._actions
-                    .get(AI.TooManyStepsActionName)!
-                    .handler(context, state, parameters, AI.TooManyStepsActionName);
-                break;
+                // Review the plans output
+                plan = await this._options.moderator.reviewOutput(context, state, plan);
             }
 
-            let output: string;
-            const cmd = plan.commands[i];
-            switch (cmd.type) {
-                case 'DO': {
-                    const { action } = cmd as PredictedDoCommand;
-                    if (this._actions.has(action)) {
-                        // Call action handler
-                        const handler = this._actions.get(action)!.handler;
-                        output = await this._actions
-                            .get(AI.DoCommandActionName)!
-                            .handler(context, state, { handler, ...(cmd as PredictedDoCommand) }, action);
-                        should_loop = output.length > 0;
-                        state.temp.actionOutputs[action] = output;
-                    } else {
-                        // Redirect to UnknownAction handler
-                        output = await this._actions.get(AI.UnknownActionName)!.handler(context, state, plan, action);
-                    }
+            // Process generated plan
+            let completed = false;
+            const response = await this._actions
+                .get(AI.PlanReadyActionName)!
+                .handler(context, state, plan, AI.PlanReadyActionName);
+            if (response == AI.StopCommandName) {
+                return false;
+            }
+
+            // Run predicted commands
+            // - If the plan ends on a SAY command then the plan is considered complete, otherwise we'll loop
+            completed = true;
+            let should_loop = false;
+            for (let i = 0; i < plan.commands.length; i++) {
+                // Check for timeout
+                if (Date.now() - start_time! > max_time || ++step_count! > max_steps) {
+                    completed = false;
+                    const parameters: actions.TooManyStepsParameters = {
+                        max_steps,
+                        max_time,
+                        start_time: start_time!,
+                        step_count: step_count!
+                    };
+                    await this._actions
+                        .get(AI.TooManyStepsActionName)!
+                        .handler(context, state, parameters, AI.TooManyStepsActionName);
                     break;
                 }
-                case 'SAY':
-                    should_loop = false;
-                    output = await this._actions
-                        .get(AI.SayCommandActionName)!
-                        .handler(context, state, cmd, AI.SayCommandActionName);
+
+                let output: string;
+                const cmd = plan.commands[i];
+                switch (cmd.type) {
+                    case 'DO': {
+                        const { action } = cmd as PredictedDoCommand;
+                        if (this._actions.has(action)) {
+                            // Call action handler
+                            const handler = this._actions.get(action)!.handler;
+                            output = await this._actions
+                                .get(AI.DoCommandActionName)!
+                                .handler(context, state, { handler, ...(cmd as PredictedDoCommand) }, action);
+                            should_loop = output.length > 0;
+                            state.temp.actionOutputs[action] = output;
+                        } else {
+                            // Redirect to UnknownAction handler
+                            output = await this._actions.get(AI.UnknownActionName)!.handler(context, state, plan, action);
+                        }
+                        break;
+                    }
+                    case 'SAY':
+                        should_loop = false;
+                        output = await this._actions
+                            .get(AI.SayCommandActionName)!
+                            .handler(context, state, cmd, AI.SayCommandActionName);
+                        break;
+                    default:
+                        throw new Error(`AI.run(): unknown command of '${cmd.type}' predicted.`);
+                }
+
+                // Check for stop command
+                if (output == AI.StopCommandName) {
+                    completed = false;
                     break;
-                default:
-                    throw new Error(`AI.run(): unknown command of '${cmd.type}' predicted.`);
+                }
+
+                // Copy the actions output to the input
+                state.temp.lastOutput = output;
+                state.temp.input = output;
+                state.temp.inputFiles = [];
             }
 
-            // Check for stop command
-            if (output == AI.StopCommandName) {
-                completed = false;
-                break;
+            // Check for looping
+            if (completed && should_loop && this._options.allow_looping) {
+                return await this.run(context, state, start_time, step_count);
             }
 
-            // Copy the actions output to the input
-            state.temp.lastOutput = output;
-            state.temp.input = output;
-            state.temp.inputFiles = [];
-        }
-
-        // Check for looping
-        if (completed && should_loop && this._options.allow_looping) {
-            return await this.run(context, state, start_time, step_count);
-        } else {
             return completed;
+        } catch (err) {
+            const onHttpError = this._actions.get(AI.HttpErrorActionName);
+
+            if (onHttpError) {
+                await onHttpError.handler(context, state, err, AI.HttpErrorActionName);
+            }
+
+            return false;
         }
     }
 }

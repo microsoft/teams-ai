@@ -57,12 +57,12 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         )
         self.assertEqual(
             result.output,
-            "user: Hello\n"
-            "assistant: Hi! How can I help you?\n"
-            "user: I'd like to book a flight\n"
-            "assistant: Sure, where would you like to go?",
+            'user: "Hello"\n'
+            'assistant: "Hi! How can I help you?"\n'
+            'user: "I\'d like to book a flight"\n'
+            'assistant: "Sure, where would you like to go?"',
         )
-        self.assertEqual(result.length, 36)
+        self.assertEqual(result.length, 42)
         self.assertFalse(result.too_long)
 
     async def test_render_as_text_include_initial_line_when_required(self):
@@ -70,8 +70,8 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         result = await conversation_history.render_as_text(
             self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 1
         )
-        self.assertEqual(result.output, "assistant: Sure, where would you like to go?")
-        self.assertEqual(result.length, 11)
+        self.assertEqual(result.output, 'assistant: "Sure, where would you like to go?"')
+        self.assertEqual(result.length, 12)
         self.assertTrue(result.too_long)
 
     async def test_render_as_text_truncate_history(self):
@@ -79,8 +79,8 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         result = await conversation_history.render_as_text(
             self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 12
         )
-        self.assertEqual(result.output, "assistant: Sure, where would you like to go?")
-        self.assertEqual(result.length, 11)
+        self.assertEqual(result.output, 'assistant: "Sure, where would you like to go?"')
+        self.assertEqual(result.length, 12)
         self.assertFalse(result.too_long)
 
     async def test_render_as_text_empty_history(self):
@@ -109,13 +109,13 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         self.assertEqual(
             result.output,
             [
-                Message("user", "Hello"),
-                Message("assistant", "Hi! How can I help you?"),
-                Message("user", "I'd like to book a flight"),
-                Message("assistant", "Sure, where would you like to go?"),
+                Message("user", '"Hello"'),
+                Message("assistant", '"Hi! How can I help you?"'),
+                Message("user", '"I\'d like to book a flight"'),
+                Message("assistant", '"Sure, where would you like to go?"'),
             ],
         )
-        self.assertEqual(result.length, 25)
+        self.assertEqual(result.length, 30)
         self.assertFalse(result.too_long)
 
     async def test_render_as_messages_include_initial_line_when_required(self):
@@ -123,8 +123,10 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         result = await conversation_history.render_as_messages(
             self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 1
         )
-        self.assertEqual(result.output, [Message("assistant", "Sure, where would you like to go?")])
-        self.assertEqual(result.length, 9)
+        self.assertEqual(
+            result.output, [Message("assistant", '"Sure, where would you like to go?"')]
+        )
+        self.assertEqual(result.length, 10)
         self.assertTrue(result.too_long)
 
     async def test_render_as_messages_truncate_history(self):
@@ -132,8 +134,10 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         result = await conversation_history.render_as_messages(
             self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 12
         )
-        self.assertEqual(result.output, [Message("assistant", "Sure, where would you like to go?")])
-        self.assertEqual(result.length, 9)
+        self.assertEqual(
+            result.output, [Message("assistant", '"Sure, where would you like to go?"')]
+        )
+        self.assertEqual(result.length, 10)
         self.assertFalse(result.too_long)
 
     async def test_render_as_messages_empty_history(self):

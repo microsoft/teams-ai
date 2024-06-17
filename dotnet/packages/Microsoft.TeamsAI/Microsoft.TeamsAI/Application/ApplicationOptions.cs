@@ -2,6 +2,7 @@
 using Microsoft.Teams.AI.State;
 using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Builder;
+using Microsoft.Teams.AI.Application;
 
 namespace Microsoft.Teams.AI
 {
@@ -52,6 +53,11 @@ namespace Microsoft.Teams.AI
         /// Optional. Factory used to create a custom turn state instance.
         /// </summary>
         public Func<TState>? TurnStateFactory { get; set; }
+
+        /// <summary>
+        /// Optional. Array of input file download plugins to use.
+        /// </summary>
+        public IList<IInputFileDownloader<TState>>? FileDownloaders { get; set; }
 
         /// <summary>
         /// Optional. Logger factory that will be used in this application.

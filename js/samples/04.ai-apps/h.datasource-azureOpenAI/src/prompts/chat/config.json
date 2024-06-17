@@ -13,20 +13,7 @@
         "top_p": 0.0,
         "presence_penalty": 0.6,
         "frequency_penalty": 0.0,
-        "stop_sequences": [],
-        "data_sources": [
-            {
-                "type": "azure_search",
-                "parameters": {
-                    "endpoint": "AZURE-AI-SEARCH-ENDPOINT",
-                    "index_name": "nba",
-                    "authentication": {
-                        "type": "api_key",
-                        "key": "AZURE-AI-SEARCH-KEY"
-                    }
-                }
-            }
-        ]
+        "stop_sequences": []
     },
     "augmentation": {
         "augmentation_type": "none"

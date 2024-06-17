@@ -33,6 +33,10 @@ namespace Microsoft.Teams.AI.AI.Planners
             Response = response;
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="PredictedSayCommand"/> class.
+        /// </summary>
+        /// <param name="response">The response that the AI system should say.</param>
         public PredictedSayCommand(string response)
         {
             Response = new ChatMessage(ChatRole.Assistant)

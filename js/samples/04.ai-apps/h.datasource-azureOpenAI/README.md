@@ -1,6 +1,7 @@
 # Azure OpenAI On Your Data
 
-The following is a conversational bot that uses the Azure OpenAI Chat Completions API `Azure OpenAI on Your Data` feature to facilitate RAG (retrieval augmentation) using Azure AI Search as the Azure data source.
+The following is a custom copilot that uses the Azure OpenAI Chat Completions API ‘Azure OpenAI On Your Data’ feature to facilitate RAG (retrieval augmented generation).
+You can chat with your data in Azure AI Search, Azure Blob Storage, URL/web address, Azure Cosmos DB for MongoDB vCore, uploaded files, and Elasticsearch.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
@@ -17,7 +18,9 @@ The following is a conversational bot that uses the Azure OpenAI Chat Completion
 
 ## Summary
 
-This sample shows how to integrate your Azure AI Search index as a data source into prompt templates through the Azure Chat Completions API.
+This sample shows how to integrate your search index as a data source into prompt templates through the Azure Chat Completions API.
+
+> Note: this sample uses managed identity, ensure your Azure OpenAI and AI Search services are configured properly https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/use-your-data-securely
 
 ### Example Interaction
 
@@ -62,33 +65,17 @@ This sample shows how to integrate your Azure AI Search index as a data source i
 > [!NOTE]
 > Please note that at this time, this sample is only supported with Azure OpenAI.
 
-1. Fill the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables appropriately.
+1. Fill the `AZURE_OPENAI_ENDPOINT`, `AZURE_SEARCH_ENDPOINT`, and `AZURE_SEARCH_INDEX` variables appropriately.
+
+1. Verify you are logged into azure cli. This is required because this sample uses managed identity. You can download and install Azure CLI from [Azure CLI docs](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli). For more information on setting up environment variables, see the [Azure SDK documentation](https://github.com/Azure/azure-sdk-for-go/wiki/Set-up-Your-Environment-for-Authentication).
 
 1. Follow the [use your data quickstart instructions](https://learn.microsoft.com/en-us/azure/ai-services/openai/use-your-data-quickstart?tabs=command-line%2Cpython-new&pivots=programming-language-studio#add-your-data-using-azure-openai-studio) to add your data using Azure OpenAI Studio. Select `Upload files` as the data source. You can upload the `nba.pdf` file. Take note of the index name.
-
-1. Update `prompts/chat/config.json` by adding the missing fields in the `data_sources` property:
-
-```json
-"data_sources": [
-    {
-        "type": "azure_search",
-        "parameters": {
-            "endpoint": "AZURE-AI-SEARCH-ENDPOINT",
-            "index_name": "nba",
-            "authentication": {
-                "type": "api_key",
-                "key": "AZURE-AI-SEARCH-KEY"
-            }
-        }
-    }
-]
-```
 
 ## Testing the sample
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
 
-1.  1. Fill the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` in the `./env/.env.local.user` file.
+1. Fill the `AZURE_OPENAI_ENDPOINT`, `AZURE_SEARCH_ENDPOINT`, and `AZURE_SEARCH_INDEX` in the `./env/.env.local.user` file.
 1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
 1. Copy this sample into a new folder outside of teams-ai

@@ -312,6 +312,7 @@ namespace Microsoft.Teams.AI.AI
 
                 // Copy the actions output to the input
                 turnState.Temp!.Input = output;
+                turnState.Temp.InputFiles = new();
             }
 
             // Check for looping
