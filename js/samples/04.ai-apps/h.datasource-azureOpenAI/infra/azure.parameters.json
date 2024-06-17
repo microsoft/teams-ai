@@ -20,6 +20,9 @@
         "azureOpenAIEndpoint": {
             "value": "${{AZURE_OPENAI_ENDPOINT}}"
         },
+        "azureOpenAIDeployment": {
+            "value": "${{AZURE_OPENAI_DEPLOYMENT}}"
+        },
         "azureSearchEndpoint": {
             "value": "${{AZURE_SEARCH_ENDPOINT}}"
         },

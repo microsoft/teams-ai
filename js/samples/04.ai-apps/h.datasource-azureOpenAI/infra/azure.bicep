@@ -7,6 +7,7 @@ param resourceBaseName string
 param botAadAppClientId string
 
 param azureOpenAIEndpoint string = ''
+param azureOpenAIDeployment string = ''
 param azureSearchEndpoint string = ''
 param azureSearchIndex string = ''
 
@@ -67,6 +68,10 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           name: 'AZURE_OPENAI_ENDPOINT'
           value: azureOpenAIEndpoint
+        }
+        {
+          name: 'AZURE_OPENAI_DEPLOYMENT'
+          value: azureOpenAIDeployment
         }
         {
           name: 'AZURE_SEARCH_ENDPOINT'

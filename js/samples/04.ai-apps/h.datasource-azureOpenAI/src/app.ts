@@ -13,9 +13,10 @@ interface ConversationState {}
 type ApplicationTurnState = TurnState<ConversationState>;
 
 // Create AI components
+const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-35-turbo';
 const model = new OpenAIModel({
     // Azure OpenAI Support
-    azureDefaultDeployment: 'gpt-35-turbo',
+    azureDefaultDeployment: deployment,
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
     azureApiVersion: '2024-02-15-preview',
     azureADTokenProvider: getBearerTokenProvider(
@@ -38,7 +39,7 @@ const planner = new ActionPlanner({
     defaultPrompt: async () => {
         const prompt = await prompts.getPrompt('chat');
 
-        prompt.config.completion.model = 'gpt-4o';
+        prompt.config.completion.model = deployment;
 
         if (process.env.AZURE_SEARCH_ENDPOINT) {
             (prompt.config.completion as any).data_sources = [
