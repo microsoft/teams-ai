@@ -103,7 +103,7 @@ class State(dict, ABC):
         await storage.delete(self.__deleted__)
         await storage.write(
             {
-                self.__key__: self.copy(),
+                self.__key__: data,
             }
         )
 
