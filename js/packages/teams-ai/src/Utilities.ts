@@ -85,14 +85,25 @@ export class Utilities {
 
         if (!matches) {
             return undefined;
-        } else {
-            const usedCitations: ClientCitation[] = [];
-            matches.forEach((match) => {
-                citations.find((citation) => {
-                    `[${citation.position}]` === match && usedCitations.push(citation);
-                });
-            });
-            return usedCitations;
         }
+
+        // Remove duplicates
+        const filteredMatches = new Set();
+        matches.forEach((match) => {
+            if (filteredMatches.has(match)) {
+                return;
+            }
+
+            filteredMatches.add(match);
+        });
+
+        // Add citations
+        const usedCitations: ClientCitation[] = [];
+        filteredMatches.forEach((match) => {
+            citations.find((citation) => {
+                `[${citation.position}]` === match && usedCitations.push(citation);
+            });
+        });
+        return usedCitations;
     }
 }
