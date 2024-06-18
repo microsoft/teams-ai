@@ -10,6 +10,13 @@ import { TurnContext } from "botbuilder-core";
 
 /**
  * A helper class for streaming responses to the client.
+ * @remarks
+ * This class is used to send a series of updates to the client in a single response. The expected
+ * sequence of calls is: 
+ * 
+ * `sendInformativeUpdate()`, `sendTextChunk()`, `sendTextChunk()`, ..., `endStream()`.
+ * 
+ * Once `endStream()` is called, the stream is considered ended and no further updates can be sent.
  */
 export class StreamingResponse {
     private readonly _context: TurnContext;
@@ -121,9 +128,35 @@ export class StreamingResponse {
 
 /**
  * @private
+ * Structure of the outgoing channelData field for streaming responses.
+ * @remarks
+ * The expected sequence of streamTypes is: 
+ * 
+ * `informative`, `streaming`, `streaming`, ..., `final`.
+ * 
+ * Once a `final` message is sent, the stream is considered ended.
  */
 interface StreamingChannelData {
+    /**
+     * The type of message being sent.
+     * @remarks
+     * `informative` - An informative update.
+     * `streaming` - A chunk of partial message text.
+     * `final` - The final message.
+     */
     streamType: 'informative' | 'streaming' | 'final';
+
+    /**
+     * Sequence number of the message in the stream.
+     * @remarks
+     * Starts at 1 for the first message and increments from there.
+     */
     streamSequence: number;
+
+    /**
+     * ID of the stream.
+     * @remarks
+     * Assigned after the initial update is sent.
+     */
     streamId?: string;
 }
