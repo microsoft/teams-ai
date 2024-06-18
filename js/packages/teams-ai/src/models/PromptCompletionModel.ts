@@ -10,7 +10,7 @@ import { TurnContext } from 'botbuilder-core';
 import { Message, PromptFunctions, PromptTemplate } from '../prompts';
 import { Tokenizer } from '../tokenizers';
 import { Memory } from '../MemoryFork';
-import StrictEventEmitter from 'strict-event-emitter-types';
+import StrictEventEmitter from '../external/strict-event-emitter-types';
 import EventEmitter from 'events';
 
 /**

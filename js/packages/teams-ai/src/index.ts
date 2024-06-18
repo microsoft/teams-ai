@@ -9,6 +9,7 @@
 export * from './augmentations';
 export * from './dataSources';
 export * from './embeddings';
+export * from './external';
 export * from './models';
 export * from './moderators';
 export * from './planners';
