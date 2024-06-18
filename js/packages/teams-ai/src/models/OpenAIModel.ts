@@ -395,18 +395,18 @@ export class OpenAIModel implements PromptCompletionModel {
             requestConfig.headers['User-Agent'] = this.UserAgent;
         }
 
-        if ('apiKey' in this.options) {
-            requestConfig.headers['api-key'] = this.options.apiKey || '';
-        }
+        if (this._useAzure) {
+            let apiKey = (this.options as AzureOpenAIModelOptions).azureApiKey;
+            const azureADTokenProvider = (this.options as AzureOpenAIModelOptions).azureADTokenProvider;
 
-        if ('azureApiKey' in this.options || 'azureADTokenProvider' in this.options) {
-            let apiKey = this.options.azureApiKey;
-
-            if (!apiKey && this.options.azureADTokenProvider) {
-                apiKey = await this.options.azureADTokenProvider();
+            if (!apiKey && azureADTokenProvider) {
+                apiKey = await azureADTokenProvider();
+                requestConfig.headers['Authorization'] = `Bearer ${apiKey}`;
+            } else {
+                requestConfig.headers['api-key'] = apiKey || '';
             }
-
-            requestConfig.headers['Authorization'] = `Bearer ${apiKey}`;
+        } else if ('apiKey' in this.options) {
+            requestConfig.headers['Authorization'] = `Bearer ${this.options.apiKey || ''}`;
         }
 
         if ('organization' in this.options && this.options.organization) {
