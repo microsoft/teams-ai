@@ -24,7 +24,7 @@
         "dotenv": "^16.4.5",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
-        "openai": "^4.28.4"
+        "openai": "^4.41.0"
     },
     "devDependencies": {
         "@types/jsonwebtoken": "^9.0.6",
