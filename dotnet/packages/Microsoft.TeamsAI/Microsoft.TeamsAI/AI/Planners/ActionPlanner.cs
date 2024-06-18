@@ -167,7 +167,7 @@ namespace Microsoft.Teams.AI.AI.Planners
                 LogRepairs = this.Options.LogRepairs
             }, this._logger);
 
-            return await client.CompletePromptAsync(context, memory, this.Prompts, null, cancellationToken);
+            return await client.CompletePromptAsync(context, memory, this.Prompts, cancellationToken);
         }
     }
 }

@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <PackageId>Microsoft.Teams.AI</PackageId>
     <Product>Microsoft Teams AI SDK</Product>
-    <Version>1.3.0</Version>
+    <Version>1.4.0</Version>
     <Authors>Microsoft</Authors>
     <Company>Microsoft</Company>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
@@ -38,15 +38,15 @@
     <PackageReference Include="AdaptiveCards" Version="3.1.0" />
     <PackageReference Include="Azure.AI.ContentSafety" Version="1.0.0-beta.1" />
     <PackageReference Include="Azure.AI.OpenAI.Assistants" Version="1.0.0-beta.3" />
-    <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.15" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.17" />
     <PackageReference Include="JsonSchema.Net" Version="5.5.1" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Bot.Builder" Version="4.22.3" />
-    <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.22.3" />
-    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.3" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.60.3" />
+    <PackageReference Include="Microsoft.Bot.Builder" Version="4.22.4" />
+    <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.22.4" />
+    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.4" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.61.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Microsoft.ML.Tokenizers" Version="0.22.0-preview.24179.1" />
+    <PackageReference Include="Microsoft.ML.Tokenizers" Version="0.22.0-preview.24271.1" />
     <PackageReference Include="System.Text.Json" Version="7.0.4" />
   </ItemGroup>
 

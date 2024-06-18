@@ -21,7 +21,7 @@ class TestToString(TestCase):
         self.assertEqual(to_string(self.tokenizer, None), "")
 
     def test_to_string_with_string(self):
-        self.assertEqual(to_string(self.tokenizer, "test"), "test")
+        self.assertEqual(to_string(self.tokenizer, "test"), '"test"')
 
     def test_to_string_with_number(self):
         self.assertEqual(to_string(self.tokenizer, 123), "123")

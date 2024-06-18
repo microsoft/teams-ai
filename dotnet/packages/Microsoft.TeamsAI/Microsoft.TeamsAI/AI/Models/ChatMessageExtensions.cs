@@ -22,9 +22,42 @@ namespace Microsoft.Teams.AI.AI.Models
             ChatRole role = chatMessage.Role;
             ChatRequestMessage? message = null;
 
+            string? content = null;
+            List<ChatMessageContentItem> contentItems = new();
+
+            // Content is a text
+            if (chatMessage.Content is string textContent)
+            {
+                content = textContent;
+            }
+            else if (chatMessage.Content is IEnumerable<MessageContentParts> contentParts)
+            {
+                // Content is has multiple possibly multi-modal parts.
+                foreach (MessageContentParts contentPart in contentParts)
+                {
+                    if (contentPart is TextContentPart textPart)
+                    {
+                        contentItems.Add(new ChatMessageTextContentItem(textPart.Text));
+                    }
+                    else if (contentPart is ImageContentPart imagePart)
+                    {
+                        contentItems.Add(new ChatMessageImageContentItem(new Uri(imagePart.ImageUrl)));
+                    }
+                }
+            }
+
+            // Different roles map to different classes
             if (role == ChatRole.User)
             {
-                ChatRequestUserMessage userMessage = new(chatMessage.Content);
+                ChatRequestUserMessage userMessage;
+                if (content != null)
+                {
+                    userMessage = new(content);
+                }
+                else
+                {
+                    userMessage = new(contentItems);
+                }
 
                 if (chatMessage.Name != null)
                 {
@@ -36,7 +69,7 @@ namespace Microsoft.Teams.AI.AI.Models
 
             if (role == ChatRole.Assistant)
             {
-                ChatRequestAssistantMessage assistantMessage = new(chatMessage.Content);
+                ChatRequestAssistantMessage assistantMessage = new(chatMessage.GetContent<string>());
 
                 if (chatMessage.FunctionCall != null)
                 {
@@ -61,7 +94,7 @@ namespace Microsoft.Teams.AI.AI.Models
 
             if (role == ChatRole.System)
             {
-                ChatRequestSystemMessage systemMessage = new(chatMessage.Content);
+                ChatRequestSystemMessage systemMessage = new(chatMessage.GetContent<string>());
 
                 if (chatMessage.Name != null)
                 {
@@ -73,12 +106,12 @@ namespace Microsoft.Teams.AI.AI.Models
 
             if (role == ChatRole.Function)
             {
-                message = new ChatRequestFunctionMessage(chatMessage.Name ?? "", chatMessage.Content);
+                message = new ChatRequestFunctionMessage(chatMessage.Name ?? "", chatMessage.GetContent<string>());
             }
 
             if (role == ChatRole.Tool)
             {
-                message = new ChatRequestToolMessage(chatMessage.Content, chatMessage.ToolCallId ?? "");
+                message = new ChatRequestToolMessage(chatMessage.GetContent<string>(), chatMessage.ToolCallId ?? "");
             }
 
             if (message == null)

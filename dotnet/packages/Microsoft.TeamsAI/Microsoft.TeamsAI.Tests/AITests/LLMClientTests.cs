@@ -132,8 +132,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 }
             });
 
+            memory.SetValue("temp.input", "hello");
+
             // Act
-            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager(), "hello");
+            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager());
 
             // Assert
             Assert.NotNull(response);
@@ -161,7 +163,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             TestMemory memory = new();
 
             // Act
-            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager(), "hello");
+            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager());
 
             // Assert
             Assert.NotNull(response);
@@ -211,8 +213,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 Valid = true
             });
 
+            memory.SetValue("temp.input", "hello");
+
             // Act
-            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager(), "hello");
+            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager());
 
             // Assert
             Assert.NotNull(response);
@@ -277,8 +281,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 Valid = true
             });
 
+            memory.SetValue("temp.input", "hello");
+
             // Act
-            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager(), "hello");
+            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager());
 
             // Assert
             Assert.NotNull(response);
@@ -344,8 +350,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 Valid = true
             });
 
+            memory.SetValue("temp.input", "hello");
+
             // Act
-            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager(), "hello");
+            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager());
 
             // Assert
             Assert.NotNull(response);
@@ -368,7 +376,6 @@ namespace Microsoft.Teams.AI.Tests.AITests
             LLMClientOptions<object> options = new(promptCompletionModel, promptTemplate)
             {
                 HistoryVariable = string.Empty,
-                InputVariable = string.Empty
             };
             LLMClient<object> client = new(options, null);
             TestMemory memory = new();
@@ -391,7 +398,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(response.Message);
             Assert.Equal(ChatRole.Assistant, response.Message.Role);
             Assert.Equal("welcome", response.Message.Content);
-            Assert.Equal(0, memory.Values.Count);
+            Assert.Equal(1, memory.Values.Count);
         }
 
         [Fact]
@@ -425,8 +432,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 Valid = false
             });
 
+            memory.SetValue("temp.input", "hello");
+
             // Act
-            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager(), "hello");
+            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager());
 
             // Assert
             Assert.NotNull(response);

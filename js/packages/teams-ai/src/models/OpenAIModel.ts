@@ -138,7 +138,7 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
     /**
      * API key to use when making requests to Azure OpenAI.
      */
-    azureApiKey: string;
+    azureApiKey?: string;
 
     /**
      * Default name of the Azure OpenAI deployment (model) to use.
@@ -154,6 +154,12 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
      * Optional. Version of the API being called. Defaults to `2023-05-15`.
      */
     azureApiVersion?: string;
+
+    /**
+     * Optional. A function that returns an access token for Microsoft Entra (formerly known as Azure Active Directory),
+     * which will be invoked on every request.
+     */
+    azureADTokenProvider?: () => Promise<string>;
 }
 
 /**
@@ -189,7 +195,7 @@ export class OpenAIModel implements PromptCompletionModel {
         }
 
         // Check for azure config
-        if ((options as AzureOpenAIModelOptions).azureApiKey) {
+        if ((options as AzureOpenAIModelOptions).azureApiKey || (options as AzureOpenAIModelOptions).azureADTokenProvider) {
             // Initialize options
             this.options = Object.assign(
                 {
@@ -222,7 +228,8 @@ export class OpenAIModel implements PromptCompletionModel {
                 { 
                     apiKey: this.options.azureApiKey,
                     endpoint: this.options.azureEndpoint,
-                    apiVersion: this.options.azureApiVersion 
+                    apiVersion: this.options.azureApiVersion,
+                    adTokenProvider: this.options.azureADTokenProvider
                 }
             ));
         } else {

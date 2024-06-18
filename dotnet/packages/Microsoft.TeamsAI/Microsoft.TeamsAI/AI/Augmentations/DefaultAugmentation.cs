@@ -31,7 +31,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         /// <inheritdoc />
         public async Task<Plan?> CreatePlanFromResponseAsync(ITurnContext context, IMemory memory, PromptResponse response, CancellationToken cancellationToken = default)
         {
-            PredictedSayCommand say = new(response.Message?.Content ?? "");
+            PredictedSayCommand say = new(response.Message?.GetContent<string>() ?? "");
 
             if (response.Message != null)
             {

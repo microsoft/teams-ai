@@ -6,17 +6,7 @@ param resourceBaseName string
 @description('Required when create Azure Bot service')
 param botAadAppClientId string
 
-@secure()
-param azureOpenAIKey string = ''
-
-@secure()
 param azureOpenAIEndpoint string = ''
-
-@secure()
-param azureSearchKey string = ''
-
-@secure()
-param azureSearchEndpoint string = ''
 
 @secure()
 @description('Required by Bot Framework package in your bot project')
@@ -73,20 +63,8 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
           value: botAadAppClientSecret
         }
         {
-          name: 'AZURE_OPENAI_KEY'
-          value: azureOpenAIKey
-        }
-        {
           name: 'AZURE_OPENAI_ENDPOINT'
           value: azureOpenAIEndpoint
-        }
-        {
-          name: 'AZURE_SEARCH_KEY'
-          value: azureSearchKey
-        }
-        {
-          name: 'AZURE_SEARCH_ENDPOINT'
-          value: azureSearchEndpoint
         }
       ]
       ftpsState: 'FtpsOnly'

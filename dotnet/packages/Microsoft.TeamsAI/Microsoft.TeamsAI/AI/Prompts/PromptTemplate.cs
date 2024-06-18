@@ -245,6 +245,14 @@ namespace Microsoft.Teams.AI.AI.Prompts
         public double TopP { get; set; } = 0.0f;
 
         /// <summary>
+        /// If true, the prompt will be augmented with any images uploaded by the user.
+        /// Defaults to false.
+        /// </summary>
+        [JsonPropertyName("include_images")]
+        [JsonPropertyOrder(12)]
+        public bool IncludeImages { get; set; } = false;
+
+        /// <summary>
         /// Additional data provided in the completion configuration.
         /// </summary>
         [JsonExtensionData]

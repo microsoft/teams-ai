@@ -173,15 +173,17 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
 
         if (data.response.context && data.response.context.citations.length > 0) {
             citations = data.response.context!.citations.map((citation, i) => {
-                return {
+                const clientCitation: ClientCitation = {
                     '@type': 'Claim',
                     position: `${i + 1}`,
                     appearance: {
                         '@type': 'DigitalDocument',
-                        name: citation.title,
+                        name: citation.title || `Document #${i + 1}`,
                         abstract: Utilities.snippet(citation.content, 500)
                     }
-                } as ClientCitation;
+                };
+
+                return clientCitation;
             });
         }
 

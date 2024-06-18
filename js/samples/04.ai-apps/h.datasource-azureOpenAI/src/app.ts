@@ -1,5 +1,7 @@
 import { OpenAIModel, PromptManager, ActionPlanner, Application, TurnState, TeamsAdapter } from '@microsoft/teams-ai';
+import { DefaultAzureCredential, getBearerTokenProvider } from '@azure/identity';
 import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
+import axios from 'axios';
 import path from 'path';
 import debug from 'debug';
 
@@ -9,20 +11,20 @@ error.log = console.log.bind(console);
 interface ConversationState {}
 type ApplicationTurnState = TurnState<ConversationState>;
 
-if (!process.env.AZURE_OPENAI_KEY || !process.env.AZURE_OPENAI_ENDPOINT) {
-    throw new Error('Missing environment variables - please check that AZURE_OPENAI_KEY and AZURE_OPENAI_ENDPOINT');
-}
-
 // Create AI components
 const model = new OpenAIModel({
     // Azure OpenAI Support
-    azureApiKey: process.env.AZURE_OPENAI_KEY!,
     azureDefaultDeployment: 'gpt-35-turbo',
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
     azureApiVersion: '2024-02-15-preview',
+    azureADTokenProvider: getBearerTokenProvider(
+        new DefaultAzureCredential(),
+        'https://cognitiveservices.azure.com/.default'
+    ),
 
     // Request logging
-    logRequests: true
+    logRequests: true,
+    useSystemMessages: true
 });
 
 const prompts = new PromptManager({
@@ -38,11 +40,11 @@ const planner = new ActionPlanner({
 // Define storage and application
 const storage = new MemoryStorage();
 export const app = new Application<ApplicationTurnState>({
+    storage,
     ai: {
         planner: planner,
         enable_feedback_loop: true
     },
-    storage: storage,
     adapter: new TeamsAdapter(
         {},
         new ConfigurationServiceClientCredentialFactory({
@@ -53,12 +55,29 @@ export const app = new Application<ApplicationTurnState>({
     )
 });
 
+app.conversationUpdate('membersAdded', async (context) => {
+    await context.sendActivity(
+        "Welcome! I'm a conversational bot that can tell you about your data. You can also type `/clear` to clear the conversation history."
+    );
+});
+
+app.message('/clear', async (context, state) => {
+    state.deleteConversationState();
+    await context.sendActivity("New chat session started: Previous messages won't be used as context for new queries.");
+});
+
 app.error(async (context: TurnContext, err: any) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
     error(`[onTurnError] unhandled error: ${err}`);
-    error(err);
+
+    if (err instanceof axios.AxiosError) {
+        error(err.toJSON());
+        error(err.response?.data);
+    } else {
+        error(err);
+    }
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
@@ -73,7 +92,7 @@ app.error(async (context: TurnContext, err: any) => {
     await context.sendActivity('To continue to run this bot, please fix the bot source code.');
 });
 
-app.feedbackLoop(async (context, state, feedbackLoopData) => {
+app.feedbackLoop(async (_context, _state, feedbackLoopData) => {
     if (feedbackLoopData.actionValue.reaction === 'like') {
         console.log('👍');
     } else {
