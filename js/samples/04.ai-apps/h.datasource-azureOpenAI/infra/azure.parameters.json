@@ -19,12 +19,6 @@
         },
         "azureOpenAIEndpoint": {
             "value": "${{AZURE_OPENAI_ENDPOINT}}"
-        },
-        "azureSearchEndpoint": {
-            "value": "${{AZURE_SEARCH_ENDPOINT}}"
-        },
-        "azureSearchIndex": {
-            "value": "${{AZURE_SEARCH_INDEX}}"
         }
     }
 }
