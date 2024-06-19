@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from logging import Logger
-from typing import List, Optional, Union, Callable
+from typing import Callable, List, Optional, Union
 
 import openai
 from botbuilder.core import TurnContext
@@ -51,7 +51,6 @@ class AzureOpenAIModelOptions:
     Options for configuring an `OpenAIModel` to call an Azure OpenAI hosted model.
     """
 
-
     default_model: str
     "Default name of the Azure OpenAI deployment (model) to use."
 
@@ -63,7 +62,7 @@ class AzureOpenAIModelOptions:
 
     api_key: Optional[str] = None
     "API key to use when making requests to Azure OpenAI."
-    
+
     azure_ad_token_provider: Optional[Callable[..., str]] = None
     "Optional. A function that returns an access token for Microsoft Entra (formerly known as Azure Active Directory), which will be invoked in every request."
 
@@ -212,7 +211,11 @@ class OpenAIModel(PromptCompletionModel):
                 message=Message(
                     role=completion.choices[0].message.role,
                     content=completion.choices[0].message.content,
-                    context=MessageContext.from_dict(completion.choices[0].message.context) if hasattr(completion.choices[0].message, 'context') else None,
+                    context=(
+                        MessageContext.from_dict(completion.choices[0].message.context)
+                        if hasattr(completion.choices[0].message, "context")
+                        else None
+                    ),
                 ),
             )
         except openai.APIError as err:

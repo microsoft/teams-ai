@@ -78,6 +78,7 @@ MessageContentParts = Union[TextContentPart, ImageContentPart]
 Represents part of the message's content
 """
 
+
 @dataclass_json
 @dataclass
 class Citation(DataClassJsonMixin):
@@ -95,6 +96,7 @@ class Citation(DataClassJsonMixin):
     title: Optional[str]
     url: Optional[str]
     filepath: Optional[str]
+
 
 @dataclass_json
 @dataclass
