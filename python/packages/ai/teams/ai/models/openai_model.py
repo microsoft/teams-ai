@@ -64,7 +64,9 @@ class AzureOpenAIModelOptions:
     "API key to use when making requests to Azure OpenAI."
 
     azure_ad_token_provider: Optional[Callable[..., str]] = None
-    "Optional. A function that returns an access token for Microsoft Entra (formerly known as Azure Active Directory), which will be invoked in every request."
+    """Optional. A function that returns an access token for Microsoft Entra (formerly known as Azure Active Directory),
+    which will be invoked in every request.
+    """
 
     organization: Optional[str] = None
     "Optional. Organization to use when calling the OpenAI API."
