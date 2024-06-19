@@ -38,3 +38,5 @@ class PromptTemplate:
     config: PromptTemplateConfig
     actions: Optional[List[ChatCompletionAction]] = None
     augmentation: Optional[teams.ai.augmentations.Augmentation] = None
+    # TODO: adding the plugins here
+    plugins: Optional[List[Plugin]] = None

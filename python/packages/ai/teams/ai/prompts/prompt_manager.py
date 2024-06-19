@@ -284,12 +284,42 @@ class PromptManager(PromptFunctions):
 
             # Load optional actions
             template_actions: List[ChatCompletionAction] = []
+
+            # TODO: Saving the template_plugins
+            template_plugins: List[Plugin] = []
+
+
             try:
                 with open(actions_file, "r", encoding="utf-8") as file:
                     actions = json.load(file)
 
                     for action in actions:
                         template_actions.append(ChatCompletionAction.from_dict(action))
+                        
+                        # TODO: (1) Add logic to map actions into plugins
+                        template_plugins.append(Plugin.from_dict(action))
+
+                        # FORMAT OF A "TOOL" DESCRIBED BY OPENAI:
+                        # {
+                        #     "type": "function",
+                        #     "function": {
+                        #     "name": "get_current_weather",
+                        #     "description": "Get the current weather in a given location",
+                        #     "parameters": {
+                        #         "type": "object",
+                        #         "properties": {
+                        #         "location": {
+                        #             "type": "string",
+                        #             "description": "The city and state, e.g. San Francisco, CA",
+                        #         },
+                        #         "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+                        #         },
+                        #         "required": ["location"],
+                        #     },
+                        #     }
+                        # }
+
+
             except IOError:
                 # Ignore missing actions file
                 pass
@@ -323,7 +353,9 @@ class PromptManager(PromptFunctions):
                 sections.append(UserMessage("{{$temp.input}}", self._options.max_input_tokens))
 
             template = PromptTemplate(
-                template_name, Prompt(sections), template_config, template_actions
+                template_name, Prompt(sections), template_config, template_actions, 
+                # TODO: Adding plugins to the PromptTemplate
+                template_plugins
             )
 
             if augmentation:

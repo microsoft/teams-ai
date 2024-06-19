@@ -71,6 +71,9 @@ class CompletionConfig:
     stop_sequences: Optional[List[str]] = None
     temperature: float = 0
     top_p: float = 0
+    # TODO: add config parameters for functions
+    tool_choice = "auto"
+    parallel_tool_calls = True
 
     @classmethod
     def from_dict(cls, data: dict) -> "CompletionConfig":
@@ -87,4 +90,7 @@ class CompletionConfig:
             stop_sequences=data.get("stop_sequences"),
             temperature=data.get("temperature", 0),
             top_p=data.get("top_p", 0),
+            # TODO: added getters
+            tool_choice=data.get("tool_choice"),
+            parallel_tool_calls=data.get("parallel_tool_calls"),
         )

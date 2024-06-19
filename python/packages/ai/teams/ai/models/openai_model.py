@@ -118,11 +118,21 @@ class OpenAIModel(PromptCompletionModel):
         template: PromptTemplate,
     ) -> PromptResponse[str]:
         max_tokens = template.config.completion.max_input_tokens
+
+        # TODO: retrieve parameters
+        tool_choice = template.config.completion.tool_choice
+        parallel_tool_calls = template.config.completion.parallel_tool_calls
+        tools = template.plugins.tools
+
         model = (
             template.config.completion.model
             if template.config.completion.model is not None
             else self._options.default_model
         )
+        
+        # TODO: Check if the model supports function calling
+        # TODO: Check that tools matches tool_choice
+
         res = await template.prompt.render_as_messages(
             context=context,
             memory=memory,
@@ -186,13 +196,76 @@ class OpenAIModel(PromptCompletionModel):
                 top_p=template.config.completion.top_p,
                 temperature=template.config.completion.temperature,
                 max_tokens=max_tokens,
+                # TODO: added tools parameter
+                tools=tools,
+                tool_choice=tool_choice,
             )
 
             if self._options.logger is not None:
                 self._options.logger.debug("COMPLETION:\n%s", completion.model_dump_json())
 
+            response_message = completion.choices[0].message
+            tool_calls = response_message.tool_calls
+
+            # TODO: used to track latest response from LLM
+            final_response = completion
+
+            while tool_calls:
+                # TODO: (1) Validate the tool_calls -> does it match tools (look at plugin names, parameters)?
+
+                # TODO: (2) Extend conversation with reply
+                messages.append(response_message)
+
+                # (3) Send the info for each plugin call and response to the model
+
+                    # (3a) Check if parallel_function_calling is False, and len(tool_calls) > 1 => SKIP
+                    #       OR alternatively..
+                    #               -> call them iteratively
+                    #               -> call first plugin in the list
+
+                for tool_call in tool_calls:
+                    function_name = tool_call.function.name
+                    function_args = json.loads(tool_call.function.arguments)
+
+                    # (3b) Check tool_choice - if a specific plugin should be called, or none
+
+                    # (3c) TODO: call the plugins and get the responses
+                    #           -> feels like a security vulnerability? 
+                    function = template.plugins.functions.getattr(function_name)
+
+                    # TODO: unravel the parameters, need to know # of args, and which args go into which pos
+                    # TODO: should we place a restriction on the type of functions handled?
+                    #           -> this may be async?
+                    #           -> limit on function args?
+                    #           -> could functions call other functions (eg. additional handlers)?
+                    function_response = function(function_args)
+
+                    messages.append(
+                        {
+                            "tool_call_id": tool_call.id,
+                            "role": "tool",
+                            "name": function_name,
+                            "content": function_response,
+                        }
+                    )
+
+                    # messages = [{"tool_call_id":1 ,..},{"tool_call_id":2 ,..},{"tool_call_id":3 ,..}]
+                
+                # (5) TODO: save to conversation history?
+                
+                # (7) TODO: update parameters to match above
+                final_response = await self._client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=messages,
+                )
+
+                tool_calls = final_response.choices[0].message.tool_calls
+
+
             input: Optional[Message] = None
             last_message = len(res.output) - 1
+
+            # TODO: Do we still skip this message if we are in tool_call mode?
 
             # Skips the first message which is the prompt
             if last_message > 0 and res.output[last_message].role == "user":
@@ -201,8 +274,9 @@ class OpenAIModel(PromptCompletionModel):
             return PromptResponse[str](
                 input=input,
                 message=Message(
-                    role=completion.choices[0].message.role,
-                    content=completion.choices[0].message.content,
+                    # TODO: update to take in the final_response
+                    role=final_response.choices[0].message.role,
+                    content=final_response.choices[0].message.content,
                 ),
             )
         except openai.APIError as err:

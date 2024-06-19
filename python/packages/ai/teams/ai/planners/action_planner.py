@@ -128,6 +128,9 @@ class ActionPlanner(Planner[StateT]):
                 self._options.prompts.add_prompt(prompt)
 
         template = await self._options.prompts.get_prompt(name)
+
+        # TODO: MERGE - update template.plugins with state.temp.tools
+
         include_history = template.config.completion.include_history
         client = LLMClient(
             LLMClientOptions(
