@@ -17,7 +17,7 @@ import { Memory } from '../MemoryFork';
 import { Tokenizer } from '../tokenizers';
 import { Utilities } from '../Utilities';
 import { DefaultAugmentation } from '../augmentations';
-import { StreamingLLMClient } from './StreamingLLMClient';
+import { LLMClient } from './LLMClient';
 
 /**
  * Factory function used to create a prompt template.
@@ -246,7 +246,7 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
         const input_variable = `temp.input`;
 
         // Create LLM client
-        const client = new StreamingLLMClient<TContent>({
+        const client = new LLMClient<TContent>({
             model,
             template,
             history_variable,

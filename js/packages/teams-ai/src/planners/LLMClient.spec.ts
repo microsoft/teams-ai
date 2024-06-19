@@ -21,6 +21,7 @@ describe('LLMClient', function() {
     };
     const model = TestModel.returnContent('hi! how are you?');
     const errorModel = TestModel.returnError(new Error('some error occurred!'));
+    const streamingModel = TestModel.streamTextChunks(['hi!', ' how are you?']);
 
     describe('constructor()', () => {
         it('should create a new instance with defaults', async () => {
@@ -89,6 +90,40 @@ describe('LLMClient', function() {
                 assert.equal(response.status, 'error', 'response status should be error');
                 assert(response.error, 'response error should not be null');
                 assert.equal(response.error.message, 'some error occurred!', 'response error message should match');
+            });
+        });
+        
+        it('should successfully complete a streaming prompt', async () => {
+            const adapter = new TestAdapter();
+            await adapter.sendTextToBot('hello', async (context) => {
+                const state = await TestTurnState.create(context);
+                const client = new LLMClient({
+                    model: streamingModel,
+                    template
+                });
+                const response = await client.completePrompt(context, state, functions);
+                assert.equal(adapter.activeQueue.length, 3, 'adapter should have 3 messages in the queue');
+                assert(response, 'response should not be null');
+                assert.equal(response.status, 'success', 'response status should be success');
+                assert(response.message == undefined, 'response message should be null');
+            });
+        });
+
+        it('should send a startStreamingMessage', async () => {
+            const adapter = new TestAdapter();
+            await adapter.sendTextToBot('hello', async (context) => {
+                const state = await TestTurnState.create(context);
+                const client = new LLMClient({
+                    model: streamingModel,
+                    template,
+                    startStreamingMessage: 'start'
+                });
+                const response = await client.completePrompt(context, state, functions);
+                assert.equal(adapter.activeQueue.length, 4, 'adapter should have 4 messages in the queue');
+                assert.equal(adapter.activeQueue[0].text, 'start', 'adapter should have a start message in the queue');
+                assert(response, 'response should not be null');
+                assert.equal(response.status, 'success', 'response status should be success');
+                assert(response.message == undefined, 'response message should be null');
             });
         });
     });
