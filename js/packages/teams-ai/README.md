@@ -6,8 +6,7 @@ This SDK is specifically designed to assist you in creating bots capable of inte
 
 Requirements:
 
--   node v16.x
--   node v18.x
+-   node v18.x &nbsp; &nbsp; &nbsp; - See [details about ending support for node 16](https://github.com/microsoft/teams-ai/issues/1371)
 
 To get started with the SDK [see](https://github.com/microsoft/teams-ai/tree/main/getting-started).
 
