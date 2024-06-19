@@ -1,4 +1,3 @@
-@maxLength(20)
 @minLength(4)
 @description('Used to generate names for all resources in this file')
 param resourceBaseName string
