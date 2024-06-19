@@ -10,3 +10,4 @@ export * from './ChatCompletionAction';
 export * from './LlamaModel';
 export * from './OpenAIModel';
 export * from './PromptCompletionModel';
+export * from './TestModel';
