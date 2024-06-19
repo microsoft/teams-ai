@@ -9,6 +9,7 @@
 export * from './augmentations';
 export * from './dataSources';
 export * from './embeddings';
+export * from './external';
 export * from './models';
 export * from './moderators';
 export * from './planners';
@@ -23,6 +24,7 @@ export * from './ApplicationBuilder';
 export * from './InputFileDownloader';
 export * from './MemoryFork';
 export * from './MessageExtensions';
+export * from './StreamingResponse';
 export * from './TaskModules';
 export * from './TeamsAttachmentDownloader';
 export * from './TurnState';
