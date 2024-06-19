@@ -67,6 +67,8 @@ This sample shows how to integrate your search index as a data source into promp
 
 1. Fill the `AZURE_OPENAI_ENDPOINT`, `AZURE_SEARCH_ENDPOINT`, and `AZURE_SEARCH_INDEX` variables appropriately.
 
+1. Verify you are logged into azure cli. This is required because this sample uses managed identity. You can download and install Azure CLI from [Azure CLI docs](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli). For more information on setting up environment variables, see the [Azure SDK documentation](https://github.com/Azure/azure-sdk-for-go/wiki/Set-up-Your-Environment-for-Authentication).
+
 1. Follow the [use your data quickstart instructions](https://learn.microsoft.com/en-us/azure/ai-services/openai/use-your-data-quickstart?tabs=command-line%2Cpython-new&pivots=programming-language-studio#add-your-data-using-azure-openai-studio) to add your data using Azure OpenAI Studio. Select `Upload files` as the data source. You can upload the `nba.pdf` file. Take note of the index name.
 
 ## Testing the sample

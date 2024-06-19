@@ -28,6 +28,10 @@ server.listen(port, () => {
 });
 
 server.post('/api/messages', async (req, res) => {
+    if (!req.headers.authorization) {
+        return res.send(401, 'unauthorized');
+    }
+
     // Route received a request to adapter for processing
     await (app.adapter as TeamsAdapter).process(req, res as any, async (context) => {
         if (context.activity.conversation.tenantId !== process.env.BOT_TENANT_ID) {
