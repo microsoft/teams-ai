@@ -18,3 +18,5 @@ class Config:
     APP_PASSWORD = os.environ["BOT_PASSWORD"]
     AZURE_OPENAI_KEY = os.environ.get("AZURE_OPENAI_KEY", "")
     AZURE_OPENAI_ENDPOINT = os.environ.get("AZURE_OPENAI_ENDPOINT", "")
+    AZURE_SEARCH_ENDPOINT = os.environ.get("AZURE_SEARCH_ENDPOINT", "")
+    AZURE_SEARCH_INDEX = os.environ.get("AZURE_SEARCH_INDEX", "")

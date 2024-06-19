@@ -92,9 +92,9 @@ class Citation(DataClassJsonMixin):
     """
 
     content: str
-    title: str
-    url: str
-    filepath: str
+    title: Optional[str]
+    url: Optional[str]
+    filepath: Optional[str]
 
 @dataclass_json
 @dataclass

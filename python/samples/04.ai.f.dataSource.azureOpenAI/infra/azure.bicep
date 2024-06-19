@@ -6,12 +6,13 @@ param resourceBaseName string
 @description('Required when create Azure Bot service')
 param botAadAppClientId string
 
+param azureOpenAIEndpoint string = ''
+
 @secure()
 @description('Required by Bot Framework package in your bot project')
 param botAadAppClientSecret string
 
 param webAppSKU string
-param linuxFxVersion string
 
 @maxLength(42)
 param botDisplayName string
@@ -19,36 +20,39 @@ param botDisplayName string
 param serverfarmsName string = resourceBaseName
 param webAppName string = resourceBaseName
 param location string = resourceGroup().location
-param pythonVersion string = linuxFxVersion
 
 // Compute resources for your Web App
 resource serverfarm 'Microsoft.Web/serverfarms@2021-02-01' = {
-  kind: 'app,linux'
+  kind: 'app'
   location: location
   name: serverfarmsName
   sku: {
     name: webAppSKU
   }
-  properties:{
-    reserved: true
-  }
 }
 
 // Web App that hosts your bot
 resource webApp 'Microsoft.Web/sites@2021-02-01' = {
-  kind: 'app,linux'
+  kind: 'app'
   location: location
   name: webAppName
   properties: {
     serverFarmId: serverfarm.id
+    httpsOnly: true
     siteConfig: {
       alwaysOn: true
-      appCommandLine: 'gunicorn --bind 0.0.0.0 --worker-class aiohttp.worker.GunicornWebWorker --timeout 600 api:api'
-      linuxFxVersion: pythonVersion
       appSettings: [
         {
-          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
-          value: 'true'
+          name: 'WEBSITE_RUN_FROM_PACKAGE'
+          value: '1' // Run Azure APP Service from a package file
+        }
+        {
+          name: 'WEBSITE_NODE_DEFAULT_VERSION'
+          value: '~18' // Set NodeJS version to 18.x for your site
+        }
+        {
+          name: 'RUNNING_ON_AZURE'
+          value: '1'
         }
         {
           name: 'BOT_ID'
@@ -57,6 +61,10 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           name: 'BOT_PASSWORD'
           value: botAadAppClientSecret
+        }
+        {
+          name: 'AZURE_OPENAI_ENDPOINT'
+          value: azureOpenAIEndpoint
         }
       ]
       ftpsState: 'FtpsOnly'

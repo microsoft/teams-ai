@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from logging import Logger
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Callable
 
 import openai
 from botbuilder.core import TurnContext
@@ -51,8 +51,6 @@ class AzureOpenAIModelOptions:
     Options for configuring an `OpenAIModel` to call an Azure OpenAI hosted model.
     """
 
-    api_key: str
-    "API key to use when making requests to Azure OpenAI."
 
     default_model: str
     "Default name of the Azure OpenAI deployment (model) to use."
@@ -62,6 +60,12 @@ class AzureOpenAIModelOptions:
 
     api_version: str = "2023-05-15"
     "Optional. Version of the API being called. Defaults to `2023-05-15`."
+
+    api_key: Optional[str] = None
+    "API key to use when making requests to Azure OpenAI."
+    
+    azure_ad_token_provider: Optional[Callable[..., str]] = None
+    "Optional. A function that returns an access token for Microsoft Entra (formerly known as Azure Active Directory), which will be invoked in every request."
 
     organization: Optional[str] = None
     "Optional. Organization to use when calling the OpenAI API."
@@ -103,6 +107,7 @@ class OpenAIModel(PromptCompletionModel):
             self._client = openai.AsyncAzureOpenAI(
                 api_key=options.api_key,
                 api_version=options.api_version,
+                azure_ad_token_provider=options.azure_ad_token_provider,
                 azure_endpoint=options.endpoint,
                 azure_deployment=options.default_model,
                 organization=options.organization,

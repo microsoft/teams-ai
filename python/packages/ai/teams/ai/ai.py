@@ -23,6 +23,7 @@ from .citations.citations import Appearance, ClientCitation
 from .moderators.moderator import Moderator
 from .planners.plan import Plan, PredictedDoCommand, PredictedSayCommand
 from .planners.planner import Planner
+from .prompts import MessageContext
 
 StateT = TypeVar("StateT", bound=TurnState)
 
@@ -283,17 +284,16 @@ class AI(Generic[StateT]):
 
         if (
             msg_context
-            and isinstance(msg_context, dict)
-            and "citations" in msg_context
-            and len(msg_context["citations"]) > 0
+            and isinstance(msg_context, MessageContext)
+            and len(msg_context.citations) > 0
         ):
-            for i, citation in enumerate(msg_context["citations"]):
+            for i, citation in enumerate(msg_context.citations):
                 citations.append(
                     ClientCitation(
-                        position=f"[{i + 1}]",
+                        position=f"{i + 1}",
                         appearance=Appearance(
-                            name=citation["title"],
-                            abstract=snippet(citation["abstract"], 500),
+                            name=citation.title or f"Document {i + 1}",
+                            abstract=snippet(citation.content, 500),
                         ),
                     )
                 )
