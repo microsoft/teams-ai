@@ -57,6 +57,8 @@ class CompletionConfig:
 
         top_p (float): The model's top_p as a number between 0 and 2.
           Defaults to 0.
+
+        data_sources (Optional[List[object]]): List of data sources to ground the answer in.
     """
 
     completion_type: Optional[Literal["chat", "text"]] = None
@@ -71,6 +73,7 @@ class CompletionConfig:
     stop_sequences: Optional[List[str]] = None
     temperature: float = 0
     top_p: float = 0
+    data_sources: Optional[List[object]] = None
 
     @classmethod
     def from_dict(cls, data: dict) -> "CompletionConfig":
@@ -87,4 +90,5 @@ class CompletionConfig:
             stop_sequences=data.get("stop_sequences"),
             temperature=data.get("temperature", 0),
             top_p=data.get("top_p", 0),
+            data_sources=data.get("data_sources", None),
         )

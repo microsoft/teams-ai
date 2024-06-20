@@ -8,14 +8,14 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from logging import Logger
-from typing import List, Optional, Union
+from typing import Callable, List, Optional, Union
 
 import openai
 from botbuilder.core import TurnContext
 from openai.types import chat
 
 from ...state import MemoryBase
-from ..prompts.message import Message
+from ..prompts.message import Message, MessageContext
 from ..prompts.prompt_functions import PromptFunctions
 from ..prompts.prompt_template import PromptTemplate
 from ..tokenizers import Tokenizer
@@ -51,9 +51,6 @@ class AzureOpenAIModelOptions:
     Options for configuring an `OpenAIModel` to call an Azure OpenAI hosted model.
     """
 
-    api_key: str
-    "API key to use when making requests to Azure OpenAI."
-
     default_model: str
     "Default name of the Azure OpenAI deployment (model) to use."
 
@@ -62,6 +59,14 @@ class AzureOpenAIModelOptions:
 
     api_version: str = "2023-05-15"
     "Optional. Version of the API being called. Defaults to `2023-05-15`."
+
+    api_key: Optional[str] = None
+    "API key to use when making requests to Azure OpenAI."
+
+    azure_ad_token_provider: Optional[Callable[..., str]] = None
+    """Optional. A function that returns an access token for Microsoft Entra 
+    (formerly known as Azure Active Directory), which will be invoked in every request.
+    """
 
     organization: Optional[str] = None
     "Optional. Organization to use when calling the OpenAI API."
@@ -103,6 +108,7 @@ class OpenAIModel(PromptCompletionModel):
             self._client = openai.AsyncAzureOpenAI(
                 api_key=options.api_key,
                 api_version=options.api_version,
+                azure_ad_token_provider=options.azure_ad_token_provider,
                 azure_endpoint=options.endpoint,
                 azure_deployment=options.default_model,
                 organization=options.organization,
@@ -178,6 +184,9 @@ class OpenAIModel(PromptCompletionModel):
             messages.append(param)
 
         try:
+            extra_body = {}
+            if template.config.completion.data_sources is not None:
+                extra_body["data_sources"] = template.config.completion.data_sources
             completion = await self._client.chat.completions.create(
                 messages=messages,
                 model=model,
@@ -186,6 +195,7 @@ class OpenAIModel(PromptCompletionModel):
                 top_p=template.config.completion.top_p,
                 temperature=template.config.completion.temperature,
                 max_tokens=max_tokens,
+                extra_body=extra_body,
             )
 
             if self._options.logger is not None:
@@ -203,6 +213,11 @@ class OpenAIModel(PromptCompletionModel):
                 message=Message(
                     role=completion.choices[0].message.role,
                     content=completion.choices[0].message.content,
+                    context=(
+                        MessageContext.from_dict(completion.choices[0].message.context)
+                        if hasattr(completion.choices[0].message, "context")
+                        else None
+                    ),
                 ),
             )
         except openai.APIError as err:
