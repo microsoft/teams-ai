@@ -1,4 +1,4 @@
-# Teams Light Bot
+# Teams LangChain Bot
 
 A conversational bot for Microsoft Teams, designed as an AI assistant. The bot connects to a third-party service to turn a light on or off.
 
@@ -8,7 +8,7 @@ This sample illustrates more complex conversational bot behavior in Microsoft Te
 
 <!-- code_chunk_output -->
 
-- [Teams Light Bot](#teams-light-bot)
+- [Teams LangChain Bot](#teams-langchain-bot)
   - [Interacting with the bot](#interacting-with-the-bot)
   - [Setting up the sample](#setting-up-the-sample)
   - [Testing the sample](#testing-the-sample)
@@ -28,7 +28,7 @@ You can interact with the bot by messaging it.
     git clone https://github.com/Microsoft/teams-ai.git
     ```
 
-2. Duplicate the `sample.env` in the `teams-ai/python/samples/04.ai.c.actionMapping.lightBot` folder. Rename the file to `.env`. 
+2. Duplicate the `sample.env` in the `teams-ai/python/samples/07.planners.a.langchain` folder. Rename the file to `.env`. 
 
 3. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
 

@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "light-sample"
+name = "langchain-sample"
 version = "0.0.0"
-description = "Light Sample"
+description = "LangChain Sample"
 authors = ["Microsoft <teams@microsoft.com>"]
 readme = "README.md"
 packages = [
@@ -9,9 +9,11 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4.0"
-teams-ai = "^1.1.0"
+python = ">=3.8.1,<4.0"
+teams-ai = { path = "../../packages/ai", develop = true }
 python-dotenv = "^1.0.1"
+langchain = "^0.2.5"
+langchain-openai = "^0.1.8"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"

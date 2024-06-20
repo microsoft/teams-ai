@@ -15,14 +15,16 @@ from botbuilder.core import MemoryStorage, TurnContext
 from teams import Application, ApplicationOptions, TeamsAdapter
 from teams.ai import AIOptions
 from teams.ai.actions import ActionTurnContext
-from teams.ai.models import AzureOpenAIModelOptions, OpenAIModel, OpenAIModelOptions
-from teams.ai.planners import ActionPlanner, ActionPlannerOptions
 from teams.ai.prompts import PromptFunctions, PromptManager, PromptManagerOptions
 from teams.ai.tokenizers import Tokenizer
-from teams.state import MemoryBase
+from teams.state import MemoryBase, todict
+
+from langchain.chat_models.base import BaseChatModel
+from langchain_openai import ChatOpenAI, AzureChatOpenAI
 
 from config import Config
 from state import AppTurnState
+from planner import LangChainPlanner
 
 config = Config()
 
@@ -31,22 +33,15 @@ if config.OPENAI_KEY is None and config.AZURE_OPENAI_KEY is None:
         "Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set."
     )
 
-# Create AI components
-model: OpenAIModel
+model: BaseChatModel
 
 if config.OPENAI_KEY:
-    model = OpenAIModel(
-        OpenAIModelOptions(api_key=config.OPENAI_KEY, default_model="gpt-3.5-turbo")
-    )
+    os.environ["OPENAI_API_KEY"] = config.OPENAI_KEY
+    model = ChatOpenAI(model="gpt-4-turbo")
 elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
-    model = OpenAIModel(
-        AzureOpenAIModelOptions(
-            api_key=config.AZURE_OPENAI_KEY,
-            default_model="gpt-35-turbo",
-            api_version="2023-03-15-preview",
-            endpoint=config.AZURE_OPENAI_ENDPOINT,
-        )
-    )
+    os.environ["AZURE_OPENAI_API_KEY"] = config.AZURE_OPENAI_KEY
+    os.environ["AZURE_OPENAI_ENDPOINT"] = config.AZURE_OPENAI_ENDPOINT
+    model = AzureChatOpenAI(model="gpt-4-turbo")
 
 prompts = PromptManager(PromptManagerOptions(prompts_folder=f"{os.path.dirname(os.path.abspath(__file__))}/prompts"))
 storage = MemoryStorage()
@@ -55,8 +50,9 @@ app = Application[AppTurnState](
         bot_app_id=config.APP_ID,
         storage=storage,
         adapter=TeamsAdapter(config),
-        ai=AIOptions(planner=ActionPlanner(
-            ActionPlannerOptions(model=model, prompts=prompts, default_prompt="sequence")
+        ai=AIOptions(planner=LangChainPlanner(
+            model=model,
+            prompts=prompts,
         )),
     )
 )
@@ -124,6 +120,7 @@ async def on_error(context: TurnContext, error: Exception):
     #       application insights.
     print(f"\n [on_turn_error] unhandled error: {error}", file=sys.stderr)
     traceback.print_exc()
+    print(todict(error))
 
     # Send a message to the user
     await context.send_activity("The bot encountered an error or bug.")

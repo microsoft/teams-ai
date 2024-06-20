@@ -3,14 +3,17 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Optional
+from typing import Optional, List
 
 from botbuilder.core import Storage, TurnContext
 from teams.state import TurnState, ConversationState, UserState, TempState
 
+from message import Message
+
 
 class AppConversationState(ConversationState):
     lights_on: bool = False
+    history: List[Message] = []
 
     @classmethod
     async def load(cls, context: TurnContext, storage: Optional[Storage] = None) -> "AppConversationState":
