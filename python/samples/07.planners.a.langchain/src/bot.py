@@ -14,7 +14,7 @@ from typing import Any, Dict, List
 from botbuilder.core import MemoryStorage, TurnContext
 from teams import Application, ApplicationOptions, TeamsAdapter
 from teams.ai import AIOptions
-from teams.ai.actions import ActionTurnContext
+from teams.ai.actions import ActionTurnContext, ActionTypes
 from teams.ai.prompts import PromptFunctions, PromptManager, PromptManagerOptions
 from teams.ai.tokenizers import Tokenizer
 from teams.state import MemoryBase, todict
@@ -73,6 +73,13 @@ async def on_get_light_status(
 ):
     return "on" if state.get("conversation.lightsOn") else "off"
 
+
+@app.ai.action(ActionTypes.SAY_COMMAND)
+async def on_say(
+    _context: ActionTurnContext,
+    _state: AppTurnState,
+):
+    return ""
 
 @app.ai.action("LightsOn")
 async def on_lights_on(

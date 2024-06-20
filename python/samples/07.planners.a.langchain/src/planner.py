@@ -110,7 +110,6 @@ class LangChainPlanner(Planner[AppTurnState]):
 
                 if len(buffer) > 0:
                     activityId = await self._upsert_activity(activityId, buffer, context)
-                    buffer = ""
 
         if res is None or not isinstance(res, AIMessageChunk):
             return plan
