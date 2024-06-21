@@ -17,7 +17,7 @@ from botbuilder.integration.aiohttp import (
     ConfigurationBotFrameworkAuthentication,
     ConfigurationServiceClientCredentialFactory,
 )
-from botbuilder.schema import Activity
+from botbuilder.schema import Activity, ConversationAccount, ResourceResponse
 from botframework.connector import (
     ConnectorClient,
     HttpClientBase,
@@ -108,6 +108,34 @@ class TeamsAdapter(CloudAdapter, _UserAgent):
             res.headers.add("User-Agent", self.user_agent)
 
         return res
+
+    # [TODO] remove once version 4.15.1 is installed
+    # https://github.com/microsoft/botbuilder-python/commit/bc3b6f4125e6f4ca5e6cae2dd25c62233e8ef508
+    async def update_activity(self, context: TurnContext, activity: Activity):
+        if not context:
+            raise TypeError("Expected TurnContext but got None instead")
+
+        if activity is None:
+            raise TypeError("Expected Activity but got None instead")
+
+        connector_client: ConnectorClient = cast(
+            ConnectorClient, context.turn_state.get(self.BOT_CONNECTOR_CLIENT_KEY)
+        )
+
+        if not connector_client:
+            raise ValueError("Unable to extract ConnectorClient from turn context.")
+
+        response = await cast(
+            Awaitable[Any],
+            connector_client.conversations.update_activity(
+                cast(ConversationAccount, activity.conversation).id,
+                activity.id,
+                activity,
+            ),
+        )
+
+        response_id = getattr(response, "id") or None
+        return ResourceResponse(id=response_id) if response_id else None
 
     def _create_turn_context(
         self,
