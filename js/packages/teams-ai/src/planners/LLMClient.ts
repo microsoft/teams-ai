@@ -7,12 +7,13 @@
  */
 
 import { ConversationHistory, Message, Prompt, PromptFunctions, PromptTemplate } from '../prompts';
-import { PromptResponse, PromptCompletionModel } from '../models';
+import { PromptResponse, PromptCompletionModel, PromptCompletionModelBeforeCompletionEvent, PromptCompletionModelChunkReceivedEvent, PromptCompletionModelResponseReceivedEvent } from '../models';
 import { Validation, PromptResponseValidator, DefaultResponseValidator } from '../validators';
 import { Memory, MemoryFork } from '../MemoryFork';
 import { Colorize } from '../internals';
 import { TurnContext } from 'botbuilder';
 import { GPTTokenizer, Tokenizer } from '../tokenizers';
+import { StreamingResponse } from '../StreamingResponse';
 
 /**
  * Options for an LLMClient instance.
@@ -79,6 +80,11 @@ export interface LLMClientOptions<TContent = any> {
      * Optional. If true, any repair attempts will be logged to the console.
      */
     logRepairs?: boolean;
+
+    /**
+     * Optional message to send a client at the start of a streaming response.
+     */
+    startStreamingMessage?: string;
 }
 
 /**
@@ -179,12 +185,9 @@ export interface ConfiguredLLMClientOptions<TContent = any> {
  * instead.
  * @template TContent Optional. Type of message content returned for a 'success' response. The `response.message.content` field will be of type TContent. Defaults to `any`.
  */
-/**
- * Represents an LLM (Language Learning Model) client.
- * This class provides methods for configuring and interacting with the LLM model.
- * @template TContent The type of message content returned for a 'success' response.
- */
 export class LLMClient<TContent = any> {
+    private readonly _startStreamingMessage: string|undefined;
+
     /**
      * Configured options for this LLMClient instance.
      */
@@ -215,6 +218,9 @@ export class LLMClient<TContent = any> {
         if (!this.options.tokenizer) {
             this.options.tokenizer = new GPTTokenizer();
         }
+
+        this._startStreamingMessage = options.startStreamingMessage;
+
     }
 
     /**
@@ -280,7 +286,90 @@ export class LLMClient<TContent = any> {
      * @param {PromptFunctions} functions - Functions to use when rendering the prompt.
      * @returns {Promise<PromptResponse<TContent>>} A `PromptResponse` with the status and message.
      */
+
     public async completePrompt(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions
+    ): Promise<PromptResponse<TContent>> {
+        // Define event handlers
+        let isStreaming = false;
+        let streamer: StreamingResponse|undefined;
+        const beforeCompletion: PromptCompletionModelBeforeCompletionEvent = async (ctx, memory, functions, tokenizer, template, streaming) => {
+            // Ignore events for other contexts
+            if (context !== ctx) {
+                return;
+            }
+
+            // Check for a streaming response
+            if (streaming) {
+                isStreaming = true;
+
+                // Create streamer and send initial message
+                streamer = new StreamingResponse(context);
+                if (this._startStreamingMessage) {
+                    await streamer.sendInformativeUpdate(this._startStreamingMessage);
+                }
+            }
+        };
+
+        const chunkReceived: PromptCompletionModelChunkReceivedEvent = async (ctx, memory, chunk) => {
+            // Ignore events for other contexts
+            if (context !== ctx || !streamer) {
+                return;
+            }
+
+            // Send chunk to client
+            const text = chunk.delta?.content ?? '';
+            if (text.length > 0) {
+                await streamer.sendTextChunk(text);
+            }
+        };
+        
+        const responseReceived: PromptCompletionModelResponseReceivedEvent = async (ctx, memory, response) => {
+            // Ignore events for other contexts
+            if (context !== ctx || !streamer) {
+                return;
+            }
+
+            // End the stream
+            await streamer.endStream();
+        }
+    
+        // Subscribe to model events
+        if (this.options.model.events) {
+            this.options.model.events.on('beforeCompletion', beforeCompletion);
+            this.options.model.events.on('chunkReceived', chunkReceived);
+            this.options.model.events.on('responseReceived', responseReceived);
+        }
+
+        try {
+            // Complete the prompt
+            const response = await this.callCompletePrompt(context, memory, functions);
+            if (response.status == 'success' && isStreaming) {
+                // Delete message from response to avoid sending it twice
+                delete response.message;
+            }
+
+            return response;
+        } finally {
+            // Unsubscribe from model events
+            if (this.options.model.events) {
+                this.options.model.events.off('beforeCompletion', beforeCompletion);
+                this.options.model.events.off('chunkReceived', chunkReceived);
+                this.options.model.events.off('responseReceived', responseReceived);
+            }
+        }
+    }
+
+    /**
+     * @param {TurnContext} context - Current turn context.
+     * @param {Memory} memory - An interface for accessing state values.
+     * @param {PromptFunctions} functions - Functions to use when rendering the prompt.
+     * @returns {Promise<PromptResponse<TContent>>} A `PromptResponse` with the status and message.
+     * @private
+     */
+    public async callCompletePrompt(
         context: TurnContext,
         memory: Memory,
         functions: PromptFunctions

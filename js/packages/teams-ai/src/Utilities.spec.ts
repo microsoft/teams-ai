@@ -104,8 +104,9 @@ describe('Utilities', () => {
                     }
                 }
             ] as ClientCitation[];
-            const result = Utilities.getUsedCitations('hello [1] world', citations);
+            const result = Utilities.getUsedCitations('hello [1] world [1]', citations);
             assert.deepEqual(result, [citations[0]]);
+            assert.equal(result.length, 1);
         });
 
         it('should return a longer array of used citations', () => {
