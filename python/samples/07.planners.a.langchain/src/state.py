@@ -3,10 +3,10 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Optional, List
+from typing import List, Optional
 
 from botbuilder.core import Storage, TurnContext
-from teams.state import TurnState, ConversationState, UserState, TempState
+from teams.state import ConversationState, TempState, TurnState, UserState
 
 from message import Message
 
@@ -16,7 +16,9 @@ class AppConversationState(ConversationState):
     history: List[Message] = []
 
     @classmethod
-    async def load(cls, context: TurnContext, storage: Optional[Storage] = None) -> "AppConversationState":
+    async def load(
+        cls, context: TurnContext, storage: Optional[Storage] = None
+    ) -> "AppConversationState":
         state = await super().load(context, storage)
         return cls(**state)
 

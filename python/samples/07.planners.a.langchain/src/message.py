@@ -1,10 +1,17 @@
-from typing import Optional, List
-
 from dataclasses import dataclass
-from dataclasses_json import dataclass_json
+from typing import List, Optional
 
+from dataclasses_json import dataclass_json
+from langchain_core.messages import (
+    AIMessage,
+    BaseMessage,
+    HumanMessage,
+    SystemMessage,
+    ToolCall,
+    ToolMessage,
+)
 from teams.ai.prompts import Message as TeamsAIMessage
-from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, SystemMessage, ToolMessage, ToolCall
+
 
 @dataclass_json
 @dataclass
@@ -24,9 +31,9 @@ class Message(TeamsAIMessage[str]):
             return AIMessage(content, tool_calls=self.tool_calls)
         elif self.role == "tool":
             return ToolMessage(content, tool_call_id=self.tool_call_id)
-        
+
         raise RuntimeError(f"invalid message role {self.role}")
-    
+
     @classmethod
     def from_langchain(cls, message: BaseMessage) -> "Message":
         content = message.content if isinstance(message.content, str) else ""
@@ -39,5 +46,5 @@ class Message(TeamsAIMessage[str]):
             return cls(role="assistant", content=content, tool_calls=message.tool_calls)
         elif isinstance(message, ToolMessage):
             return cls(role="tool", content=content, tool_call_id=message.tool_call_id)
-        
+
         raise RuntimeError(f"invalid message type {message.__class__}")

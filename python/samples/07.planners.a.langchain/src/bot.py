@@ -12,6 +12,8 @@ import traceback
 from typing import Any, Dict, List
 
 from botbuilder.core import MemoryStorage, TurnContext
+from langchain.chat_models.base import BaseChatModel
+from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from teams import Application, ApplicationOptions, TeamsAdapter
 from teams.ai import AIOptions
 from teams.ai.actions import ActionTurnContext, ActionTypes
@@ -19,12 +21,9 @@ from teams.ai.prompts import PromptFunctions, PromptManager, PromptManagerOption
 from teams.ai.tokenizers import Tokenizer
 from teams.state import MemoryBase, todict
 
-from langchain.chat_models.base import BaseChatModel
-from langchain_openai import ChatOpenAI, AzureChatOpenAI
-
 from config import Config
-from state import AppTurnState
 from planner import LangChainPlanner
+from state import AppTurnState
 
 config = Config()
 
@@ -43,17 +42,21 @@ elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
     os.environ["AZURE_OPENAI_ENDPOINT"] = config.AZURE_OPENAI_ENDPOINT
     model = AzureChatOpenAI(model="gpt-4-turbo")
 
-prompts = PromptManager(PromptManagerOptions(prompts_folder=f"{os.path.dirname(os.path.abspath(__file__))}/prompts"))
+prompts = PromptManager(
+    PromptManagerOptions(prompts_folder=f"{os.path.dirname(os.path.abspath(__file__))}/prompts")
+)
 storage = MemoryStorage()
 app = Application[AppTurnState](
     ApplicationOptions(
         bot_app_id=config.APP_ID,
         storage=storage,
         adapter=TeamsAdapter(config),
-        ai=AIOptions(planner=LangChainPlanner(
-            model=model,
-            prompts=prompts,
-        )),
+        ai=AIOptions(
+            planner=LangChainPlanner(
+                model=model,
+                prompts=prompts,
+            )
+        ),
     )
 )
 
@@ -80,6 +83,7 @@ async def on_say(
     _state: AppTurnState,
 ):
     return ""
+
 
 @app.ai.action("LightsOn")
 async def on_lights_on(
