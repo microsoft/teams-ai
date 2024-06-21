@@ -109,6 +109,8 @@ class TeamsAdapter(CloudAdapter, _UserAgent):
 
         return res
 
+    # [TODO] remove once version 4.15.1 is installed
+    # https://github.com/microsoft/botbuilder-python/commit/bc3b6f4125e6f4ca5e6cae2dd25c62233e8ef508 
     async def update_activity(self, context: TurnContext, activity: Activity):
         if not context:
             raise TypeError("Expected TurnContext but got None instead")
