@@ -15,7 +15,7 @@
       "value": "B1"
     },
     "botDisplayName": {
-      "value": "LightBotInfra"
+      "value": "LangChainInfra"
     },
     "linuxFxVersion": {
       "value": "PYTHON|3.11"
