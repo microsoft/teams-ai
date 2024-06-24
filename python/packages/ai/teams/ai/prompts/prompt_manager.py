@@ -284,14 +284,12 @@ class PromptManager(PromptFunctions):
 
             # Load optional actions
             template_actions: List[ChatCompletionAction] = []
-
             try:
                 with open(actions_file, "r", encoding="utf-8") as file:
                     actions = json.load(file)
 
                     for action in actions:
                         template_actions.append(ChatCompletionAction.from_dict(action))
-
             except IOError:
                 # Ignore missing actions file
                 pass
