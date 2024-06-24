@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Literal, Optional
+from typing import Dict, List, Literal, Optional, Union
 
 
 # pylint: disable=too-many-instance-attributes
@@ -57,6 +57,12 @@ class CompletionConfig:
 
         top_p (float): The model's top_p as a number between 0 and 2.
           Defaults to 0.
+
+        tool_choice (Optional[Union[str, Dict]]): Defines function calling behavior.
+          Defaults to None.
+
+        parallel_tool_calls (Optional[bool]): Configures parallel function calling.
+          Defaults to True.
     """
 
     completion_type: Optional[Literal["chat", "text"]] = None
@@ -71,9 +77,8 @@ class CompletionConfig:
     stop_sequences: Optional[List[str]] = None
     temperature: float = 0
     top_p: float = 0
-    # TODO: add config parameters for functions
-    tool_choice = "auto"
-    parallel_tool_calls = True
+    tool_choice: Optional[Union[str, Dict]] = None
+    parallel_tool_calls: Optional[bool] = True
 
     @classmethod
     def from_dict(cls, data: dict) -> "CompletionConfig":
@@ -90,7 +95,6 @@ class CompletionConfig:
             stop_sequences=data.get("stop_sequences"),
             temperature=data.get("temperature", 0),
             top_p=data.get("top_p", 0),
-            # TODO: added getters
-            tool_choice=data.get("tool_choice"),
-            parallel_tool_calls=data.get("parallel_tool_calls"),
+            tool_choice=data.get("tool_choice", None),
+            parallel_tool_calls=data.get("parallel_tool_calls", True),
         )

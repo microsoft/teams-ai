@@ -119,10 +119,12 @@ class OpenAIModel(PromptCompletionModel):
     ) -> PromptResponse[str]:
         max_tokens = template.config.completion.max_input_tokens
 
-        # TODO: retrieve parameters
+        # TODO: retrieve parameters - may or may not exist
+        # TODO: update everything
+        # TODO: check that tool_choice confirms to a set definition
         tool_choice = template.config.completion.tool_choice
         parallel_tool_calls = template.config.completion.parallel_tool_calls
-        tools = template.plugins.tools
+        # tools = template.plugins.tools
 
         model = (
             template.config.completion.model

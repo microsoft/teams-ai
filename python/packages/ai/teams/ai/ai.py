@@ -137,7 +137,6 @@ class AI(Generic[StateT]):
 
         plan: Optional[Plan] = None
 
-        # TODO: Saving the action handlers into the state, in order to access in the planner
         state.temp.tools = self._actions
 
         if step == 0:
