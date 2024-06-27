@@ -145,9 +145,10 @@ class OpenAIModel(PromptCompletionModel):
                 )
 
             for action in template.actions:
-                handler = tools_handlers.get(action.name).func
-                tool = OpenAIFunction(action.name, action.description, action.parameters, handler)
-                tools.append(tool)
+                if action.name in tools_handlers:
+                    handler = tools_handlers.get(action.name).func
+                    tool = OpenAIFunction(action.name, action.description, action.parameters, handler)
+                    tools.append(tool)
 
         formatted_tools: List[chat.ChatCompletionToolParam] = []
 
@@ -292,7 +293,7 @@ class OpenAIModel(PromptCompletionModel):
                                 break
 
                         # Call the function
-                        function_response: Union[str, Awaitable[str]] = await self._handle_function_response(curr_function_handler, required_args, curr_args)
+                        function_response = await self._handle_function_response(curr_function_handler, required_args, curr_args)
 
                         messages.append(
                             chat.ChatCompletionToolMessageParam(
@@ -354,13 +355,12 @@ class OpenAIModel(PromptCompletionModel):
         required_args: Optional[List[str]],
         curr_args: Dict[str, Any],
     ) -> Union[str, Awaitable[str]]:
-        
-        # TODO: BUG - Passing in optional vars is an option, should check for curr_args.values size instead
-        if asyncio.iscoroutinefunction(curr_function_handler) and required_args and len(required_args) > 0:
+
+        if asyncio.iscoroutinefunction(curr_function_handler) and len(curr_args) > 0:
             return await curr_function_handler(**curr_args.values())
         elif asyncio.iscoroutinefunction(curr_function_handler):
             return await curr_function_handler()
-        elif required_args and len(required_args) > 0:
+        elif required_args and len(curr_args) > 0:
             return curr_function_handler(**curr_args.values())
         else:
             return curr_function_handler()
@@ -375,7 +375,6 @@ class OpenAIModel(PromptCompletionModel):
         # TODO: BUG - Needs updates to match up with single tool call
         for tool_call in tool_calls:
             function_name = tool_call.function.name
-            curr_args = json.loads(tool_call.function.arguments)
             curr_function = list(filter(lambda tool: tool.name == function_name, tools))
 
             # Validate function name
@@ -384,16 +383,20 @@ class OpenAIModel(PromptCompletionModel):
 
             # Validate function arguments
             required_args = (
-                curr_function[0].parameters.keys() if list(curr_function[0].parameters) else None
+                curr_function[0].parameters["required"]
+                if curr_function[0].parameters and "required" in curr_function[0].parameters
+                else None
             )
+
+            curr_args = json.loads(tool_call.function.arguments)
             curr_function_handler = curr_function[0].handler
 
             if required_args:
-                if len(required_args) != len(curr_args):
+                if len(required_args) > len(curr_args):
                     continue
 
             # Call the function
-            function_response: Union[str, Awaitable[str]] = await self._handle_function_response(curr_function_handler, required_args, curr_args)
+            function_response = await self._handle_function_response(curr_function_handler, required_args, curr_args)
 
             messages.append(
                 chat.ChatCompletionToolMessageParam(
