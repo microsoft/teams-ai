@@ -125,6 +125,7 @@ class OpenAIModel(PromptCompletionModel):
         tokenizer: Tokenizer,
         template: PromptTemplate,
     ) -> PromptResponse[str]:
+        # pylint: disable=too-many-locals
         max_tokens = template.config.completion.max_input_tokens
 
         # Setup tools if enabled
@@ -141,8 +142,8 @@ class OpenAIModel(PromptCompletionModel):
 
             if len(tools_handlers) == 0:
                 return PromptResponse[str](status="tools_error", error="Missing tools handlers")
-            
-            # TODO: Choice - more rigorous comparison of template.actions and tools_handlers 
+
+            # TODO: Choice - more rigorous comparison of template.actions and tools_handlers
 
             if len(template.actions) != len(tools_handlers):
                 return PromptResponse[str](
@@ -153,7 +154,9 @@ class OpenAIModel(PromptCompletionModel):
             for action in template.actions:
                 if action.name in tools_handlers:
                     handler = tools_handlers.get(action.name).func
-                    tool = OpenAIFunction(action.name, action.description, action.parameters, handler)
+                    tool = OpenAIFunction(
+                        action.name, action.description, action.parameters, handler
+                    )
                     tools.append(tool)
 
         formatted_tools: List[chat.ChatCompletionToolParam] = []
@@ -290,7 +293,8 @@ class OpenAIModel(PromptCompletionModel):
                         # Validate function arguments
                         required_args = (
                             curr_function[0].parameters["required"]
-                            if curr_function[0].parameters and "required" in curr_function[0].parameters
+                            if curr_function[0].parameters
+                            and "required" in curr_function[0].parameters
                             else None
                         )
 
@@ -303,7 +307,9 @@ class OpenAIModel(PromptCompletionModel):
                                 break
 
                         # Call the function
-                        function_response = await self._handle_function_response(curr_function_handler, required_args, curr_args)
+                        function_response = await self._handle_function_response(
+                            curr_function_handler, required_args, curr_args
+                        )
 
                         messages.append(
                             chat.ChatCompletionToolMessageParam(
@@ -363,7 +369,7 @@ class OpenAIModel(PromptCompletionModel):
                 status of {err.code}: {err.message}
                 """,
             )
-    
+
     async def _handle_function_response(
         self,
         curr_function_handler: Callable[..., Union[str, Awaitable[str]]],
@@ -373,12 +379,11 @@ class OpenAIModel(PromptCompletionModel):
 
         if asyncio.iscoroutinefunction(curr_function_handler) and len(curr_args) > 0:
             return await curr_function_handler(**curr_args.values())
-        elif asyncio.iscoroutinefunction(curr_function_handler):
+        if asyncio.iscoroutinefunction(curr_function_handler):
             return await curr_function_handler()
-        elif required_args and len(curr_args) > 0:
+        if required_args and len(curr_args) > 0:
             return curr_function_handler(**curr_args.values())
-        else:
-            return curr_function_handler()
+        return curr_function_handler()
 
     async def _handle_multiple_tool_calls(
         self,
@@ -386,11 +391,13 @@ class OpenAIModel(PromptCompletionModel):
         tool_calls: List[chat.ChatCompletionMessageToolCall],
         tools: List[OpenAIFunction],
     ) -> List[chat.ChatCompletionMessageParam]:
-        
+
         # TODO: BUG - Needs updates to match up with single tool call
         for tool_call in tool_calls:
-            function_name = tool_call.function.name
-            curr_function = list(filter(lambda tool: tool.name == function_name, tools))
+            tool_name = tool_call.function.name
+            # TODO: can also use "next" to just find a single item
+            # TODO: Choice - what to do if curr_function has multiple items?
+            curr_function = [tool for tool in tools if tool.name == tool_name]
 
             # Validate function name
             if len(curr_function) == 0:
@@ -411,7 +418,9 @@ class OpenAIModel(PromptCompletionModel):
                     continue
 
             # Call the function
-            function_response = await self._handle_function_response(curr_function_handler, required_args, curr_args)
+            function_response = await self._handle_function_response(
+                curr_function_handler, required_args, curr_args
+            )
 
             messages.append(
                 chat.ChatCompletionToolMessageParam(
