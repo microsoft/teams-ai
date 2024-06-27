@@ -68,6 +68,8 @@ class CompletionConfig:
 
         parallel_tool_calls (Optional[bool]): Configures parallel function calling.
           Defaults to True.
+
+        data_sources (Optional[List[object]]): List of data sources to ground the answer in.
     """
 
     completion_type: Optional[Literal["chat", "text"]] = None
@@ -85,6 +87,7 @@ class CompletionConfig:
     include_tools: Optional[bool] = False
     tool_choice: Optional[chat.ChatCompletionToolChoiceOptionParam] = "auto"
     parallel_tool_calls: Optional[bool] = True
+    data_sources: Optional[List[object]] = None
 
     @classmethod
     def from_dict(cls, data: dict) -> "CompletionConfig":
@@ -104,4 +107,5 @@ class CompletionConfig:
             include_tools=data.get("include_tools", False),
             tool_choice=data.get("tool_choice", "auto"),
             parallel_tool_calls=data.get("parallel_tool_calls", True),
+            data_sources=data.get("data_sources", None),
         )

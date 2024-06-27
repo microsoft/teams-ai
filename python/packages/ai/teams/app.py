@@ -664,114 +664,116 @@ class Application(Bot, Generic[StateT]):
 
     async def _on_turn(self, context: TurnContext):
         try:
-            if self._options.start_typing_timer:
-                await self.typing.start(context)
+            await self._start_typing(context)
 
-            # remove @mentions
-            if self.options.remove_recipient_mention:
-                if context.activity.type == ActivityTypes.message:
-                    context.activity.text = context.remove_recipient_mention(context.activity)
+            self._remove_mentions(context)
 
-            state: StateT = cast(StateT, await TurnState.load(context, self._options.storage))
+            state = await self._initialize_state(context)
 
-            if self._turn_state_factory:
-                state = await self._turn_state_factory(context)
+            if not await self._authenticate_user(context, state):
+                return
 
-            await state.load(context, self._options.storage)
-            state.temp.input = context.activity.text
+            if not await self._run_before_turn_middleware(context, state):
+                return
 
-            # authentication
-            if (
-                self.options.auth
-                and self._auth
-                and (
-                    (
-                        (
-                            isinstance(self.options.auth.auto, bool)
-                            and self.options.auth.auto is True
-                        )
-                        or (
-                            callable(self.options.auth.auto)
-                            and self.options.auth.auto(context) is True
-                        )
-                    )
-                    or IN_SIGN_IN_KEY in state.user
-                )
-            ):
-                key: Optional[str] = (
-                    state.user[IN_SIGN_IN_KEY]
-                    if IN_SIGN_IN_KEY in state.user
-                    else self.options.auth.default
-                )
+            await self._handle_file_downloads(context, state)
 
-                if key is not None:
-                    state.user[IN_SIGN_IN_KEY] = key
-                    res = await self._auth.sign_in(context, state, key=key)
-
-                    if res.status == "complete":
-                        del state.user[IN_SIGN_IN_KEY]
-
-                    if res.status == "pending":
-                        await state.save(context, self._options.storage)
-                        return
-
-                    if res.status == "error" and res.reason != "invalid-activity":
-                        del state.user[IN_SIGN_IN_KEY]
-                        raise ApplicationError(f"[{res.reason}] => {res.message}")
-
-            # run before turn middleware
-            for before_turn in self._before_turn:
-                is_ok = await before_turn(context, state)
-
-                if not is_ok:
-                    await state.save(context, self._options.storage)
-                    return
-
-            # download input files
-            if (
-                self._options.file_downloaders is not None
-                and len(self._options.file_downloaders) > 0
-            ):
-                input_files = state.temp.input_files if state.temp.input_files is not None else []
-                for file_downloader in self._options.file_downloaders:
-                    files = await file_downloader.download_files(context)
-                    input_files.append(files)
-                state.temp.input_files = input_files
-
-            # run activity handlers
             is_ok, matches = await self._on_activity(context, state)
-
             if not is_ok:
                 await state.save(context, self._options.storage)
                 return
-
-            # only run chain when no activity handlers matched
-            if (
-                matches == 0
-                and self._ai
-                and self._options.ai
-                and context.activity.type == ActivityTypes.message
-                and context.activity.text
-            ):
-                is_ok = await self._ai.run(context, state)
-
-                if not is_ok:
-                    await state.save(context, self._options.storage)
+            if matches == 0:
+                if not await self._run_ai_chain(context, state):
                     return
 
-            # run after turn middleware
-            for after_turn in self._after_turn:
-                is_ok = await after_turn(context, state)
-
-                if not is_ok:
-                    await state.save(context, self._options.storage)
-                    return
+            if not await self._run_after_turn_middleware(context, state):
+                return
 
             await state.save(context, self._options.storage)
         except ApplicationError as err:
             await self._on_error(context, err)
         finally:
             self.typing.stop()
+
+    async def _start_typing(self, context: TurnContext):
+        if self._options.start_typing_timer:
+            await self.typing.start(context)
+
+    def _remove_mentions(self, context: TurnContext):
+        if self.options.remove_recipient_mention and context.activity.type == ActivityTypes.message:
+            context.activity.text = context.remove_recipient_mention(context.activity)
+
+    async def _initialize_state(self, context: TurnContext):
+        state = cast(StateT, await TurnState.load(context, self._options.storage))
+
+        if self._turn_state_factory:
+            state = await self._turn_state_factory(context)
+
+        await state.load(context, self._options.storage)
+        state.temp.input = context.activity.text
+        return state
+
+    async def _authenticate_user(self, context: TurnContext, state):
+        if self.options.auth and self._auth:
+            auth_condition = (
+                isinstance(self.options.auth.auto, bool) and self.options.auth.auto
+            ) or (callable(self.options.auth.auto) and self.options.auth.auto(context))
+            user_in_sign_in = IN_SIGN_IN_KEY in state.user
+            if auth_condition or user_in_sign_in:
+                key: Optional[str] = state.user.get(IN_SIGN_IN_KEY, self.options.auth.default)
+
+                if key is not None:
+                    state.user[IN_SIGN_IN_KEY] = key
+                    res = await self._auth.sign_in(context, state, key=key)
+                    if res.status == "complete":
+                        del state.user[IN_SIGN_IN_KEY]
+
+                    if res.status == "pending":
+                        await state.save(context, self._options.storage)
+                        return False
+
+                    if res.status == "error" and res.reason != "invalid-activity":
+                        del state.user[IN_SIGN_IN_KEY]
+                        raise ApplicationError(f"[{res.reason}] => {res.message}")
+
+        return True
+
+    async def _run_before_turn_middleware(self, context: TurnContext, state):
+        for before_turn in self._before_turn:
+            is_ok = await before_turn(context, state)
+            if not is_ok:
+                await state.save(context, self._options.storage)
+                return False
+        return True
+
+    async def _handle_file_downloads(self, context: TurnContext, state):
+        if self._options.file_downloaders and len(self._options.file_downloaders) > 0:
+            input_files = state.temp.input_files if state.temp.input_files is not None else []
+            for file_downloader in self._options.file_downloaders:
+                files = await file_downloader.download_files(context)
+                input_files.append(files)
+            state.temp.input_files = input_files
+
+    async def _run_ai_chain(self, context: TurnContext, state):
+        if (
+            self._ai
+            and self._options.ai
+            and context.activity.type == ActivityTypes.message
+            and context.activity.text
+        ):
+            is_ok = await self._ai.run(context, state)
+            if not is_ok:
+                await state.save(context, self._options.storage)
+                return False
+        return True
+
+    async def _run_after_turn_middleware(self, context: TurnContext, state):
+        for after_turn in self._after_turn:
+            is_ok = await after_turn(context, state)
+            if not is_ok:
+                await state.save(context, self._options.storage)
+                return False
+        return True
 
     async def _on_activity(self, context: TurnContext, state: StateT) -> Tuple[bool, int]:
         matches = 0
