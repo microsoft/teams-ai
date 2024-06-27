@@ -6,7 +6,9 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Literal, Optional, Union
+from typing import List, Literal, Optional
+
+from openai.types import chat
 
 
 # pylint: disable=too-many-instance-attributes
@@ -58,8 +60,11 @@ class CompletionConfig:
         top_p (float): The model's top_p as a number between 0 and 2.
           Defaults to 0.
 
-        tool_choice (Optional[Union[str, Dict]]): Defines function calling behavior.
-          Defaults to None.
+        include_tools (Optional[bool]): If True, function calling will be enabled with the LLM.
+          Defaults to False.
+
+        tool_choice (Optional[chat.ChatCompletionToolChoiceOptionParam]):
+          Defines function calling behavior. Defaults to "auto".
 
         parallel_tool_calls (Optional[bool]): Configures parallel function calling.
           Defaults to True.
@@ -77,7 +82,8 @@ class CompletionConfig:
     stop_sequences: Optional[List[str]] = None
     temperature: float = 0
     top_p: float = 0
-    tool_choice: Optional[Union[str, Dict]] = None
+    include_tools: Optional[bool] = False
+    tool_choice: Optional[chat.ChatCompletionToolChoiceOptionParam] = "auto"
     parallel_tool_calls: Optional[bool] = True
 
     @classmethod
@@ -95,6 +101,7 @@ class CompletionConfig:
             stop_sequences=data.get("stop_sequences"),
             temperature=data.get("temperature", 0),
             top_p=data.get("top_p", 0),
-            tool_choice=data.get("tool_choice", None),
+            include_tools=data.get("include_tools", False),
+            tool_choice=data.get("tool_choice", "auto"),
             parallel_tool_calls=data.get("parallel_tool_calls", True),
         )

@@ -11,7 +11,9 @@ from typing import Any, Generic, Literal, Optional, TypeVar
 from ..prompts.message import Message
 
 ContentT = TypeVar("ContentT")
-PromptResponseStatus = Literal["success", "error", "rate_limited", "invalid_response", "too_long"]
+PromptResponseStatus = Literal[
+    "success", "error", "rate_limited", "invalid_response", "too_long", "tools_error"
+]
 
 
 @dataclass
