@@ -5,11 +5,10 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-import asyncio
 import json
 from dataclasses import dataclass
 from logging import Logger
-from typing import Any, Awaitable, Callable, Dict, List, Optional, Union
+from typing import Any, Awaitable, Callable, Dict, List, Optional, Union, cast
 
 import openai
 from botbuilder.core import TurnContext
@@ -136,21 +135,16 @@ class OpenAIModel(PromptCompletionModel):
         tools_handlers = memory.get("temp.tools")
 
         # If tools is enabled, reformat actions to appropriate schema
-        if is_tools_enabled and template.actions and tools_handlers:
-            if len(template.actions) == 0:
+        if is_tools_enabled:
+            if not template.actions:
                 return PromptResponse[str](status="tools_error", error="Missing actions")
-
-            if len(tools_handlers) == 0:
+            if not tools_handlers or len(tools_handlers) == 0:
                 return PromptResponse[str](status="tools_error", error="Missing tools handlers")
-
-            # TODO: Choice - more rigorous comparison of template.actions and tools_handlers
-
             if len(template.actions) != len(tools_handlers):
                 return PromptResponse[str](
                     status="tools_error",
                     error="Number of actions does not match number of tool handlers",
                 )
-
             for action in template.actions:
                 if action.name in tools_handlers:
                     handler = tools_handlers.get(action.name).func
@@ -167,7 +161,7 @@ class OpenAIModel(PromptCompletionModel):
                 function=shared_params.FunctionDefinition(
                     name=tool.name,
                     description=tool.description or "",
-                    parameters=tool.parameters or Dict[str, object](),
+                    parameters=tool.parameters or {},
                 ),
             )
             formatted_tools.append(curr_tool)
@@ -177,9 +171,6 @@ class OpenAIModel(PromptCompletionModel):
             if template.config.completion.model is not None
             else self._options.default_model
         )
-
-        # TODO: Choice - Check if the model supports function calling and parallel tool calls
-        # TODO: Choice - Check if tool matches tool_choice
 
         res = await template.prompt.render_as_messages(
             context=context,
@@ -262,11 +253,14 @@ class OpenAIModel(PromptCompletionModel):
 
             # Tracks the latest response from the LLM
             final_response = completion
+            augmentation = template.config.augmentation
 
-            if template.config.augmentation == "default" and is_tools_enabled:
-
-                # TODO: BUG - Handle edge cases where parameters dict is empty or none
-
+            if (
+                augmentation
+                and augmentation.augmentation_type == "none"
+                and is_tools_enabled
+                and tool_calls
+            ):
                 while tool_calls and len(tool_calls) > 0:
                     if not parallel_tool_calls and len(tool_calls) > 1:
                         break
@@ -277,38 +271,37 @@ class OpenAIModel(PromptCompletionModel):
                     if tool_choice == "none":
                         break
 
-                    messages.append(response_message)
-
-                    # TODO: BUG - Accessing wrong key for tools properties
-                    # TODO: BUG - Handling required and optional arguments
-                    # TODO: BUG - Make sure single tool and multiple tools matches up
-                    # TODO: BUG - Pass in JSON obj vs string back to the LLM
+                    messages.append(
+                        cast(chat.ChatCompletionAssistantMessageParam, response_message)
+                    )
 
                     if isinstance(tool_choice, dict):
                         # Calling a single tool
                         function_name = tool_choice["function"]["name"]
                         curr_tool_call = tool_calls[0]
-                        curr_function = list(filter(lambda tool: tool.name == function_name, tools))
+                        curr_function = next(tool for tool in tools if tool.name == function_name)
+
+                        # Validate function name
+                        if not curr_function:
+                            break
 
                         # Validate function arguments
                         required_args = (
-                            curr_function[0].parameters["required"]
-                            if curr_function[0].parameters
-                            and "required" in curr_function[0].parameters
+                            curr_function.parameters["required"]
+                            if curr_function.parameters and "required" in curr_function.parameters
                             else None
                         )
 
                         curr_args = json.loads(curr_tool_call.function.arguments)
-                        curr_function_handler = curr_function[0].handler
+                        curr_function_handler = curr_function.handler
 
                         if required_args:
-                            # TODO: CHOICE - Verify each argument
                             if len(required_args) > len(curr_args):
                                 break
 
                         # Call the function
                         function_response = await self._handle_function_response(
-                            curr_function_handler, required_args, curr_args
+                            curr_function_handler, curr_args
                         )
 
                         messages.append(
@@ -372,18 +365,12 @@ class OpenAIModel(PromptCompletionModel):
 
     async def _handle_function_response(
         self,
-        curr_function_handler: Callable[..., Union[str, Awaitable[str]]],
-        required_args: Optional[List[str]],
+        curr_function_handler: Callable[..., Awaitable[str]],
         curr_args: Dict[str, Any],
-    ) -> Union[str, Awaitable[str]]:
-
-        if asyncio.iscoroutinefunction(curr_function_handler) and len(curr_args) > 0:
-            return await curr_function_handler(**curr_args.values())
-        if asyncio.iscoroutinefunction(curr_function_handler):
-            return await curr_function_handler()
-        if required_args and len(curr_args) > 0:
-            return curr_function_handler(**curr_args.values())
-        return curr_function_handler()
+    ) -> str:
+        if len(curr_args) > 0:
+            return await curr_function_handler(**curr_args)
+        return await curr_function_handler()
 
     async def _handle_multiple_tool_calls(
         self,
@@ -391,27 +378,23 @@ class OpenAIModel(PromptCompletionModel):
         tool_calls: List[chat.ChatCompletionMessageToolCall],
         tools: List[OpenAIFunction],
     ) -> List[chat.ChatCompletionMessageParam]:
-
-        # TODO: BUG - Needs updates to match up with single tool call
         for tool_call in tool_calls:
             tool_name = tool_call.function.name
-            # TODO: can also use "next" to just find a single item
-            # TODO: Choice - what to do if curr_function has multiple items?
-            curr_function = [tool for tool in tools if tool.name == tool_name]
+            curr_function = next(tool for tool in tools if tool.name == tool_name)
 
             # Validate function name
-            if len(curr_function) == 0:
+            if not curr_function:
                 continue
 
             # Validate function arguments
             required_args = (
-                curr_function[0].parameters["required"]
-                if curr_function[0].parameters and "required" in curr_function[0].parameters
+                curr_function.parameters["required"]
+                if curr_function.parameters and "required" in curr_function.parameters
                 else None
             )
 
             curr_args = json.loads(tool_call.function.arguments)
-            curr_function_handler = curr_function[0].handler
+            curr_function_handler = curr_function.handler
 
             if required_args:
                 if len(required_args) > len(curr_args):
@@ -419,7 +402,7 @@ class OpenAIModel(PromptCompletionModel):
 
             # Call the function
             function_response = await self._handle_function_response(
-                curr_function_handler, required_args, curr_args
+                curr_function_handler, curr_args
             )
 
             messages.append(

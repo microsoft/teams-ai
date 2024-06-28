@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Awaitable, Callable, Dict, Optional, Union
+from typing import Any, Awaitable, Callable, Dict, Optional
 
 from dataclasses_json import DataClassJsonMixin, dataclass_json
 
@@ -33,7 +33,7 @@ class OpenAIFunction(DataClassJsonMixin):
     Parameters the function accepts, described as a JSON Schema object.
     """
 
-    handler: Callable[..., Union[str, Awaitable[str]]]
+    handler: Callable[..., Awaitable[str]]
     """
     The function handler, may be asynchoronous, takes in any number of
     arguments and must return a string.
