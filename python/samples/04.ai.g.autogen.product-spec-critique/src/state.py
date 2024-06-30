@@ -7,7 +7,6 @@ from typing import Optional, List, Dict
 
 from botbuilder.core import Storage, TurnContext
 from teams.state import ConversationState, TempState, TurnState, UserState
-from autogen import ConversableAgent
 from datetime import datetime
 
 class AppConversationState(ConversationState):
