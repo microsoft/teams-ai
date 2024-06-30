@@ -48,7 +48,7 @@ class AnswererAgent(AssistantAgent):
         def add_spec_to_message(messages):
             messages = messages.copy()
             if self.spec_details:
-                messages.append({"content": self.spec_details, "role": "user"})
+                messages.append({"content": f'Here is the spec: {self.spec_details}', "role": "user"})
             else:
                 messages.append({"content": "No spec details provided. Ask the user to provide you one.", "role": "user"})
             return messages
@@ -64,7 +64,7 @@ pm_spec_criteria = f"""
 6. Clear identification of the unique selling proposition 
 7. Clear identification of the call to action. 
 """
-def build_group_chat(context: TurnContext, state: AppTurnState, user_agent: Agent):
+async def build_group_chat(context: TurnContext, state: AppTurnState, user_agent: Agent):
     # If the spec is sent as a md file, we can use
     spect_details = state.conversation.spec_details
     if context.activity.attachments:
@@ -75,7 +75,8 @@ def build_group_chat(context: TurnContext, state: AppTurnState, user_agent: Agen
             if content_type == "md":
                 download_url = content.get('downloadUrl')
                 spect_details = download_file_and_return_contents(download_url)
-                state.conversation.spect_details = spect_details
+                state.conversation.spec_details = spect_details
+                await state.conversation.save(context)
     
     # def read_spec() -> str:
     #     # this would probably be RAG in production
@@ -91,7 +92,9 @@ Ask a single question at a given time.
 If you do not have any more questions, say so.
 
 When asking the question, you should include the spec requirement that the question is trying to answer. For example:
-<question> (for spec requirement 1)
+<QUESTION requirement=1>
+Your question here
+</QUESTION>
 
 If you have no questions to ask, say "NO_QUESTIONS" and nothing else.
         """,
@@ -101,10 +104,14 @@ If you have no questions to ask, say "NO_QUESTIONS" and nothing else.
         name="Answerer",
         system_message=f"""You are an answerer agent. 
 Your role is to answer questions based on the product specs requirements. 
-If you do not understand something from the spec, you may ask a clarifying question. 
 Answer the questions as clearly and concisely as possible.
 
-DO NOT under any circumstance answer a question that is not based on the provided spec.
+Your answers MUST be factual and only backed by the facts presented in the product spec or by clarifying responses from the user. Do NOT use facts that are not in the spec or in clarifying responses by the user.
+If you do not understand something from the spec or it is not described in the spec, you may ask a clarifying question. 
+Please wrap your question for the user in the following format:
+<CLARIFYING_QUESTION>
+Question for the user
+</CLARIFYING_QUESTION>
         """,
         
         llm_config={"config_list": [llm_config], "timeout": 60, "temperature": 0},
@@ -125,7 +132,7 @@ DO NOT under any circumstance answer a question that is not based on the provide
         Evaluate the answers based on the following spec criteria:
         {pm_spec_criteria}
         
-        Rate each area on a scale of 1 to 5 as well.
+        Provide some actionable feedback to the answerer agent on how they can improve their answers when necessary.
         """,
         llm_config={"config_list": [llm_config], "timeout": 60, "temperature": 0},
     )
@@ -136,13 +143,18 @@ DO NOT under any circumstance answer a question that is not based on the provide
     def custom_speaker_selection_func(
             last_speaker: Agent, groupchat: GroupChat
         ) -> Union[Agent, str, None]:
+        last_message = groupchat.messages[-1]
+        content = last_message.get("content")
         if last_speaker == questioner_agent:
-            last_message = groupchat.messages[-1]
-            content = last_message.get("content")
             if content is not None and content.lower() == "no_questions":
                 return answer_evaluator_agent
             else:
                 return answerer_agent
+        elif last_speaker == answerer_agent:
+            if content is not None and '<CLARIFYING_QUESTION>' in content:
+                return user_agent
+            else:
+                return questioner_agent
         return 'auto'
             
     

@@ -5,7 +5,7 @@ from teams.ai.planners import Planner, Plan, PredictedSayCommand
 from autogen import Agent, GroupChat, GroupChatManager, ChatResult
 from autogen.agentchat.agent import Agent
 from state import AppTurnState
-from typing import List, Callable, Optional
+from typing import List, Callable, Optional, Coroutine, Optional
 from teams_user_proxy import TeamsUserProxy
 from datetime import datetime
 from dataclasses import dataclass
@@ -21,7 +21,7 @@ class PredictedSayCommandWithAttachments(PredictedSayCommand):
 
 
 class AutoGenPlanner(Planner):
-    def __init__(self, llm_config, build_group_chat: Callable[[TurnContext, AppTurnState, Agent], GroupChat | None]) -> None:
+    def __init__(self, llm_config, build_group_chat: Callable[[TurnContext, AppTurnState, Agent], Coroutine[None, None, Optional[GroupChat]]]) -> None:
         self.llm_config = llm_config
         self.build_group_chat = build_group_chat
         super().__init__()
@@ -36,7 +36,7 @@ class AutoGenPlanner(Planner):
             llm_config=self.llm_config
         )
 
-        groupchat = self.build_group_chat(context, state, user_proxy)
+        groupchat = await self.build_group_chat(context, state, user_proxy)
         if groupchat is None:
             return Plan(commands=[])
         
