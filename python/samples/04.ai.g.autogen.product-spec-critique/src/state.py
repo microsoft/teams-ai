@@ -25,7 +25,7 @@ class AppConversationState(ConversationState):
     async def clear(self, context: TurnContext) -> None:
         self.is_waiting_for_user_input = False
         self.started_waiting_for_user_input_at = None
-        self.spec_url = None
+        self.spec_details = None
         await self.save(context)
 
 

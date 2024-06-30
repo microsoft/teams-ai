@@ -87,13 +87,11 @@ async def say_command(context: ActionTurnContext[PredictedSayCommandWithAttachme
     return ""
 
 @app.message("/clear")
-async def on_login(context: TurnContext, state: AppTurnState):
+async def clear(context: TurnContext, state: AppTurnState):
     await state.conversation.clear(context)
     await context.send_activity("Cleared and ready to analyze next spec")
     
     return True
-
-
 
 @app.turn_state_factory
 async def turn_state_factory(context: TurnContext):
