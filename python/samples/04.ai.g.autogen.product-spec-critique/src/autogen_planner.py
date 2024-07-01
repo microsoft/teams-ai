@@ -39,15 +39,6 @@ class AutoGenPlanner(Planner):
         groupchat = await self.build_group_chat(context, state, user_proxy)
         if groupchat is None:
             return Plan(commands=[])
-        
-        if state.conversation.is_waiting_for_user_input and state.conversation.started_waiting_for_user_input_at is not None:
-            # if the user has not responded in 2 minutes
-            started_waiting_for_user_input_at = state.conversation.started_waiting_for_user_input_at if isinstance(
-                state.conversation.started_waiting_for_user_input_at, datetime) else datetime.fromisoformat(
-                state.conversation.started_waiting_for_user_input_at)
-            if (datetime.now() - started_waiting_for_user_input_at).total_seconds() > 2 * 60:
-                state.conversation.is_waiting_for_user_input = False
-                state.conversation.started_waiting_for_user_input_at = None
 
         is_existing_group_chat = state.conversation.is_waiting_for_user_input and state.conversation.message_history is not None
         manager = GroupChatManager(
