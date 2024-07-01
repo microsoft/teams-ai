@@ -14,7 +14,7 @@ import { MonologueAugmentation, SequenceAugmentation } from '../augmentations';
 import { DataSource } from '../dataSources';
 import { Memory } from '../MemoryFork';
 import { Tokenizer } from '../tokenizers';
-import { CompletionConfig } from '../types/CompletionConfig';
+import { CompletionConfig } from '../types';
 import { ConversationHistory } from './ConversationHistory';
 import { PromptTemplate } from './PromptTemplate';
 import { DataSourceSection } from './DataSourceSection';

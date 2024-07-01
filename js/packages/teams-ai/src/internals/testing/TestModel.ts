@@ -9,7 +9,8 @@
 import { TurnContext } from 'botbuilder';
 
 import { Memory } from '../../MemoryFork';
-import { PromptCompletionModel, PromptResponse, PromptResponseStatus } from '../../models/PromptCompletionModel';
+import { PromptCompletionModel } from '../../models/PromptCompletionModel';
+import { PromptResponse, PromptResponseStatus } from '../../types';
 import { Message, PromptFunctions, PromptTemplate } from '../../prompts';
 import { Tokenizer } from '../../tokenizers';
 

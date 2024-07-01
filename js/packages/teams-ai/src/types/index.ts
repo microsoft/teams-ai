@@ -8,3 +8,4 @@
 
 export * from './CompletionConfig';
 export * from './OpenAIFuncion';
+export * from './PromptResponse';

@@ -6,26 +6,24 @@
  * Licensed under the MIT License.
  */
 
+import { AxiosRequestConfig } from 'axios';
+import { TurnContext } from 'botbuilder';
+import EventEmitter from 'events';
 import { ClientOptions, AzureOpenAI, OpenAI } from 'openai';
-import { 
-    ChatCompletionCreateParams, 
+import {
+    ChatCompletionCreateParams,
     ChatCompletionMessageParam,
     ChatCompletionChunk,
     ChatCompletion
 } from 'openai/resources';
-import { AxiosRequestConfig } from 'axios';
+import { Stream } from 'openai/streaming';
+
 import { Message, PromptFunctions, PromptTemplate } from '../prompts';
-import { 
-    PromptCompletionModel, 
-    PromptCompletionModelEmitter, 
-    PromptResponse 
-} from './PromptCompletionModel';
+import { PromptCompletionModel, PromptCompletionModelEmitter } from './PromptCompletionModel';
 import { Colorize } from '../internals';
 import { Tokenizer } from '../tokenizers';
-import { TurnContext } from 'botbuilder';
+import { PromptResponse } from '../types';
 import { Memory } from '../MemoryFork';
-import EventEmitter from 'events';
-import { Stream } from 'openai/streaming';
 
 /**
  * Base model options common to both OpenAI and Azure OpenAI services.
@@ -190,12 +188,15 @@ export class OpenAIModel implements PromptCompletionModel {
             options.clientOptions = {
                 timeout: options.requestConfig.timeout,
                 httpAgent: options.requestConfig.httpsAgent ?? options.requestConfig.httpAgent,
-                defaultHeaders: options.requestConfig.headers as any 
+                defaultHeaders: options.requestConfig.headers as any
             };
         }
 
         // Check for azure config
-        if ((options as AzureOpenAIModelOptions).azureApiKey || (options as AzureOpenAIModelOptions).azureADTokenProvider) {
+        if (
+            (options as AzureOpenAIModelOptions).azureApiKey ||
+            (options as AzureOpenAIModelOptions).azureADTokenProvider
+        ) {
             // Initialize options
             this.options = Object.assign(
                 {
@@ -222,16 +223,14 @@ export class OpenAIModel implements PromptCompletionModel {
             // Create client
             // - NOTE: we're not passing in a deployment as that hardcodes the deployment used.
             this._useAzure = true;
-            this._client = new AzureOpenAI(Object.assign(
-                {}, 
-                this.options.clientOptions, 
-                { 
+            this._client = new AzureOpenAI(
+                Object.assign({}, this.options.clientOptions, {
                     apiKey: this.options.azureApiKey,
                     endpoint: this.options.azureEndpoint,
                     apiVersion: this.options.azureApiVersion,
                     adTokenProvider: this.options.azureADTokenProvider
-                }
-            ));
+                })
+            );
         } else {
             // Initialize options
             this.options = Object.assign(
@@ -244,16 +243,14 @@ export class OpenAIModel implements PromptCompletionModel {
 
             // Create client
             this._useAzure = false;
-            this._client = new OpenAI(Object.assign(
-                {},
-                this.options.clientOptions,
-                {
+            this._client = new OpenAI(
+                Object.assign({}, this.options.clientOptions, {
                     apiKey: this.options.apiKey,
                     baseURL: this.options.endpoint,
                     organization: this.options.organization ?? null,
                     project: this.options.project ?? null
-                }
-            ));
+                })
+            );
         }
     }
 
@@ -287,10 +284,12 @@ export class OpenAIModel implements PromptCompletionModel {
             (this._useAzure
                 ? (this.options as AzureOpenAIModelOptions).azureDefaultDeployment
                 : (this.options as OpenAIModelOptions).defaultModel);
-        
-        // Check for legacy completion type  
+
+        // Check for legacy completion type
         if (template.config.type == 'completion') {
-            throw new Error(`The completion type 'completion' is no longer supported. Only 'chat' based models are supported.`);
+            throw new Error(
+                `The completion type 'completion' is no longer supported. Only 'chat' based models are supported.`
+            );
         }
 
         // Signal start of completion
@@ -332,7 +331,7 @@ export class OpenAIModel implements PromptCompletionModel {
 
                 // Enumerate the streams chunks
                 message = { role: 'assistant', content: '' };
-                for await (const chunk of (completion as Stream<ChatCompletionChunk>)) {
+                for await (const chunk of completion as Stream<ChatCompletionChunk>) {
                     const delta: ChatCompletionChunk.Choice.Delta = chunk.choices[0]?.delta || {};
                     if (delta.role) {
                         message.role = delta.role;
@@ -344,7 +343,7 @@ export class OpenAIModel implements PromptCompletionModel {
                     // if (delta.tool_calls) {
                     //     message.tool_calls = delta.tool_calls;
                     // }
-                    
+
                     // Signal chunk received
                     if (this.options.logRequests) {
                         console.log(Colorize.value('CHUNK', delta));
@@ -357,7 +356,10 @@ export class OpenAIModel implements PromptCompletionModel {
                 console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
             } else {
                 // Log the generated response
-                message = (completion as ChatCompletion).choices[0]?.message as Message<string> ?? { role: 'assistant', content: '' }; 
+                message = ((completion as ChatCompletion).choices[0]?.message as Message<string>) ?? {
+                    role: 'assistant',
+                    content: ''
+                };
                 if (this.options.logRequests) {
                     console.log(Colorize.title('CHAT RESPONSE:'));
                     console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
@@ -399,7 +401,11 @@ export class OpenAIModel implements PromptCompletionModel {
      * @param template Prompt template being used.
      * @returns Chat completion parameters.
      */
-    private getChatCompletionParams(model: string, messages: Message<string>[], template: PromptTemplate): ChatCompletionCreateParams {
+    private getChatCompletionParams(
+        model: string,
+        messages: Message<string>[],
+        template: PromptTemplate
+    ): ChatCompletionCreateParams {
         const params: ChatCompletionCreateParams = this.copyOptionsToRequest<ChatCompletionCreateParams>(
             {
                 messages: messages as ChatCompletionMessageParam[]
@@ -447,7 +453,7 @@ export class OpenAIModel implements PromptCompletionModel {
             return messages[last];
         }
 
-        return undefined;;
+        return undefined;
     }
 
     private returnTooLong(max_input_tokens: number, length: number): PromptResponse<string> {
@@ -460,7 +466,7 @@ export class OpenAIModel implements PromptCompletionModel {
         };
     }
 
-    private returnError(err: unknown, input: Message<string>|undefined): PromptResponse<string> {
+    private returnError(err: unknown, input: Message<string> | undefined): PromptResponse<string> {
         if (err instanceof OpenAI.APIError) {
             if (err.status == 429) {
                 if (this.options.logRequests) {
@@ -476,18 +482,14 @@ export class OpenAIModel implements PromptCompletionModel {
                 return {
                     status: 'error',
                     input,
-                    error: new Error(
-                        `The chat completion API returned an error status of ${err.status}: ${err.name}`
-                    )
+                    error: new Error(`The chat completion API returned an error status of ${err.status}: ${err.name}`)
                 };
             }
         } else {
             return {
                 status: 'error',
                 input,
-                error: new Error(
-                    `The chat completion API returned an error: ${(err as Error).toString()}`
-                )
+                error: new Error(`The chat completion API returned an error: ${(err as Error).toString()}`)
             };
         }
     }

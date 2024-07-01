@@ -9,7 +9,7 @@
 import { PromptSection } from './PromptSection';
 import { ChatCompletionAction } from '../models';
 import { Augmentation } from '../augmentations';
-import { CompletionConfig } from '../types/CompletionConfig';
+import { CompletionConfig } from '../types';
 
 /**
  * Prompt template cached by the prompt manager.
