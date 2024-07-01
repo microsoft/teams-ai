@@ -359,11 +359,14 @@ export class AI<TState extends TurnState = TurnState> {
                 step_count = 0;
             }
 
+            // Add actions for function calling to temp state
+            state.temp.tools = this._actions as unknown as Map<string, actions.ActionEntry<TurnState>>;
+
             // Review input on first loop
             let plan: Plan | undefined =
                 step_count == 0 ? await this._options.moderator.reviewInput(context, state) : undefined;
 
-            // Generate plan
+            // Generate plan if moderator did not return one as flag for input.
             if (!plan) {
                 if (step_count == 0) {
                     plan = await this._options.planner.beginTask(context, state, this);
@@ -371,7 +374,7 @@ export class AI<TState extends TurnState = TurnState> {
                     plan = await this._options.planner.continueTask(context, state, this);
                 }
 
-                // Review the plans output
+                // Review the plan's output
                 plan = await this._options.moderator.reviewOutput(context, state, plan);
             }
 
@@ -419,7 +422,9 @@ export class AI<TState extends TurnState = TurnState> {
                             state.temp.actionOutputs[action] = output;
                         } else {
                             // Redirect to UnknownAction handler
-                            output = await this._actions.get(AI.UnknownActionName)!.handler(context, state, plan, action);
+                            output = await this._actions
+                                .get(AI.UnknownActionName)!
+                                .handler(context, state, plan, action);
                         }
                         break;
                     }
