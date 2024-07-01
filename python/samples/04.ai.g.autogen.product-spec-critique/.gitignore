@@ -14,3 +14,4 @@ appPackage/build
 **/__pycache__/
 
 .cache/
+.python-version
