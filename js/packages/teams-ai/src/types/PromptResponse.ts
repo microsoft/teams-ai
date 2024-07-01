@@ -10,7 +10,13 @@ import { Message } from '../prompts';
  * `too_long` - The rendered prompt exceeded the `max_input_tokens` limit.
  */
 
-export type PromptResponseStatus = 'success' | 'error' | 'rate_limited' | 'invalid_response' | 'too_long';
+export type PromptResponseStatus =
+    | 'success'
+    | 'error'
+    | 'rate_limited'
+    | 'invalid_response'
+    | 'too_long'
+    | 'tools_error';
 
 /**
  * Response returned by a `PromptCompletionClient`.
