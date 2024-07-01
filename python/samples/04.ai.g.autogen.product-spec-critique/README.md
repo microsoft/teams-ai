@@ -18,7 +18,7 @@ This project uses Teams AI library and autogen.
 1. Clone repo
 2. Setup your virtual env (`virtualenv .venv` and `source .venv/bin/activate`)
 2. Install the required packages. We used poetry to manage the dependencies. You can install poetry by running `pip install poetry`. Then run `poetry install` to install the dependencies.
-3. Update .env. Make sure it includes either `OPENAI_KEY` or `AZURE_OPENAI_API_KEY` with `AZURE_OPENAI_ENDPOINT`. If you look for `build_llm_config` in the code, you will see how it builds the config for the model.
+3. Update .env. Make sure it includes either `OPENAI_KEY` or `AZURE_OPENAI_API_KEY` with `AZURE_OPENAI_ENDPOINT`. If you look for `build_llm_config` in the code, you will see how it builds the config for the model. You may need to modify it to suit your needs.
 3. Open the project in VSCode. Make sure you have the Teams Toolkit (TTK) extension installed.
 5. Go to the TTK extension, then click "local" debug under environment. This will create a package under appPackage/build folder and start Teams up. It'll also do the installation for your bot on Teams.
 
