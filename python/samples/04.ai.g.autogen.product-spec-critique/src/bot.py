@@ -8,27 +8,25 @@ Description: initialize the app and listen for `message` activitys
 import os
 import sys
 import traceback
-from typing import Union
-from spec_critique_group import SpecCritiqueGroup
 from botbuilder.schema import Activity, ActivityTypes
 
 from botbuilder.core import TurnContext, MemoryStorage
 from teams import Application, ApplicationOptions, TeamsAdapter
 from teams.ai import AIOptions
 from teams.ai.actions import ActionTypes, ActionTurnContext
-from teams.input_file import InputFile
 from autogen_planner import AutoGenPlanner, PredictedSayCommandWithAttachments
 
 from config import Config
 from state import AppTurnState
 
+from spec_critique_group import SpecCritiqueGroup
 
 config = Config()
 def build_llm_config():
     if "OPENAI_KEY" in os.environ:
-        config = {"model": "gpt-4o", "api_key": os.environ["OPENAI_KEY"]}
+        autogen_llm_config = {"model": "gpt-4o", "api_key": os.environ["OPENAI_KEY"]}
     elif "AZURE_OPENAI_KEY" in os.environ and "AZURE_OPENAI_ENDPOINT" in os.environ:
-        config = {
+        autogen_llm_config = {
             "model": "my-gpt-4-deployment",
             "api_version": "2024-02-01",
             "api_type": "azure",
@@ -37,7 +35,7 @@ def build_llm_config():
         }
     else:
         raise ValueError("Neither OPENAI_KEY nor AZURE_OPENAI_KEY environment variables are set.")
-    return config
+    return autogen_llm_config
 
 if config.OPENAI_KEY is None and config.AZURE_OPENAI_KEY is None:
     raise RuntimeError(
@@ -59,7 +57,7 @@ app = Application[AppTurnState](
 )
 
 @app.ai.action(ActionTypes.SAY_COMMAND)
-async def say_command(context: ActionTurnContext[PredictedSayCommandWithAttachments], state: AppTurnState):
+async def say_command(context: ActionTurnContext[PredictedSayCommandWithAttachments], _state: AppTurnState):
     content = (
         context.data.response.content
         if context.data.response and context.data.response.content

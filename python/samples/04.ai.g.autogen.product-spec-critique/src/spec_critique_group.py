@@ -1,5 +1,3 @@
-
-import os
 from typing import Union, Dict
 from autogen import AssistantAgent, GroupChat, Agent
 
@@ -13,11 +11,11 @@ config = Config()
 # TeamsDownloader currently has an issue where it can't download files from `download_url`
 def download_file_and_return_contents(download_url):
     import requests
-    response = requests.get(download_url)
+    response = requests.get(download_url, timeout=30)
     return response.text
 
 class AnswererAgent(AssistantAgent):
-     def __init__(self, spec_details: str | None, *args, **kwargs):
+     def __init__(self, spec_details: Union[str, None], *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.spec_details = spec_details
 
@@ -32,7 +30,7 @@ class AnswererAgent(AssistantAgent):
             add_spec_to_message)
         
 class SpecCritiqueGroup:
-    def __init__(self, llm_config: Dict, criteria: str = f"""
+    def __init__(self, llm_config: Dict, criteria: str = """
 1. Clear identification of the audience 
 2. Clear identification of the problem 
 3. Clear identification of the solution 
@@ -78,7 +76,7 @@ If you have no questions to ask, say "NO_QUESTIONS" and nothing else.
         )
         answerer_agent = AnswererAgent(
             name="Answerer",
-            system_message=f"""You are an answerer agent. 
+            system_message="""You are an answerer agent. 
 Your role is to answer questions based on the product specs requirements. 
 Answer the questions as clearly and concisely as possible.
 

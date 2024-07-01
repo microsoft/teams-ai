@@ -1,5 +1,5 @@
 from autogen import ConversableAgent
-from typing import Optional, Dict, Callable, Literal, List
+from typing import Literal
 
 class TeamsUserProxy(ConversableAgent):
     def __init__(self,

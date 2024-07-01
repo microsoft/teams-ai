@@ -1,15 +1,15 @@
+from typing import List, Callable, Coroutine, Optional
+from datetime import datetime
+from dataclasses import dataclass
+from dataclasses_json import dataclass_json
 from botbuilder.schema import Attachment
 from botbuilder.core import CardFactory, TurnContext
 from teams.ai.prompts import Message
 from teams.ai.planners import Planner, Plan, PredictedSayCommand
 from autogen import Agent, GroupChat, GroupChatManager, ChatResult
-from autogen.agentchat.agent import Agent
-from state import AppTurnState
-from typing import List, Callable, Optional, Coroutine, Optional
+
 from teams_user_proxy import TeamsUserProxy
-from datetime import datetime
-from dataclasses import dataclass
-from dataclasses_json import dataclass_json
+from state import AppTurnState
 
 @dataclass_json
 @dataclass
