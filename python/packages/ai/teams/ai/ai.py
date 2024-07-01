@@ -138,6 +138,8 @@ class AI(Generic[StateT]):
 
         plan: Optional[Plan] = None
 
+        state.temp.tools = self._actions
+
         if step == 0:
             plan = await self.moderator.review_input(context, state)
 

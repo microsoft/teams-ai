@@ -8,17 +8,18 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from logging import Logger
-from typing import Callable, List, Optional, Union
+from typing import Any, Awaitable, Callable, Dict, List, Optional, Union, cast
 
 import openai
 from botbuilder.core import TurnContext
-from openai.types import chat
+from openai.types import chat, shared_params
 
 from ...state import MemoryBase
 from ..prompts.message import Message, MessageContext
 from ..prompts.prompt_functions import PromptFunctions
 from ..prompts.prompt_template import PromptTemplate
 from ..tokenizers import Tokenizer
+from .openai_function import OpenAIFunction
 from .prompt_completion_model import PromptCompletionModel
 from .prompt_response import PromptResponse
 
@@ -123,12 +124,54 @@ class OpenAIModel(PromptCompletionModel):
         tokenizer: Tokenizer,
         template: PromptTemplate,
     ) -> PromptResponse[str]:
+        # pylint: disable=too-many-locals
         max_tokens = template.config.completion.max_input_tokens
+
+        # Setup tools if enabled
+        is_tools_enabled = template.config.completion.include_tools
+        tool_choice = template.config.completion.tool_choice
+        parallel_tool_calls = template.config.completion.parallel_tool_calls
+        tools: List[OpenAIFunction] = []
+        tools_handlers = memory.get("temp.tools")
+
+        # If tools is enabled, reformat actions to appropriate schema
+        if is_tools_enabled:
+            if not template.actions:
+                return PromptResponse[str](status="tools_error", error="Missing actions")
+            if not tools_handlers or len(tools_handlers) == 0:
+                return PromptResponse[str](status="tools_error", error="Missing tools handlers")
+            if len(template.actions) != len(tools_handlers):
+                return PromptResponse[str](
+                    status="tools_error",
+                    error="Number of actions does not match number of tool handlers",
+                )
+            for action in template.actions:
+                if action.name in tools_handlers:
+                    handler = tools_handlers.get(action.name).func
+                    tool = OpenAIFunction(
+                        action.name, action.description, action.parameters, handler
+                    )
+                    tools.append(tool)
+
+        formatted_tools: List[chat.ChatCompletionToolParam] = []
+
+        for tool in tools:
+            curr_tool = chat.ChatCompletionToolParam(
+                type="function",
+                function=shared_params.FunctionDefinition(
+                    name=tool.name,
+                    description=tool.description or "",
+                    parameters=tool.parameters or {},
+                ),
+            )
+            formatted_tools.append(curr_tool)
+
         model = (
             template.config.completion.model
             if template.config.completion.model is not None
             else self._options.default_model
         )
+
         res = await template.prompt.render_as_messages(
             context=context,
             memory=memory,
@@ -195,11 +238,99 @@ class OpenAIModel(PromptCompletionModel):
                 top_p=template.config.completion.top_p,
                 temperature=template.config.completion.temperature,
                 max_tokens=max_tokens,
+                tools=formatted_tools,
+                tool_choice=tool_choice or "auto",
+                parallel_tool_calls=parallel_tool_calls or True,
                 extra_body=extra_body,
             )
 
             if self._options.logger is not None:
                 self._options.logger.debug("COMPLETION:\n%s", completion.model_dump_json())
+
+            # Handle tools flow
+            response_message = completion.choices[0].message
+            tool_calls = response_message.tool_calls
+
+            # Tracks the latest response from the LLM
+            final_response = completion
+            augmentation = template.config.augmentation
+
+            if (
+                augmentation
+                and augmentation.augmentation_type == "none"
+                and is_tools_enabled
+                and tool_calls
+            ):
+                while tool_calls and len(tool_calls) > 0:
+                    if not parallel_tool_calls and len(tool_calls) > 1:
+                        break
+
+                    if isinstance(tool_choice, dict) and len(tool_calls) > 1:
+                        break
+
+                    if tool_choice == "none":
+                        break
+
+                    messages.append(
+                        cast(chat.ChatCompletionAssistantMessageParam, response_message)
+                    )
+
+                    if isinstance(tool_choice, dict):
+                        # Calling a single tool
+                        function_name = tool_choice["function"]["name"]
+                        curr_tool_call = tool_calls[0]
+                        curr_function = next(tool for tool in tools if tool.name == function_name)
+
+                        # Validate function name
+                        if not curr_function:
+                            break
+
+                        # Validate function arguments
+                        required_args = (
+                            curr_function.parameters["required"]
+                            if curr_function.parameters and "required" in curr_function.parameters
+                            else None
+                        )
+
+                        curr_args = json.loads(curr_tool_call.function.arguments)
+                        curr_function_handler = curr_function.handler
+
+                        if required_args:
+                            if len(required_args) > len(curr_args):
+                                break
+
+                        # Call the function
+                        function_response = await self._handle_function_response(
+                            curr_function_handler, curr_args
+                        )
+
+                        messages.append(
+                            chat.ChatCompletionToolMessageParam(
+                                role="tool",
+                                tool_call_id=curr_tool_call.id,
+                                content=function_response,
+                            )
+                        )
+                    else:
+                        curr_message_length = len(messages)
+                        messages = await self._handle_multiple_tool_calls(
+                            messages, tool_calls, tools
+                        )
+                        # No tools were run successfully
+                        if len(messages) == curr_message_length:
+                            break
+
+                    final_response = await self._client.chat.completions.create(
+                        messages=messages,
+                        model=model,
+                        presence_penalty=template.config.completion.presence_penalty,
+                        frequency_penalty=template.config.completion.frequency_penalty,
+                        top_p=template.config.completion.top_p,
+                        temperature=template.config.completion.temperature,
+                        max_tokens=max_tokens,
+                    )
+
+                    tool_calls = final_response.choices[0].message.tool_calls
 
             input: Optional[Message] = None
             last_message = len(res.output) - 1
@@ -211,11 +342,11 @@ class OpenAIModel(PromptCompletionModel):
             return PromptResponse[str](
                 input=input,
                 message=Message(
-                    role=completion.choices[0].message.role,
-                    content=completion.choices[0].message.content,
+                    role=final_response.choices[0].message.role,
+                    content=final_response.choices[0].message.content,
                     context=(
-                        MessageContext.from_dict(completion.choices[0].message.context)
-                        if hasattr(completion.choices[0].message, "context")
+                        MessageContext.from_dict(final_response.choices[0].message.context)
+                        if hasattr(final_response.choices[0].message, "context")
                         else None
                     ),
                 ),
@@ -231,3 +362,55 @@ class OpenAIModel(PromptCompletionModel):
                 status of {err.code}: {err.message}
                 """,
             )
+
+    async def _handle_function_response(
+        self,
+        curr_function_handler: Callable[..., Awaitable[str]],
+        curr_args: Dict[str, Any],
+    ) -> str:
+        if len(curr_args) > 0:
+            return await curr_function_handler(**curr_args)
+        return await curr_function_handler()
+
+    async def _handle_multiple_tool_calls(
+        self,
+        messages: List[chat.ChatCompletionMessageParam],
+        tool_calls: List[chat.ChatCompletionMessageToolCall],
+        tools: List[OpenAIFunction],
+    ) -> List[chat.ChatCompletionMessageParam]:
+        for tool_call in tool_calls:
+            tool_name = tool_call.function.name
+            curr_function = next(tool for tool in tools if tool.name == tool_name)
+
+            # Validate function name
+            if not curr_function:
+                continue
+
+            # Validate function arguments
+            required_args = (
+                curr_function.parameters["required"]
+                if curr_function.parameters and "required" in curr_function.parameters
+                else None
+            )
+
+            curr_args = json.loads(tool_call.function.arguments)
+            curr_function_handler = curr_function.handler
+
+            if required_args:
+                if len(required_args) > len(curr_args):
+                    continue
+
+            # Call the function
+            function_response = await self._handle_function_response(
+                curr_function_handler, curr_args
+            )
+
+            messages.append(
+                chat.ChatCompletionToolMessageParam(
+                    role="tool",
+                    tool_call_id=tool_call.id,
+                    content=function_response,
+                )
+            )
+
+        return messages
