@@ -6,6 +6,8 @@
  * Licensed under the MIT License.
  */
 
+import Chat from 'openai';
+
 /**
  * Interface for the completion configuration portion of a prompt template.
  */
@@ -95,4 +97,19 @@ export interface CompletionConfig {
      * Defaults to 0.
      */
     top_p: number;
+
+    /**
+     * Optional. If true, function calling will be enabled with the LLM. Defaults to false.
+     */
+    include_tools?: boolean;
+
+    /**
+     * Optional. Defines the tools function calling behavior. Defaults to 'auto'.
+     */
+    tool_choice?: Chat.ChatCompletionToolChoiceOption;
+
+    /**
+     * Opetional. Enables parallel tools function calling. Defaults to true.
+     */
+    parallel_tool_calls?: boolean;
 }
