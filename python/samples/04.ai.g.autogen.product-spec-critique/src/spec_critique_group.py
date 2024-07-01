@@ -62,32 +62,32 @@ class SpecCritiqueGroup:
         questioner_agent = AssistantAgent(
             name="Questioner",
             system_message=f"""You are a questioner agent. 
-    Your role is to ask questions for product specs based on the these requirements: 
-    {self.criteria}
-    Ask a single question at a given time. 
-    If you do not have any more questions, say so.
+Your role is to ask questions for product specs based on the these requirements: 
+{self.criteria}
+Ask a single question at a given time. 
+You may assume that the Answerer agent has access to the product spec.
 
-    When asking the question, you should include the spec requirement that the question is trying to answer. For example:
-    <QUESTION requirement=1>
-    Your question here
-    </QUESTION>
+When asking the question, you should include the spec requirement that the question is trying to answer. For example:
+<QUESTION requirement=1>
+Your question here
+</QUESTION>
 
-    If you have no questions to ask, say "NO_QUESTIONS" and nothing else.
+If you have no questions to ask, say "NO_QUESTIONS" and nothing else.
             """,
             llm_config={"config_list": [self.llm_config], "timeout": 60, "temperature": 0},
         )
         answerer_agent = AnswererAgent(
             name="Answerer",
             system_message=f"""You are an answerer agent. 
-    Your role is to answer questions based on the product specs requirements. 
-    Answer the questions as clearly and concisely as possible.
+Your role is to answer questions based on the product specs requirements. 
+Answer the questions as clearly and concisely as possible.
 
-    Your answers MUST be factual and only backed by the facts presented in the product spec or by clarifying responses from the user. Do NOT use facts that are not in the spec or in clarifying responses by the user.
-    If you do not understand something from the spec or it is not described in the spec, you may ask a clarifying question. 
-    Please wrap your question for the user in the following format:
-    <CLARIFYING_QUESTION>
-    Question for the user
-    </CLARIFYING_QUESTION>
+Your answers MUST be factual and only backed by the facts presented in the product spec or by clarifying responses from the user. Do NOT use facts that are not in the spec or in clarifying responses by the user.
+If you do not understand something from the spec or it is not described in the spec, you may ask a clarifying question. 
+Please wrap your question for the user in the following format:
+<CLARIFYING_QUESTION>
+Question for the user
+</CLARIFYING_QUESTION>
             """,
             
             llm_config={"config_list": [self.llm_config], "timeout": 60, "temperature": 0},
@@ -102,13 +102,13 @@ class SpecCritiqueGroup:
         answer_evaluator_agent = AssistantAgent(
             name="Overall_spec_evaluator",
             system_message=f"""You are an answer reviewer agent. 
-    Your role is to evaluate the answers given by the answerer agent.
-    You are only called if the Questioner agent has no more questions to ask. 
-    Provide details on the quality of the specs based on the answers given by the answerer agent.
-    Evaluate the answers based on the following spec criteria:
-    {self.criteria}
+Your role is to evaluate the answers given by the answerer agent.
+You are only called if the Questioner agent has no more questions to ask. 
+Provide details on the quality of the specs based on the answers given by the answerer agent.
+Evaluate the answers based on the following spec criteria:
+{self.criteria}
 
-    Provide some actionable feedback to the answerer agent on how they can improve their answers when necessary.
+Provide some actionable feedback to the answerer agent on how they can improve their answers when necessary.
             """,
             llm_config={"config_list": [self.llm_config], "timeout": 60, "temperature": 0},
         )
