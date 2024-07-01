@@ -1303,6 +1303,13 @@
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
   integrity sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==
 
+"@types/jsonwebtoken@8.3.5":
+  version "8.3.5"
+  resolved "https://registry.yarnpkg.com/@types/jsonwebtoken/-/jsonwebtoken-8.3.5.tgz#ff9be1151a844095df1ff5f723651298c2c07659"
+  integrity sha512-VGM1gb+LwsQ5EPevvbvdnKncajBdYqNcrvixBif1BsiDQiSF1q+j4bBTvKC6Bt9n2kqNSx+yNTY2TVJ360E7EQ==
+  dependencies:
+    "@types/node" "*"
+
 "@types/jsonwebtoken@9.0.4", "@types/jsonwebtoken@^9.0.4":
   version "9.0.4"
   resolved "https://registry.yarnpkg.com/@types/jsonwebtoken/-/jsonwebtoken-9.0.4.tgz#8b74bbe87bde81a3469d4b32a80609bec62c23ec"
@@ -2263,15 +2270,6 @@ axios@^0.26.0:
   dependencies:
     follow-redirects "^1.14.8"
 
-axios@^0.28.0:
-  version "0.28.1"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.28.1.tgz#2a7bcd34a3837b71ee1a5ca3762214b86b703e70"
-  integrity sha512-iUcGA5a7p0mVb4Gm/sy+FSECNkPFT4y7wt6OM/CDpO/OnNCvSs3PoMG8ibrC9jRoGYU0gUK5pXVC4NPXq6lHRQ==
-  dependencies:
-    follow-redirects "^1.15.0"
-    form-data "^4.0.0"
-    proxy-from-env "^1.1.0"
-
 axios@^1.3.4, axios@^1.6.8, axios@^1.7.2:
   version "1.7.2"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.7.2.tgz#b625db8a7051fbea61c35a3cbb3a1daa7b9c7621"
@@ -2390,73 +2388,73 @@ boolbase@^1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==
 
-botbuilder-azure-blobs@^4.22.2:
-  version "4.22.2"
-  resolved "https://registry.yarnpkg.com/botbuilder-azure-blobs/-/botbuilder-azure-blobs-4.22.2.tgz#482e59a1246daa6ee828ee6384a0abb829406ac1"
-  integrity sha512-L+dNsc9cQwWhpmyRyrwTUhioBXclMHDi44Zz/DNWqXnM15ZFPA7j1xfA//JMZMkdU2dfLCO1wG07641pqzL69A==
+botbuilder-azure-blobs@^4.22.3:
+  version "4.22.3"
+  resolved "https://registry.yarnpkg.com/botbuilder-azure-blobs/-/botbuilder-azure-blobs-4.22.3.tgz#fee946c3ed2a239089e22710f6e46607c141e696"
+  integrity sha512-aCK5PZuc5OtvRn8uEzFeBss38EeVacYhcCKDSsYEJcHSfLtJqZC7j9LWeub4I9dctOWqSHHUi/xqD/ajcUrYyQ==
   dependencies:
     "@azure/core-http" "^3.0.2"
     "@azure/storage-blob" "^12.15.0"
-    botbuilder-core "4.22.2"
-    botbuilder-stdlib "4.22.2-internal"
+    botbuilder-core "4.22.3"
+    botbuilder-stdlib "4.22.3-internal"
     get-stream "^6.0.0"
     p-map "^4.0.0"
     zod "^3.22.4"
 
-botbuilder-core@4.22.2, botbuilder-core@^4.22.1:
-  version "4.22.2"
-  resolved "https://registry.yarnpkg.com/botbuilder-core/-/botbuilder-core-4.22.2.tgz#f5c308f23e7ef8924707e6cfa12bfe8ce4f1b1e1"
-  integrity sha512-3qzdiq0V51mrKzEZzle6TSAcX/XfiKyxyKQfStV8C4ivmYFC1RDAv2MVvvg2U4hcLvcp1MHqnDBlQJq/bwrT2w==
+botbuilder-core@4.22.3, botbuilder-core@^4.22.1:
+  version "4.22.3"
+  resolved "https://registry.yarnpkg.com/botbuilder-core/-/botbuilder-core-4.22.3.tgz#2f150f86ac836d556ba8ba8811d6ece1f44c3d8c"
+  integrity sha512-159+ugNI/gp7u+ByYWIjVPE6csFEMfJzbYISf1HVFHhw0m/h0zEyXMvjoiwGu/fA7TI+TtpuFLdh75roEodOsw==
   dependencies:
-    botbuilder-dialogs-adaptive-runtime-core "4.22.2-preview"
-    botbuilder-stdlib "4.22.2-internal"
-    botframework-connector "4.22.2"
-    botframework-schema "4.22.2"
+    botbuilder-dialogs-adaptive-runtime-core "4.22.3-preview"
+    botbuilder-stdlib "4.22.3-internal"
+    botframework-connector "4.22.3"
+    botframework-schema "4.22.3"
     uuid "^8.3.2"
     zod "^3.22.4"
 
-botbuilder-dialogs-adaptive-runtime-core@4.22.2-preview:
-  version "4.22.2-preview"
-  resolved "https://registry.yarnpkg.com/botbuilder-dialogs-adaptive-runtime-core/-/botbuilder-dialogs-adaptive-runtime-core-4.22.2-preview.tgz#757b7f14216335a17f28527eb8328a531abe118b"
-  integrity sha512-eMUkwu2dmf7r+tA1jPp4lP3XD2mVHGv1oRRcqkkWV/4B3xS9vnGpMywKL1xYVwm88eyZA64QGQFlxi6GOtpPaA==
+botbuilder-dialogs-adaptive-runtime-core@4.22.3-preview:
+  version "4.22.3-preview"
+  resolved "https://registry.yarnpkg.com/botbuilder-dialogs-adaptive-runtime-core/-/botbuilder-dialogs-adaptive-runtime-core-4.22.3-preview.tgz#1a02dcef2e0af810916d8c57ca36acf0e6b9e4d8"
+  integrity sha512-JbVKKmriLwUOgBI040unl5xVTmGhESFXnvC3O75nDzjFjdRpaIAwA2/L7ik6E3O4bOkwO2jDov2W+LWlbSnjXQ==
   dependencies:
     dependency-graph "^0.10.0"
 
-botbuilder-dialogs@^4.22.1, botbuilder-dialogs@^4.22.2:
-  version "4.22.2"
-  resolved "https://registry.yarnpkg.com/botbuilder-dialogs/-/botbuilder-dialogs-4.22.2.tgz#0b6be9477f56486752d6050d45fd73476afcaae9"
-  integrity sha512-Y2tBEmi7cHa/2/5dyLLD6IT6KaggyG9iv46iuqbNV4CxI/c21fxL4TTB+YM64exD7YjUPQQC+UiUXQGOOaHFPw==
+botbuilder-dialogs@^4.22.1, botbuilder-dialogs@^4.22.3:
+  version "4.22.3"
+  resolved "https://registry.yarnpkg.com/botbuilder-dialogs/-/botbuilder-dialogs-4.22.3.tgz#af24106305eb11036c625b5e03634cd7f64a99a5"
+  integrity sha512-mrMVz+aiYoLCwIEpYzTyMXvrMVrxSl4OXWD1nFA7brlwbHwb6McG423I0DKoDTRN7buOLYY4CCWItXMp2mRq8Q==
   dependencies:
     "@microsoft/recognizers-text-choice" "1.1.4"
     "@microsoft/recognizers-text-date-time" "1.1.4"
     "@microsoft/recognizers-text-number" "1.3.1"
     "@microsoft/recognizers-text-suite" "1.1.4"
-    botbuilder-core "4.22.2"
-    botbuilder-dialogs-adaptive-runtime-core "4.22.2-preview"
-    botframework-connector "4.22.2"
+    botbuilder-core "4.22.3"
+    botbuilder-dialogs-adaptive-runtime-core "4.22.3-preview"
+    botframework-connector "4.22.3"
     globalize "^1.4.2"
     lodash "^4.17.21"
     uuid "^8.3.2"
     zod "^3.22.4"
 
-botbuilder-stdlib@4.22.2-internal:
-  version "4.22.2-internal"
-  resolved "https://registry.yarnpkg.com/botbuilder-stdlib/-/botbuilder-stdlib-4.22.2-internal.tgz#862d396c95a0ebec80132f4d32431c805f960305"
-  integrity sha512-ny6rFD/KM63XtiIITrYdwM+1qh9A5m83bf9E8O0cTrFQjvHLP+zHAHslbl1/Wpv7j6nEnAoLUJB6IVBEkb53Kw==
+botbuilder-stdlib@4.22.3-internal:
+  version "4.22.3-internal"
+  resolved "https://registry.yarnpkg.com/botbuilder-stdlib/-/botbuilder-stdlib-4.22.3-internal.tgz#8f6a000c738a8a50a53978137e08f59f3430f098"
+  integrity sha512-DZwHRHpEZQNDQ426RpSmEpNKm9V/5k11lpXmQ41Eq2g0LHdaz1TqgV97US+Mj7Xyp4Fngp23HWcGivU8bQeArA==
 
-botbuilder@^4.22.1, botbuilder@^4.22.2:
-  version "4.22.2"
-  resolved "https://registry.yarnpkg.com/botbuilder/-/botbuilder-4.22.2.tgz#35057e5acb9c34ab229498aaf56fe3c40d0f7349"
-  integrity sha512-pfMbpN5nKyDNMKZZl4palWET+Q7oNHLYLSEyBie5sA4xJ1Gbzn7DT0T1QykATsr9O9s13mojJRyqnNYRflH0rw==
+botbuilder@^4.22.1, botbuilder@^4.22.3:
+  version "4.22.3"
+  resolved "https://registry.yarnpkg.com/botbuilder/-/botbuilder-4.22.3.tgz#baf58a0cd4c0677057f93d849d802bc447c0fdf0"
+  integrity sha512-vmsCBaqC6mvX9Kr6xVvU0Zlblh1d923HTXJqs196QspDMX9sedmxORfgX3u3P1vNXqx5jt4ODm52k5Aau+IP+w==
   dependencies:
     "@azure/core-http" "^3.0.2"
     "@azure/msal-node" "^1.18.4"
-    axios "^0.28.0"
-    botbuilder-core "4.22.2"
-    botbuilder-stdlib "4.22.2-internal"
-    botframework-connector "4.22.2"
-    botframework-schema "4.22.2"
-    botframework-streaming "4.22.2"
+    axios "^1.7.2"
+    botbuilder-core "4.22.3"
+    botbuilder-stdlib "4.22.3-internal"
+    botframework-connector "4.22.3"
+    botframework-schema "4.22.3"
+    botframework-streaming "4.22.3"
     dayjs "^1.10.3"
     filenamify "^4.1.0"
     fs-extra "^7.0.1"
@@ -2464,43 +2462,45 @@ botbuilder@^4.22.1, botbuilder@^4.22.2:
     uuid "^8.3.2"
     zod "^3.22.4"
 
-botframework-connector@4.22.2, botframework-connector@^4.22.1:
-  version "4.22.2"
-  resolved "https://registry.yarnpkg.com/botframework-connector/-/botframework-connector-4.22.2.tgz#4a884f067d44557dc7057b9b0e3313001dee772c"
-  integrity sha512-V6mRsQPthhlKHxNw73fW7ZcfM0AlOXlTR6u49O+5+PQ8fDwLbNNswN4AyUpSp+JFW9facR407dd2vNbUoKYOcA==
+botframework-connector@4.22.3, botframework-connector@^4.22.1:
+  version "4.22.3"
+  resolved "https://registry.yarnpkg.com/botframework-connector/-/botframework-connector-4.22.3.tgz#0e97a541424b7a1dad037d6657122d0ca5b5fb76"
+  integrity sha512-xsGFfphSMECvaBJynWmvSXbG8o72WqX8Ba885kz/lxGXu1f6CjTObO0enxQdtH9O7YmCX4T0xOaHiFxnU2U61A==
   dependencies:
     "@azure/core-http" "^3.0.2"
     "@azure/identity" "^2.0.4"
     "@azure/msal-node" "^1.18.4"
+    "@types/jsonwebtoken" "8.3.5"
+    axios "^1.7.2"
     base64url "^3.0.0"
-    botbuilder-stdlib "4.22.2-internal"
-    botframework-schema "4.22.2"
+    botbuilder-stdlib "4.22.3-internal"
+    botframework-schema "4.22.3"
     cross-fetch "^3.0.5"
     https-proxy-agent "^7.0.2"
-    jsonwebtoken "^9.0.0"
+    jsonwebtoken "^9.0.2"
     node-fetch "^2.6.7"
     openssl-wrapper "^0.3.4"
     rsa-pem-from-mod-exp "^0.8.4"
     zod "^3.22.4"
 
-botframework-schema@4.22.2, botframework-schema@^4.22.1:
-  version "4.22.2"
-  resolved "https://registry.yarnpkg.com/botframework-schema/-/botframework-schema-4.22.2.tgz#9a8748704eada397e99d4537e0591ad42bb1f794"
-  integrity sha512-D2SauTdimpfN6TRfDS94GYrRGn/dpTq/n24yAR1cQ9GcV8qq1MydxCYyVbsgzdlkNOFSRJHYJMAp85VKUoYUGg==
+botframework-schema@4.22.3, botframework-schema@^4.22.1:
+  version "4.22.3"
+  resolved "https://registry.yarnpkg.com/botframework-schema/-/botframework-schema-4.22.3.tgz#e776fba97f725de80a3d7694b6b81dba3b71929e"
+  integrity sha512-8d/IgrFPrVIJFOqExASROYYaV4ikQvDIq60sEN2DphVS+Cnlvm65Tl/6vv+3c27A6xrih23nyvjgAafhLmZ1gQ==
   dependencies:
     adaptivecards "1.2.3"
     uuid "^8.3.2"
     zod "^3.22.4"
 
-botframework-streaming@4.22.2, botframework-streaming@^4.22.1:
-  version "4.22.2"
-  resolved "https://registry.yarnpkg.com/botframework-streaming/-/botframework-streaming-4.22.2.tgz#c57c9a3dcb0875bc68b7a575ee3207c52cbc018a"
-  integrity sha512-xsozFqv3B65jPQnmPa1r7Cq/OMXe1iod+MmcwiVs4oa8Th8YQ1m38+eyUPIm8vCMfeNeULm8EOvYiC9XC8P1NA==
+botframework-streaming@4.22.3, botframework-streaming@^4.22.1:
+  version "4.22.3"
+  resolved "https://registry.yarnpkg.com/botframework-streaming/-/botframework-streaming-4.22.3.tgz#d1e6530407009a73a46a9d1b7222d1ea22f62a61"
+  integrity sha512-N0lI6eezH1wj5fkB+L5W+lDLL3EOOpqfj6OEf7xgzIdoJrDZy4vK/du66ptzWKZveyWK2MDd5Xme+pOm2H6dRA==
   dependencies:
     "@types/node" "^10.17.27"
     "@types/ws" "^6.0.3"
     uuid "^8.3.2"
-    ws "^7.1.2"
+    ws "^7.5.10"
 
 boxen@^1.2.1:
   version "1.3.0"
@@ -4864,7 +4864,7 @@ flatted@^3.1.0:
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.2.7.tgz#609f39207cb614b89d0765b477cb2d437fbf9787"
   integrity sha512-5nqDSxl8nn5BSNxyR3n4I6eDmbolI6WT+QqR547RwxQapgjQBmtktdP+HTBb/a/zLsbzERTONyUB5pefh5TtjQ==
 
-follow-redirects@^1.14.0, follow-redirects@^1.14.8, follow-redirects@^1.15.0, follow-redirects@^1.15.6:
+follow-redirects@^1.14.0, follow-redirects@^1.14.8, follow-redirects@^1.15.6:
   version "1.15.6"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.6.tgz#7f815c0cda4249c74ff09e95ef97c23b5fd0399b"
   integrity sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==
@@ -10193,7 +10193,7 @@ write-file-atomic@^3.0.0:
     signal-exit "^3.0.2"
     typedarray-to-buffer "^3.1.5"
 
-ws@^7.1.2:
+ws@^7.5.10:
   version "7.5.10"
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.5.10.tgz#58b5c20dc281633f6c19113f39b349bd8bd558d9"
   integrity sha512-+dbF1tHwZpXcbOJdVOkzLDxZP1ailvSxM6ZweXTegylPny803bFhA+vqBYw4s31NSAk4S2Qz+AKXK9a4wkdjcQ==
