@@ -3,13 +3,14 @@ from datetime import datetime
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json
 from botbuilder.schema import Attachment
-from botbuilder.core import CardFactory, TurnContext
+from botbuilder.core import TurnContext
 from teams.ai.prompts import Message
 from teams.ai.planners import Planner, Plan, PredictedSayCommand
-from autogen import Agent, GroupChat, GroupChatManager, ChatResult
+from autogen import Agent, GroupChat, GroupChatManager
 
 from teams_user_proxy import TeamsUserProxy
 from state import AppTurnState
+from group_chat_history_adaptive_card import create_chat_history_ac
 
 @dataclass_json
 @dataclass
@@ -76,54 +77,3 @@ class AutoGenPlanner(Planner):
                     )
                 ]
             )
-
-
-def create_chat_history_ac(message: ChatResult) -> Attachment:
-    facts = []
-    for value in message.chat_history:
-        if value.get("name") is not None:
-            facts.append({
-                "title": value["name"],
-                "value": value["content"]
-            })
-
-    return CardFactory.adaptive_card(
-        {
-            "type": "AdaptiveCard",
-            "speak": "3 minute energy flow with kayo video",
-            "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
-            "version": "1.5",
-            "body": [
-                {
-                    "type": "TextBlock",
-                    "wrap": True,
-                    "text": "Agent Reasoning",
-                    "style": "heading",
-                    "size": "Medium"
-                },
-                {
-                    "type": "TextBlock",
-                    "wrap": True,
-                    "text": "You can view the agent's internal conversation by toggling the card below"
-                },
-                {
-                    "type": "ActionSet",
-                    "actions": [
-                        {
-                            "type": "Action.ShowCard",
-                            "title": "Show internal discussion",
-                            "card": {
-                                "type": "AdaptiveCard",
-                                "body": [
-                                    {
-                                        "type": "FactSet",
-                                        "facts": facts
-                                    }
-                                ]
-                            }
-                        }
-                    ]
-                }
-            ]
-        }
-    )

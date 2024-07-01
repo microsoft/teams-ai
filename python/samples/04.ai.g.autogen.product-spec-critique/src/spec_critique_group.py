@@ -90,11 +90,6 @@ Question for the user
             llm_config={"config_list": [self.llm_config], "timeout": 60, "temperature": 0},
             spec_details=spect_details
         )
-        # if spec_url:
-        #     d_retrieve_content = answerer_agent.register_for_llm(
-        #         description="Retrieve the contents of the product spec", api_style="function"
-        #     )(read_spec)
-        #     answerer_agent.register_for_execution()(d_retrieve_content)
         
         answer_evaluator_agent = AssistantAgent(
             name="Overall_spec_evaluator",

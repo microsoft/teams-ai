@@ -22,20 +22,6 @@ from state import AppTurnState
 from spec_critique_group import SpecCritiqueGroup
 
 config = Config()
-def build_llm_config():
-    if "OPENAI_KEY" in os.environ:
-        autogen_llm_config = {"model": "gpt-4o", "api_key": os.environ["OPENAI_KEY"]}
-    elif "AZURE_OPENAI_KEY" in os.environ and "AZURE_OPENAI_ENDPOINT" in os.environ:
-        autogen_llm_config = {
-            "model": "my-gpt-4-deployment",
-            "api_version": "2024-02-01",
-            "api_type": "azure",
-            "api_key": os.environ['AZURE_OPENAI_API_KEY'],
-            "base_url": os.environ['AZURE_OPENAI_ENDPOINT'],
-        }
-    else:
-        raise ValueError("Neither OPENAI_KEY nor AZURE_OPENAI_KEY environment variables are set.")
-    return autogen_llm_config
 
 if config.OPENAI_KEY is None and config.AZURE_OPENAI_KEY is None:
     raise RuntimeError(
@@ -43,7 +29,11 @@ if config.OPENAI_KEY is None and config.AZURE_OPENAI_KEY is None:
     )
 
 
-llm_config = build_llm_config()
+llm_config = config.build_llm_config()
+if llm_config is None:
+    raise RuntimeError(
+        "Unable to build LLM config - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set."
+    )
 spec_critique_group = SpecCritiqueGroup(llm_config=llm_config)
 
 storage = MemoryStorage()

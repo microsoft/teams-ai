@@ -40,7 +40,7 @@ class TeamsUserProxy(ConversableAgent):
         return message
 
     # Since this UserProxy is designed to be used asynchrnously
-    # we exist the conversation, then wait asynchronously for the next user message
+    # we exit the conversation, then wait asynchronously for the next user message
     def get_human_input(self, _prompt) -> str:
         return 'exit'
 

@@ -3,17 +3,17 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Union
 
 from botbuilder.core import Storage, TurnContext
 from teams.state import ConversationState, TempState, TurnState, UserState
 from datetime import datetime
 
 class AppConversationState(ConversationState):
-    message_history: List[Dict] | None = None
+    message_history: Union[List[Dict], None] = None
     is_waiting_for_user_input: bool = False
-    started_waiting_for_user_input_at: datetime | str | None = None
-    spec_details: str | None = None
+    started_waiting_for_user_input_at: Union[datetime, str, None] = None
+    spec_details: Union[str, None] = None
 
     @classmethod
     async def load(
