@@ -256,6 +256,7 @@ export class OpenAIModel implements PromptCompletionModel {
 
     /**
      * Events emitted by the model.
+     @returns {PromptCompletionModelEmitter} The event emitter.
      */
     public get events(): PromptCompletionModelEmitter {
         return this._events;
@@ -316,7 +317,7 @@ export class OpenAIModel implements PromptCompletionModel {
 
         // Get input message
         // - we're doing this here because the input message can be complex and include images.
-        let input = this.getInputMessage(result.output);
+        const input = this.getInputMessage(result.output);
 
         try {
             // Call chat completion API
@@ -396,10 +397,10 @@ export class OpenAIModel implements PromptCompletionModel {
 
     /**
      * @private
-     * @param model - Model to use.
-     * @param messages - Messages to send.
-     * @param template Prompt template being used.
-     * @returns Chat completion parameters.
+     * @param {string} model - Model to use.
+     * @param {Message<string>[]} messages - Messages to send.
+     * @param {PromptTemplate} template Prompt template being used.
+     * @returns {ChatCompletionCreateParams} Chat completion parameters.
      */
     private getChatCompletionParams(
         model: string,
