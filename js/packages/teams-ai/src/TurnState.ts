@@ -7,6 +7,8 @@
  */
 
 import { TurnContext, Storage, StoreItems } from 'botbuilder';
+
+import { ActionEntry } from './actions';
 import { Memory } from './MemoryFork';
 import { InputFile } from './InputFileDownloader';
 
@@ -79,6 +81,11 @@ export interface DefaultTempState {
      * Flag indicating whether a token exchange event has already been processed
      */
     duplicateTokenExchange?: boolean;
+
+    /**
+     *  Map of actions for calling tools
+     */
+    tools?: Map<string, ActionEntry<TurnState>>;
 }
 
 /**
