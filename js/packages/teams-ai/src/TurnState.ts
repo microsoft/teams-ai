@@ -85,7 +85,7 @@ export interface DefaultTempState {
     /**
      *  Map of actions for calling tools
      */
-    tools?: Map<string, ActionEntry<TurnState>>;
+    toolHandlers?: Map<string, ActionEntry<TurnState>>;
 }
 
 /**
