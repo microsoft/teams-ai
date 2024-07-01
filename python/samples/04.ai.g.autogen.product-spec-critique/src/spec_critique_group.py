@@ -60,10 +60,10 @@ class SpecCritiqueGroup:
         questioner_agent = AssistantAgent(
             name="Questioner",
             system_message=f"""You are a questioner agent. 
-Your role is to ask questions for product specs based on the these requirements: 
+Your role is to ask questions for a product spec that the Answerer agent has.
+As questions based on these requirements:
 {self.criteria}
-Ask a single question at a given time. 
-You may assume that the Answerer agent has access to the product spec.
+Ask a single question at a given time.
 
 When asking the question, you should include the spec requirement that the question is trying to answer. For example:
 <QUESTION requirement=1>
@@ -81,8 +81,7 @@ Your role is to answer questions based on the product specs requirements.
 Answer the questions as clearly and concisely as possible.
 
 Your answers MUST be factual and only backed by the facts presented in the product spec or by clarifying responses from the user. Do NOT use facts that are not in the spec or in clarifying responses by the user.
-If you do not understand something from the spec or it is not described in the spec, you may ask a clarifying question. 
-Please wrap your question for the user in the following format:
+If you do not understand something from the spec or it is not described in the spec, you may ask a clarifying question for the user. In these cases, only include the clarifying question in the following format in your response:
 <CLARIFYING_QUESTION>
 Question for the user
 </CLARIFYING_QUESTION>
@@ -120,12 +119,14 @@ Provide some actionable feedback to the answerer agent on how they can improve t
             last_message = groupchat.messages[-1]
             content = last_message.get("content")
             if last_speaker == questioner_agent:
-                if content is not None and content.lower() == "no_questions":
+                if content is not None and "NO_QUESTIONS" in content:
+                    print("Switching to answer evaluator agent")
                     return answer_evaluator_agent
                 else:
                     return answerer_agent
             elif last_speaker == answerer_agent:
                 if content is not None and '<CLARIFYING_QUESTION>' in content:
+                    print("Sending clarifying question for user")
                     return user_agent
                 else:
                     return questioner_agent
