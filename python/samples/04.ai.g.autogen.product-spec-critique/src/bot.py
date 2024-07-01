@@ -22,12 +22,6 @@ from spec_critique_group import SpecCritiqueGroup
 
 config = Config()
 
-if config.OPENAI_KEY is None and config.AZURE_OPENAI_KEY is None:
-    raise RuntimeError(
-        "Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set."
-    )
-
-
 llm_config = config.build_llm_config()
 if llm_config is None:
     raise RuntimeError(
