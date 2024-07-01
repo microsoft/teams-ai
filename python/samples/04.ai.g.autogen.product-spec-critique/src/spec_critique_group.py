@@ -108,7 +108,7 @@ Provide details on the quality of the specs based on the answers given by the an
 Evaluate the answers based on the following spec criteria:
 {self.criteria}
 
-Provide some actionable feedback to the answerer agent on how they can improve their answers when necessary.
+Provide some actionable feedback to the answerer agent on how they can improve their answers. If the answers are good, provide positive feedback instead.
             """,
             llm_config={"config_list": [self.llm_config], "timeout": 60, "temperature": 0},
         )
