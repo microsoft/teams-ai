@@ -151,7 +151,10 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
         mock_get.return_value.__aenter__.return_value = response_obj
         mocked_content = await response_obj.read()
         attachment = Attachment(
-            content_url="https://example.com/file.png", content_type="image/png", name="file.png", content={"downloadUrl": "https://example.com/special_download_url_file.png"}
+            content_url="https://example.com/file.png",
+            content_type="image/png",
+            name="file.png",
+            content={"downloadUrl": "https://example.com/special_download_url_file.png"}
         )
 
         context = self.create_mock_context()
