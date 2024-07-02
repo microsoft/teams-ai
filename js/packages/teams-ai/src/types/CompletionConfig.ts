@@ -112,4 +112,9 @@ export interface CompletionConfig {
      * Opetional. Enables parallel tools function calling. Defaults to true.
      */
     parallel_tool_calls?: boolean;
+
+    /**
+     * Optional. Array of tools to use for function calling.
+     */
+    tools?: Chat.ChatCompletionTool[];
 }

@@ -359,7 +359,7 @@ export class AI<TState extends TurnState = TurnState> {
                 step_count = 0;
             }
 
-            // Add actions for function calling to temp state
+            // Add action handlers for tools function calling to temp state
             state.temp.toolHandlers = this._actions as unknown as Map<string, actions.ActionEntry<TurnState>>;
 
             // Review input on first loop
