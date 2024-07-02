@@ -7,27 +7,30 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Optional
+
 from botbuilder.schema import Entity
 from msrest.serialization import Model
+
 
 @dataclass
 class AIEntity(Entity):
 
     _attribute_map = {
-        "type": { "key": "type", "type": "str" },
-        "type_": { "key": "@type", "type": "str" },
-        "context_": { "key": "@context", "type": "str" },
-        "id_": { "key": "@id", "type": "str" },
-        "additional_type": { "key": "additionalType", "type": "[str]"},
-        "citation": { "key": "citation", "type": "[ClientCitation]"},
+        "type": {"key": "type", "type": "str"},
+        "type_": {"key": "@type", "type": "str"},
+        "context_": {"key": "@context", "type": "str"},
+        "id_": {"key": "@id", "type": "str"},
+        "additional_type": {"key": "additionalType", "type": "[str]"},
+        "citation": {"key": "citation", "type": "[ClientCitation]"},
     }
-    
+
     additional_type: Optional[list[str]]
     citation: Optional[list[ClientCitation]]
     type: str = "https://schema.org/Message"
     type_: str = "Message"
     context_: str = "https://schema.org"
     id_: str = ""
+
 
 @dataclass
 class ClientCitation(Model):
@@ -108,7 +111,6 @@ class SensitivityUsageInfo(Model):
         "description": {"key": "description", "type": "str"},
         "position": {"key": "position", "type": "int"},
         "pattern": {"key": "pattern", "type": "Pattern"},
-
     }
 
     name: str

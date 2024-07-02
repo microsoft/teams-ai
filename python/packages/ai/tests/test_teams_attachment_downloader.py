@@ -154,7 +154,7 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
             content_url="https://example.com/file.png",
             content_type="image/png",
             name="file.png",
-            content={"downloadUrl": "https://example.com/special_download_url_file.png"}
+            content={"downloadUrl": "https://example.com/special_download_url_file.png"},
         )
 
         context = self.create_mock_context()
@@ -179,7 +179,6 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
                 )
             ],
         )
-
 
     @mock.patch("aiohttp.ClientSession.get")
     async def test_should_download_local_file(self, mock_get):

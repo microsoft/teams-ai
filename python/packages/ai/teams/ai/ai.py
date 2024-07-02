@@ -19,7 +19,7 @@ from ..utils import snippet
 from ..utils.citations import format_citations_response, get_used_citations
 from .actions import ActionEntry, ActionHandler, ActionTurnContext, ActionTypes
 from .ai_options import AIOptions
-from .citations.citations import Appearance, ClientCitation, AIEntity
+from .citations.citations import AIEntity, Appearance, ClientCitation
 from .moderators.moderator import Moderator
 from .planners.plan import Plan, PredictedDoCommand, PredictedSayCommand
 from .planners.planner import Planner
@@ -308,7 +308,7 @@ class AI(Generic[StateT]):
 
         if is_teams_channel:
             channel_data["feedbackLoopEnabled"] = self._options.enable_feedback_loop
-      
+
         await context.send_activity(
             Activity(
                 type=ActivityTypes.message,
@@ -316,10 +316,13 @@ class AI(Generic[StateT]):
                 channel_data=channel_data,
                 entities=[
                     AIEntity(
-                        citation = [citation for citation in referenced_citations] if referenced_citations else [],
-                        additional_type = ["AIGeneratedContent"]
+                        citation=(
+                            [citation for citation in referenced_citations]
+                            if referenced_citations
+                            else []
+                        ),
+                        additional_type=["AIGeneratedContent"],
                     ),
-                    
                 ],
             )
         )
