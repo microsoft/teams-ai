@@ -7,11 +7,8 @@
  */
 
 import { PromptFunctions, PromptTemplate } from '../prompts';
-import { 
-    PromptCompletionModel, 
-    PromptCompletionModelEmitter, 
-    PromptResponse 
-} from './PromptCompletionModel';
+import { PromptCompletionModel, PromptCompletionModelEmitter } from './PromptCompletionModel';
+import { PromptResponse } from '../types';
 import { Tokenizer } from '../tokenizers';
 import { TurnContext } from 'botbuilder';
 import { Memory } from '../MemoryFork';
