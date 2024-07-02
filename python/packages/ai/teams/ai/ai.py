@@ -317,7 +317,7 @@ class AI(Generic[StateT]):
                 entities=[
                     AIEntity(
                         citation=(
-                            [citation for citation in referenced_citations]
+                            list(referenced_citations)
                             if referenced_citations
                             else []
                         ),
