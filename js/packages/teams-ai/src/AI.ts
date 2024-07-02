@@ -195,11 +195,6 @@ export class AI<TState extends TurnState = TurnState> {
     public static readonly SayCommandActionName = '___SAY___';
 
     /**
-     * An action that is called before the AI system calls the planner and streams responses to the client.
-     */
-    public static readonly BeforeStreamActionName = '___BeforeStream___';
-
-    /**
      * Creates a new AI system.
      * @param {ConfiguredAIOptions} options The options used to configure the AI system.
      */
