@@ -11,19 +11,22 @@ import { TurnContext } from 'botbuilder';
 import EventEmitter from 'events';
 import { ClientOptions, AzureOpenAI, OpenAI } from 'openai';
 import {
-    ChatCompletionCreateParams,
+    type ChatCompletionCreateParams,
     ChatCompletionMessageParam,
     ChatCompletionChunk,
-    ChatCompletion
+    ChatCompletion,
+    ChatCompletionTool
 } from 'openai/resources';
 import { Stream } from 'openai/streaming';
 
+import { ActionEntry } from '../actions';
 import { Message, PromptFunctions, PromptTemplate } from '../prompts';
-import { PromptCompletionModel, PromptCompletionModelEmitter } from './PromptCompletionModel';
 import { Colorize } from '../internals';
 import { Tokenizer } from '../tokenizers';
-import { PromptResponse } from '../types';
+import { OpenAIFunction, PromptResponse } from '../types';
 import { Memory } from '../MemoryFork';
+import { TurnState } from '../TurnState';
+import { PromptCompletionModel, PromptCompletionModelEmitter } from './PromptCompletionModel';
 
 /**
  * Base model options common to both OpenAI and Azure OpenAI services.
@@ -280,6 +283,11 @@ export class OpenAIModel implements PromptCompletionModel {
     ): Promise<PromptResponse<string>> {
         const startTime = Date.now();
         const max_input_tokens = template.config.completion.max_input_tokens;
+
+        const chatCompletionTools: OpenAIFunction[] = [];
+        const chatCompletionToolHandlers: Map<string, ActionEntry<TurnState>> = memory.getValue('temp.toolHandlers');
+        const isToolsEnabled = template.config.completion.include_tools ?? false;
+
         const model =
             template.config.completion.model ??
             (this._useAzure
@@ -291,6 +299,44 @@ export class OpenAIModel implements PromptCompletionModel {
             throw new Error(
                 `The completion type 'completion' is no longer supported. Only 'chat' based models are supported.`
             );
+        }
+
+        // If tools are enabled, massage data with action handlers to match schema
+        if (isToolsEnabled) {
+            if (!template.actions || template.actions.length == 0) {
+                return this.returnToolsError('noActions', undefined);
+            }
+
+            if (template.actions.length !== chatCompletionToolHandlers.size) {
+                return this.returnToolsError('lengthMismatch', undefined);
+            }
+
+            for (const action of template.actions!) {
+                if (chatCompletionToolHandlers.has(action.name)) {
+                    const toolsHandler = chatCompletionToolHandlers.get(action.name)!.handler;
+
+                    chatCompletionTools.push({
+                        name: action.name,
+                        handler: toolsHandler,
+                        description: action.description,
+                        parameters: action.parameters
+                    });
+                }
+            }
+
+            const formattedChatCompletionTools: ChatCompletionTool[] = [];
+            for (const tool of chatCompletionTools) {
+                formattedChatCompletionTools.push({
+                    type: 'function',
+                    // OpenAI's shared FunctionDefinition
+                    function: {
+                        name: tool.name,
+                        description: tool.description,
+                        parameters: tool.parameters
+                    }
+                });
+            }
+            template.config.completion.tools = formattedChatCompletionTools;
         }
 
         // Signal start of completion
@@ -431,7 +477,8 @@ export class OpenAIModel implements PromptCompletionModel {
                 'response_format',
                 'seed',
                 'tool_choice',
-                'tools'
+                'tools',
+                'parallel_tool_calls'
             ]
         );
         if (this.options.responseFormat) {
@@ -493,5 +540,29 @@ export class OpenAIModel implements PromptCompletionModel {
                 error: new Error(`The chat completion API returned an error: ${(err as Error).toString()}`)
             };
         }
+    }
+
+    private returnToolsError(
+        errorType: 'noActions' | 'lengthMismatch',
+        input: Message<string> | undefined
+    ): PromptResponse<string> {
+        let errorString = '';
+
+        switch (errorType) {
+            case 'noActions':
+                errorString = 'Missing actions from template config';
+                break;
+            case 'lengthMismatch':
+                errorString = 'Number of actions does not match number of tool handlers';
+                break;
+            default:
+                errorString = 'Unknown tools error';
+        }
+
+        return {
+            status: 'tools_error',
+            input,
+            error: new Error(errorString)
+        };
     }
 }
