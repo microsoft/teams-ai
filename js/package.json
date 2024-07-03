@@ -20,7 +20,7 @@
         "test:nyc:report": "npx rimraf coverage && yarn test:mocha && nyc report"
     },
     "dependencies": {
-        "botbuilder": "^4.22.2",
+        "botbuilder": "^4.22.3",
         "openai": "4.41.0"
     },
     "devDependencies": {
