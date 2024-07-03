@@ -31,7 +31,7 @@
     "@microsoft/teamsfx": "^2.3.2",
     "botbuilder": "^4.22.2",
     "dotenv": "^16.4.1",
-    "openai": "^4.41.0",
+    "openai": "4.28.4",
     "replace": "~1.2.0",
     "restify": "~11.1.0",
     "vectra": "^0.7.6"
