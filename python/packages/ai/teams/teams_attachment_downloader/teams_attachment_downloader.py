@@ -90,7 +90,7 @@ class TeamsAttachmentDownloader(InputFileDownloader):
 
             download_url = attachment.content_url
             if attachment.content and isinstance(attachment.content, dict):
-                download_url = attachment.content.get('downloadUrl', attachment.content_url)
+                download_url = attachment.content.get("downloadUrl", attachment.content_url)
             async with aiohttp.ClientSession() as session:
                 async with session.get(download_url, headers=headers) as response:
                     content = await response.read()
@@ -102,8 +102,7 @@ class TeamsAttachmentDownloader(InputFileDownloader):
 
                     return InputFile(content, content_type, attachment.content_url)
         else:
-            content = bytes(
-                attachment.content) if attachment.content else bytes()
+            content = bytes(attachment.content) if attachment.content else bytes()
             return InputFile(content, attachment.content_type, attachment.content_url)
 
     async def _get_access_token(self):

@@ -19,7 +19,7 @@ from ..utils import snippet
 from ..utils.citations import format_citations_response, get_used_citations
 from .actions import ActionEntry, ActionHandler, ActionTurnContext, ActionTypes
 from .ai_options import AIOptions
-from .citations.citations import Appearance, ClientCitation
+from .citations.citations import AIEntity, Appearance, ClientCitation
 from .moderators.moderator import Moderator
 from .planners.plan import Plan, PredictedDoCommand, PredictedSayCommand
 from .planners.planner import Planner
@@ -317,18 +317,14 @@ class AI(Generic[StateT]):
                 text=content_text,
                 channel_data=channel_data,
                 entities=[
-                    {
-                        "type": "https://schema.org/Message",
-                        "@type": "Message",
-                        "@context": "https://schema.org",
-                        "@id": "",
-                        "additionalType": ["AIGeneratedContent"],
-                        **(
-                            {"citation": [citation.__dict__ for citation in referenced_citations]}
+                    AIEntity(
+                        citation=(
+                            list(referenced_citations)
                             if referenced_citations
-                            else {}
+                            else []
                         ),
-                    }
+                        additional_type=["AIGeneratedContent"],
+                    ),
                 ],
             )
         )
