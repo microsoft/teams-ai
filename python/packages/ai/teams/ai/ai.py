@@ -359,5 +359,6 @@ class AI(Generic[StateT]):
         if action not in self._actions:
             raise ApplicationError(f"Can't find an action named '{action}'.")
 
-        handler = self._actions[action].handler
+        action_entry = self._actions[action]
+        handler = action_entry.handler
         return await handler(context, state, parameters, action)
