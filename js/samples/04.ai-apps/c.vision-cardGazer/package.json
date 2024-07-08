@@ -29,16 +29,16 @@
         "restify": "~11.1.0"
     },
     "devDependencies": {
-        "@types/node": "^20.14.8",
+        "@types/node": "^20.14.10",
         "@types/restify": "8.5.12",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
         "env-cmd": "^10.1.0",
         "eslint": "^8.57.0",
         "prettier": "^3.3.2",
-        "rimraf": "^5.0.7",
+        "rimraf": "^5.0.8",
         "nodemon": "~3.0.1",
         "ts-node": "^10.9.2",
-        "typescript": "^5.5.2"
+        "typescript": "^5.5.3"
     }
 }
