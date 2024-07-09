@@ -14,7 +14,7 @@ The result from the evaluator agent is sent back to the Teams user. We also send
 
 <!-- code_chunk_output -->
 
-- [Teams Autogen Bot](#teams-light-bot)
+- [Teams Autogen Bot](#teams-autogen-bot)
   - [Interacting with the bot](#interacting-with-the-bot)
   - [Setting up the sample](#setting-up-the-sample)
   - [Testing the sample](#testing-the-sample)
