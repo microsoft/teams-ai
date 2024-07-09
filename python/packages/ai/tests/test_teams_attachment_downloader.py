@@ -146,6 +146,41 @@ class TestTeamsAttachmentDownloader(IsolatedAsyncioTestCase):
         )
 
     @mock.patch("aiohttp.ClientSession.get")
+    async def test_should_download_file_with_download_url(self, mock_get):
+        response_obj = MockedResponse()
+        mock_get.return_value.__aenter__.return_value = response_obj
+        mocked_content = await response_obj.read()
+        attachment = Attachment(
+            content_url="https://example.com/file.png",
+            content_type="image/png",
+            name="file.png",
+            content={"downloadUrl": "https://example.com/special_download_url_file.png"},
+        )
+
+        context = self.create_mock_context()
+        context.activity.type = "message"
+        context.activity.text = "Here is the attachment"
+        context.activity.attachments = [attachment]
+        downloader = TeamsAttachmentDownloader(
+            TeamsAttachmentDownloaderOptions(bot_app_id="botAppId", adapter=TeamsAdapter({}))
+        )
+
+        input_files = await downloader.download_files(context)
+
+        assert mock_get.call_count == 1
+        assert mock_get.call_args[0][0] == "https://example.com/special_download_url_file.png"
+        self.assertEqual(
+            input_files,
+            [
+                InputFile(
+                    content=mocked_content,
+                    content_type="image/png",
+                    content_url="https://example.com/file.png",
+                )
+            ],
+        )
+
+    @mock.patch("aiohttp.ClientSession.get")
     async def test_should_download_local_file(self, mock_get):
         response_obj = MockedResponse()
         mock_get.return_value.__aenter__.return_value = response_obj

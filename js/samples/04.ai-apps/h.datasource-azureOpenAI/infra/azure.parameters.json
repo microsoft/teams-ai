@@ -11,6 +11,9 @@
         "botAadAppClientSecret": {
             "value": "${{SECRET_BOT_PASSWORD}}"
         },
+        "botTenantId": {
+            "value": "${{TEAMS_APP_TENANT_ID}}"
+        },
         "webAppSKU": {
             "value": "B1"
         },
@@ -19,12 +22,6 @@
         },
         "azureOpenAIEndpoint": {
             "value": "${{AZURE_OPENAI_ENDPOINT}}"
-        },
-        "azureSearchEndpoint": {
-            "value": "${{AZURE_SEARCH_ENDPOINT}}"
-        },
-        "azureSearchIndex": {
-            "value": "${{AZURE_SEARCH_INDEX}}"
         }
     }
 }

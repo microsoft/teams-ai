@@ -8,7 +8,28 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional
 
+from botbuilder.schema import Entity
 from msrest.serialization import Model
+
+
+@dataclass
+class AIEntity(Entity):
+
+    _attribute_map = {
+        "type": {"key": "type", "type": "str"},
+        "type_": {"key": "@type", "type": "str"},
+        "context_": {"key": "@context", "type": "str"},
+        "id_": {"key": "@id", "type": "str"},
+        "additional_type": {"key": "additionalType", "type": "[str]"},
+        "citation": {"key": "citation", "type": "[ClientCitation]"},
+    }
+
+    additional_type: Optional[list[str]]
+    citation: Optional[list[ClientCitation]]
+    type: str = "https://schema.org/Message"
+    type_: str = "Message"
+    context_: str = "https://schema.org"
+    id_: str = ""
 
 
 @dataclass
@@ -24,11 +45,13 @@ class ClientCitation(Model):
 
     _attribute_map = {
         "type_": {"key": "@type", "type": "str"},
+        "position": {"key": "position", "type": "str"},
+        "appearance": {"key": "appearance", "type": "Appearance"},
     }
 
-    type_: str = field(default="Claim", metadata={"alias": "@type"}, init=False, repr=False)
     position: str
     appearance: Appearance
+    type_: str = field(default="Claim", metadata={"alias": "@type"}, init=False, repr=False)
 
 
 @dataclass
@@ -50,21 +73,25 @@ class Appearance(Model):
 
     _attribute_map = {
         "type_": {"key": "@type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "abstract": {"key": "abstract", "type": "str"},
         "usage_info": {"key": "usageInfo", "type": "SensitivityUsageInfo"},
+        "keywords": {"key": "keywords", "type": "[str]"},
+        "text": {"key": "text", "type": "str"},
+        "url": {"key": "url", "type": "str"},
         "encoding_format": {"key": "encodingFormat", "type": "str"},
+        "image": {"key": "image", "type": "str"},
     }
 
     name: str
     abstract: str
-    usage_info: Optional[SensitivityUsageInfo] = field(
-        default=None, metadata={"alias": "usageInfo"}, init=False, repr=False
-    )
-    keywords: Optional[list[str]] = None
+    keywords: Optional[list[str]] = field(default=None)
+    text: Optional[str] = field(default=None)
+    url: Optional[str] = field(default=None)
+    image: Optional[str] = field(default=None)
+    encoding_format: Optional[str] = field(default=None)
+    usage_info: Optional[SensitivityUsageInfo] = field(default=None)
     type_: str = field(default="DigitalDocument", metadata={"alias": "@type"})
-    text: Optional[str] = ""
-    url: str = ""
-    encoding_format: Optional[str] = "text/html"
-    image: Optional[str] = ""
 
 
 @dataclass
@@ -80,12 +107,16 @@ class SensitivityUsageInfo(Model):
 
     _attribute_map = {
         "type_": {"key": "@type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "description": {"key": "description", "type": "str"},
+        "position": {"key": "position", "type": "int"},
+        "pattern": {"key": "pattern", "type": "Pattern"},
     }
 
     name: str
-    description: Optional[str]
-    position: Optional[int]
-    pattern: Optional[Pattern]
+    description: Optional[str] = field(default=None)
+    position: Optional[int] = field(default=None)
+    pattern: Optional[Pattern] = field(default=None)
     type_: str = field(default="https://schema.org/Message", metadata={"alias": "@type"})
 
 
@@ -103,6 +134,7 @@ class Pattern(Model):
     _attribute_map = {
         "type_": {"key": "@type", "type": "str"},
         "in_defined_term_set": {"key": "inDefinedTermSet", "type": "str"},
+        "name": {"key": "name", "type": "str"},
         "term_code": {"key": "termCode", "type": "str"},
     }
 

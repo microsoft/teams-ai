@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "teams-ai"
-version = "1.2.1"
+version = "1.2.2"
 description = "SDK focused on building AI based applications for Microsoft Teams."
 authors = ["Microsoft <teams@microsoft.com>"]
 readme = "README.md"
@@ -17,7 +17,7 @@ botbuilder-core = "^4.15.0"
 botbuilder-integration-aiohttp = "^4.15.0"
 botframework-connector = "^4.15.0"
 python = ">=3.8,<4.0"
-tiktoken = "^0.4.0"
+tiktoken = "^0.7.0"
 aiohttp = "^3.9.3"
 jsonschema = "^4.21.1"
 types-pyyaml = "^6.0.12.12"

@@ -88,8 +88,11 @@ class TeamsAttachmentDownloader(InputFileDownloader):
                 # Build request for downloading file if access token is available
                 headers.update({"Authorization": f"Bearer {access_token}"})
 
+            download_url = attachment.content_url
+            if attachment.content and isinstance(attachment.content, dict):
+                download_url = attachment.content.get("downloadUrl", attachment.content_url)
             async with aiohttp.ClientSession() as session:
-                async with session.get(attachment.content_url, headers=headers) as response:
+                async with session.get(download_url, headers=headers) as response:
                     content = await response.read()
 
                     content_type = attachment.content_type

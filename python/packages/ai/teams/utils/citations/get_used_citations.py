@@ -28,7 +28,12 @@ def get_used_citations(
         return None
 
     used_citations = []
+    processed_matches = []
     for match in matches:
+        if match in processed_matches:
+            continue
+        processed_matches.append(match)
+
         for citation in citations:
             if citation.position == match:
                 used_citations.append(citation)

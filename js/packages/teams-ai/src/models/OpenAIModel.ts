@@ -6,19 +6,26 @@
  * Licensed under the MIT License.
  */
 
-import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
+import { ClientOptions, AzureOpenAI, OpenAI } from 'openai';
+import { 
+    ChatCompletionCreateParams, 
+    ChatCompletionMessageParam,
+    ChatCompletionChunk,
+    ChatCompletion
+} from 'openai/resources';
+import { AxiosRequestConfig } from 'axios';
 import { Message, PromptFunctions, PromptTemplate } from '../prompts';
-import { PromptCompletionModel, PromptResponse } from './PromptCompletionModel';
-import {
-    ChatCompletionRequestMessage,
-    Colorize,
-    CreateChatCompletionRequest,
-    CreateChatCompletionResponse,
-    OpenAICreateChatCompletionRequest
-} from '../internals';
+import { 
+    PromptCompletionModel, 
+    PromptCompletionModelEmitter, 
+    PromptResponse 
+} from './PromptCompletionModel';
+import { Colorize } from '../internals';
 import { Tokenizer } from '../tokenizers';
 import { TurnContext } from 'botbuilder';
 import { Memory } from '../MemoryFork';
+import EventEmitter from 'events';
+import { Stream } from 'openai/streaming';
 
 /**
  * Base model options common to both OpenAI and Azure OpenAI services.
@@ -39,17 +46,32 @@ export interface BaseOpenAIModelOptions {
     responseFormat?: { type: 'json_object' };
 
     /**
+     * @deprecated
      * Optional. Retry policy to use when calling the OpenAI API.
      * @remarks
-     * The default retry policy is `[2000, 5000]` which means that the first retry will be after
-     * 2 seconds and the second retry will be after 5 seconds.
+     * Use `maxRetries` instead.
      */
     retryPolicy?: number[];
 
     /**
+     * Optional. Maximum number of retries to use when calling the OpenAI API.
+     * @remarks
+     * The default is to retry twice.
+     */
+    maxRetries?: number;
+
+    /**
+     * @deprecated
      * Optional. Request options to use when calling the OpenAI API.
+     * @abstract
+     * Use `clientOptions` instead.
      */
     requestConfig?: AxiosRequestConfig;
+
+    /**
+     * Optional. Custom client options to use when calling the OpenAI API.
+     */
+    clientOptions?: ClientOptions;
 
     /**
      * Optional. A static seed to use when making model calls.
@@ -66,6 +88,13 @@ export interface BaseOpenAIModelOptions {
      * prompt to be sent as `user` messages instead.
      */
     useSystemMessages?: boolean;
+
+    /**
+     * Optional. Whether the models responses should be streamed back using Server Sent Events (SSE.)
+     * @remarks
+     * Defaults to `false`.
+     */
+    stream?: boolean;
 }
 
 /**
@@ -95,34 +124,11 @@ export interface OpenAIModelOptions extends BaseOpenAIModelOptions {
      * For Azure OpenAI this is the deployment endpoint.
      */
     endpoint?: string;
-}
-
-/**
- * Options for configuring a model that calls and `OpenAI` compliant endpoint.
- * @remarks
- * The endpoint should comply with the OpenAPI spec for OpenAI's API:
- *
- * https://github.com/openai/openai-openapi
- *
- * And an example of a compliant endpoint is LLaMA.cpp's reference server:
- *
- * https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md
- */
-export interface OpenAILikeModelOptions extends BaseOpenAIModelOptions {
-    /**
-     * Endpoint of the model server to call.
-     */
-    endpoint: string;
 
     /**
-     * Default model to use for completions.
+     * Optional. Project to use when calling the OpenAI API.
      */
-    defaultModel: string;
-
-    /**
-     * Optional. API key to use when calling the models endpoint.
-     */
-    apiKey?: string;
+    project?: string;
 }
 
 /**
@@ -160,28 +166,40 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
  * A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
  */
 export class OpenAIModel implements PromptCompletionModel {
-    private readonly _httpClient: AxiosInstance;
+    private readonly _events: PromptCompletionModelEmitter = new EventEmitter() as PromptCompletionModelEmitter;
+    private readonly _client: OpenAI;
     private readonly _useAzure: boolean;
-
-    private readonly UserAgent = '@microsoft/teams-ai-v1';
 
     /**
      * Options the client was configured with.
      */
-    public readonly options: OpenAIModelOptions | AzureOpenAIModelOptions | OpenAILikeModelOptions;
+    public readonly options: OpenAIModelOptions | AzureOpenAIModelOptions;
 
     /**
      * Creates a new `OpenAIModel` instance.
      * @param {OpenAIModelOptions} options - Options for configuring the model client.
      */
-    public constructor(options: OpenAIModelOptions | AzureOpenAIModelOptions | OpenAILikeModelOptions) {
+    public constructor(options: OpenAIModelOptions | AzureOpenAIModelOptions) {
+        // Handle deprecated options
+        if (options.maxRetries == undefined && options.retryPolicy != undefined) {
+            console.warn(`OpenAIModel: The 'retryPolicy' option is deprecated. Use 'maxRetries' instead.`);
+            options.maxRetries = options.retryPolicy.length;
+        }
+        if (options.clientOptions == undefined && options.requestConfig != undefined) {
+            console.warn(`OpenAIModel: The 'requestConfig' option is deprecated. Use 'clientOptions' instead.`);
+            options.clientOptions = {
+                timeout: options.requestConfig.timeout,
+                httpAgent: options.requestConfig.httpsAgent ?? options.requestConfig.httpAgent,
+                defaultHeaders: options.requestConfig.headers as any 
+            };
+        }
+
         // Check for azure config
-        if ('azureApiKey' in options || 'azureADTokenProvider' in options) {
-            this._useAzure = true;
+        if ((options as AzureOpenAIModelOptions).azureApiKey || (options as AzureOpenAIModelOptions).azureADTokenProvider) {
+            // Initialize options
             this.options = Object.assign(
                 {
                     completion_type: 'chat',
-                    retryPolicy: [2000, 5000],
                     azureApiVersion: '2023-05-15',
                     useSystemMessages: false
                 },
@@ -194,23 +212,56 @@ export class OpenAIModel implements PromptCompletionModel {
                 endpoint = endpoint.substring(0, endpoint.length - 1);
             }
 
+            if (!endpoint.toLowerCase().startsWith('https://')) {
+                throw new Error(
+                    `Model created with an invalid endpoint of '${endpoint}'. The endpoint must be a valid HTTPS url.`
+                );
+            }
             this.options.azureEndpoint = endpoint;
+
+            // Create client
+            // - NOTE: we're not passing in a deployment as that hardcodes the deployment used.
+            this._useAzure = true;
+            this._client = new AzureOpenAI(Object.assign(
+                {}, 
+                this.options.clientOptions, 
+                { 
+                    apiKey: this.options.azureApiKey,
+                    endpoint: this.options.azureEndpoint,
+                    apiVersion: this.options.azureApiVersion,
+                    adTokenProvider: this.options.azureADTokenProvider
+                }
+            ));
         } else {
-            this._useAzure = false;
+            // Initialize options
             this.options = Object.assign(
                 {
                     completion_type: 'chat',
-                    retryPolicy: [2000, 5000],
                     useSystemMessages: false
                 },
                 options
             ) as OpenAIModelOptions;
-        }
 
-        // Create client
-        this._httpClient = axios.create({
-            validateStatus: (status) => status < 400 || status == 429
-        });
+            // Create client
+            this._useAzure = false;
+            this._client = new OpenAI(Object.assign(
+                {},
+                this.options.clientOptions,
+                {
+                    apiKey: this.options.apiKey,
+                    baseURL: this.options.endpoint,
+                    organization: this.options.organization ?? null,
+                    project: this.options.project ?? null
+                }
+            ));
+        }
+    }
+
+    /**
+     * Events emitted by the model.
+     */
+    public get events(): PromptCompletionModelEmitter {
+        return this._events;
     }
 
     /**
@@ -236,20 +287,29 @@ export class OpenAIModel implements PromptCompletionModel {
             (this._useAzure
                 ? (this.options as AzureOpenAIModelOptions).azureDefaultDeployment
                 : (this.options as OpenAIModelOptions).defaultModel);
+        
+        // Check for legacy completion type  
+        if (template.config.type == 'completion') {
+            throw new Error(`The completion type 'completion' is no longer supported. Only 'chat' based models are supported.`);
+        }
+
+        // Signal start of completion
+        const streaming = this.options.stream;
+        this._events.emit('beforeCompletion', context, memory, functions, tokenizer, template, !!streaming);
+
         // Render prompt
         const result = await template.prompt.renderAsMessages(context, memory, functions, tokenizer, max_input_tokens);
         if (result.tooLong) {
-            return {
-                status: 'too_long',
-                input: undefined,
-                error: new Error(
-                    `The generated chat completion prompt had a length of ${result.length} tokens which exceeded the max_input_tokens of ${max_input_tokens}.`
-                )
-            };
+            return this.returnTooLong(max_input_tokens, result.length);
         }
+
+        // Check for use of system messages
+        // - 'user' messages tend to be followed better by the model then 'system' messages.
         if (!this.options.useSystemMessages && result.output.length > 0 && result.output[0].role == 'system') {
             result.output[0].role = 'user';
         }
+
+        // Log the generated prompt
         if (this.options.logRequests) {
             console.log(Colorize.title('CHAT PROMPT:'));
             console.log(Colorize.output(result.output));
@@ -257,75 +317,60 @@ export class OpenAIModel implements PromptCompletionModel {
 
         // Get input message
         // - we're doing this here because the input message can be complex and include images.
-        let input: Message<any> | undefined;
-        const last = result.output.length - 1;
-        if (last > 0 && result.output[last].role == 'user') {
-            input = result.output[last];
-        }
+        let input = this.getInputMessage(result.output);
 
-        // Initialize chat completion request
-        const request: CreateChatCompletionRequest = this.copyOptionsToRequest<CreateChatCompletionRequest>(
-            {
-                messages: result.output as ChatCompletionRequestMessage[]
-            },
-            template.config.completion,
-            [
-                'max_tokens',
-                'temperature',
-                'top_p',
-                'n',
-                'stream',
-                'logprobs',
-                'echo',
-                'stop',
-                'presence_penalty',
-                'frequency_penalty',
-                'best_of',
-                'logit_bias',
-                'user',
-                'functions',
-                'function_call',
-                'data_sources'
-            ]
-        );
-        if (this.options.responseFormat) {
-            request.response_format = this.options.responseFormat;
-        }
-        if (this.options.seed !== undefined) {
-            request.seed = this.options.seed;
-        }
+        try {
+            // Call chat completion API
+            let message: Message<string>;
+            const params = this.getChatCompletionParams(model, result.output, template);
+            const completion = await this._client.chat.completions.create(params);
+            if (params.stream) {
+                // Log start of streaming
+                if (this.options.logRequests) {
+                    console.log(Colorize.title('STREAM STARTED:'));
+                }
 
-        // Call chat completion API
-        const response = await this.createChatCompletion(request, model);
-        if (this.options.logRequests) {
-            console.log(Colorize.title('CHAT RESPONSE:'));
-            console.log(Colorize.value('status', response.status));
-            console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
-            console.log(Colorize.output(response.data));
-        }
+                // Enumerate the streams chunks
+                message = { role: 'assistant', content: '' };
+                for await (const chunk of (completion as Stream<ChatCompletionChunk>)) {
+                    const delta: ChatCompletionChunk.Choice.Delta = chunk.choices[0]?.delta || {};
+                    if (delta.role) {
+                        message.role = delta.role;
+                    }
+                    if (delta.content) {
+                        message.content += delta.content;
+                    }
+                    // TODO: handle tool calls
+                    // if (delta.tool_calls) {
+                    //     message.tool_calls = delta.tool_calls;
+                    // }
+                    
+                    // Signal chunk received
+                    if (this.options.logRequests) {
+                        console.log(Colorize.value('CHUNK', delta));
+                    }
+                    this._events.emit('chunkReceived', context, memory, { delta: delta as Partial<Message<string>> });
+                }
 
-        // Process response
-        if (response.status < 300) {
-            const completion = response.data.choices[0];
-            return { status: 'success', input, message: completion.message ?? { role: 'assistant', content: '' } };
-        } else if (response.status == 429) {
-            if (this.options.logRequests) {
-                console.log(Colorize.title('HEADERS:'));
-                console.log(Colorize.output(response.headers));
+                // Log stream completion
+                console.log(Colorize.title('STREAM COMPLETED:'));
+                console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
+            } else {
+                // Log the generated response
+                message = (completion as ChatCompletion).choices[0]?.message as Message<string> ?? { role: 'assistant', content: '' }; 
+                if (this.options.logRequests) {
+                    console.log(Colorize.title('CHAT RESPONSE:'));
+                    console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
+                    console.log(Colorize.output(message));
+                }
             }
-            return {
-                status: 'rate_limited',
-                input: undefined,
-                error: new Error(`The chat completion API returned a rate limit error.`)
-            };
-        } else {
-            return {
-                status: 'error',
-                input: undefined,
-                error: new Error(
-                    `The chat completion API returned an error status of ${response.status}: ${response.statusText}`
-                )
-            };
+
+            // Signal response received
+            const response: PromptResponse<string> = { status: 'success', input, message };
+            this._events.emit('responseReceived', context, memory, response);
+            return response;
+        } catch (err: unknown) {
+            return this.returnError(err, input);
         }
     }
 
@@ -337,7 +382,7 @@ export class OpenAIModel implements PromptCompletionModel {
      * @param {string[]} fields - List of fields to copy.
      * @returns {TRequest} The TRequest
      */
-    protected copyOptionsToRequest<TRequest>(target: Partial<TRequest>, src: any, fields: string[]): TRequest {
+    private copyOptionsToRequest<TRequest>(target: Partial<TRequest>, src: any, fields: string[]): TRequest {
         for (const field of fields) {
             if (src[field] !== undefined) {
                 (target as any)[field] = src[field];
@@ -349,91 +394,101 @@ export class OpenAIModel implements PromptCompletionModel {
 
     /**
      * @private
-     * @param {CreateChatCompletionRequest} request - The request for Chat Completion
-     * @param {string} model - The string name of the model.
-     * @returns {Promise<AxiosResponse<CreateChatCompletionResponse>>} A Promise containing the CreateChatCompletionResponse response.
+     * @param model - Model to use.
+     * @param messages - Messages to send.
+     * @param template Prompt template being used.
+     * @returns Chat completion parameters.
      */
-    protected createChatCompletion(
-        request: CreateChatCompletionRequest,
-        model: string
-    ): Promise<AxiosResponse<CreateChatCompletionResponse>> {
-        if (this._useAzure) {
-            const options = this.options as AzureOpenAIModelOptions;
-            const url = `${
-                options.azureEndpoint
-            }/openai/deployments/${model}/chat/completions?api-version=${options.azureApiVersion!}`;
-            return this.post(url, request);
-        } else {
-            const options = this.options as OpenAIModelOptions;
-            const url = `${options.endpoint ?? 'https://api.openai.com'}/v1/chat/completions`;
-            (request as OpenAICreateChatCompletionRequest).model = model;
-            return this.post(url, request);
+    private getChatCompletionParams(model: string, messages: Message<string>[], template: PromptTemplate): ChatCompletionCreateParams {
+        const params: ChatCompletionCreateParams = this.copyOptionsToRequest<ChatCompletionCreateParams>(
+            {
+                messages: messages as ChatCompletionMessageParam[]
+            },
+            template.config.completion,
+            [
+                'max_tokens',
+                'temperature',
+                'top_p',
+                'n',
+                'stream',
+                'logprobs',
+                'top_logprobs',
+                'stop',
+                'presence_penalty',
+                'frequency_penalty',
+                'logit_bias',
+                'user',
+                'functions',
+                'function_call',
+                'data_sources',
+                'response_format',
+                'seed',
+                'tool_choice',
+                'tools'
+            ]
+        );
+        if (this.options.responseFormat) {
+            params.response_format = this.options.responseFormat;
         }
+        if (this.options.seed !== undefined) {
+            params.seed = this.options.seed;
+        }
+        if (this.options.stream) {
+            params.stream = true;
+        }
+        params.model = model;
+
+        return params;
     }
 
-    /**
-     * @private
-     * @template TData
-     * @param {string} url - Url to post to.
-     * @param {object} body - POST body.
-     * @param {number} retryCount - Number of allowed retries.
-     * @returns {Promise<AxiosResponse<TData>>} Promise containing the POST response.
-     */
-    protected async post<TData>(url: string, body: object, retryCount = 0): Promise<AxiosResponse<TData>> {
-        // Initialize request config
-        const requestConfig: AxiosRequestConfig = Object.assign({}, this.options.requestConfig);
-
-        if (!requestConfig.headers) {
-            requestConfig.headers = {};
+    private getInputMessage(messages: Message<string>[]): Message<string> | undefined {
+        const last = messages.length - 1;
+        if (last > 0 && messages[last].role == 'user') {
+            return messages[last];
         }
 
-        if (!requestConfig.headers['Content-Type']) {
-            requestConfig.headers['Content-Type'] = 'application/json';
-        }
+        return undefined;;
+    }
 
-        if (!requestConfig.headers['User-Agent']) {
-            requestConfig.headers['User-Agent'] = this.UserAgent;
-        }
+    private returnTooLong(max_input_tokens: number, length: number): PromptResponse<string> {
+        return {
+            status: 'too_long',
+            input: undefined,
+            error: new Error(
+                `The generated chat completion prompt had a length of ${length} tokens which exceeded the max_input_tokens of ${max_input_tokens}.`
+            )
+        };
+    }
 
-        if ('apiKey' in this.options) {
-            requestConfig.headers['api-key'] = this.options.apiKey || '';
-        }
-
-        if ('azureApiKey' in this.options || 'azureADTokenProvider' in this.options) {
-            let apiKey = this.options.azureApiKey;
-
-            if (!apiKey && this.options.azureADTokenProvider) {
-                apiKey = await this.options.azureADTokenProvider();
+    private returnError(err: unknown, input: Message<string>|undefined): PromptResponse<string> {
+        if (err instanceof OpenAI.APIError) {
+            if (err.status == 429) {
+                if (this.options.logRequests) {
+                    console.log(Colorize.title('HEADERS:'));
+                    console.log(Colorize.output(err.headers as any));
+                }
+                return {
+                    status: 'rate_limited',
+                    input,
+                    error: new Error(`The chat completion API returned a rate limit error.`)
+                };
+            } else {
+                return {
+                    status: 'error',
+                    input,
+                    error: new Error(
+                        `The chat completion API returned an error status of ${err.status}: ${err.name}`
+                    )
+                };
             }
-
-            requestConfig.headers['Authorization'] = `Bearer ${apiKey}`;
-        }
-
-        if ('organization' in this.options && this.options.organization) {
-            requestConfig.headers['OpenAI-Organization'] = this.options.organization;
-        }
-
-        try {
-            const res = await this._httpClient.post(url, body, requestConfig);
-
-            // Check for rate limit error
-            if (
-                res.status == 429 &&
-                Array.isArray(this.options.retryPolicy) &&
-                retryCount < this.options.retryPolicy.length
-            ) {
-                const delay = this.options.retryPolicy[retryCount];
-                await new Promise((resolve) => setTimeout(resolve, delay));
-                return this.post(url, body, retryCount + 1);
-            }
-
-            return res;
-        } catch (err) {
-            if (this.options.logRequests) {
-                console.error(Colorize.error(err as Error));
-            }
-
-            throw err;
+        } else {
+            return {
+                status: 'error',
+                input,
+                error: new Error(
+                    `The chat completion API returned an error: ${(err as Error).toString()}`
+                )
+            };
         }
     }
 }

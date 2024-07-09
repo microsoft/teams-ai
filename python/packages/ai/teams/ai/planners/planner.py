@@ -22,7 +22,7 @@ class Planner(Generic[StateT], ABC):
     """
 
     @abstractmethod
-    async def begin_task(self, context: TurnContext, state: TurnState) -> Plan:
+    async def begin_task(self, context: TurnContext, state: StateT) -> Plan:
         """
         Starts a new task.
 
@@ -32,7 +32,7 @@ class Planner(Generic[StateT], ABC):
         """
 
     @abstractmethod
-    async def continue_task(self, context: TurnContext, state: TurnState) -> Plan:
+    async def continue_task(self, context: TurnContext, state: StateT) -> Plan:
         """
         Continues the current task.
 

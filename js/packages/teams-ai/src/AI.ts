@@ -7,7 +7,6 @@
  */
 
 import { TurnContext } from 'botbuilder';
-
 import { DefaultModerator } from './moderators';
 import { Moderator } from './moderators/Moderator';
 import { PredictedDoCommand, Planner, Plan } from './planners';
@@ -60,7 +59,10 @@ export interface AIOptions<TState extends TurnState> {
 
     /**
      * Optional. If true, the AI system will enable the feedback loop in Teams that allows a user to give thumbs up or down to a response. Default is `false`.
-     * NOTE: At this time, there is no activity handler support in the Teams AI Library to handle when a user gives feedback.
+     * @remarks
+     * At this time, there is no activity handler support in the Teams AI Library to handle when a user gives feedback.
+     * To make use of the feedback loop, use the app.feedbackLoop route registration.
+     * https://github.com/microsoft/teams-ai/blob/main/getting-started/CONCEPTS/POWERED-BY-AI.md
      */
     enable_feedback_loop?: boolean;
 }
