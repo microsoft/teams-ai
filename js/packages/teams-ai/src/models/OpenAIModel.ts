@@ -311,7 +311,7 @@ export class OpenAIModel implements PromptCompletionModel {
                 return this.returnToolsError('lengthMismatch', undefined);
             }
 
-            for (const action of template.actions!) {
+            for (const action of template.actions) {
                 if (chatCompletionToolHandlers.has(action.name)) {
                     const toolsHandler = chatCompletionToolHandlers.get(action.name)!.handler;
 
@@ -336,7 +336,6 @@ export class OpenAIModel implements PromptCompletionModel {
                     }
                 });
             }
-            template.config.completion.tools = formattedChatCompletionTools;
         }
 
         // Signal start of completion
