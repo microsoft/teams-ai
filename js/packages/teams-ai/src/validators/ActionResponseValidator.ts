@@ -1,5 +1,6 @@
 import { TurnContext } from 'botbuilder';
-import { ChatCompletionAction, PromptResponse } from '../models';
+import { ChatCompletionAction } from '../models';
+import { PromptResponse } from '../types';
 import { JSONResponseValidator } from './JSONResponseValidator';
 import { PromptResponseValidator, Validation } from './PromptResponseValidator';
 import { Tokenizer } from '../tokenizers';

@@ -7,13 +7,15 @@
  */
 
 import { TurnContext } from 'botbuilder-core';
-import { PromptResponse } from '../models';
+
+import { Memory } from '../MemoryFork';
+import { PromptResponse } from '../types';
 import { Plan, PredictedSayCommand } from '../planners';
+import { PromptSection } from '../prompts';
 import { Tokenizer } from '../tokenizers';
 import { Validation } from '../validators';
+
 import { Augmentation } from './Augmentation';
-import { PromptSection } from '../prompts';
-import { Memory } from '../MemoryFork';
 
 /**
  * The default 'none' augmentation.

@@ -8,7 +8,7 @@
 
 import { TurnContext } from 'botbuilder';
 import { Tokenizer } from '../tokenizers';
-import { PromptResponse } from '../models';
+import { PromptResponse } from '../types';
 import { Validation, PromptResponseValidator } from './PromptResponseValidator';
 import { Memory } from '../MemoryFork';
 

@@ -1,7 +1,7 @@
 import { TurnContext } from 'botbuilder';
 import { Validator, Schema, ValidationError } from 'jsonschema';
 import { Tokenizer } from '../tokenizers';
-import { PromptResponse } from '../models';
+import { PromptResponse } from '../types';
 import { Validation, PromptResponseValidator } from './PromptResponseValidator';
 import { Response } from './Response';
 import { Memory } from '../MemoryFork';
