@@ -3,8 +3,10 @@ import { TestAdapter } from 'botbuilder';
 
 import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { TestTurnState } from '../internals/testing/TestTurnState';
-import { ChatCompletionAction, PromptResponse } from '../models';
+import { ChatCompletionAction } from '../models';
 import { GPTTokenizer } from '../tokenizers';
+import { PromptResponse } from '../types';
+
 import { SequenceAugmentation } from './SequenceAugmentation';
 
 describe('SequenceAugmentation', () => {
