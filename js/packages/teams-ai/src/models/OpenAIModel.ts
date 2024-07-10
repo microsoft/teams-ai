@@ -285,7 +285,7 @@ export class OpenAIModel implements PromptCompletionModel {
         const max_input_tokens = template.config.completion.max_input_tokens;
 
         const chatCompletionTools: OpenAIFunction[] = [];
-        const chatCompletionToolHandlers: Map<string, ActionEntry<TurnState>> = memory.getValue('temp.toolHandlers');
+        const chatCompletionToolsHandlers: Map<string, ActionEntry<TurnState>> = memory.getValue('temp.toolsHandlers');
         const isToolsEnabled = template.config.completion.include_tools ?? false;
 
         const model =
@@ -304,16 +304,20 @@ export class OpenAIModel implements PromptCompletionModel {
         // If tools are enabled, massage data with action handlers to match schema
         if (isToolsEnabled) {
             if (!template.actions || template.actions.length == 0) {
-                return this.returnToolsError('noActions', undefined);
+                return this.returnToolsError('noActions');
             }
 
-            if (template.actions.length !== chatCompletionToolHandlers.size) {
-                return this.returnToolsError('lengthMismatch', undefined);
+            if (!chatCompletionToolsHandlers || chatCompletionToolsHandlers.size == 0) {
+                return this.returnToolsError('noToolsHandlers');
+            }
+
+            if (template.actions.length !== chatCompletionToolsHandlers.size) {
+                return this.returnToolsError('lengthMismatch');
             }
 
             for (const action of template.actions) {
-                if (chatCompletionToolHandlers.has(action.name)) {
-                    const toolsHandler = chatCompletionToolHandlers.get(action.name)!.handler;
+                if (chatCompletionToolsHandlers.has(action.name)) {
+                    const toolsHandler = chatCompletionToolsHandlers.get(action.name)!.handler;
 
                     chatCompletionTools.push({
                         name: action.name,
@@ -321,6 +325,8 @@ export class OpenAIModel implements PromptCompletionModel {
                         description: action.description,
                         parameters: action.parameters
                     });
+                } else {
+                    return this.returnToolsError('missingToolsHandler', action.name);
                 }
             }
 
@@ -542,8 +548,8 @@ export class OpenAIModel implements PromptCompletionModel {
     }
 
     private returnToolsError(
-        errorType: 'noActions' | 'lengthMismatch',
-        input: Message<string> | undefined
+        errorType: 'noActions' | 'lengthMismatch' | 'noToolsHandlers' | 'missingToolsHandler',
+        ..._args: any[]
     ): PromptResponse<string> {
         let errorString = '';
 
@@ -554,13 +560,18 @@ export class OpenAIModel implements PromptCompletionModel {
             case 'lengthMismatch':
                 errorString = 'Number of actions does not match number of tool handlers';
                 break;
+            case 'noToolsHandlers':
+                errorString = 'Missing tools handlers from actions routes';
+                break;
+            case 'missingToolsHandler':
+                errorString = `Missing tools handler for action ${_args[0]}`;
+                break;
             default:
                 errorString = 'Unknown tools error';
         }
 
         return {
             status: 'tools_error',
-            input,
             error: new Error(errorString)
         };
     }

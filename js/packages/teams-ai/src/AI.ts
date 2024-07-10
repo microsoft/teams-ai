@@ -360,7 +360,7 @@ export class AI<TState extends TurnState = TurnState> {
             }
 
             // Add action handlers for tools function calling to temp state
-            state.temp.toolHandlers = this._actions as unknown as Map<string, actions.ActionEntry<TurnState>>;
+            state.temp.toolsHandlers = this._actions as unknown as Map<string, actions.ActionEntry<TurnState>>;
 
             // Review input on first loop
             let plan: Plan | undefined =
