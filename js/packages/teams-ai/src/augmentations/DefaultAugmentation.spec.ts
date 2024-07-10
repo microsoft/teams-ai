@@ -2,8 +2,9 @@ import assert from 'assert';
 import { TestAdapter } from 'botbuilder';
 
 import { TestTurnState } from '../internals/testing/TestTurnState';
-import { PromptResponse } from '../models';
 import { GPTTokenizer } from '../tokenizers';
+import { PromptResponse } from '../types';
+
 import { DefaultAugmentation } from './DefaultAugmentation';
 
 describe('DefaultAugmentation', () => {

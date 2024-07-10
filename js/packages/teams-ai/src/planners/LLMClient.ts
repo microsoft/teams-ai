@@ -6,14 +6,21 @@
  * Licensed under the MIT License.
  */
 
-import { ConversationHistory, Message, Prompt, PromptFunctions, PromptTemplate } from '../prompts';
-import { PromptResponse, PromptCompletionModel, PromptCompletionModelBeforeCompletionEvent, PromptCompletionModelChunkReceivedEvent, PromptCompletionModelResponseReceivedEvent } from '../models';
-import { Validation, PromptResponseValidator, DefaultResponseValidator } from '../validators';
-import { Memory, MemoryFork } from '../MemoryFork';
-import { Colorize } from '../internals';
 import { TurnContext } from 'botbuilder';
-import { GPTTokenizer, Tokenizer } from '../tokenizers';
+
+import { Colorize } from '../internals';
+import { Memory, MemoryFork } from '../MemoryFork';
+import {
+    PromptCompletionModel,
+    PromptCompletionModelBeforeCompletionEvent,
+    PromptCompletionModelChunkReceivedEvent,
+    PromptCompletionModelResponseReceivedEvent
+} from '../models';
+import { ConversationHistory, Message, Prompt, PromptFunctions, PromptTemplate } from '../prompts';
 import { StreamingResponse } from '../StreamingResponse';
+import { GPTTokenizer, Tokenizer } from '../tokenizers';
+import { PromptResponse } from '../types';
+import { Validation, PromptResponseValidator, DefaultResponseValidator } from '../validators';
 
 /**
  * Options for an LLMClient instance.
@@ -186,7 +193,7 @@ export interface ConfiguredLLMClientOptions<TContent = any> {
  * @template TContent Optional. Type of message content returned for a 'success' response. The `response.message.content` field will be of type TContent. Defaults to `any`.
  */
 export class LLMClient<TContent = any> {
-    private readonly _startStreamingMessage: string|undefined;
+    private readonly _startStreamingMessage: string | undefined;
 
     /**
      * Configured options for this LLMClient instance.
@@ -220,7 +227,6 @@ export class LLMClient<TContent = any> {
         }
 
         this._startStreamingMessage = options.startStreamingMessage;
-
     }
 
     /**
@@ -294,8 +300,15 @@ export class LLMClient<TContent = any> {
     ): Promise<PromptResponse<TContent>> {
         // Define event handlers
         let isStreaming = false;
-        let streamer: StreamingResponse|undefined;
-        const beforeCompletion: PromptCompletionModelBeforeCompletionEvent = async (ctx, memory, functions, tokenizer, template, streaming) => {
+        let streamer: StreamingResponse | undefined;
+        const beforeCompletion: PromptCompletionModelBeforeCompletionEvent = async (
+            ctx,
+            memory,
+            functions,
+            tokenizer,
+            template,
+            streaming
+        ) => {
             // Ignore events for other contexts
             if (context !== ctx) {
                 return;
@@ -325,7 +338,7 @@ export class LLMClient<TContent = any> {
                 await streamer.sendTextChunk(text);
             }
         };
-        
+
         const responseReceived: PromptCompletionModelResponseReceivedEvent = async (ctx, memory, response) => {
             // Ignore events for other contexts
             if (context !== ctx || !streamer) {
@@ -334,8 +347,8 @@ export class LLMClient<TContent = any> {
 
             // End the stream
             await streamer.endStream();
-        }
-    
+        };
+
         // Subscribe to model events
         if (this.options.model.events) {
             this.options.model.events.on('beforeCompletion', beforeCompletion);

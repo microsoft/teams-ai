@@ -11,7 +11,7 @@ import { PromptResponseValidator } from '../validators';
 import { Plan } from '../planners';
 import { PromptSection } from '../prompts';
 import { Memory } from '../MemoryFork';
-import { PromptResponse } from '../models';
+import { PromptResponse } from '../types';
 
 /**
  * An augmentation is a component that can be added to a prompt template to add additional

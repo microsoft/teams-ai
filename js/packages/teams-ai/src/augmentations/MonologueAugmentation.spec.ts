@@ -1,10 +1,12 @@
 import { strict as assert } from 'assert';
 import { TestAdapter } from 'botbuilder';
 
-import { GPTTokenizer } from '../tokenizers';
 import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { TestTurnState } from '../internals/testing/TestTurnState';
-import { ChatCompletionAction, PromptResponse } from '../models';
+import { ChatCompletionAction } from '../models';
+import { GPTTokenizer } from '../tokenizers';
+import { PromptResponse } from '../types';
+
 import { MonologueAugmentation } from './MonologueAugmentation';
 
 describe('MonologueAugmentation', () => {

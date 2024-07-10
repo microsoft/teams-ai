@@ -7,15 +7,18 @@
  */
 
 import { TurnContext } from 'botbuilder-core';
-import { ChatCompletionAction, PromptResponse } from '../models';
-import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from '../planners';
+import { Schema } from 'jsonschema';
+
+import { Memory } from '../MemoryFork';
+import { ChatCompletionAction } from '../models';
+import { Message, PromptSection } from '../prompts';
 import { Tokenizer } from '../tokenizers';
+import { PromptResponse } from '../types';
+import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from '../planners';
 import { ActionResponseValidator, JSONResponseValidator, Validation } from '../validators';
+
 import { Augmentation } from './Augmentation';
 import { ActionAugmentationSection } from './ActionAugmentationSection';
-import { Schema } from 'jsonschema';
-import { Message, PromptSection } from '../prompts';
-import { Memory } from '../MemoryFork';
 
 /**
  * @private
