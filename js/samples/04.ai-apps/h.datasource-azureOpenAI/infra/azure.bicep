@@ -6,6 +6,7 @@ param resourceBaseName string
 @description('Required when create Azure Bot service')
 param botAadAppClientId string
 
+param botTenantId string
 param azureOpenAIEndpoint string = ''
 
 @secure()
@@ -61,6 +62,10 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           name: 'BOT_PASSWORD'
           value: botAadAppClientSecret
+        }
+        {
+          name: 'BOT_TENANT_ID'
+          value: botTenantId
         }
         {
           name: 'AZURE_OPENAI_ENDPOINT'

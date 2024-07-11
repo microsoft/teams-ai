@@ -10,7 +10,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
-teams-ai = "^1.1.0"
+teams-ai = "^1.2.2"
 python-dotenv = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]

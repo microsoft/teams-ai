@@ -114,3 +114,4 @@ appPackage/build
 .deployment
 devTools/
 build
+config.json

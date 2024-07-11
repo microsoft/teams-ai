@@ -14,8 +14,10 @@ import { MonologueAugmentation, SequenceAugmentation } from '../augmentations';
 import { DataSource } from '../dataSources';
 import { Memory } from '../MemoryFork';
 import { Tokenizer } from '../tokenizers';
+import { CompletionConfig } from '../types';
+
 import { ConversationHistory } from './ConversationHistory';
-import { CompletionConfig, PromptTemplate } from './PromptTemplate';
+import { PromptTemplate } from './PromptTemplate';
 import { DataSourceSection } from './DataSourceSection';
 import { GroupSection } from './GroupSection';
 import { Prompt } from './Prompt';
@@ -386,7 +388,10 @@ export class PromptManager implements PromptFunctions {
                 max_input_tokens: 2048,
                 presence_penalty: 0.0,
                 temperature: 0.0,
-                top_p: 0.0
+                top_p: 0.0,
+                include_tools: false,
+                tool_choice: 'auto',
+                parallel_tool_calls: true
             } as CompletionConfig,
             template.config.completion
         );

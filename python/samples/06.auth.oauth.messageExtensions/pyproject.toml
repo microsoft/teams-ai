@@ -11,7 +11,7 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
 python-dotenv = "^1.0.1"
-teams-ai = "^1.1.0"
+teams-ai = "^1.2.2"
 msgraph-sdk = "^1.2.0"
 
 [tool.poetry.group.dev.dependencies]

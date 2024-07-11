@@ -41,9 +41,9 @@
     <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.17" />
     <PackageReference Include="JsonSchema.Net" Version="5.5.1" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Bot.Builder" Version="4.22.4" />
-    <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.22.4" />
-    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.4" />
+    <PackageReference Include="Microsoft.Bot.Builder" Version="4.22.7" />
+    <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.22.7" />
+    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.7" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.61.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Microsoft.ML.Tokenizers" Version="0.22.0-preview.24271.1" />
