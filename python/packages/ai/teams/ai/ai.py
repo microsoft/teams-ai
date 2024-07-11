@@ -360,5 +360,4 @@ class AI(Generic[StateT]):
             raise ApplicationError(f"Can't find an action named '{action}'.")
 
         action_entry = self._actions[action]
-        handler = action_entry.func
-        return await handler(ActionTurnContext(action, parameters, context), state)
+        return await action_entry.invoke(context, state, parameters, action)
