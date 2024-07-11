@@ -48,9 +48,10 @@ export const app = new Application<ApplicationTurnState>({
     adapter: new TeamsAdapter(
         {},
         new ConfigurationServiceClientCredentialFactory({
-            MicrosoftAppId: process.env.BOT_ID, // Set to "" if using the Teams Test Tool
-            MicrosoftAppPassword: process.env.BOT_PASSWORD, // Set to "" if using the Teams Test Tool
-            MicrosoftAppType: 'MultiTenant'
+            MicrosoftAppId: process.env.BOT_ID,
+            MicrosoftAppPassword: process.env.BOT_PASSWORD,
+            MicrosoftAppTenantId: process.env.BOT_TENANT_ID,
+            MicrosoftAppType: process.env.BOT_TYPE
         })
     )
 });

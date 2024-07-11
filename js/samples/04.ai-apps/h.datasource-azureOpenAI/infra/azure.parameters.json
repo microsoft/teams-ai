@@ -4,16 +4,7 @@
     "parameters": {
         "resourceBaseName": {
             "value": "TeamsAzureOpenAI-${{RESOURCE_SUFFIX}}"
-        },
-        "botAadAppClientId": {
-            "value": "${{BOT_ID}}"
-        },
-        "botAadAppClientSecret": {
-            "value": "${{SECRET_BOT_PASSWORD}}"
-        },
-        "botTenantId": {
-            "value": "${{TEAMS_APP_TENANT_ID}}"
-        },
+        },        
         "webAppSKU": {
             "value": "B1"
         },
