@@ -63,5 +63,4 @@ deploy:
               BOT_PASSWORD: ${{SECRET_BOT_PASSWORD}}
               BOT_TENANT_ID: ${{TEAMS_APP_TENANT_ID}}
               BOT_TYPE: 'SingleTenant'
-              AZURE_OPENAI_ENDPOINT: ${{AZURE_OPENAI_ENDPOINT}}
               AZURE_TENANT_ID: ${{TEAMS_APP_TENANT_ID}}

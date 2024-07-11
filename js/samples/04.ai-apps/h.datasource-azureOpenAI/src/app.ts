@@ -14,7 +14,7 @@ type ApplicationTurnState = TurnState<ConversationState>;
 // Create AI components
 const model = new OpenAIModel({
     // Azure OpenAI Support
-    azureDefaultDeployment: 'gpt-35-turbo',
+    azureDefaultDeployment: process.env.AZURE_OPENAI_DEPLOYMENT!,
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
     azureApiVersion: '2024-02-15-preview',
     azureADTokenProvider: getBearerTokenProvider(
