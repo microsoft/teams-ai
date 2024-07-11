@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://aka.ms/teams-toolkit/1.0.0/yaml.schema.json
+# yaml-language-server: $schema=https://aka.ms/teams-toolkit/v1.5/yaml.schema.json
 #
 # The teamsapp.yml composes automation tasks for Teams Toolkit when running other environment configurations.
 # This file is used when selecting the Provision, Deploy, or Publish menu items in the Teams Toolkit for Visual Studio Code window
@@ -6,7 +6,10 @@
 # i.e. `teamsfx provision --env {environment name}` or `teamsfx deploy --env {environment name}`.
 #
 # You can customize this file. Visit https://aka.ms/teamsfx-v5.0-guide for more info about Teams Toolkit project files.
-version: 1.0.0
+version: v1.5
+
+additionalMetadata:
+  sampleTag: TeamsAI-Samples:datasource-azureopenai
 
 environmentFolderPath: ./env
 
