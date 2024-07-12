@@ -43,7 +43,7 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
       appSettings: [
         {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '1' // Run Azure APP Service from a package file
+          value: '1' // Run Azure App Service from a package file
         }
         {
           name: 'WEBSITE_NODE_DEFAULT_VERSION'
@@ -63,7 +63,7 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         }
         { 
           name: 'BOT_TYPE' 
-          value: 'UserAssignedMsi'
+          value: 'UserAssignedMSI'
         }
         {
           name: 'AZURE_OPENAI_ENDPOINT'
@@ -72,6 +72,10 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           name: 'AZURE_OPENAI_DEPLOYMENT'
           value: azureOpenAIDeployment
+        }
+        {
+          name: 'AZURE_CLIENT_ID'
+          value: identity.properties.clientId
         }
       ]
       ftpsState: 'FtpsOnly'

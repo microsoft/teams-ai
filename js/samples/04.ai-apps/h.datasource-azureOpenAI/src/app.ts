@@ -56,13 +56,13 @@ export const app = new Application<ApplicationTurnState>({
     )
 });
 
-app.conversationUpdate('membersAdded', async (context) => {
+app.conversationUpdate('membersAdded', async (context: TurnContext) => {
     await context.sendActivity(
         "Welcome! I'm a conversational bot that can tell you about your data. You can also type `/clear` to clear the conversation history."
     );
 });
 
-app.message('/clear', async (context, state) => {
+app.message('/clear', async (context: TurnContext, state: any) => {
     state.deleteConversationState();
     await context.sendActivity("New chat session started: Previous messages won't be used as context for new queries.");
 });
@@ -79,7 +79,7 @@ app.error(async (context: TurnContext, err: any) => {
     } else {
         error(err);
     }
-
+    
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
@@ -93,7 +93,7 @@ app.error(async (context: TurnContext, err: any) => {
     await context.sendActivity('To continue to run this bot, please fix the bot source code.');
 });
 
-app.feedbackLoop(async (_context, _state, feedbackLoopData) => {
+app.feedbackLoop(async (_context: TurnContext, _state: any, feedbackLoopData: any) => {
     if (feedbackLoopData.actionValue.reaction === 'like') {
         console.log('👍');
     } else {

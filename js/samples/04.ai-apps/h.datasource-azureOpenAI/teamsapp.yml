@@ -32,7 +32,7 @@ provision:
       templates:
         - path: ./infra/azure.bicep
           parameters: ./infra/azure.parameters.json
-          deploymentName: Create-resources-for-tab
+          deploymentName: Create-resources-for-bot
       bicepCliVersion: v0.9.1
 
   # Optional: Automates schema and error checking of the Teams app manifest and outputs the results in the console.
@@ -65,7 +65,7 @@ deploy:
   - uses: cli/runNpmCommand
     name: install dependencies
     with:
-      args: install
+      args: install --workspaces=false
 
   - uses: cli/runNpmCommand
     name: build app

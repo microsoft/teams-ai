@@ -33,7 +33,7 @@ server.post('/api/messages', async (req, res) => {
     }
 
     // Route received a request to adapter for processing
-    await (app.adapter as TeamsAdapter).process(req, res as any, async (context) => {
+    await (app.adapter as TeamsAdapter).process(req, res as any, async (context: any) => {
         if (context.activity.conversation.tenantId !== process.env.BOT_TENANT_ID) {
             return res.send(401, 'invalid tenant');
         }
