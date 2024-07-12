@@ -85,8 +85,8 @@
             ],
             "preLaunchTask": "Start Teams App (Test Tool)",
             "presentation": {
-                "group": "all",
-                "order": 3
+                "group": "2-local",
+                "order": 1
             },
             "stopAll": true
         },
