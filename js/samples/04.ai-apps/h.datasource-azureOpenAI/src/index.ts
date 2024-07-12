@@ -28,13 +28,13 @@ server.listen(port, () => {
 });
 
 server.post('/api/messages', async (req, res) => {
-    if (!req.headers.authorization) {
+    if (!req.headers.authorization && process.env.RUNNING_ON_AZURE === "1") {
         return res.send(401, 'unauthorized');
     }
 
     // Route received a request to adapter for processing
     await (app.adapter as TeamsAdapter).process(req, res as any, async (context: any) => {
-        if (context.activity.conversation.tenantId !== process.env.BOT_TENANT_ID) {
+        if (context.activity.conversation.tenantId !== process.env.BOT_TENANT_ID  && process.env.RUNNING_ON_AZURE === "1") {
             return res.send(401, 'invalid tenant');
         }
 
