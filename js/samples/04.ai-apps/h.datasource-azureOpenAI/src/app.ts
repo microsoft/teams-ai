@@ -1,4 +1,4 @@
-import { OpenAIModel, PromptManager, ActionPlanner, Application, TurnState, TeamsAdapter } from '@microsoft/teams-ai';
+import { OpenAIModel, PromptManager, ActionPlanner, Application, TurnState, TeamsAdapter, FeedbackLoopData } from '@microsoft/teams-ai';
 import { DefaultAzureCredential, getBearerTokenProvider } from '@azure/identity';
 import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
 import axios from 'axios';
@@ -62,7 +62,7 @@ app.conversationUpdate('membersAdded', async (context: TurnContext) => {
     );
 });
 
-app.message('/clear', async (context: TurnContext, state: any) => {
+app.message('/clear', async (context: TurnContext, state: TurnState) => {
     state.deleteConversationState();
     await context.sendActivity("New chat session started: Previous messages won't be used as context for new queries.");
 });
@@ -93,7 +93,7 @@ app.error(async (context: TurnContext, err: any) => {
     await context.sendActivity('To continue to run this bot, please fix the bot source code.');
 });
 
-app.feedbackLoop(async (_context: TurnContext, _state: any, feedbackLoopData: any) => {
+app.feedbackLoop(async (_context: TurnContext, _state: TurnState, feedbackLoopData: FeedbackLoopData ) => {
     if (feedbackLoopData.actionValue.reaction === 'like') {
         console.log('👍');
     } else {

@@ -8,6 +8,7 @@ import debug from 'debug';
 import * as restify from 'restify';
 import { app } from './app';
 import { TeamsAdapter } from '@microsoft/teams-ai';
+import { Request, Response, TurnContext } from 'botbuilder';
 
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
@@ -33,7 +34,7 @@ server.post('/api/messages', async (req, res) => {
     }
 
     // Route received a request to adapter for processing
-    await (app.adapter as TeamsAdapter).process(req, res as any, async (context: any) => {
+    await (app.adapter as TeamsAdapter).process(req, res, async (context: TurnContext) => {
         if (context.activity.conversation.tenantId !== process.env.BOT_TENANT_ID  && process.env.RUNNING_ON_AZURE === "1") {
             return res.send(401, 'invalid tenant');
         }
