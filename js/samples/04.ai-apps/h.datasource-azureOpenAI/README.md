@@ -62,7 +62,7 @@ Note: Testing this sample requires that you are logged into Azure CLI and you ha
 
 1. If you chose `API key` in data connection, manually copy and paste your Azure AI Search key in `src\prompts\chat\config.json` file. Your **Azure AI Search Key** can be found in Azure OpenAI Studio Playground by clicking the `View code` button and looking under **Azure Search Resource Key**. If you chose `system assigned managed identity`, you can skip this step. Learn more about different data connection options in the [Data connection section](https://review.learn.microsoft.com/en-us/azure/ai-services/openai/concepts/use-your-data?tabs=ai-search%2Ccopilot&branch=pr-en-us-277392#data-connection) .
    
-1. Open the Visual Studio terminal by selecting `View > Terminal` and log into Azure CLI selecting the Azure account that you assigned Cognitive Service OpenAI User role to. Use the following command to log in:
+1. Open the Visual Studio Code terminal by selecting `View > Terminal` and log into Azure CLI selecting the Azure account that you assigned Cognitive Service OpenAI User role to. Use the following command to log in:
    ```bash
      az login
    ```
