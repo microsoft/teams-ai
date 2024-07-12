@@ -67,7 +67,7 @@ Note: Testing this sample requires that you are logged into Azure CLI and you ha
      az login
    ```
  
-1. To debug your app, press the `F5` key or from the left pane, select `RUN AND DEBUG ▷` (Ctrl+Shift+D) and then select `Debug in (Test tool)` from the dropdown list.  Select `Run > Start Debugging` (F5). The Test Tool opens in a webpage where you can chat with your custom copilot. 
+1. To debug your app, press the `F5` key or from the left pane, select `RUN AND DEBUG ▷` (Ctrl+Shift+D) and then select `Debug in Test Tool` from the dropdown list.  Select `Run > Start Debugging` (F5). The Test Tool opens in a webpage where you can chat with your custom copilot. 
 
 ### Provisioning, Deploying, and Publishing your custom Copilot
 After you've tested your copilot, you can provision, deploy, and publish your Teams app by selecting the Teams Toolkit Extension on the left pane in Visual Studio. Run the separate provision, deploy, and publish stages in Lifecycle section. You may be asked to sign into your Microsoft 365 account where you have permissions to upload custom apps and your Azure Account.
