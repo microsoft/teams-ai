@@ -75,3 +75,24 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 1. In the browser that launches, select the **Add** button to install the app to Teams.
 
 > If you do not have permission to upload custom apps (sideloading), Teams Toolkit will recommend creating and using a Microsoft 365 Developer Program account - a free program to get your own dev environment sandbox that includes Teams.
+
+## Instructions to enable multi-tenant support
+
+This sample is configured to work only in the tenant in which the Azure app registration is created. To enable multi-tenant support a few configurations have to be updated:
+
+1. Navigate to `aad.manifest.json` and set
+    ```json
+    "signInAudience": "AzureADMultipleOrgs"
+    ```
+1. Navigate to the `teamsapp.local.yml` file and set
+    ```yml
+    signInAudience: "AzureADMultipleOrgs" # Authenticate users with a Microsoft work or school account in your organization's Azure AD tenant (for example, single tenant).
+    ```
+1. Navigate to the `src/auth-start.html` page and set
+    ```js
+    let authorizeEndpoint = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${toQueryString(queryParams)}`;
+    ```
+2. Navigate to the `src/index.ts` file and on line 81 set 
+    ```js
+    authority: `${process.env.AAD_APP_OAUTH_AUTHORITY_HOST}/common`
+    ``` 
