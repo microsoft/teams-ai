@@ -211,7 +211,7 @@ class Application(Bot, Generic[StateT]):
         """
 
         def __selector__(context: TurnContext):
-            return type == str(context.activity.type)
+            return type == context.activity.type
 
         def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
             self._routes.append(Route[StateT](__selector__, func))
