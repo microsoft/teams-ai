@@ -806,9 +806,14 @@ class Application(Bot, Generic[StateT]):
             and ActivityTypes.message == context.activity.type
             and self._options.long_running_messages
         ):
+            def wrapped_callback(ctx: TurnContext) -> Awaitable:
+                for key in context.activity._attribute_map.keys():
+                    setattr(ctx.activity, key, getattr(context.activity, key))
+                return func(ctx)
+
             return await self._adapter.continue_conversation(
                 reference=context.get_conversation_reference(context.activity),
-                callback=func,
+                callback=wrapped_callback,
                 bot_app_id=self.options.bot_app_id,
             )
 
