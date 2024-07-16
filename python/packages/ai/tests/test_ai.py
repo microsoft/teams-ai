@@ -9,7 +9,7 @@ from botbuilder.core import TurnContext
 from botbuilder.schema import Activity, ChannelAccount, ConversationAccount
 from teams.state import TurnState
 from teams.ai.ai import AI, AIOptions, ApplicationError
-from teams.ai.actions import ActionEntry, ActionTypes, ActionTurnContext
+from teams.ai.actions import ActionTurnContext
 from teams.ai.planners.planner import Planner
 from tests.utils import SimpleAdapter
 
@@ -39,7 +39,7 @@ class TestAI(IsolatedAsyncioTestCase):
         )
 
     def create_mock_state(self):
-        state = MagicMock(spec=TurnState)
+        state = TurnState()
         return state
 
     async def test_do_action_existing_action(self):
@@ -48,11 +48,7 @@ class TestAI(IsolatedAsyncioTestCase):
 
         mock_handler = AsyncMock(return_value="action result")
 
-        self.ai._actions["test_action"] = ActionEntry(
-            name="test_action",
-            allow_overrides=True,
-            func=mock_handler
-        )
+        self.ai.action(name="test_action")(mock_handler)
 
         result = await self.ai.do_action(context, state, "test_action")
         self.assertEqual(result, "action result")
@@ -77,11 +73,7 @@ class TestAI(IsolatedAsyncioTestCase):
 
         mock_handler = AsyncMock(return_value="action result")
 
-        self.ai._actions["test_action"] = ActionEntry(
-            name="test_action",
-            allow_overrides=True,
-            func=mock_handler
-        )
+        self.ai.action(name="test_action")(mock_handler)
 
         parameters = {"param1": "value1"}
         result = await self.ai.do_action(context, state, "test_action", parameters)
@@ -93,8 +85,3 @@ class TestAI(IsolatedAsyncioTestCase):
         self.assertEqual(called_context._activity, context.activity)
         self.assertEqual(called_context.adapter, context.adapter)
         self.assertEqual(called_state, state)
-
-
-# if __name__ == "__main__":
-#     import unittest
-#     unittest.main()
