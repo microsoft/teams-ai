@@ -316,11 +316,7 @@ class AI(Generic[StateT]):
                 channel_data=channel_data,
                 entities=[
                     AIEntity(
-                        citation=(
-                            list(referenced_citations)
-                            if referenced_citations
-                            else []
-                        ),
+                        citation=(list(referenced_citations) if referenced_citations else []),
                         additional_type=["AIGeneratedContent"],
                     ),
                 ],
@@ -342,17 +338,17 @@ class AI(Generic[StateT]):
         context: TurnContext,
         state: StateT,
         action: str,
-        parameters: Optional[Dict[str, Any]] = None
+        parameters: Optional[Dict[str, Any]] = None,
     ) -> str:
         """
         Manually executes a named action.
-        
+
         Args:
             context (TurnContext): Current turn context.
             state (StateT): Current turn state.
             action (str): Name of the action to execute.
             parameters (Optional[Dict[str, Any]]): Optional. Entities to pass to the action.
-        
+
         Returns:
             str: The result of the action.
         """

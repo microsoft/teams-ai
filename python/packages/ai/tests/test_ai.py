@@ -5,12 +5,14 @@ Licensed under the MIT License.
 
 from unittest import IsolatedAsyncioTestCase
 from unittest.mock import AsyncMock, MagicMock
+
 from botbuilder.core import TurnContext
 from botbuilder.schema import Activity, ChannelAccount, ConversationAccount
-from teams.state import TurnState
-from teams.ai.ai import AI, AIOptions, ApplicationError
+
 from teams.ai.actions import ActionTurnContext
+from teams.ai.ai import AI, AIOptions, ApplicationError
 from teams.ai.planners.planner import Planner
+from teams.state import TurnState
 from tests.utils import SimpleAdapter
 
 
@@ -35,7 +37,7 @@ class TestAI(IsolatedAsyncioTestCase):
                 channel_id="UnitTest",
                 locale="en-uS",
                 service_url="https://example.org",
-            )
+            ),
         )
 
     def create_mock_state(self):
