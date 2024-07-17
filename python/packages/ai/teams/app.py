@@ -751,7 +751,8 @@ class Application(Bot, Generic[StateT]):
             input_files = state.temp.input_files if state.temp.input_files else []
             for file_downloader in self._options.file_downloaders:
                 files = await file_downloader.download_files(context)
-                input_files.append(*files)
+                for file in files:
+                    input_files.append(file)
             state.temp.input_files = input_files
 
     async def _run_ai_chain(self, context: TurnContext, state):
