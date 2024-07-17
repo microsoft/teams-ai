@@ -770,7 +770,7 @@ class Application(Bot, Generic[StateT]):
     def _contains_non_text_attachments(self, context):
         non_text_attachments = filter(lambda a: not a.content_type.startswith(
             "text/html"), context.activity.attachments)
-        return len(non_text_attachments) > 0
+        return len(list(non_text_attachments)) > 0
 
     async def _run_after_turn_middleware(self, context: TurnContext, state):
         for after_turn in self._after_turn:
