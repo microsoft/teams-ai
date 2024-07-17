@@ -23,7 +23,7 @@ You can chat with your data in Azure AI Search, Azure Blob Storage, URL/web addr
 ## Summary
 You can deploy to a standalone Teams app (preview) directly from Azure OpenAI Studio, enabling you to bring conversational experience to your users in Teams to improve operational efficiency and democratize access of information. This Teams app is configured by default to only users within your Azure account tenant and to personal chat (non-group chat) scenarios. See the [Enable your Custom Copilot for Group Chats and Channels](#enable-your-custom-copilot-for-group-chats-and-channels) section to enable group chat scenarios noting that the AI response quality from Azure OpenAI On Your Data has not been fully tested for group chats. 
 
-This guide will show you have the set up your custom copilot for Teams using Azure OpenAI Studio and Teams Toolkit.
+This guide will show you how to set up your custom copilot for Teams using Azure OpenAI Studio and Teams Toolkit.
 
 ### Prerequisites
 
@@ -35,7 +35,7 @@ This guide will show you have the set up your custom copilot for Teams using Azu
 | [Microsoft Teams](https://www.microsoft.com/microsoft-teams/download-app)                                                     | Microsoft Teams to collaborate with everyone you work with through apps for chat, meetings, and call-all in one place.                                                                                                                                              |
 | [Microsoft 365 developer account](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/build-and-test/prepare-your-o365-tenant)                  | Access to Teams account with the appropriate permissions to install an app and [enable custom Teams apps, and turn on custom app uploading.](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/build-and-test/prepare-your-o365-tenant#enable-custom-teams-apps-and-turn-on-custom-app-uploading). |
 | [Azure OpenAI](https://oai.azure.com/portal)                                                                                  | Deploy Azure OpenAI large language models and test your custom copilot ideas in the Azure OpenAI Studio Playground. If you want to host your app or access resources in Microsoft Azure, you must create an Azure OpenAI service.                                                                                                                                                                                                                                 |
-| [Microsoft&nbsp;Edge](https://www.microsoft.com/edge) (recommended) or [Google Chrome](https://www.google.com/chrome/)        | Optional: a browser with developer tools if testing in Edge or Chrome is desired.                                                                                                                                                                                                                                     |
+| [Microsoft&nbsp;Edge](https://www.microsoft.com/edge) (recommended) or [Google Chrome](https://www.google.com/chrome/)        | Optional: A browser with developer tools if testing in Edge or Chrome is desired.                                                                                                                                                                                                                                     |
 | [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)                  | The Azure Command-Line Interface (CLI) is a cross-platform command-line tool to connect to Azure and execute administrative commands on Azure resources. For more information on setting up environment variables, see the [Azure SDK documentation](https://github.com/Azure/azure-sdk-for-go/wiki/Set-up-Your-Environment-for-Authentication). |
 | [Cognitive Services OpenAI User](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/role-based-access-control#:~:text=to%20a%20role.-,Cognitive%20Services%20OpenAI%20User,-If%20a%20user) Role                                                                              | Your Azure account has been assigned “Cognitive Services OpenAI user” or “Cognitive Services OpenAI Contributor” role of the Azure OpenAI resource you are using allowing your account to make Azure OpenAI API calls. For more information see [Using your data with Azure OpenAI securely](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/use-your-data-securely#using-the-api) and [Add role assignment to an Azure OpenAI resource](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/role-based-access-control#add-role-assignment-to-an-azure-openai-resource) for instructions on setting this role in the Azure portal.                                                                                                                                                                                              |
 
@@ -73,7 +73,7 @@ Note: Testing this sample requires that you are logged into Azure CLI and you ha
 	- Note: The citation experience is available in `Debug in (Edge)` or `Debug in (Chrome)` only.
 
 ### Provisioning, Deploying, and Publishing your custom Copilot
-**IMPORTANT** As this sample uses managed identity, for your custom copilot to generate responses you must assign Cognitive Service OpenAI User role to your custom copilot’s App Service resource group after deploying your app to Azure.
+**IMPORTANT**: As this sample uses managed identity, for your custom copilot to generate responses you must assign Cognitive Service OpenAI User role to your custom copilot’s App Service resource group after deploying your app to Azure.
 
 1. [Provision your app](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/provision)
 1. [Deploy to Azure](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/deploy)
@@ -116,7 +116,7 @@ Now, your published custom copilot Teams app is ready for use.
 
 This custom copilot sample is pre-configured for only personal chats (1 on 1) during preview due to ongoing testing from Azure OpenAI On Your Data to determine the effects of group chats on AI response quality. Group chats can be enabled with the understanding that the AI response quality has not been fully tested for these scenarios. 
 
-A custom copilot can be mentioned ("@customcopilotname") in a channel if it has been added to the team. Note that additional replies to a custom copilot in a channel require @ mentioning the custom copilot. It will not respond to replies where it isn't mentioned. See here for more information. 
+A custom copilot can be mentioned ("@customcopilotname") in a channel if it has been added to the team. Note that additional replies to a custom copilot in a channel require @ mentioning the custom copilot. It will not respond to replies where it isn't mentioned. See [here](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/conversations/channel-and-group-conversations?tabs=dotnet) for more information. 
 
 To enable group chats:
 
