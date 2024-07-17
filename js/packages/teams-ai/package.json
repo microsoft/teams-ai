@@ -58,7 +58,7 @@
         "jsonwebtoken": "^9.0.2",
         "mocha": "10.6.0",
         "nyc": "^15.1.0",
-        "rimraf": "5.0.8",
+        "rimraf": "5.0.9",
         "shx": "^0.3.4",
         "ts-mocha": "10.0.0",
         "typescript": "^5.5.3"
