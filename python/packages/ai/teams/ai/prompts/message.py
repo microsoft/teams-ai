@@ -6,9 +6,10 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Generic, Literal, Optional, TypeVar, Union
+from typing import Generic, List, Literal, Optional, TypeVar, Union
 
 from dataclasses_json import DataClassJsonMixin, dataclass_json
+from openai.types import chat
 
 from .function_call import FunctionCall
 
@@ -26,6 +27,8 @@ class Message(Generic[T], DataClassJsonMixin):
         content (Optional[T]): Text of the message.
         function_call (Optional[FunctionCall]): A named function to call.
         name (Optional[str]): Name of the function that was called.
+        action_tool_calls (Optional[List[chat.ChatCompletionMessageToolCall]]): 
+            List of tool calls from the model.
     """
 
     role: str
@@ -33,6 +36,7 @@ class Message(Generic[T], DataClassJsonMixin):
     context: Optional[MessageContext] = None
     function_call: Optional[FunctionCall] = None
     name: Optional[str] = None
+    action_tool_calls: Optional[List[chat.ChatCompletionMessageToolCall]] = None
 
 
 @dataclass

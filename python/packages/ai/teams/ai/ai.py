@@ -138,8 +138,6 @@ class AI(Generic[StateT]):
 
         plan: Optional[Plan] = None
 
-        state.temp.tools = self._actions
-
         if step == 0:
             plan = await self.moderator.review_input(context, state)
 
@@ -318,11 +316,7 @@ class AI(Generic[StateT]):
                 channel_data=channel_data,
                 entities=[
                     AIEntity(
-                        citation=(
-                            list(referenced_citations)
-                            if referenced_citations
-                            else []
-                        ),
+                        citation=(list(referenced_citations) if referenced_citations else []),
                         additional_type=["AIGeneratedContent"],
                     ),
                 ],

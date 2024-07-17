@@ -8,18 +8,22 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from logging import Logger
-from typing import Any, Awaitable, Callable, Dict, List, Optional, Union, cast
+from typing import Callable, List, Optional, Union, cast
 
 import openai
 from botbuilder.core import TurnContext
 from openai.types import chat, shared_params
 
 from ...state import MemoryBase
+from ..augmentations.tools_constants import (
+    SUBMIT_TOOL_OUTPUTS_MAP,
+    SUBMIT_TOOL_OUTPUTS_MESSAGES,
+    SUBMIT_TOOL_OUTPUTS_VARIABLE,
+)
 from ..prompts.message import Message, MessageContext
 from ..prompts.prompt_functions import PromptFunctions
 from ..prompts.prompt_template import PromptTemplate
 from ..tokenizers import Tokenizer
-from .openai_function import OpenAIFunction
 from .prompt_completion_model import PromptCompletionModel
 from .prompt_response import PromptResponse
 
@@ -124,47 +128,34 @@ class OpenAIModel(PromptCompletionModel):
         tokenizer: Tokenizer,
         template: PromptTemplate,
     ) -> PromptResponse[str]:
-        # pylint: disable=too-many-locals
         max_tokens = template.config.completion.max_input_tokens
 
-        # Setup tools if enabled
-        is_tools_enabled = template.config.completion.include_tools
-        tool_choice = template.config.completion.tool_choice
-        parallel_tool_calls = template.config.completion.parallel_tool_calls
-        tools: List[OpenAIFunction] = []
-        tools_handlers = memory.get("temp.tools")
+        # Setup action tools if enabled
+        is_tools_aug = (
+            template.config.augmentation
+            and template.config.augmentation.augmentation_type == "tools"
+        )
+        is_tools_enabled = template.config.completion.include_tools and is_tools_aug
+        tool_choice = template.config.completion.tool_choice or "auto"
+        parallel_tool_calls = template.config.completion.parallel_tool_calls or True
+        tools: List[chat.ChatCompletionToolParam] = []
 
-        # If tools is enabled, reformat actions to appropriate schema
+        # If tools is enabled, reformat actions to schema
         if is_tools_enabled:
             if not template.actions:
-                return PromptResponse[str](status="tools_error", error="Missing actions")
-            if not tools_handlers or len(tools_handlers) == 0:
-                return PromptResponse[str](status="tools_error", error="Missing tools handlers")
-            if len(template.actions) != len(tools_handlers):
                 return PromptResponse[str](
-                    status="tools_error",
-                    error="Number of actions does not match number of tool handlers",
+                    status="tools_error", error="Missing tools in template.actions"
                 )
             for action in template.actions:
-                if action.name in tools_handlers:
-                    handler = tools_handlers.get(action.name).func
-                    tool = OpenAIFunction(
-                        action.name, action.description, action.parameters, handler
-                    )
-                    tools.append(tool)
-
-        formatted_tools: List[chat.ChatCompletionToolParam] = []
-
-        for tool in tools:
-            curr_tool = chat.ChatCompletionToolParam(
-                type="function",
-                function=shared_params.FunctionDefinition(
-                    name=tool.name,
-                    description=tool.description or "",
-                    parameters=tool.parameters or {},
-                ),
-            )
-            formatted_tools.append(curr_tool)
+                curr_tool = chat.ChatCompletionToolParam(
+                    type="function",
+                    function=shared_params.FunctionDefinition(
+                        name=action.name,
+                        description=action.description or "",
+                        parameters=action.parameters or {},
+                    ),
+                )
+                tools.append(curr_tool)
 
         model = (
             template.config.completion.model
@@ -193,6 +184,19 @@ class OpenAIModel(PromptCompletionModel):
             self._options.logger.debug(f"PROMPT:\n{res.output}")
 
         messages: List[chat.ChatCompletionMessageParam] = []
+
+        # Submit tool outputs, if previously invoked
+        if memory.get(SUBMIT_TOOL_OUTPUTS_VARIABLE) is True:
+            prev_messages = memory.get("temp.tool_messages") or []
+            messages.extend(prev_messages)
+            tool_outputs: List[chat.ChatCompletionToolMessageParam] = (
+                memory.get(SUBMIT_TOOL_OUTPUTS_MESSAGES) or []
+            )
+            for message in tool_outputs:
+                messages.append(message)
+            memory.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, False)
+            memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, {})
+            memory.set(SUBMIT_TOOL_OUTPUTS_MAP, {})
 
         for msg in res.output:
             param: Union[
@@ -230,6 +234,7 @@ class OpenAIModel(PromptCompletionModel):
             extra_body = {}
             if template.config.completion.data_sources is not None:
                 extra_body["data_sources"] = template.config.completion.data_sources
+
             completion = await self._client.chat.completions.create(
                 messages=messages,
                 model=model,
@@ -238,9 +243,9 @@ class OpenAIModel(PromptCompletionModel):
                 top_p=template.config.completion.top_p,
                 temperature=template.config.completion.temperature,
                 max_tokens=max_tokens,
-                tools=formatted_tools,
-                tool_choice=tool_choice or "auto",
-                parallel_tool_calls=parallel_tool_calls or True,
+                tools=tools,
+                tool_choice=tool_choice,
+                parallel_tool_calls=parallel_tool_calls,
                 extra_body=extra_body,
             )
 
@@ -248,89 +253,32 @@ class OpenAIModel(PromptCompletionModel):
                 self._options.logger.debug("COMPLETION:\n%s", completion.model_dump_json())
 
             # Handle tools flow
+            tool_calls: Optional[List[chat.ChatCompletionMessageToolCall]] = []
             response_message = completion.choices[0].message
-            tool_calls = response_message.tool_calls
 
-            # Tracks the latest response from the LLM
-            final_response = completion
-            augmentation = template.config.augmentation
-
-            if (
-                augmentation
-                and augmentation.augmentation_type == "none"
-                and is_tools_enabled
-                and tool_calls
-            ):
-                while tool_calls and len(tool_calls) > 0:
+            if is_tools_enabled:
+                tool_calls = response_message.tool_calls
+                if tool_calls and len(tool_calls) > 0:
                     if not parallel_tool_calls and len(tool_calls) > 1:
-                        break
+                        tool_calls = []
 
                     if isinstance(tool_choice, dict) and len(tool_calls) > 1:
-                        break
+                        tool_calls = []
 
                     if tool_choice == "none":
-                        break
+                        tool_calls = []
 
-                    messages.append(
-                        cast(chat.ChatCompletionAssistantMessageParam, response_message)
-                    )
-
-                    if isinstance(tool_choice, dict):
-                        # Calling a single tool
-                        function_name = tool_choice["function"]["name"]
-                        curr_tool_call = tool_calls[0]
-                        curr_function = next(tool for tool in tools if tool.name == function_name)
-
-                        # Validate function name
-                        if not curr_function:
-                            break
-
-                        # Validate function arguments
-                        required_args = (
-                            curr_function.parameters["required"]
-                            if curr_function.parameters and "required" in curr_function.parameters
-                            else None
-                        )
-
-                        curr_args = json.loads(curr_tool_call.function.arguments)
-                        curr_function_handler = curr_function.handler
-
-                        if required_args:
-                            if len(required_args) > len(curr_args):
-                                break
-
-                        # Call the function
-                        function_response = await self._handle_function_response(
-                            curr_function_handler, curr_args
-                        )
-
+                    if len(tool_calls) > 0:
+                        memory.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
                         messages.append(
-                            chat.ChatCompletionToolMessageParam(
-                                role="tool",
-                                tool_call_id=curr_tool_call.id,
-                                content=function_response,
-                            )
+                            cast(chat.ChatCompletionAssistantMessageParam, response_message)
                         )
-                    else:
-                        curr_message_length = len(messages)
-                        messages = await self._handle_multiple_tool_calls(
-                            messages, tool_calls, tools
+                        memory.set("temp.tool_messages", messages)
+                else:
+                    if tool_choice == "required":
+                        return PromptResponse[str](
+                            status="tools_error", error="Model did not return any tools"
                         )
-                        # No tools were run successfully
-                        if len(messages) == curr_message_length:
-                            break
-
-                    final_response = await self._client.chat.completions.create(
-                        messages=messages,
-                        model=model,
-                        presence_penalty=template.config.completion.presence_penalty,
-                        frequency_penalty=template.config.completion.frequency_penalty,
-                        top_p=template.config.completion.top_p,
-                        temperature=template.config.completion.temperature,
-                        max_tokens=max_tokens,
-                    )
-
-                    tool_calls = final_response.choices[0].message.tool_calls
 
             input: Optional[Message] = None
             last_message = len(res.output) - 1
@@ -342,11 +290,16 @@ class OpenAIModel(PromptCompletionModel):
             return PromptResponse[str](
                 input=input,
                 message=Message(
-                    role=final_response.choices[0].message.role,
-                    content=final_response.choices[0].message.content,
+                    role=completion.choices[0].message.role,
+                    content=completion.choices[0].message.content,
+                    action_tool_calls=(
+                        tool_calls
+                        if is_tools_enabled and tool_calls and len(tool_calls) > 0
+                        else None
+                    ),
                     context=(
-                        MessageContext.from_dict(final_response.choices[0].message.context)
-                        if hasattr(final_response.choices[0].message, "context")
+                        MessageContext.from_dict(completion.choices[0].message.context)
+                        if hasattr(completion.choices[0].message, "context")
                         else None
                     ),
                 ),
@@ -362,55 +315,3 @@ class OpenAIModel(PromptCompletionModel):
                 status of {err.code}: {err.message}
                 """,
             )
-
-    async def _handle_function_response(
-        self,
-        curr_function_handler: Callable[..., Awaitable[str]],
-        curr_args: Dict[str, Any],
-    ) -> str:
-        if len(curr_args) > 0:
-            return await curr_function_handler(**curr_args)
-        return await curr_function_handler()
-
-    async def _handle_multiple_tool_calls(
-        self,
-        messages: List[chat.ChatCompletionMessageParam],
-        tool_calls: List[chat.ChatCompletionMessageToolCall],
-        tools: List[OpenAIFunction],
-    ) -> List[chat.ChatCompletionMessageParam]:
-        for tool_call in tool_calls:
-            tool_name = tool_call.function.name
-            curr_function = next(tool for tool in tools if tool.name == tool_name)
-
-            # Validate function name
-            if not curr_function:
-                continue
-
-            # Validate function arguments
-            required_args = (
-                curr_function.parameters["required"]
-                if curr_function.parameters and "required" in curr_function.parameters
-                else None
-            )
-
-            curr_args = json.loads(tool_call.function.arguments)
-            curr_function_handler = curr_function.handler
-
-            if required_args:
-                if len(required_args) > len(curr_args):
-                    continue
-
-            # Call the function
-            function_response = await self._handle_function_response(
-                curr_function_handler, curr_args
-            )
-
-            messages.append(
-                chat.ChatCompletionToolMessageParam(
-                    role="tool",
-                    tool_call_id=tool_call.id,
-                    content=function_response,
-                )
-            )
-
-        return messages
