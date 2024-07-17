@@ -116,7 +116,7 @@ Now, your published custom copilot Teams app is ready for use.
 
 This custom copilot sample is pre-configured for only personal chats (1 on 1) during preview due to ongoing testing from Azure OpenAI On Your Data to determine the effects of group chats on AI response quality. Group chats can be enabled with the understanding that the AI response quality has not been fully tested for these scenarios. 
 
-A custom copilot can be mentioned ("@customcopilotname") in a channel if it has been added to the team. Note that additional replies to a custom copilot in a channel require @ mentioning the custom copilot. It will not respond to replies where it isn't mentioned. See [here](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/conversations/channel-and-group-conversations?tabs=dotnet) for more information. 
+A custom copilot can be mentioned ("@customcopilotname") in a channel if it has been added to the team. Note that additional replies to a custom copilot in a channel require @ mentioning the custom copilot. It will not respond to replies where it isn't mentioned. See [here](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/conversations/channel-and-group-conversations?tabs=typescript) for more information. 
 
 To enable group chats:
 
