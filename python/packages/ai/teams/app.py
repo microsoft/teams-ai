@@ -73,10 +73,8 @@ class Application(Bot, Generic[StateT]):
     _before_turn: List[RouteHandler[StateT]] = []
     _after_turn: List[RouteHandler[StateT]] = []
     _routes: List[Route[StateT]] = []
-    _error: Optional[Callable[[TurnContext,
-                               Exception], Awaitable[None]]] = None
-    _turn_state_factory: Optional[Callable[[
-        TurnContext], Awaitable[StateT]]] = None
+    _error: Optional[Callable[[TurnContext, Exception], Awaitable[None]]] = None
+    _turn_state_factory: Optional[Callable[[TurnContext], Awaitable[StateT]]] = None
     _message_extensions: MessageExtensions[StateT]
     _task_modules: TaskModules[StateT]
     _meetings: Meetings[StateT]
@@ -86,8 +84,7 @@ class Application(Bot, Generic[StateT]):
         Creates a new Application instance.
         """
         self.typing = Typing()
-        self._ai = AI[StateT](
-            options.ai, logger=options.logger) if options.ai else None
+        self._ai = AI[StateT](options.ai, logger=options.logger) if options.ai else None
         self._options = options
         self._routes = []
         self._message_extensions = MessageExtensions[StateT](self._routes)
@@ -496,8 +493,7 @@ class Application(Bot, Generic[StateT]):
         self,
     ) -> Callable[
         [Callable[[TurnContext, StateT, O365ConnectorCardActionQuery], Awaitable[None]]],
-        Callable[[TurnContext, StateT, O365ConnectorCardActionQuery],
-                 Awaitable[None]],
+        Callable[[TurnContext, StateT, O365ConnectorCardActionQuery], Awaitable[None]],
     ]:
         """
         Registers a handler for when a O365 connector card action is received from the user.
@@ -567,8 +563,7 @@ class Application(Bot, Generic[StateT]):
                     return False
                 await func(context, state, context.activity.value["continuation"])
                 await context.send_activity(
-                    Activity(type=ActivityTypes.invoke_response,
-                             value=InvokeResponse(status=200))
+                    Activity(type=ActivityTypes.invoke_response, value=InvokeResponse(status=200))
                 )
                 return True
 
@@ -706,8 +701,7 @@ class Application(Bot, Generic[StateT]):
 
     def _remove_mentions(self, context: TurnContext):
         if self.options.remove_recipient_mention and context.activity.type == ActivityTypes.message:
-            context.activity.text = context.remove_recipient_mention(
-                context.activity)
+            context.activity.text = context.remove_recipient_mention(context.activity)
 
     async def _initialize_state(self, context: TurnContext):
         state = cast(StateT, await TurnState.load(context, self._options.storage))
@@ -722,13 +716,11 @@ class Application(Bot, Generic[StateT]):
     async def _authenticate_user(self, context: TurnContext, state):
         if self.options.auth and self._auth:
             auth_condition = (
-                isinstance(self.options.auth.auto,
-                           bool) and self.options.auth.auto
+                isinstance(self.options.auth.auto, bool) and self.options.auth.auto
             ) or (callable(self.options.auth.auto) and self.options.auth.auto(context))
             user_in_sign_in = IN_SIGN_IN_KEY in state.user
             if auth_condition or user_in_sign_in:
-                key: Optional[str] = state.user.get(
-                    IN_SIGN_IN_KEY, self.options.auth.default)
+                key: Optional[str] = state.user.get(IN_SIGN_IN_KEY, self.options.auth.default)
 
                 if key is not None:
                     state.user[IN_SIGN_IN_KEY] = key
@@ -742,8 +734,7 @@ class Application(Bot, Generic[StateT]):
 
                     if res.status == "error" and res.reason != "invalid-activity":
                         del state.user[IN_SIGN_IN_KEY]
-                        raise ApplicationError(
-                            f"[{res.reason}] => {res.message}")
+                        raise ApplicationError(f"[{res.reason}] => {res.message}")
 
         return True
 
@@ -793,10 +784,8 @@ class Application(Bot, Generic[StateT]):
         matches = 0
 
         # ensure we handle invokes first
-        routes = filter(lambda r: not r.is_invoke and r.selector(
-            context), self._routes)
-        invoke_routes = filter(
-            lambda r: r.is_invoke and r.selector(context), self._routes)
+        routes = filter(lambda r: not r.is_invoke and r.selector(context), self._routes)
+        invoke_routes = filter(lambda r: r.is_invoke and r.selector(context), self._routes)
 
         for route in invoke_routes:
             if route.selector(context):
