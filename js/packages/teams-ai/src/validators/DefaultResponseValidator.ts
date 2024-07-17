@@ -7,10 +7,12 @@
  */
 
 import { TurnContext } from 'botbuilder';
-import { Tokenizer } from '../tokenizers';
-import { PromptResponse } from '../models';
-import { Validation, PromptResponseValidator } from './PromptResponseValidator';
+
 import { Memory } from '../MemoryFork';
+import { Tokenizer } from '../tokenizers';
+import { PromptResponse } from '../types';
+
+import { Validation, PromptResponseValidator } from './PromptResponseValidator';
 
 /**
  * Default response validator that always returns true.

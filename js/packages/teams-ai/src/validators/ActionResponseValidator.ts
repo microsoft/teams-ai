@@ -1,10 +1,13 @@
 import { TurnContext } from 'botbuilder';
-import { ChatCompletionAction, PromptResponse } from '../models';
+
+import { Memory } from '../MemoryFork';
+import { ChatCompletionAction } from '../models';
+import { Message } from '../prompts';
+import { Tokenizer } from '../tokenizers';
+import { PromptResponse } from '../types';
+
 import { JSONResponseValidator } from './JSONResponseValidator';
 import { PromptResponseValidator, Validation } from './PromptResponseValidator';
-import { Tokenizer } from '../tokenizers';
-import { Message } from '../prompts';
-import { Memory } from '../MemoryFork';
 
 /**
  * A validated action call.
