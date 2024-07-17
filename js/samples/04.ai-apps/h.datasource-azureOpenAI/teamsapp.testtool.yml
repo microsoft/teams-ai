@@ -18,3 +18,13 @@ deploy:
     - uses: cli/runNpmCommand
       with:
         args: install --no-audit --workspaces=false
+
+    # Provides the Teams Toolkit .env file values to the apps runtime so they can be accessed with `process.env`.
+    - uses: file/createOrUpdateEnvironmentFile
+      with:
+          target: ./.env
+          envs: # These values need to be empty when using the test tool to prevent 401 errors with the bot.
+              BOT_ID: ""
+              BOT_PASSWORD: ""
+              BOT_TENANT_ID: ""
+              AZURE_TENANT_ID: ""
