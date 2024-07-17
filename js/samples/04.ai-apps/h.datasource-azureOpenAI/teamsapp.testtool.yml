@@ -1,7 +1,10 @@
-# yaml-language-server: $schema=https://aka.ms/teams-toolkit/v1.3/yaml.schema.json
+# yaml-language-server: $schema=https://aka.ms/teams-toolkit/v1.5/yaml.schema.json
 # Visit https://aka.ms/teamsfx-v5.0-guide for details on this file
 # Visit https://aka.ms/teamsfx-actions for details on actions
-version: v1.3
+version: v1.5
+
+additionalMetadata:
+  sampleTag: TeamsAI-Samples:datasource-azureopenai
 
 deploy:
     # Install development tool(s)
@@ -10,3 +13,18 @@ deploy:
           testTool:
               version: ~0.1.0-beta
               symlinkDir: ./devTools/teamsapptester
+
+    # Run npm command
+    - uses: cli/runNpmCommand
+      with:
+        args: install --no-audit --workspaces=false
+
+    # Provides the Teams Toolkit .env file values to the apps runtime so they can be accessed with `process.env`.
+    - uses: file/createOrUpdateEnvironmentFile
+      with:
+          target: ./.env
+          envs: # These values need to be empty when using the test tool to prevent 401 errors with the bot.
+              BOT_ID: ""
+              BOT_PASSWORD: ""
+              BOT_TENANT_ID: ""
+              AZURE_TENANT_ID: ""

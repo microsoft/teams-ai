@@ -34,8 +34,8 @@
         "@typescript-eslint/parser": "^6.21.0",
         "eslint": "^8.57.0",
         "nodemon": "~3.0.1",
-        "prettier": "^3.3.2",
-        "rimraf": "^5.0.8",
+        "prettier": "^3.3.3",
+        "rimraf": "^5.0.9",
         "shx": "^0.3.4",
         "ts-node": "^10.9.2",
         "typescript": "^5.5.3"
