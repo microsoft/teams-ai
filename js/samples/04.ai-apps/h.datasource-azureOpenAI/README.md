@@ -21,7 +21,7 @@ You can chat with your data in Azure AI Search, Azure Blob Storage, URL/web addr
 <!-- /code_chunk_output -->
 
 ## Summary
-You can deploy to a standalone Teams app (preview) directly from Azure OpenAI Studio, enabling you to bring conversational experience to your users in Teams to improve operational efficiency and democratize access of information. This Teams app is configured to users within a single tenant and personal chat (non-group chat) scenarios. See the [Enable your Custom Copilot for Group Chats and Channels](#enable-your-custom-copilot-for-group-chats-and-channels) section to enable group chat scenarios noting that the AI response quality from Azure OpenAI On Your Data has not been fully tested for group chats. 
+You can deploy to a standalone Teams app (preview) directly from Azure OpenAI Studio, enabling you to bring conversational experience to your users in Teams to improve operational efficiency and democratize access of information. This Teams app is configured by default to only users within your Azure account tenant and to personal chat (non-group chat) scenarios. See the [Enable your Custom Copilot for Group Chats and Channels](#enable-your-custom-copilot-for-group-chats-and-channels) section to enable group chat scenarios noting that the AI response quality from Azure OpenAI On Your Data has not been fully tested for group chats. 
 
 This guide will show you have the set up your custom copilot for Teams using Azure OpenAI Studio and Teams Toolkit.
 
@@ -69,7 +69,8 @@ Note: Testing this sample requires that you are logged into Azure CLI and you ha
      az login
    ```
  
-1. To debug your app, press the `F5` key or from the left pane, select `RUN AND DEBUG ▷` (Ctrl+Shift+D) and then select `Debug in Test Tool` from the dropdown list.  Select `Run > Start Debugging` (F5). The Test Tool opens in a webpage where you can chat with your custom copilot. 
+1. To debug your app, press the `F5` key or from the left pane, select `RUN AND DEBUG ▷` (Ctrl+Shift+D) and then select `Debug in (Edge)`, `Debug in (Chrome)`, or `Debug in Test Tool` from the dropdown list.  Select `Run > Start Debugging` (F5). A webpage opens where you can chat with your custom copilot.
+	- Note: The citation experience is available in `Debug in (Edge)` or `Debug in (Chrome)` only.
 
 ### Provisioning, Deploying, and Publishing your custom Copilot
 **IMPORTANT** As this sample uses managed identity, for your custom copilot to generate responses you must assign Cognitive Service OpenAI User role to your custom copilot’s App Service resource group after deploying your app to Azure.
