@@ -3,9 +3,10 @@ import { TurnContext } from 'botbuilder';
 
 import { Colorize } from '../internals/Colorize';
 import { Memory } from '../MemoryFork';
+import { PromptCompletionModel } from '../models';
 import { Message, PromptFunctions, PromptTemplate } from '../prompts';
-import { PromptCompletionModel, PromptResponse } from '../models';
 import { Tokenizer } from '../tokenizers';
+import { PromptResponse } from '../types';
 
 export interface LlamaModelOptions {
     apiKey: string;
