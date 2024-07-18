@@ -23,7 +23,7 @@
         "axios": "^1.7.2",
         "botbuilder": "^4.22.3",
         "dotenv": "^16.4.5",
-        "openai": "^4.41.0",
+        "openai": "4.28.4",
         "replace": "~1.2.0",
         "restify": "~11.1.0"
     },
@@ -34,8 +34,8 @@
         "@typescript-eslint/parser": "^6.21.0",
         "eslint": "^8.57.0",
         "nodemon": "~3.0.1",
-        "prettier": "^3.3.2",
-        "rimraf": "^5.0.8",
+        "prettier": "^3.3.3",
+        "rimraf": "^5.0.9",
         "typescript": "^5.5.3",
         "ts-node": "^10.9.2"
     }
