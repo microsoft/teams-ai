@@ -25,7 +25,7 @@
         "@microsoft/teams-js": "^2.25.0",
         "botbuilder": "^4.22.3",
         "dotenv": "^16.4.5",
-        "openai": "^4.41.0",
+        "openai": "4.28.4",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
         "vectra": "^0.7.6"
