@@ -23,7 +23,7 @@
         "axios": "^1.7.2",
         "botbuilder": "^4.22.3",
         "dotenv": "^16.4.5",
-        "openai": "^4.41.0",
+        "openai": "4.28.4",
         "replace": "~1.2.0",
         "restify": "~11.1.0"
     },

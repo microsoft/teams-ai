@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from logging import Logger
-from typing import Callable, Dict, Generic, Optional, TypeVar
+from typing import Any, Callable, Dict, Generic, Optional, TypeVar
 
 from botbuilder.core import TurnContext
 from botbuilder.schema import Activity, ActivityTypes
@@ -332,3 +332,28 @@ class AI(Generic[StateT]):
     ) -> str:
         self._logger.error("The run retrieval for the Assistants Planner has expired.")
         return ActionTypes.STOP
+
+    async def do_action(
+        self,
+        context: TurnContext,
+        state: StateT,
+        action: str,
+        parameters: Optional[Dict[str, Any]] = None,
+    ) -> str:
+        """
+        Manually executes a named action.
+
+        Args:
+            context (TurnContext): Current turn context.
+            state (StateT): Current turn state.
+            action (str): Name of the action to execute.
+            parameters (Optional[Dict[str, Any]]): Optional. Entities to pass to the action.
+
+        Returns:
+            str: The result of the action.
+        """
+        if action not in self._actions:
+            raise ApplicationError(f"Can't find an action named '{action}'.")
+
+        action_entry = self._actions[action]
+        return await action_entry.invoke(context, state, parameters, action)
