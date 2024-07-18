@@ -211,7 +211,7 @@ class Application(Bot, Generic[StateT]):
         """
 
         def __selector__(context: TurnContext):
-            return type == str(context.activity.type)
+            return type == context.activity.type
 
         def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
             self._routes.append(Route[StateT](__selector__, func))
@@ -748,10 +748,10 @@ class Application(Bot, Generic[StateT]):
 
     async def _handle_file_downloads(self, context: TurnContext, state):
         if self._options.file_downloaders and len(self._options.file_downloaders) > 0:
-            input_files = state.temp.input_files if state.temp.input_files is not None else []
+            input_files = state.temp.input_files if state.temp.input_files else []
             for file_downloader in self._options.file_downloaders:
                 files = await file_downloader.download_files(context)
-                input_files.append(files)
+                input_files.extend(files)
             state.temp.input_files = input_files
 
     async def _run_ai_chain(self, context: TurnContext, state):

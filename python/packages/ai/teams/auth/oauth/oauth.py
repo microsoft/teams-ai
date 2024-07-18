@@ -46,11 +46,14 @@ class OAuth(Auth[StateT]):
 
     async def get_token(self, context: TurnContext) -> Optional[str]:
         client = self._user_token_client(context)
+        code = ""
+        if isinstance(context.activity.value, dict) and "state" in context.activity.value:
+            code = context.activity.value["state"]
         res = await client.get_user_token(
             getattr(context.activity.from_property, "id"),
             self._options.connection_name,
             context.activity.channel_id,
-            "",
+            code,
         )
 
         if res and res.token:

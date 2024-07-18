@@ -1,10 +1,12 @@
 import { TurnContext } from 'botbuilder';
 import { Validator, Schema, ValidationError } from 'jsonschema';
-import { Tokenizer } from '../tokenizers';
-import { PromptResponse } from '../models';
-import { Validation, PromptResponseValidator } from './PromptResponseValidator';
-import { Response } from './Response';
+
 import { Memory } from '../MemoryFork';
+import { Validation, PromptResponseValidator } from './PromptResponseValidator';
+import { Tokenizer } from '../tokenizers';
+import { PromptResponse } from '../types';
+
+import { Response } from './Response';
 
 /**
  * Parses any JSON returned by the model and optionally verifies it against a JSON schema.

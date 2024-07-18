@@ -3,14 +3,8 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "resourceBaseName": {
-            "value": "TeamsAzureOpenAI-${{RESOURCE_SUFFIX}}"
-        },
-        "botAadAppClientId": {
-            "value": "${{BOT_ID}}"
-        },
-        "botAadAppClientSecret": {
-            "value": "${{SECRET_BOT_PASSWORD}}"
-        },
+            "value": "teamsopenai-${{RESOURCE_SUFFIX}}"
+        },        
         "webAppSKU": {
             "value": "B1"
         },
@@ -19,6 +13,9 @@
         },
         "azureOpenAIEndpoint": {
             "value": "${{AZURE_OPENAI_ENDPOINT}}"
+        },
+        "azureOpenAIDeployment": {
+            "value": "${{AZURE_OPENAI_DEPLOYMENT}}"
         }
     }
 }

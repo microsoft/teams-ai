@@ -9,11 +9,11 @@
         "full": "Teams Azure OpenAI"
     },
     "developer": {
-        "name": "TeamsAzureOpenAI",
+        "name": "Teams App, Inc.",
         "mpnId": "",
-        "websiteUrl": "https://microsoft.com",
-        "privacyUrl": "https://privacy.microsoft.com/privacystatement",
-        "termsOfUseUrl": "https://www.microsoft.com/legal/terms-of-use"
+        "websiteUrl": "https://www.example.com",
+        "privacyUrl": "https://www.example.com/privacy",
+        "termsOfUseUrl": "https://www.example.com/terms-of-use"
     },
     "description": {
         "short": "Custom copilot to chat with your data via RAG through Azure OpenAI On Your Data",

@@ -6,18 +6,21 @@
  * Licensed under the MIT License.
  */
 
-import { Planner, Plan } from './Planner';
-import { TurnState } from '../TurnState';
 import { TurnContext } from 'botbuilder';
+
 import { AI } from '../AI';
-import { PromptTemplate, PromptManager } from '../prompts';
-import { PromptCompletionModel, PromptResponse } from '../models';
-import { PromptResponseValidator } from '../validators';
-import { Memory } from '../MemoryFork';
-import { Tokenizer } from '../tokenizers';
-import { Utilities } from '../Utilities';
 import { DefaultAugmentation } from '../augmentations';
+import { Memory } from '../MemoryFork';
+import { PromptCompletionModel } from '../models';
+import { PromptTemplate, PromptManager } from '../prompts';
+import { Tokenizer } from '../tokenizers';
+import { TurnState } from '../TurnState';
+import { Utilities } from '../Utilities';
+import { PromptResponse } from '../types';
+import { PromptResponseValidator } from '../validators';
+
 import { LLMClient } from './LLMClient';
+import { Planner, Plan } from './Planner';
 
 /**
  * Factory function used to create a prompt template.
