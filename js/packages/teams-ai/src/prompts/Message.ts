@@ -6,6 +6,8 @@
  * Licensed under the MIT License.
  */
 
+import ChatCompletionMessageToolCall from 'openai';
+
 /**
  * A message object sent to or received from an LLM.
  * @param TContent Optional. Type of the message content. Defaults to `string`
@@ -35,6 +37,11 @@ export interface Message<TContent = string> {
      * Optional. Name of the function that was called.
      */
     name?: string;
+
+    /**
+     * Optional. The action or tool to be called by the model. In OpenAI, this is the tool_calls property.
+     */
+    action_tool_calls?: ChatCompletionMessageToolCall[];
 }
 
 /**
