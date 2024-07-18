@@ -43,11 +43,14 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
 
         [Theory(Skip = "Should only run manually for now.")]
         [InlineData("What is the capital of Thailand?", "Bangkok")]
-        public async Task OpenAIModel_CompletePrompt(string input, string expectedAnswer)
+        public async Task OpenAIModel_CompleteChatPrompt(string input, string expectedAnswer)
         {
             // Arrange
             var config = _configuration.GetSection("OpenAI").Get<OpenAIConfiguration>();
-            var modelOptions = new AI.Models.OpenAIModelOptions(config.ApiKey, config.ChatModelId!);
+            var modelOptions = new AI.Models.OpenAIModelOptions(config.ApiKey, config.ChatModelId!)
+            {
+                CompletionType = CompletionConfiguration.CompletionType.Chat
+            };
             var model = new AI.Models.OpenAIModel(modelOptions);
 
             var botAdapterMock = new Mock<BotAdapter>();

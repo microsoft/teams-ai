@@ -1,13 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
-using Azure.AI.OpenAI;
-using Azure;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Teams.AI.Utilities;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.AI.Models;
-using Azure.Core.Pipeline;
-using Azure.Core;
-using static Azure.AI.OpenAI.OpenAIClientOptions;
+using OpenAI;
+using ServiceVersion = Azure.AI.OpenAI.AzureOpenAIClientOptions.ServiceVersion;
+using System.ClientModel.Primitives;
+using Azure.AI.OpenAI;
+using System.ClientModel;
+using OpenAI.Embeddings;
 
 namespace Microsoft.Teams.AI.AI.Embeddings
 {
@@ -40,25 +41,27 @@ namespace Microsoft.Teams.AI.AI.Embeddings
             {
                 Organization = options.Organization,
                 LogRequests = options.LogRequests ?? false,
-                RetryPolicy = options.RetryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) }
+                RetryPolicy = options.RetryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) },
             };
             _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<OpenAIModel>();
 
+            OpenAIEmbeddingsOptions embeddingsOptions = (OpenAIEmbeddingsOptions)_options;
             OpenAIClientOptions openAIClientOptions = new()
             {
-                RetryPolicy = new RetryPolicy(_options.RetryPolicy!.Count, new SequentialDelayStrategy(_options.RetryPolicy))
+                RetryPolicy = new SequentialDelayRetryPolicy(embeddingsOptions.RetryPolicy!, embeddingsOptions.RetryPolicy!.Count)
             };
-            openAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("User-Agent", _userAgent), HttpPipelinePosition.PerCall);
+
+            openAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("User-Agent", _userAgent), PipelinePosition.PerCall);
             if (httpClient != null)
             {
-                openAIClientOptions.Transport = new HttpClientTransport(httpClient);
+                openAIClientOptions.Transport = new HttpClientPipelineTransport(httpClient);
             }
-            OpenAIEmbeddingsOptions openAIModelOptions = (OpenAIEmbeddingsOptions)_options;
-            if (!string.IsNullOrEmpty(openAIModelOptions.Organization))
+
+            if (!string.IsNullOrEmpty(embeddingsOptions.Organization))
             {
-                openAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("OpenAI-Organization", openAIModelOptions.Organization!), HttpPipelinePosition.PerCall);
+                openAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("OpenAI-Organization", options.Organization!), PipelinePosition.PerCall);
             }
-            _openAIClient = new OpenAIClient(openAIModelOptions.ApiKey, openAIClientOptions);
+            _openAIClient = new OpenAIClient(new ApiKeyCredential(embeddingsOptions.ApiKey), openAIClientOptions);
 
             _deploymentName = options.Model;
         }
@@ -76,7 +79,7 @@ namespace Microsoft.Teams.AI.AI.Embeddings
             Verify.ParamNotNull(options.AzureDeployment, "AzureOpenAIEmbeddingsOptions.AzureDeployment");
             Verify.ParamNotNull(options.AzureEndpoint, "AzureOpenAIEmbeddingsOptions.AzureEndpoint");
 
-            string apiVersion = options.AzureApiVersion ?? "2023-05-15";
+            string apiVersion = options.AzureApiVersion ?? "2024-06-01";
             ServiceVersion? serviceVersion = ConvertStringToServiceVersion(apiVersion);
             if (serviceVersion == null)
             {
@@ -91,18 +94,20 @@ namespace Microsoft.Teams.AI.AI.Embeddings
             };
             _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<OpenAIModel>();
 
-            OpenAIClientOptions openAIClientOptions = new(serviceVersion.Value)
+
+            AzureOpenAIEmbeddingsOptions azureEmbeddingsOptions = (AzureOpenAIEmbeddingsOptions)_options;
+            AzureOpenAIClientOptions azureOpenAIClientOptions = new(serviceVersion.Value)
             {
-                RetryPolicy = new RetryPolicy(_options.RetryPolicy!.Count, new SequentialDelayStrategy(_options.RetryPolicy))
+                RetryPolicy = new SequentialDelayRetryPolicy(_options.RetryPolicy, _options.RetryPolicy.Count)
             };
-            openAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("User-Agent", _userAgent), HttpPipelinePosition.PerCall);
+
+            azureOpenAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("User-Agent", _userAgent), PipelinePosition.PerCall);
             if (httpClient != null)
             {
-                openAIClientOptions.Transport = new HttpClientTransport(httpClient);
+                azureOpenAIClientOptions.Transport = new HttpClientPipelineTransport(httpClient);
             }
-            AzureOpenAIEmbeddingsOptions azureOpenAIModelOptions = (AzureOpenAIEmbeddingsOptions)_options;
-            _openAIClient = new OpenAIClient(new Uri(azureOpenAIModelOptions.AzureEndpoint), new AzureKeyCredential(azureOpenAIModelOptions.AzureApiKey), openAIClientOptions);
 
+            _openAIClient = new AzureOpenAIClient(new Uri(azureEmbeddingsOptions.AzureEndpoint), new ApiKeyCredential(azureEmbeddingsOptions.AzureApiKey), azureOpenAIClientOptions);
             _deploymentName = options.AzureDeployment;
         }
 
@@ -114,13 +119,13 @@ namespace Microsoft.Teams.AI.AI.Embeddings
                 _logger?.LogInformation($"\nEmbeddings REQUEST: inputs={inputs}");
             }
 
-            EmbeddingsOptions embeddingsOptions = new(_deploymentName, inputs);
+            EmbeddingClient embeddingsClient = _openAIClient.GetEmbeddingClient(_deploymentName);
 
             try
             {
                 DateTime startTime = DateTime.Now;
-                Response<Azure.AI.OpenAI.Embeddings> response = await _openAIClient.GetEmbeddingsAsync(embeddingsOptions, cancellationToken);
-                List<ReadOnlyMemory<float>> embeddingItems = response.Value.Data.OrderBy(item => item.Index).Select(item => item.Embedding).ToList();
+                ClientResult<EmbeddingCollection> response = await embeddingsClient.GenerateEmbeddingsAsync(inputs);
+                List<ReadOnlyMemory<float>> embeddingItems = response.Value.OrderBy(item => item.Index).Select(item => item.Vector).ToList();
 
                 if (_options.LogRequests!.Value)
                 {
@@ -134,7 +139,7 @@ namespace Microsoft.Teams.AI.AI.Embeddings
                     Output = embeddingItems,
                 };
             }
-            catch (RequestFailedException ex) when (ex.Status == 429)
+            catch (ClientResultException ex) when (ex.Status == 429)
             {
                 return new EmbeddingsResponse
                 {
@@ -142,7 +147,7 @@ namespace Microsoft.Teams.AI.AI.Embeddings
                     Message = $"The embeddings API returned a rate limit error",
                 };
             }
-            catch (RequestFailedException ex)
+            catch (ClientResultException ex)
             {
                 return new EmbeddingsResponse
                 {
@@ -158,17 +163,13 @@ namespace Microsoft.Teams.AI.AI.Embeddings
 
         private ServiceVersion? ConvertStringToServiceVersion(string apiVersion)
         {
-            switch (apiVersion)
+            return apiVersion switch
             {
-                case "2022-12-01": return ServiceVersion.V2022_12_01;
-                case "2023-05-15": return ServiceVersion.V2023_05_15;
-                case "2023-06-01-preview": return ServiceVersion.V2023_06_01_Preview;
-                case "2023-07-01-preview": return ServiceVersion.V2023_07_01_Preview;
-                case "2024-02-15-preview": return ServiceVersion.V2024_02_15_Preview;
-                case "2024-03-01-preview": return ServiceVersion.V2024_03_01_Preview;
-                default:
-                    return null;
-            }
+                "2024-04-01-preview" => ServiceVersion.V2024_04_01_Preview,
+                "2024-05-01-preview" => ServiceVersion.V2024_05_01_Preview,
+                "2024-06-01" => ServiceVersion.V2024_06_01,
+                _ => null,
+            };
         }
     }
 }

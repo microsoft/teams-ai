@@ -1,6 +1,7 @@
-﻿using Azure.AI.OpenAI;
-using Microsoft.Teams.AI.Exceptions;
+﻿using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.Utilities;
+using OpenAI.Chat;
+using OAI = OpenAI;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
@@ -10,20 +11,20 @@ namespace Microsoft.Teams.AI.AI.Models
     internal static class ChatMessageExtensions
     {
         /// <summary>
-        /// Converts a <see cref="ChatMessage"/> to an <see cref="ChatRequestMessage"/>.
+        /// Converts a <see cref="ChatMessage"/> to an <see cref="OAI.Chat.ChatMessage"/>.
         /// </summary>
         /// <param name="chatMessage">The original <see cref="ChatMessage" />.</param>
-        /// <returns>An <see cref="ChatRequestMessage"/>.</returns>
-        public static ChatRequestMessage ToChatRequestMessage(this ChatMessage chatMessage)
+        /// <returns>An <see cref="OAI.Chat.ChatMessage"/>.</returns>
+        public static OAI.Chat.ChatMessage ToOpenAIChatMessage(this ChatMessage chatMessage)
         {
             Verify.NotNull(chatMessage.Content);
             Verify.NotNull(chatMessage.Role);
 
             ChatRole role = chatMessage.Role;
-            ChatRequestMessage? message = null;
+            OAI.Chat.ChatMessage? message = null;
 
             string? content = null;
-            List<ChatMessageContentItem> contentItems = new();
+            List<ChatMessageContentPart> contentItems = new();
 
             // Content is a text
             if (chatMessage.Content is string textContent)
@@ -37,11 +38,11 @@ namespace Microsoft.Teams.AI.AI.Models
                 {
                     if (contentPart is TextContentPart textPart)
                     {
-                        contentItems.Add(new ChatMessageTextContentItem(textPart.Text));
+                        contentItems.Add(ChatMessageContentPart.CreateTextMessageContentPart(textPart.Text));
                     }
                     else if (contentPart is ImageContentPart imagePart)
                     {
-                        contentItems.Add(new ChatMessageImageContentItem(new Uri(imagePart.ImageUrl)));
+                        contentItems.Add(ChatMessageContentPart.CreateImageMessageContentPart(new Uri(imagePart.ImageUrl)));
                     }
                 }
             }
@@ -49,7 +50,7 @@ namespace Microsoft.Teams.AI.AI.Models
             // Different roles map to different classes
             if (role == ChatRole.User)
             {
-                ChatRequestUserMessage userMessage;
+                UserChatMessage userMessage;
                 if (content != null)
                 {
                     userMessage = new(content);
@@ -61,7 +62,8 @@ namespace Microsoft.Teams.AI.AI.Models
 
                 if (chatMessage.Name != null)
                 {
-                    userMessage.Name = chatMessage.Name;
+                    // TODO: Currently no way to set `ParticipantName` come and change it eventually.
+                    //userMessage.ParticipantName = chatMessage.Name;
                 }
 
                 message = userMessage;
@@ -69,24 +71,31 @@ namespace Microsoft.Teams.AI.AI.Models
 
             if (role == ChatRole.Assistant)
             {
-                ChatRequestAssistantMessage assistantMessage = new(chatMessage.GetContent<string>());
+                AssistantChatMessage assistantMessage;
 
                 if (chatMessage.FunctionCall != null)
                 {
-                    assistantMessage.FunctionCall = new(chatMessage.FunctionCall.Name ?? "", chatMessage.FunctionCall.Arguments ?? "");
+                    ChatFunctionCall functionCall = new(chatMessage.FunctionCall.Name ?? "", chatMessage.FunctionCall.Arguments ?? "");
+                    assistantMessage = new AssistantChatMessage(functionCall, chatMessage.GetContent<string>());
                 }
-
-                if (chatMessage.ToolCalls != null)
+                else if (chatMessage.ToolCalls != null)
                 {
+                    List<ChatToolCall> toolCalls = new();
                     foreach (ChatCompletionsToolCall toolCall in chatMessage.ToolCalls)
                     {
-                        assistantMessage.ToolCalls.Add(toolCall.ToAzureSdkChatCompletionsToolCall());
+                        toolCalls.Add(toolCall.ToChatToolCall());
                     }
+                    assistantMessage = new AssistantChatMessage(toolCalls, chatMessage.GetContent<string>());
+                }
+                else
+                {
+                    assistantMessage = new AssistantChatMessage(chatMessage.GetContent<string>());
                 }
 
                 if (chatMessage.Name != null)
                 {
-                    assistantMessage.Name = chatMessage.Name;
+                    // TODO: Currently no way to set `ParticipantName` come and change it eventually.
+                    // assistantMessage.ParticipantName = chatMessage.Name;
                 }
 
                 message = assistantMessage;
@@ -94,11 +103,12 @@ namespace Microsoft.Teams.AI.AI.Models
 
             if (role == ChatRole.System)
             {
-                ChatRequestSystemMessage systemMessage = new(chatMessage.GetContent<string>());
+                SystemChatMessage systemMessage = new(chatMessage.GetContent<string>());
 
                 if (chatMessage.Name != null)
                 {
-                    systemMessage.Name = chatMessage.Name;
+                    // TODO: Currently no way to set `ParticipantName` come and change it eventually.
+                    // systemMessage.ParticipantName = chatMessage.Name;
                 }
 
                 message = systemMessage;
@@ -106,12 +116,14 @@ namespace Microsoft.Teams.AI.AI.Models
 
             if (role == ChatRole.Function)
             {
-                message = new ChatRequestFunctionMessage(chatMessage.Name ?? "", chatMessage.GetContent<string>());
+                // TODO: Clean up
+                message = new FunctionChatMessage(chatMessage.Name ?? "", chatMessage.GetContent<string>());
             }
 
             if (role == ChatRole.Tool)
             {
-                message = new ChatRequestToolMessage(chatMessage.GetContent<string>(), chatMessage.ToolCallId ?? "");
+
+                message = new ToolChatMessage(chatMessage.ToolCallId ?? "", chatMessage.GetContent<string>());
             }
 
             if (message == null)
@@ -122,12 +134,12 @@ namespace Microsoft.Teams.AI.AI.Models
             return message;
         }
 
-        public static Azure.AI.OpenAI.ChatCompletionsToolCall ToAzureSdkChatCompletionsToolCall(this ChatCompletionsToolCall toolCall)
+        public static ChatToolCall ToChatToolCall(this ChatCompletionsToolCall toolCall)
         {
             if (toolCall.Type == ToolType.Function)
             {
                 ChatCompletionsFunctionToolCall functionToolCall = (ChatCompletionsFunctionToolCall)toolCall;
-                return new Azure.AI.OpenAI.ChatCompletionsFunctionToolCall(functionToolCall.Id, functionToolCall.Name, functionToolCall.Arguments);
+                return ChatToolCall.CreateFunctionToolCall(functionToolCall.Id, functionToolCall.Name, functionToolCall.Arguments);
             }
 
             throw new TeamsAIException($"Invalid tool type: {toolCall.Type}");
