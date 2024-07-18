@@ -11,10 +11,11 @@ import { TurnContext } from 'botbuilder';
 import EventEmitter from 'events';
 import { ClientOptions, AzureOpenAI, OpenAI } from 'openai';
 import {
-    ChatCompletionCreateParams,
+    type ChatCompletionCreateParams,
     ChatCompletionMessageParam,
     ChatCompletionChunk,
-    ChatCompletion
+    ChatCompletion,
+    ChatCompletionTool
 } from 'openai/resources';
 import { Stream } from 'openai/streaming';
 
@@ -257,7 +258,7 @@ export class OpenAIModel implements PromptCompletionModel {
 
     /**
      * Events emitted by the model.
-     * @returns {PromptCompletionModelEmitter} The events emitted by the model.
+     * @returns {PromptCompletionModelEmitter} The event emitter.
      */
     public get events(): PromptCompletionModelEmitter {
         return this._events;
@@ -408,11 +409,32 @@ export class OpenAIModel implements PromptCompletionModel {
         messages: Message<string>[],
         template: PromptTemplate
     ): ChatCompletionCreateParams {
+        const includeTools = template.config.completion.include_tools ?? false;
+
+        const completion = {
+            ...template.config.completion,
+            tool_choice: template.config.completion.tool_choice ?? 'auto',
+            tools: includeTools
+                ? template.actions?.map((action) => {
+                      return {
+                          type: 'function',
+                          function: {
+                              name: action.name,
+                              description: action.description,
+                              parameters: action.parameters
+                          }
+                      } as ChatCompletionTool;
+                  })
+                : undefined,
+            // Only include parallel_tool_calls if tools are enabled and the template has it set; otherwise, it will default to true without being added to the API call
+            parallel_tool_calls: includeTools ? template.config.completion.parallel_tool_calls : undefined
+        };
+
         const params: ChatCompletionCreateParams = this.copyOptionsToRequest<ChatCompletionCreateParams>(
             {
                 messages: messages as ChatCompletionMessageParam[]
             },
-            template.config.completion,
+            completion,
             [
                 'max_tokens',
                 'temperature',
@@ -432,7 +454,8 @@ export class OpenAIModel implements PromptCompletionModel {
                 'response_format',
                 'seed',
                 'tool_choice',
-                'tools'
+                'tools',
+                'parallel_tool_calls'
             ]
         );
         if (this.options.responseFormat) {
