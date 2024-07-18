@@ -109,7 +109,7 @@ export interface CompletionConfig {
     tool_choice?: Chat.ChatCompletionToolChoiceOption;
 
     /**
-     * Opetional. Enables parallel tools function calling. Defaults to true.
+     * Optional. Enables parallel tools function calling. Defaults to true.
      */
     parallel_tool_calls?: boolean;
 }
