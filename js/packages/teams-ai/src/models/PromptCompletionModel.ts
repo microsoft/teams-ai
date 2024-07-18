@@ -6,12 +6,14 @@
  * Licensed under the MIT License.
  */
 
+import EventEmitter from 'events';
+
 import { TurnContext } from 'botbuilder-core';
 import { Message, PromptFunctions, PromptTemplate } from '../prompts';
 import { Tokenizer } from '../tokenizers';
+import { PromptResponse } from '../types';
 import { Memory } from '../MemoryFork';
 import StrictEventEmitter from '../external/strict-event-emitter-types';
-import EventEmitter from 'events';
 
 /**
  * Events emitted by a PromptCompletionModel.
@@ -26,7 +28,14 @@ export interface PromptCompletionModelEvents {
      * @param template Prompt template being completed.
      * @param streaming `true` if the prompts response is being streamed.
      */
-    beforeCompletion: (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate, streaming: boolean) => void;
+    beforeCompletion: (
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        template: PromptTemplate,
+        streaming: boolean
+    ) => void;
 
     /**
      * Triggered when a chunk is received from the model via streaming.
@@ -35,7 +44,7 @@ export interface PromptCompletionModelEvents {
      * @param chunk Message delta received from the model.
      */
     chunkReceived: (context: TurnContext, memory: Memory, chunk: PromptChunk) => void;
-    
+
     /**
      * Triggered after the model finishes returning a response.
      * @param context Current turn context.
@@ -48,17 +57,32 @@ export interface PromptCompletionModelEvents {
 /**
  * Type signature for the `beforeCompletion` event of a `PromptCompletionModel`.
  */
-export type PromptCompletionModelBeforeCompletionEvent = (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate, streaming: boolean) => void;
+export type PromptCompletionModelBeforeCompletionEvent = (
+    context: TurnContext,
+    memory: Memory,
+    functions: PromptFunctions,
+    tokenizer: Tokenizer,
+    template: PromptTemplate,
+    streaming: boolean
+) => void;
 
 /**
  * Type signature for the `chunkReceived` event of a `PromptCompletionModel`.
  */
-export type PromptCompletionModelChunkReceivedEvent = (context: TurnContext, memory: Memory, chunk: PromptChunk) => void;
+export type PromptCompletionModelChunkReceivedEvent = (
+    context: TurnContext,
+    memory: Memory,
+    chunk: PromptChunk
+) => void;
 
 /**
  * Type signature for the `responseReceived` event of a `PromptCompletionModel`.
  */
-export type PromptCompletionModelResponseReceivedEvent = (context: TurnContext, memory: Memory, response: PromptResponse<string>) => void;
+export type PromptCompletionModelResponseReceivedEvent = (
+    context: TurnContext,
+    memory: Memory,
+    response: PromptResponse<string>
+) => void;
 
 /**
  * Helper type that strongly types the the EventEmitter for a PromptCOmpletionModel instance.
@@ -90,45 +114,6 @@ export interface PromptCompletionModel {
         tokenizer: Tokenizer,
         template: PromptTemplate
     ): Promise<PromptResponse<string>>;
-}
-
-/**
- * Status of the prompt response.
- * @remarks
- * `success` - The prompt was successfully completed.
- * `error` - An error occurred while completing the prompt.
- * `rate_limited` - The request was rate limited.
- * `invalid_response` - The response was invalid.
- * `too_long` - The rendered prompt exceeded the `max_input_tokens` limit.
- */
-export type PromptResponseStatus = 'success' | 'error' | 'rate_limited' | 'invalid_response' | 'too_long';
-
-/**
- * Response returned by a `PromptCompletionClient`.
- * @template TContent Optional. Type of the content in the message. Defaults to `unknown`.
- */
-export interface PromptResponse<TContent = unknown> {
-    /**
-     * Status of the prompt response.
-     */
-    status: PromptResponseStatus;
-
-    /**
-     * User input message sent to the model. `undefined` if no input was sent.
-     */
-    input?: Message<any>;
-
-    /**
-     * Message returned.
-     * @remarks
-     * This will be a `Message<TContent>` object if the status is `success`, otherwise it will be a `string`.
-     */
-    message?: Message<TContent>;
-
-    /**
-     * Error returned.
-     */
-    error?: Error;
 }
 
 /**
