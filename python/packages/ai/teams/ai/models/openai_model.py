@@ -204,7 +204,7 @@ class OpenAIModel(PromptCompletionModel):
             for message in tool_outputs:
                 messages.append(message)
             memory.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, False)
-            memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, {})
+            memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, [])
             memory.set(SUBMIT_TOOL_OUTPUTS_MAP, {})
             memory.set(SUBMIT_TOOL_HISTORY, [])
 

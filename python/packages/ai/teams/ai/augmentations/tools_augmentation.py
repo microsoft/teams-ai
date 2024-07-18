@@ -146,7 +146,7 @@ class ToolsAugmentation(Augmentation[Union[str, List[chat.ChatCompletionMessageT
             if len(valid_action_tool_calls) == 0:
                 memory.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, False)
                 memory.set(SUBMIT_TOOL_OUTPUTS_MAP, {})
-                memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, {})
+                memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, [])
                 memory.set(SUBMIT_TOOL_HISTORY, [])
 
             return Validation(

@@ -165,7 +165,7 @@ class ActionPlanner(Planner[StateT]):
 
             # Ensure clean state
             memory.set(SUBMIT_TOOL_OUTPUTS_MAP, {})
-            memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, {})
+            memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, [])
             memory.set(SUBMIT_TOOL_HISTORY, [])
 
         elif memory.get(SUBMIT_TOOL_OUTPUTS_VARIABLE) is True:
@@ -191,7 +191,7 @@ class ActionPlanner(Planner[StateT]):
                 # Reset state
                 memory.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, False)
                 memory.set(SUBMIT_TOOL_OUTPUTS_MAP, {})
-                memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, {})
+                memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, [])
                 memory.set(SUBMIT_TOOL_HISTORY, [])
         return memory
 

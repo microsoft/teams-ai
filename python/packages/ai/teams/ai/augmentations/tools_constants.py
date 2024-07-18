@@ -14,7 +14,7 @@ SUBMIT_TOOL_OUTPUTS_MAP = "temp.submit_tool_map"
 # Map of tool_name to tool_id
 
 SUBMIT_TOOL_OUTPUTS_MESSAGES = "temp.submit_tool_messages"
-# Map of tool_name to tool_output messages
+# List of tool_output messages
 
 SUBMIT_TOOL_HISTORY = "temp.tool_history"
 # List of all the messages from the model
