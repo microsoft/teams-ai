@@ -735,5 +735,5 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
 
         self.assertFalse(tool_var)
         self.assertEqual(tool_map, {})
-        self.assertEqual(tool_outputs, {})
+        self.assertEqual(tool_outputs, [])
         self.assertEqual(len(tool_history), 0)
