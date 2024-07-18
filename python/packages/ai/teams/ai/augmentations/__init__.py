@@ -9,6 +9,7 @@ from .monologue_augmentation import MonologueAugmentation
 from .sequence_augmentation import SequenceAugmentation
 from .tools_augmentation import ToolsAugmentation
 from .tools_constants import (
+    SUBMIT_TOOL_HISTORY,
     SUBMIT_TOOL_OUTPUTS_MAP,
     SUBMIT_TOOL_OUTPUTS_MESSAGES,
     SUBMIT_TOOL_OUTPUTS_VARIABLE,
@@ -23,4 +24,5 @@ __all__ = [
     "SUBMIT_TOOL_OUTPUTS_VARIABLE",
     "SUBMIT_TOOL_OUTPUTS_MAP",
     "SUBMIT_TOOL_OUTPUTS_MESSAGES",
+    "SUBMIT_TOOL_HISTORY",
 ]

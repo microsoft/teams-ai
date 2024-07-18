@@ -21,6 +21,7 @@ from ..tokenizers.tokenizer import Tokenizer
 from ..validators.validation import Validation
 from .augmentation import Augmentation
 from .tools_constants import (
+    SUBMIT_TOOL_HISTORY,
     SUBMIT_TOOL_OUTPUTS_MAP,
     SUBMIT_TOOL_OUTPUTS_MESSAGES,
     SUBMIT_TOOL_OUTPUTS_VARIABLE,
@@ -146,6 +147,7 @@ class ToolsAugmentation(Augmentation[Union[str, List[chat.ChatCompletionMessageT
                 memory.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, False)
                 memory.set(SUBMIT_TOOL_OUTPUTS_MAP, {})
                 memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, {})
+                memory.set(SUBMIT_TOOL_HISTORY, [])
 
             return Validation(
                 valid=True,

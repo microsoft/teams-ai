@@ -16,6 +16,7 @@ from openai.types import chat, shared_params
 
 from ...state import MemoryBase
 from ..augmentations.tools_constants import (
+    SUBMIT_TOOL_HISTORY,
     SUBMIT_TOOL_OUTPUTS_MAP,
     SUBMIT_TOOL_OUTPUTS_MESSAGES,
     SUBMIT_TOOL_OUTPUTS_VARIABLE,
@@ -136,13 +137,21 @@ class OpenAIModel(PromptCompletionModel):
             and template.config.augmentation.augmentation_type == "tools"
         )
         is_tools_enabled = template.config.completion.include_tools and is_tools_aug
-        tool_choice = template.config.completion.tool_choice or "auto"
-        parallel_tool_calls = template.config.completion.parallel_tool_calls or True
+        tool_choice = (
+            template.config.completion.tool_choice
+            if template.config.completion.tool_choice is not None
+            else "auto"
+        )
+        parallel_tool_calls = (
+            template.config.completion.parallel_tool_calls
+            if template.config.completion.parallel_tool_calls is not None
+            else True
+        )
         tools: List[chat.ChatCompletionToolParam] = []
 
         # If tools is enabled, reformat actions to schema
         if is_tools_enabled:
-            if not template.actions:
+            if not template.actions or len(template.actions) == 0:
                 return PromptResponse[str](
                     status="tools_error", error="Missing tools in template.actions"
                 )
@@ -187,7 +196,7 @@ class OpenAIModel(PromptCompletionModel):
 
         # Submit tool outputs, if previously invoked
         if memory.get(SUBMIT_TOOL_OUTPUTS_VARIABLE) is True:
-            prev_messages = memory.get("temp.tool_messages") or []
+            prev_messages = memory.get(SUBMIT_TOOL_HISTORY) or []
             messages.extend(prev_messages)
             tool_outputs: List[chat.ChatCompletionToolMessageParam] = (
                 memory.get(SUBMIT_TOOL_OUTPUTS_MESSAGES) or []
@@ -197,6 +206,7 @@ class OpenAIModel(PromptCompletionModel):
             memory.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, False)
             memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, {})
             memory.set(SUBMIT_TOOL_OUTPUTS_MAP, {})
+            memory.set(SUBMIT_TOOL_HISTORY, [])
 
         for msg in res.output:
             param: Union[
@@ -273,7 +283,7 @@ class OpenAIModel(PromptCompletionModel):
                         messages.append(
                             cast(chat.ChatCompletionAssistantMessageParam, response_message)
                         )
-                        memory.set("temp.tool_messages", messages)
+                        memory.set(SUBMIT_TOOL_HISTORY, messages)
                 else:
                     if tool_choice == "required":
                         return PromptResponse[str](

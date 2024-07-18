@@ -16,6 +16,7 @@ from ...app_error import ApplicationError
 from ...state import MemoryBase, TurnState
 from ..augmentations.default_augmentation import DefaultAugmentation
 from ..augmentations.tools_constants import (
+    SUBMIT_TOOL_HISTORY,
     SUBMIT_TOOL_OUTPUTS_MAP,
     SUBMIT_TOOL_OUTPUTS_MESSAGES,
     SUBMIT_TOOL_OUTPUTS_VARIABLE,
@@ -165,6 +166,7 @@ class ActionPlanner(Planner[StateT]):
             # Ensure clean state
             memory.set(SUBMIT_TOOL_OUTPUTS_MAP, {})
             memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, {})
+            memory.set(SUBMIT_TOOL_HISTORY, [])
 
         elif memory.get(SUBMIT_TOOL_OUTPUTS_VARIABLE) is True:
             # Submit tool outputs
@@ -190,6 +192,7 @@ class ActionPlanner(Planner[StateT]):
                 memory.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, False)
                 memory.set(SUBMIT_TOOL_OUTPUTS_MAP, {})
                 memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, {})
+                memory.set(SUBMIT_TOOL_HISTORY, [])
         return memory
 
     def add_semantic_function(
