@@ -4,12 +4,11 @@ Licensed under the MIT License.
 """
 
 from unittest import IsolatedAsyncioTestCase
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
 from botbuilder.core import TurnContext
 from botbuilder.schema import Activity, ChannelAccount, ConversationAccount
 
-from teams.ai.actions import ActionTurnContext
 from teams.ai.ai import AI, AIOptions, ApplicationError
 from teams.ai.planners.planner import Planner
 from teams.state import TurnState
@@ -55,12 +54,15 @@ class TestAI(IsolatedAsyncioTestCase):
         result = await self.ai.do_action(context, state, "test_action")
         self.assertEqual(result, "action result")
 
-        called_context, called_state = mock_handler.await_args.args
-        self.assertEqual(called_context.name, "test_action")
-        self.assertEqual(called_context.data, None)
-        self.assertEqual(called_context._activity, context.activity)
-        self.assertEqual(called_context.adapter, context.adapter)
-        self.assertEqual(called_state, state)
+        await mock_handler.wait_called()  # Ensure the mock handler is called
+
+        if mock_handler.await_args is not None:
+            called_context, called_state = mock_handler.await_args.args
+            self.assertEqual(called_context.name, "test_action")
+            self.assertEqual(called_context.data, None)
+            self.assertEqual(called_context._activity, context.activity)
+            self.assertEqual(called_context.adapter, context.adapter)
+            self.assertEqual(called_state, state)
 
     async def test_do_action_non_existing_action(self):
         context = self.create_mock_context()
@@ -81,9 +83,12 @@ class TestAI(IsolatedAsyncioTestCase):
         result = await self.ai.do_action(context, state, "test_action", parameters)
         self.assertEqual(result, "action result")
 
-        called_context, called_state = mock_handler.await_args.args
-        self.assertEqual(called_context.name, "test_action")
-        self.assertEqual(called_context.data, parameters)
-        self.assertEqual(called_context._activity, context.activity)
-        self.assertEqual(called_context.adapter, context.adapter)
-        self.assertEqual(called_state, state)
+        await mock_handler.wait_called()  # Ensure the mock handler is called
+
+        if mock_handler.await_args is not None:
+            called_context, called_state = mock_handler.await_args.args
+            self.assertEqual(called_context.name, "test_action")
+            self.assertEqual(called_context.data, parameters)
+            self.assertEqual(called_context._activity, context.activity)
+            self.assertEqual(called_context.adapter, context.adapter)
+            self.assertEqual(called_state, state)

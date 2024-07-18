@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from logging import Logger
-from typing import Callable, Dict, Generic, Optional, TypeVar
+from typing import Any, Callable, Dict, Generic, Optional, TypeVar
 
 from botbuilder.core import TurnContext
 from botbuilder.schema import Activity, ActivityTypes
