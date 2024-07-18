@@ -59,7 +59,7 @@ class ToolsAugmentation(Augmentation[Union[str, List[chat.ChatCompletionMessageT
             context (TurnContext): Context for the current turn of conversation.
             memory (MemoryBase): Interface for accessing state variables.
             tokenizer (Tokenizer): Tokenizer to use for encoding/decoding text.
-            response (PromptResponse[Union[str, List[chat.ChatCompletionMessageToolCall]]]): 
+            response (PromptResponse[Union[str, List[chat.ChatCompletionMessageToolCall]]]):
                 Response to validate.
             remaining_attempts (int): Nubmer of remaining attempts to validate the response.
 

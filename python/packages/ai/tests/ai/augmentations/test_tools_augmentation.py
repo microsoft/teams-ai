@@ -127,9 +127,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 action_tool_calls=[
                     chat.ChatCompletionMessageToolCall(
                         id="call_3PqbuK5OrvmImKb6VURn2jXz",
-                        function=Function(
-                            arguments="{}", name="LightsOn"
-                        ),
+                        function=Function(arguments="{}", name="LightsOn"),
                         type="function",
                     )
                 ],
@@ -171,9 +169,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 action_tool_calls=[
                     chat.ChatCompletionMessageToolCall(
                         id="call_3PqbuK5OrvmImKb6VURn2jXz",
-                        function=Function(
-                            arguments="{}", name="LightsOn"
-                        ),
+                        function=Function(arguments="{}", name="LightsOn"),
                         type="function",
                     )
                 ],
@@ -201,9 +197,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         state.set("temp.tool_choice", {"type": "function", "function": {"name": "LightsOn"}})
         tool_call_one = chat.ChatCompletionMessageToolCall(
             id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(
-                arguments="{}", name="LightsOn"
-            ),
+            function=Function(arguments="{}", name="LightsOn"),
             type="function",
         )
 
@@ -248,9 +242,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         state.set("temp.tool_choice", {"type": "function", "function": {"name": "Pause"}})
         tool_call_one = chat.ChatCompletionMessageToolCall(
             id="call_Y3M0cw8T8LRuINOiLaQHs5jk",
-            function=Function(
-                arguments='{"time": 10}', name="Pause"
-            ),
+            function=Function(arguments='{"time": 10}', name="Pause"),
             type="function",
         )
 
@@ -310,9 +302,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         state.set("temp.tool_choice", {"type": "function", "function": {"name": "Pause"}})
         tool_call_one = chat.ChatCompletionMessageToolCall(
             id="call_Y3M0cw8T8LRuINOiLaQHs5jk",
-            function=Function(
-                arguments="{}", name="Pause"
-            ),
+            function=Function(arguments="{}", name="Pause"),
             type="function",
         )
 
@@ -374,9 +364,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         state.set("temp.tool_choice", {"type": "function", "function": {"name": "Pause"}})
         tool_call_one = chat.ChatCompletionMessageToolCall(
             id="call_Y3M0cw8T8LRuINOiLaQHs5jk",
-            function=Function(
-                arguments="{}", name="Pause"
-            ),
+            function=Function(arguments="{}", name="Pause"),
             type="function",
         )
 
@@ -420,9 +408,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
         tool_call_one = chat.ChatCompletionMessageToolCall(
             id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(
-                arguments="{}", name="LightsOn"
-            ),
+            function=Function(arguments="{}", name="LightsOn"),
             type="function",
         )
 
@@ -469,9 +455,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
         tool_call_one = chat.ChatCompletionMessageToolCall(
             id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(
-                arguments="{}", name="Lights"
-            ),
+            function=Function(arguments="{}", name="Lights"),
             type="function",
         )
 
@@ -520,16 +504,12 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
         tool_call_one = chat.ChatCompletionMessageToolCall(
             id="call_Y3M0cw8T8LRuINOiLaQHs5jk",
-            function=Function(
-                arguments='{"time": 10}', name="Pause"
-            ),
+            function=Function(arguments='{"time": 10}', name="Pause"),
             type="function",
         )
         tool_call_two = chat.ChatCompletionMessageToolCall(
             id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(
-                arguments="{}", name="LightsOn"
-            ),
+            function=Function(arguments="{}", name="LightsOn"),
             type="function",
         )
 
@@ -589,16 +569,12 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
         tool_call_one = chat.ChatCompletionMessageToolCall(
             id="call_Y3M0cw8T8LRuINOiLaQHs5jk",
-            function=Function(
-                arguments="{}", name="Pause"
-            ),
+            function=Function(arguments="{}", name="Pause"),
             type="function",
         )
         tool_call_two = chat.ChatCompletionMessageToolCall(
             id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(
-                arguments="{}", name="LightsOn"
-            ),
+            function=Function(arguments="{}", name="LightsOn"),
             type="function",
         )
 
@@ -683,9 +659,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, False)
         tool_call_one = chat.ChatCompletionMessageToolCall(
             id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(
-                arguments="{}", name="LightsOn"
-            ),
+            function=Function(arguments="{}", name="LightsOn"),
             type="function",
         )
         tools = [tool_call_one]
@@ -737,9 +711,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
         tool_call_one = chat.ChatCompletionMessageToolCall(
             id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(
-                arguments="{}", name="LightsOn"
-            ),
+            function=Function(arguments="{}", name="LightsOn"),
             type="function",
         )
         tools = [tool_call_one]
@@ -776,8 +748,9 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         self.assertEqual(plan.commands[0].action, "LightsOn")
         self.assertEqual(plan.commands[0].parameters, {})
 
-        tool_map = cast(Dict[str, chat.ChatCompletionToolMessageParam],
-                        state.get(SUBMIT_TOOL_OUTPUTS_MAP))
+        tool_map = cast(
+            Dict[str, chat.ChatCompletionToolMessageParam], state.get(SUBMIT_TOOL_OUTPUTS_MAP)
+        )
         self.assertTrue("LightsOn" in tool_map)
         self.assertEqual(tool_map["LightsOn"], "call_3PqbuK5OrvmImKb6VURn2jXz")
 
@@ -787,16 +760,12 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
         tool_call_one = chat.ChatCompletionMessageToolCall(
             id="call_Y3M0cw8T8LRuINOiLaQHs5jk",
-            function=Function(
-                arguments='{"time": 10}', name="Pause"
-            ),
+            function=Function(arguments='{"time": 10}', name="Pause"),
             type="function",
         )
         tool_call_two = chat.ChatCompletionMessageToolCall(
             id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(
-                arguments="{}", name="LightsOn"
-            ),
+            function=Function(arguments="{}", name="LightsOn"),
             type="function",
         )
         tools = [tool_call_one, tool_call_two]
@@ -837,8 +806,9 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         self.assertEqual(plan.commands[1].action, "LightsOn")
         self.assertEqual(plan.commands[1].parameters, {})
 
-        tool_map = cast(Dict[str, chat.ChatCompletionToolMessageParam],
-                        state.get(SUBMIT_TOOL_OUTPUTS_MAP))
+        tool_map = cast(
+            Dict[str, chat.ChatCompletionToolMessageParam], state.get(SUBMIT_TOOL_OUTPUTS_MAP)
+        )
         self.assertTrue("Pause" in tool_map)
         self.assertEqual(tool_map["Pause"], "call_Y3M0cw8T8LRuINOiLaQHs5jk")
         self.assertTrue("LightsOn" in tool_map)

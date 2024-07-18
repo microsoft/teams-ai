@@ -27,7 +27,7 @@ class Message(Generic[T], DataClassJsonMixin):
         content (Optional[T]): Text of the message.
         function_call (Optional[FunctionCall]): A named function to call.
         name (Optional[str]): Name of the function that was called.
-        action_tool_calls (Optional[List[chat.ChatCompletionMessageToolCall]]): 
+        action_tool_calls (Optional[List[chat.ChatCompletionMessageToolCall]]):
             List of tool calls from the model.
     """
 
