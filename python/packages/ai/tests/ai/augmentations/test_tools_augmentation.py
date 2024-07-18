@@ -412,7 +412,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
             remaining_attempts=0,
         )
         self.assertEqual(validation.valid, False)
-        self.assertEqual(validation.feedback, "The evoked tool does not exist.")
+        self.assertEqual(validation.feedback, "The invoked tool does not exist.")
 
     async def test_validate_tool_call_response_multiple_tools(self):
         state = TurnState()
@@ -840,6 +840,6 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         tool_map = cast(Dict[str, chat.ChatCompletionToolMessageParam],
                         state.get(SUBMIT_TOOL_OUTPUTS_MAP))
         self.assertTrue("Pause" in tool_map)
-        self.assertEqual(tool_map, "call_Y3M0cw8T8LRuINOiLaQHs5jk")
+        self.assertEqual(tool_map["Pause"], "call_Y3M0cw8T8LRuINOiLaQHs5jk")
         self.assertTrue("LightsOn" in tool_map)
         self.assertEqual(tool_map["LightsOn"], "call_3PqbuK5OrvmImKb6VURn2jXz")
