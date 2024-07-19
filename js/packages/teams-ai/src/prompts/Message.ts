@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import ChatCompletionMessageToolCall from 'openai';
+import { ChatCompletionMessageToolCall } from 'openai/resources';
 
 /**
  * A message object sent to or received from an LLM.
@@ -14,7 +14,7 @@ import ChatCompletionMessageToolCall from 'openai';
  */
 export interface Message<TContent = string> {
     /**
-     * The messages role. Typically 'system', 'user', 'assistant', 'function'.
+     * The messages role. Typically 'system', 'user', 'assistant', 'tool', 'function'.
      */
     role: string;
 
