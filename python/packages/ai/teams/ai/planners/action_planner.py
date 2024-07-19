@@ -170,7 +170,7 @@ class ActionPlanner(Planner[StateT]):
 
         elif memory.get(SUBMIT_TOOL_OUTPUTS_VARIABLE) is True:
             # Submit tool outputs
-            action_outputs = memory.get("temp.action_outputs") or []
+            action_outputs = memory.get("temp.action_outputs") or {}
             tool_map = memory.get(SUBMIT_TOOL_OUTPUTS_MAP) or {}
             tool_outputs: List[chat.ChatCompletionToolMessageParam] = []
 
