@@ -11,6 +11,7 @@ from .input_file import InputFile
 from .message_reaction_types import MessageReactionTypes
 from .query import Query
 from .teams_adapter import TeamsAdapter
+from .feedback_loop_data import FeedbackLoopData, FeedbackLoopActionValue
 
 __all__ = [
     "ActivityType",
@@ -22,4 +23,6 @@ __all__ = [
     "Query",
     "TeamsAdapter",
     "MessageReactionTypes",
+    "FeedbackLoopData",
+    "FeedbackLoopActionValue"
 ]

@@ -12,6 +12,7 @@ from botbuilder.core import TurnContext
 from botbuilder.schema import Activity, ChannelAccount, ConversationAccount
 
 from teams import Application
+from teams.feedback_loop_data import FeedbackLoopActionValue, FeedbackLoopData
 from teams.message_reaction_types import MessageReactionTypes
 from tests.utils import SimpleAdapter
 
@@ -775,3 +776,32 @@ class TestApp(IsolatedAsyncioTestCase):
         )
 
         on_handoff.assert_called_once()
+    
+    @pytest.mark.asyncio
+    async def test_feedback_loop(self):
+        on_feedback_loop = mock.AsyncMock()
+        self.app.feedback_loop()(on_feedback_loop)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="message/submitAction",
+                    reply_to_id="5678",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value=FeedbackLoopData(
+                        action_name="feedback",
+                        action_value=FeedbackLoopActionValue(
+                            reaction="like", feedback="Thanks for liking this"),reply_to_id="5678")
+                ),
+            )
+        )
+
+        on_feedback_loop.assert_called_once()
