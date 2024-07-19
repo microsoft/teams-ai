@@ -11,19 +11,19 @@
  */
 export const ToolsAugmentationConstants = {
     /**
-     * 'temp.tool_history': List of all the messages from the model.
+     * 'temp.toolHistory': List of all the messages from the model.
      */
-    SUBMIT_TOOL_HISTORY: 'temp.tool_history',
+    SUBMIT_TOOL_HISTORY: 'temp.toolHistory',
     /**
-     * 'temp.submit_tool_outputs_map': Map of tool_name and tool_id
+     * 'temp.submitToolOutputsMap': Map of tool_name and tool_id
      */
-    SUBMIT_TOOL_OUTPUTS_MAP: 'temp.submit_tool_outputs_map',
+    SUBMIT_TOOL_OUTPUTS_MAP: 'temp.submitToolOutputsMap',
     /**
-     * 'temp.submit_tool_outputs_messages': List of tools messages sent back from LLM.
+     * 'temp.submitToolOutputsMessages': List of tools messages sent back from LLM.
      */
-    SUBMIT_TOOL_OUTPUTS_MESSAGES: 'temp.submit_tool_outputs_messages',
+    SUBMIT_TOOL_OUTPUTS_MESSAGES: 'temp.submitToolOutputsMessages',
     /**
-     * 'temp.submit_tool_outputs': Boolean flag to denote roundtrip tool calls to the LLM.
+     * 'temp.submitToolOutputs': Boolean flag to denote roundtrip tool calls to the LLM.
      */
-    SUBMIT_TOOL_OUTPUTS_VARIABLE: 'temp.submit_tool_outputs'
+    SUBMIT_TOOL_OUTPUTS_VARIABLE: 'temp.submitToolOutputs'
 };

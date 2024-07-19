@@ -64,7 +64,7 @@ export class ToolsAugmentation implements Augmentation<string | ChatCompletionMe
         ) {
             const actionToolCalls: ChatCompletionMessageToolCall[] = response.message.action_tool_calls!;
             const actions = this._actions;
-            const toolChoice = memory.getValue('temp.tool_choice') || 'auto';
+            const toolChoice = memory.getValue('temp.toolChoice') || 'auto';
 
             // Call a single tool where tool_choice is a single action definition
             if (toolChoice instanceof Map) {
