@@ -250,8 +250,10 @@ class Application(Bot, Generic[StateT]):
                 hits = re.match(select, text)
                 return hits is not None
 
-            i = context.activity.text.find(select)
-            return i > -1
+            if context.activity.text:
+                i = context.activity.text.find(select)
+                return i > -1
+            return False
 
         def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
             self._routes.append(Route[StateT](__selector__, func))
