@@ -763,7 +763,6 @@ class TestApp(IsolatedAsyncioTestCase):
                 Activity(
                     id="1234",
                     type="invoke",
-                    channel_data={"feedback_loop_enabled": True},
                     name="handoff/action",
                     from_property=ChannelAccount(id="user", name="User Name"),
                     recipient=ChannelAccount(id="bot", name="Bot Name"),
@@ -790,6 +789,7 @@ class TestApp(IsolatedAsyncioTestCase):
                     id="1234",
                     type="invoke",
                     name="message/submitAction",
+                    channel_data={"feedback_loop_enabled": True},
                     reply_to_id="5678",
                     from_property=ChannelAccount(id="user", name="User Name"),
                     recipient=ChannelAccount(id="bot", name="Bot Name"),
