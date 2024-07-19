@@ -24,11 +24,11 @@
         "dotenv": "^16.4.5",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
-        "openai": "^4.41.0"
+        "openai": "4.28.4"
     },
     "devDependencies": {
         "@types/jsonwebtoken": "^9.0.6",
-        "@types/node": "^20.14.10",
+        "@types/node": "^20.14.11",
         "@types/restify": "^8.5.12",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",

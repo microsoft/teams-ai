@@ -33,7 +33,7 @@
         "botbuilder": "^4.22.3",
         "debug": "^4.3.5",
         "dotenv": "^16.4.1",
-        "openai": "^4.41.0",
+        "openai": "4.28.4",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
         "vectra": "^0.7.6"
@@ -41,7 +41,7 @@
     "devDependencies": {
         "@types/debug": "^4.1.12",
         "@types/jsonwebtoken": "^8.5.0",
-        "@types/node": "^20.14.10",
+        "@types/node": "^20.14.11",
         "@types/restify": "8.5.12",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
