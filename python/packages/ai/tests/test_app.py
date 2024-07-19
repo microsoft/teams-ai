@@ -763,6 +763,7 @@ class TestApp(IsolatedAsyncioTestCase):
                 Activity(
                     id="1234",
                     type="invoke",
+                    channel_data={"feedback_loop_enabled": True},
                     name="handoff/action",
                     from_property=ChannelAccount(id="user", name="User Name"),
                     recipient=ChannelAccount(id="bot", name="Bot Name"),
@@ -776,7 +777,7 @@ class TestApp(IsolatedAsyncioTestCase):
         )
 
         on_handoff.assert_called_once()
-    
+
     @pytest.mark.asyncio
     async def test_feedback_loop(self):
         on_feedback_loop = mock.AsyncMock()
@@ -799,7 +800,10 @@ class TestApp(IsolatedAsyncioTestCase):
                     value=FeedbackLoopData(
                         action_name="feedback",
                         action_value=FeedbackLoopActionValue(
-                            reaction="like", feedback="Thanks for liking this"),reply_to_id="5678")
+                            reaction="like", feedback="Thanks for liking this"
+                        ),
+                        reply_to_id="5678",
+                    ),
                 ),
             )
         )

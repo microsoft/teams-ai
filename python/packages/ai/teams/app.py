@@ -38,6 +38,7 @@ from .ai import AI
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
 from .auth import AuthManager, OAuth, OAuthOptions
+from .feedback_loop_data import FeedbackLoopData
 from .meetings.meetings import Meetings
 from .message_extensions.message_extensions import MessageExtensions
 from .route import Route, RouteHandler
@@ -45,7 +46,6 @@ from .state import TurnState
 from .task_modules import TaskModules
 from .teams_adapter import TeamsAdapter
 from .typing import Typing
-from .feedback_loop_data import FeedbackLoopData
 
 StateT = TypeVar("StateT", bound=TurnState)
 IN_SIGN_IN_KEY = "__InSignInFlow__"
@@ -581,7 +581,7 @@ class Application(Bot, Generic[StateT]):
     ]:
         """
         Registers a handler for feedback loop events when a user clicks the thumbs
-        up or down button on a response from AI. 
+        up or down button on a response from AI.
         enable_feedback_loop must be set to true in the AI Module.
          ```python
         # Use this method as a decorator
@@ -608,8 +608,10 @@ class Application(Bot, Generic[StateT]):
             async def __handler__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
-                
-                feedback = FeedbackLoopData(**context.activity.value, reply_to_id=context.activity.reply_to_id)
+
+                feedback = context.activity.value
+                feedback.reply_to_id=context.activity.reply_to_id
+
                 await func(context, state, feedback)
                 await context.send_activity(
                     Activity(type=ActivityTypes.invoke_response, value=InvokeResponse(status=200))

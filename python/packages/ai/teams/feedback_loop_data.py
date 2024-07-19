@@ -7,14 +7,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Literal
+
 from dataclasses_json import DataClassJsonMixin, dataclass_json
+
 
 @dataclass_json
 @dataclass
 class FeedbackLoopData(DataClassJsonMixin):
     """
-    Data returned when the thumbs up or down button 
-    is clicked and response sent when enable_feedback_loop 
+    Data returned when the thumbs up or down button
+    is clicked and response sent when enable_feedback_loop
     is set to true in the AI Module.
     """
 
