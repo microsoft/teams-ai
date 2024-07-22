@@ -23,7 +23,7 @@ import { Colorize } from '../internals';
 import { Memory } from '../MemoryFork';
 import { Message, PromptFunctions, PromptTemplate } from '../prompts';
 import { Tokenizer } from '../tokenizers';
-import { PromptResponse } from '../types';
+import { PromptResponse, ToolsAugmentationConstants } from '../types';
 
 import { PromptCompletionModel, PromptCompletionModelEmitter } from './PromptCompletionModel';
 
@@ -96,6 +96,9 @@ export interface BaseOpenAIModelOptions {
      */
     stream?: boolean;
 }
+
+// const { SUBMIT_TOOL_HISTORY, SUBMIT_TOOL_OUTPUTS_MAP, SUBMIT_TOOL_OUTPUTS_MESSAGES, SUBMIT_TOOL_OUTPUTS_VARIABLE } =
+//     ToolsAugmentationConstants;
 
 /**
  * Options for configuring an `OpenAIModel` to call an OpenAI hosted model.
@@ -321,10 +324,37 @@ export class OpenAIModel implements PromptCompletionModel {
         // - we're doing this here because the input message can be complex and include images.
         const input = this.getInputMessage(result.output);
 
+        // Setup action tools if ToolsAugmentation and actions exist
+        const isToolsEnabled = template.actions && template.config.augmentation?.augmentation_type == 'tools';
+
+        if (isToolsEnabled && template.actions!.length === 0) {
+            return this.returnError('noActions', input);
+        }
+
+        const chatCompletionTools = isToolsEnabled
+            ? template.actions?.map((action) => {
+                  return {
+                      type: 'function',
+                      function: {
+                          name: action.name,
+                          description: action.description,
+                          parameters: action.parameters
+                      }
+                  } as ChatCompletionTool;
+              })
+            : undefined;
+
+        if (chatCompletionTools) {
+            // Temporarily set to memory, to be used in getChatCompletionParams
+            memory.setValue('temp.chatCompletionTools', chatCompletionTools);
+        }
+
         try {
             // Call chat completion API
             let message: Message<string>;
-            const params = this.getChatCompletionParams(model, result.output, template);
+            const params = this.getChatCompletionParams(model, result.output, template, memory);
+            memory.deleteValue('temp.chatCompletionTools');
+
             const completion = await this._client.chat.completions.create(params);
             if (params.stream) {
                 // Log start of streaming
@@ -402,32 +432,25 @@ export class OpenAIModel implements PromptCompletionModel {
      * @param {string} model - Model to use.
      * @param {Message<string>[]} messages - Messages to send.
      * @param {PromptTemplate} template Prompt template being used.
+     * @param {Memory} memory - Current memory state.
      * @returns {ChatCompletionCreateParams} Chat completion parameters.
      */
     private getChatCompletionParams(
         model: string,
         messages: Message<string>[],
-        template: PromptTemplate
+        template: PromptTemplate,
+        memory: Memory
     ): ChatCompletionCreateParams {
-        const includeTools = template.config.completion.include_tools ?? false;
+        // Validate Tools Augmentation
+        const isToolsEnabled = template.actions && template.config.augmentation?.augmentation_type == 'tools';
+        const chatCompletionTools: ChatCompletionTool[] = memory.getValue('temp.chatCompletionTools') || undefined;
 
         const completion = {
             ...template.config.completion,
             tool_choice: template.config.completion.tool_choice ?? 'auto',
-            tools: includeTools
-                ? template.actions?.map((action) => {
-                      return {
-                          type: 'function',
-                          function: {
-                              name: action.name,
-                              description: action.description,
-                              parameters: action.parameters
-                          }
-                      } as ChatCompletionTool;
-                  })
-                : undefined,
+            tools: chatCompletionTools,
             // Only include parallel_tool_calls if tools are enabled and the template has it set; otherwise, it will default to true without being added to the API call
-            parallel_tool_calls: includeTools ? template.config.completion.parallel_tool_calls : undefined
+            parallel_tool_calls: isToolsEnabled ? template.config.completion.parallel_tool_calls : undefined
         };
 
         const params: ChatCompletionCreateParams = this.copyOptionsToRequest<ChatCompletionCreateParams>(
@@ -492,6 +515,19 @@ export class OpenAIModel implements PromptCompletionModel {
     }
 
     private returnError(err: unknown, input: Message<string> | undefined): PromptResponse<string> {
+        if (err === 'noActions') {
+            return {
+                status: 'error',
+                input,
+                error: new Error('Missing actions/tools from template.actions')
+            };
+        } else if (err === 'noToolsFromModel') {
+            return {
+                status: 'error',
+                input,
+                error: new Error(`Model did not return any tools`)
+            };
+        }
         if (err instanceof OpenAI.APIError) {
             if (err.status == 429) {
                 if (this.options.logRequests) {
