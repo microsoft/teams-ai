@@ -23,13 +23,19 @@ const { SUBMIT_TOOL_OUTPUTS_VARIABLE, SUBMIT_TOOL_OUTPUTS_MAP, SUBMIT_TOOL_OUTPU
     ToolsAugmentationConstants;
 
 /**
- * The 'tools' augmentation for enabling server-side action/tools calling.
+ * The 'tools' augmentation is for enabling server-side action/tools calling.
+ * In the Teams AI Library, the equivalent to OpenAI's 'tools' functionality is called an 'action'.
+ * More information about OpenAI's tools can be found at https://platform.openai.com/docs/api-reference/chat/create#chat-create-tool_choice.
+ *
+ * Therefore, tools/actions are defined in `actions.json`, and when 'tools' augmentation is set in `config.json`, the LLM model can specify which action(s) to call.
+ * To avoid using server-side tool-calling, do not set augmentation to 'tools' in `config.json`.
+ * Server-side tool-calling is not compatible with other augmentation types.
  */
 export class ToolsAugmentation implements Augmentation<string | ChatCompletionMessageToolCall[]> {
     private readonly _actions: ChatCompletionAction[];
 
     public constructor(actions: ChatCompletionAction[]) {
-        this._actions = actions;
+        this._actions = actions ?? [];
     }
     /**
      * @returns {PromptSection|undefined} Returns an optional prompt section for the augmentation.
@@ -54,7 +60,7 @@ export class ToolsAugmentation implements Augmentation<string | ChatCompletionMe
         response: PromptResponse<string>,
         remaining_attempts: number
     ): Promise<Validation> {
-        const validActionToolCalls: ChatCompletionMessageToolCall[] = [];
+        const validActionHandlers: ChatCompletionMessageToolCall[] = [];
 
         if (
             this._actions &&
@@ -62,15 +68,19 @@ export class ToolsAugmentation implements Augmentation<string | ChatCompletionMe
             response.message.action_tool_calls &&
             memory.getValue(SUBMIT_TOOL_OUTPUTS_VARIABLE) === true
         ) {
-            const actionToolCalls: ChatCompletionMessageToolCall[] = response.message.action_tool_calls!;
+            const actionCall: ChatCompletionMessageToolCall[] = response.message.action_tool_calls!;
             const actions = this._actions;
+            // TODO: Just check template.actions and template.config.completion.tool_choice instead?
             const toolChoice = memory.getValue('temp.toolChoice') || 'auto';
 
-            // Call a single tool where tool_choice is a single action definition
+            let currentCall: ChatCompletionMessageToolCall | undefined;
+            let currentTool: ChatCompletionAction | undefined;
+            let functionName: string = '';
+
+            // Validate a single tool where tool_choice is a single action definition
             if (toolChoice instanceof Map) {
-                const functionName: string = toolChoice.get('function').get('name');
-                const currToolCall = actionToolCalls[0];
-                let currentTool: ChatCompletionAction | undefined;
+                functionName = toolChoice.get('function').get('name');
+                currentCall = actionCall[0];
 
                 for (const tool of actions) {
                     if (tool.name === functionName) {
@@ -78,38 +88,15 @@ export class ToolsAugmentation implements Augmentation<string | ChatCompletionMe
                         break;
                     }
                 }
-                if (currentTool) {
-                    // Validate required function arguments
-                    const requiredArgs: string[] =
-                        currentTool &&
-                        currentTool.parameters &&
-                        currentTool.parameters.required &&
-                        Array.isArray(currentTool.parameters.required)
-                            ? currentTool.parameters.required
-                            : [];
-                    const currentArgs = currToolCall.function.arguments;
-
-                    if (requiredArgs && requiredArgs.every((arg) => Object.keys(currentArgs).includes(arg))) {
-                        validActionToolCalls.push(currToolCall);
-                    } else {
-                        validActionToolCalls.push(currToolCall);
-                    }
-                } else {
-                    return Promise.resolve({
-                        type: 'Validation',
-                        valid: false,
-                        feedback: 'The invoked tool does not exist.'
-                    });
-                }
             } else {
-                // Calling multiple tools
-                for (const actionToolCall of actionToolCalls) {
-                    const functionName = actionToolCall.function.name;
-                    let currentTool: ChatCompletionAction | undefined;
+                // Validate multiple tools
+                for (const call of actionCall) {
+                    functionName = call.function.name;
 
                     for (const tool of actions) {
                         if (tool.name === functionName) {
                             currentTool = tool;
+                            currentCall = call;
                             break;
                         }
                     }
@@ -117,48 +104,62 @@ export class ToolsAugmentation implements Augmentation<string | ChatCompletionMe
                     if (!currentTool) {
                         continue;
                     }
-
-                    // Validate required function arguments
-                    const requiredArgs: string[] =
-                        currentTool &&
-                        currentTool.parameters &&
-                        currentTool.parameters.required &&
-                        Array.isArray(currentTool.parameters.required)
-                            ? currentTool.parameters.required
-                            : [];
-                    let currentArgs;
-                    try {
-                        currentArgs = JSON.parse(actionToolCall.function.arguments);
-                    } catch (err) {
-                        console.error('ToolsAugmentation validateResponse: Error parsing tool arguments: ', err);
-                        currentArgs = {};
-                    }
-
-                    if (
-                        requiredArgs &&
-                        typeof currentArgs === 'object' &&
-                        !Array.isArray(currentArgs) &&
-                        currentArgs !== null &&
-                        requiredArgs.every((arg) => Object.keys(currentArgs).includes(arg))
-                    ) {
-                        validActionToolCalls.push(actionToolCall);
-                    } else {
-                        validActionToolCalls.push(actionToolCall);
-                    }
-                }
-                // No tools were valid; reset ToolsAugmentation constants
-                if (validActionToolCalls.length === 0) {
-                    memory.setValue(SUBMIT_TOOL_OUTPUTS_VARIABLE, false);
-                    memory.setValue(SUBMIT_TOOL_OUTPUTS_MAP, {});
-                    memory.setValue(SUBMIT_TOOL_OUTPUTS_MESSAGES, []);
-                    memory.setValue(SUBMIT_TOOL_HISTORY, []);
                 }
             }
+
+            if (!currentTool) {
+                return Promise.resolve({
+                    type: 'Validation',
+                    valid: false,
+                    feedback: `ToolsAugmentation: The invoked action ${functionName} does not exist.`
+                });
+            }
+
+            if (currentTool && currentCall) {
+                // Validate required function arguments
+                const requiredArgs: string[] =
+                    currentTool.parameters &&
+                    currentTool.parameters.required &&
+                    Array.isArray(currentTool.parameters.required)
+                        ? currentTool.parameters.required
+                        : [];
+
+                let currentArgs = {};
+                try {
+                    currentArgs = JSON.parse(currentCall.function.arguments);
+                } catch (error) {
+                    return Promise.resolve({
+                        type: 'Validation',
+                        valid: false,
+                        feedback: `ToolsAugmentation: Error parsing tool arguments: ${error}`
+                    });
+                }
+
+                // Validate that required arguments are included in current arguments
+                if (
+                    requiredArgs &&
+                    currentArgs &&
+                    requiredArgs.every((arg) => Object.keys(currentArgs).includes(arg))
+                ) {
+                    validActionHandlers.push(currentCall);
+                } else {
+                    // There are no required arguments that need validation
+                    validActionHandlers.push(currentCall);
+                }
+            }
+            // No tools were valid; reset ToolsAugmentation constants
+            if (validActionHandlers.length === 0) {
+                memory.setValue(SUBMIT_TOOL_OUTPUTS_VARIABLE, false);
+                memory.setValue(SUBMIT_TOOL_OUTPUTS_MAP, {});
+                memory.setValue(SUBMIT_TOOL_OUTPUTS_MESSAGES, []);
+                memory.setValue(SUBMIT_TOOL_HISTORY, []);
+            }
         }
+
         return Promise.resolve({
             type: 'Validation',
             valid: true,
-            value: validActionToolCalls.length > 0 ? validActionToolCalls : undefined
+            value: validActionHandlers.length > 0 ? validActionHandlers : undefined
         });
     }
 
