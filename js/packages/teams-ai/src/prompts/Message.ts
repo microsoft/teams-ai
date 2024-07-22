@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { ChatCompletionMessageToolCall } from 'openai/resources';
+import { ActionCall } from '../types';
 
 /**
  * A message object sent to or received from an LLM.
@@ -39,9 +39,9 @@ export interface Message<TContent = string> {
     name?: string;
 
     /**
-     * Optional. The action or tool to be called by the model. In OpenAI, this is the tool_calls property.
+     * Optional. The action or tool to be called by the model when using 'tools' augmentation. In OpenAI, this is the tool_calls property returned from the model.
      */
-    action_tool_calls?: ChatCompletionMessageToolCall[];
+    action_tool_calls?: ActionCall[];
 }
 
 /**

@@ -6,6 +6,7 @@
  * Licensed under the MIT License.
  */
 
+export * from './ActionCall';
 export * from './CompletionConfig';
 export * from './PromptResponse';
 export * from './ToolsAugmentationConstants';
