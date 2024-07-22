@@ -389,7 +389,6 @@ export class PromptManager implements PromptFunctions {
                 presence_penalty: 0.0,
                 temperature: 0.0,
                 top_p: 0.0,
-                include_tools: false,
                 tool_choice: 'auto',
                 parallel_tool_calls: true
             } as CompletionConfig,
