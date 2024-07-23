@@ -276,7 +276,8 @@ describe('AssistantsPlanner', () => {
             assert.equal(plan2.commands[0].type, 'SAY');
             assert.equal((plan2.commands[0] as PredictedSayCommand).response.content, 'welcome');
 
-            const toolMap: { [key: string]: string } = state.getValue('temp.submit_tool_map');
+            const toolMap: { [key: string]: string } = state.getValue('temp.submitToolMap');
+            console.log(toolMap);
             assert(toolMap);
             assert.equal(Object.keys(toolMap).length, 1);
             assert('test-action' in toolMap);
@@ -334,7 +335,7 @@ describe('AssistantsPlanner', () => {
             assert.equal(plan2.commands[0].type, 'SAY');
             assert.equal((plan2.commands[0] as PredictedSayCommand).response.content, 'welcome');
 
-            const toolMap: { [key: string]: string } = state.getValue('temp.submit_tool_map');
+            const toolMap: { [key: string]: string } = state.getValue('temp.submitToolMap');
             assert(toolMap);
             assert.equal(Object.keys(toolMap).length, 1);
             assert('test-action' in toolMap);
