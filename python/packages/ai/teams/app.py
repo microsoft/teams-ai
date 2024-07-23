@@ -38,6 +38,7 @@ from .ai import AI
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
 from .auth import AuthManager, OAuth, OAuthOptions
+from .feedback_loop_data import FeedbackLoopData
 from .meetings.meetings import Meetings
 from .message_extensions.message_extensions import MessageExtensions
 from .route import Route, RouteHandler
@@ -562,6 +563,56 @@ class Application(Bot, Generic[StateT]):
                 if not context.activity.value:
                     return False
                 await func(context, state, context.activity.value["continuation"])
+                await context.send_activity(
+                    Activity(type=ActivityTypes.invoke_response, value=InvokeResponse(status=200))
+                )
+                return True
+
+            self._routes.append(Route[StateT](__selector__, __handler__, True))
+            return func
+
+        return __call__
+
+    def feedback_loop(
+        self,
+    ) -> Callable[
+        [Callable[[TurnContext, StateT, FeedbackLoopData], Awaitable[None]]],
+        Callable[[TurnContext, StateT, FeedbackLoopData], Awaitable[None]],
+    ]:
+        """
+        Registers a handler for feedback loop events when a user clicks the thumbs
+        up or down button on a response from AI.
+        enable_feedback_loop must be set to true in the AI Module.
+         ```python
+        # Use this method as a decorator
+        @app.feedback_loop
+        async def feedback_loop(
+            context: TurnContext, state: TurnState, feedback_data: FeedbackLoopData
+        ):
+            print(feedback_data)
+        # Pass a function to this method
+        app.feedback_loop()(feedback_loop)
+        ```
+        """
+
+        def __selector__(context: TurnContext) -> bool:
+            return (
+                context.activity.type == ActivityTypes.invoke
+                and context.activity.name == "message/submitAction"
+                and context.activity.value.action_name == "feedback"
+            )
+
+        def __call__(
+            func: Callable[[TurnContext, StateT, FeedbackLoopData], Awaitable[None]],
+        ) -> Callable[[TurnContext, StateT, FeedbackLoopData], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: StateT):
+                if not context.activity.value:
+                    return False
+
+                feedback = context.activity.value
+                feedback.reply_to_id=context.activity.reply_to_id
+
+                await func(context, state, feedback)
                 await context.send_activity(
                     Activity(type=ActivityTypes.invoke_response, value=InvokeResponse(status=200))
                 )
