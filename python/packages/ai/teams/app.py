@@ -246,12 +246,12 @@ class Application(Bot, Generic[StateT]):
             if context.activity.type != ActivityTypes.message:
                 return False
 
+            text = context.activity.text if context.activity.text else ""
             if isinstance(select, Pattern):
-                text = context.activity.text if context.activity.text else ""
                 hits = re.match(select, text)
                 return hits is not None
 
-            i = context.activity.text.find(select)
+            i = text.find(select)
             return i > -1
 
         def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
@@ -810,13 +810,18 @@ class Application(Bot, Generic[StateT]):
             self._ai
             and self._options.ai
             and context.activity.type == ActivityTypes.message
-            and context.activity.text
+            and (context.activity.text or self._contains_non_text_attachments(context))
         ):
             is_ok = await self._ai.run(context, state)
             if not is_ok:
                 await state.save(context, self._options.storage)
                 return False
         return True
+
+    def _contains_non_text_attachments(self, context):
+        non_text_attachments = filter(lambda a: not a.content_type.startswith(
+            "text/html"), context.activity.attachments)
+        return len(list(non_text_attachments)) > 0
 
     async def _run_after_turn_middleware(self, context: TurnContext, state):
         for after_turn in self._after_turn:
