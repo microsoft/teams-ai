@@ -7,7 +7,6 @@
  */
 
 import { TurnContext } from 'botbuilder';
-import { type ChatCompletionToolMessageParam } from 'openai/resources';
 
 import { AI } from '../AI';
 import { DefaultAugmentation } from '../augmentations';
@@ -17,13 +16,13 @@ import { PromptTemplate, PromptManager } from '../prompts';
 import { Tokenizer } from '../tokenizers';
 import { TurnState } from '../TurnState';
 import { Utilities } from '../Utilities';
-import { PromptResponse, ToolsAugmentationConstants } from '../types';
+import { ChatCompletionActionResponse, PromptResponse, ToolsAugmentationConstants } from '../types';
 import { PromptResponseValidator } from '../validators';
 
 import { LLMClient } from './LLMClient';
 import { Planner, Plan } from './Planner';
 
-const { SUBMIT_TOOL_HISTORY, SUBMIT_TOOL_OUTPUTS_MAP, SUBMIT_TOOL_OUTPUTS_MESSAGES, SUBMIT_TOOL_OUTPUTS_VARIABLE } =
+const { SUBMIT_TOOL_OUTPUTS_MAP, SUBMIT_TOOL_OUTPUTS_MESSAGES, SUBMIT_TOOL_OUTPUTS_VARIABLE } =
     ToolsAugmentationConstants;
 /**
  * Factory function used to create a prompt template.
@@ -326,16 +325,15 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
             // Reset state
             memory.setValue(SUBMIT_TOOL_OUTPUTS_MAP, {});
             memory.setValue(SUBMIT_TOOL_OUTPUTS_MESSAGES, []);
-            memory.setValue(SUBMIT_TOOL_HISTORY, []);
         } else if (memory.getValue(SUBMIT_TOOL_OUTPUTS_VARIABLE)) {
             // Submit tool outputs
             const actionOutputs: Record<string, string> = memory.getValue('temp.actionOutputs') ?? {};
-            const toolMap: Map<string, string> = memory.getValue(SUBMIT_TOOL_OUTPUTS_MAP);
-            const toolOutputs: ChatCompletionToolMessageParam[] = [];
+            const toolsMap: Map<string, string> = memory.getValue(SUBMIT_TOOL_OUTPUTS_MAP);
+            const toolOutputs: ChatCompletionActionResponse[] = [];
 
             for (const output in actionOutputs) {
-                if (toolMap) {
-                    const toolCallId = toolMap.get(output) ?? undefined;
+                if (toolsMap) {
+                    const toolCallId = toolsMap.get(output) ?? undefined;
                     if (toolCallId) {
                         toolOutputs.push({ role: 'tool', tool_call_id: toolCallId, content: actionOutputs[output] });
                     }
@@ -349,7 +347,6 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
                 memory.setValue(SUBMIT_TOOL_OUTPUTS_VARIABLE, false);
                 memory.setValue(SUBMIT_TOOL_OUTPUTS_MAP, {});
                 memory.setValue(SUBMIT_TOOL_OUTPUTS_MESSAGES, []);
-                memory.setValue(SUBMIT_TOOL_HISTORY, []);
             }
         }
         return memory;

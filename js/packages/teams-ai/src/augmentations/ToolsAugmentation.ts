@@ -18,7 +18,7 @@ import { Validation } from '../validators';
 
 import { Augmentation } from './Augmentation';
 
-const { SUBMIT_TOOL_OUTPUTS_VARIABLE, SUBMIT_TOOL_OUTPUTS_MAP, SUBMIT_TOOL_OUTPUTS_MESSAGES, SUBMIT_TOOL_HISTORY } =
+const { SUBMIT_TOOL_OUTPUTS_VARIABLE, SUBMIT_TOOL_OUTPUTS_MAP, SUBMIT_TOOL_OUTPUTS_MESSAGES } =
     ToolsAugmentationConstants;
 
 /**
@@ -150,7 +150,6 @@ export class ToolsAugmentation implements Augmentation<string | ActionCall[]> {
                 memory.setValue(SUBMIT_TOOL_OUTPUTS_VARIABLE, false);
                 memory.setValue(SUBMIT_TOOL_OUTPUTS_MAP, {});
                 memory.setValue(SUBMIT_TOOL_OUTPUTS_MESSAGES, []);
-                memory.setValue(SUBMIT_TOOL_HISTORY, []);
             }
         }
 

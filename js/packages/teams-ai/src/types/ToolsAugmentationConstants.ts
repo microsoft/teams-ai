@@ -11,10 +11,6 @@
  */
 export const ToolsAugmentationConstants = {
     /**
-     * 'temp.toolHistory': List of all the messages from the model.
-     */
-    SUBMIT_TOOL_HISTORY: 'temp.toolHistory',
-    /**
      * 'temp.submitToolOutputsMap': Map of tool_name and tool_id
      */
     SUBMIT_TOOL_OUTPUTS_MAP: 'temp.submitToolOutputsMap',
