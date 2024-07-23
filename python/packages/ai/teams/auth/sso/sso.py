@@ -120,11 +120,11 @@ class SsoAuth(Auth[StateT]):
         token_exchange_request = context.activity.value
         
         result = self._msal.acquire_token_on_behalf_of(
-            user_assertion= token_exchange_request.token,
+            user_assertion= token_exchange_request["token"],
             scopes= self._options.scopes
         )
         
-        if result:
+        if result and "access_token" in result:
             return TokenResponse(token=result["access_token"], expiration=cast(datetime, result["expires_on"]).isoformat())
         
         return None
