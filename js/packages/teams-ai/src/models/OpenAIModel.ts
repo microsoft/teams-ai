@@ -23,7 +23,7 @@ import { Colorize } from '../internals';
 import { Memory } from '../MemoryFork';
 import { Message, PromptFunctions, PromptTemplate } from '../prompts';
 import { Tokenizer } from '../tokenizers';
-import { PromptResponse, ToolsAugmentationConstants } from '../types';
+import { ActionCall, PromptResponse, ToolsAugmentationConstants } from '../types';
 
 import { PromptCompletionModel, PromptCompletionModelEmitter } from './PromptCompletionModel';
 
@@ -97,8 +97,8 @@ export interface BaseOpenAIModelOptions {
     stream?: boolean;
 }
 
-// const { SUBMIT_TOOL_HISTORY, SUBMIT_TOOL_OUTPUTS_MAP, SUBMIT_TOOL_OUTPUTS_MESSAGES, SUBMIT_TOOL_OUTPUTS_VARIABLE } =
-//     ToolsAugmentationConstants;
+const { SUBMIT_TOOL_OUTPUTS_MAP, SUBMIT_TOOL_OUTPUTS_MESSAGES, SUBMIT_TOOL_OUTPUTS_VARIABLE } =
+    ToolsAugmentationConstants;
 
 /**
  * Options for configuring an `OpenAIModel` to call an OpenAI hosted model.
@@ -323,39 +323,21 @@ export class OpenAIModel implements PromptCompletionModel {
         // Get input message
         // - we're doing this here because the input message can be complex and include images.
         const input = this.getInputMessage(result.output);
-
-        // Setup action tools if ToolsAugmentation and actions exist
         const isToolsEnabled = template.actions && template.config.augmentation?.augmentation_type == 'tools';
+        const toolChoice = template.config.completion.tool_choice;
+        const parallelToolCalls = template.config.completion.parallel_tool_calls ?? true;
 
         if (isToolsEnabled && template.actions!.length === 0) {
             return this.returnError('noActions', input);
-        }
-
-        const chatCompletionTools = isToolsEnabled
-            ? template.actions?.map((action) => {
-                  return {
-                      type: 'function',
-                      function: {
-                          name: action.name,
-                          description: action.description,
-                          parameters: action.parameters
-                      }
-                  } as ChatCompletionTool;
-              })
-            : undefined;
-
-        if (chatCompletionTools) {
-            // Temporarily set to memory, to be used in getChatCompletionParams
-            memory.setValue('temp.chatCompletionTools', chatCompletionTools);
         }
 
         try {
             // Call chat completion API
             let message: Message<string>;
             const params = this.getChatCompletionParams(model, result.output, template, memory);
-            memory.deleteValue('temp.chatCompletionTools');
 
             const completion = await this._client.chat.completions.create(params);
+
             if (params.stream) {
                 // Log start of streaming
                 if (this.options.logRequests) {
@@ -372,10 +354,19 @@ export class OpenAIModel implements PromptCompletionModel {
                     if (delta.content) {
                         message.content += delta.content;
                     }
-                    // TODO: handle tool calls
-                    // if (delta.tool_calls) {
-                    //     message.tool_calls = delta.tool_calls;
-                    // }
+
+                    if (isToolsEnabled && delta.tool_calls) {
+                        message.action_tool_calls = delta.tool_calls.map((toolCall) => {
+                            return {
+                                id: toolCall.id,
+                                function: {
+                                    name: toolCall.function?.name,
+                                    arguments: toolCall.function?.arguments
+                                },
+                                type: 'function'
+                            } as ActionCall;
+                        });
+                    }
 
                     // Signal chunk received
                     if (this.options.logRequests) {
@@ -388,15 +379,60 @@ export class OpenAIModel implements PromptCompletionModel {
                 console.log(Colorize.title('STREAM COMPLETED:'));
                 console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
             } else {
+                const chatCompletion = completion as ChatCompletion;
+                const toolCalls = chatCompletion.choices[0]?.message.tool_calls ?? [];
                 // Log the generated response
-                message = ((completion as ChatCompletion).choices[0]?.message as Message<string>) ?? {
+                message = (chatCompletion.choices[0]?.message as Message<string>) ?? {
                     role: 'assistant',
                     content: ''
                 };
+
+                if (isToolsEnabled && toolCalls.length > 0) {
+                    // Map tool_calls to action_tool_calls
+                    message.action_tool_calls = toolCalls?.map((toolCall) => {
+                        return {
+                            id: toolCall.id,
+                            function: {
+                                name: toolCall.function?.name,
+                                arguments: toolCall.function?.arguments
+                            },
+                            type: 'function'
+                        } as ActionCall;
+                    });
+                }
+
                 if (this.options.logRequests) {
                     console.log(Colorize.title('CHAT RESPONSE:'));
                     console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
                     console.log(Colorize.output(message));
+                }
+            }
+
+            if (isToolsEnabled && message.action_tool_calls) {
+                if (!parallelToolCalls && message.action_tool_calls.length > 1) {
+                    return {
+                        status: 'error',
+                        input,
+                        error: new Error('Model returned multiple tool calls but parallel_tool_calls is false')
+                    } as PromptResponse<string>;
+                }
+
+                if (message.action_tool_calls.length === 0) {
+                    return {
+                        status: 'error',
+                        input,
+                        error: new Error('Model did not return any tools')
+                    } as PromptResponse<string>;
+                }
+
+                if (toolChoice === 'none' && message.action_tool_calls.length > 0) {
+                    message.action_tool_calls = [];
+                }
+
+                if (message.action_tool_calls.length > 0) {
+                    memory.setValue(SUBMIT_TOOL_OUTPUTS_VARIABLE, true);
+                    memory.setValue(SUBMIT_TOOL_OUTPUTS_MAP, message.action_tool_calls);
+                    memory.setValue(SUBMIT_TOOL_OUTPUTS_MESSAGES, result.output);
                 }
             }
 
@@ -443,7 +479,19 @@ export class OpenAIModel implements PromptCompletionModel {
     ): ChatCompletionCreateParams {
         // Validate Tools Augmentation
         const isToolsEnabled = template.actions && template.config.augmentation?.augmentation_type == 'tools';
-        const chatCompletionTools: ChatCompletionTool[] = memory.getValue('temp.chatCompletionTools') || undefined;
+
+        const chatCompletionTools = isToolsEnabled
+            ? template.actions?.map((action) => {
+                  return {
+                      type: 'function',
+                      function: {
+                          name: action.name,
+                          description: action.description,
+                          parameters: action.parameters
+                      }
+                  } as ChatCompletionTool;
+              })
+            : undefined;
 
         const completion = {
             ...template.config.completion,
@@ -528,6 +576,7 @@ export class OpenAIModel implements PromptCompletionModel {
                 error: new Error(`Model did not return any tools`)
             };
         }
+
         if (err instanceof OpenAI.APIError) {
             if (err.status == 429) {
                 if (this.options.logRequests) {
