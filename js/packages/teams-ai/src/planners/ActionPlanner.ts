@@ -319,6 +319,7 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
 
     public handleActionTools(memory: Memory, template: PromptTemplate): Memory {
         if (!memory.getValue(SUBMIT_TOOL_OUTPUTS_VARIABLE)) {
+            // Set state from template; for the first time or if validation failed
             memory.setValue('temp.toolChoice', template.config.completion.tool_choice ?? 'auto');
             memory.setValue('temp.parallelToolCalls', template.config.completion.parallel_tool_calls);
 

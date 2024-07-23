@@ -69,7 +69,6 @@ export class ToolsAugmentation implements Augmentation<string | ActionCall[]> {
         ) {
             const actionCall: ActionCall[] = response.message.action_tool_calls!;
             const actions = this._actions;
-            // TODO: Just check template.actions and template.config.completion.tool_choice instead?
             const toolChoice = memory.getValue('temp.toolChoice') || 'auto';
 
             let currentCall: ActionCall | undefined;
