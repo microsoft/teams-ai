@@ -201,10 +201,10 @@
     tslib "^2.2.0"
     uuid "^8.3.0"
 
-"@azure/identity@^4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@azure/identity/-/identity-4.3.0.tgz#e8da6b3bf1df4de1511e813a7166a4b5b4a99ca1"
-  integrity sha512-LHZ58/RsIpIWa4hrrE2YuJ/vzG1Jv9f774RfTTAVDZDriubvJ0/S5u4pnw4akJDlS0TiJb6VMphmVUFsWmgodQ==
+"@azure/identity@^4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@azure/identity/-/identity-4.4.0.tgz#f2743e63d346000a70b0eed5a3b397dedd3984a7"
+  integrity sha512-oG6oFNMxUuoivYg/ElyZWVSZfw42JQyHbrp+lR7VJ1BYWsGzt34NwyDw3miPp1QI7Qm5+4KAd76wGsbHQmkpkg==
   dependencies:
     "@azure/abort-controller" "^1.0.0"
     "@azure/core-auth" "^1.5.0"
@@ -213,7 +213,7 @@
     "@azure/core-tracing" "^1.0.0"
     "@azure/core-util" "^1.3.0"
     "@azure/logger" "^1.0.0"
-    "@azure/msal-browser" "^3.11.1"
+    "@azure/msal-browser" "^3.14.0"
     "@azure/msal-node" "^2.9.2"
     events "^3.0.0"
     jws "^4.0.0"
@@ -266,12 +266,12 @@
   dependencies:
     "@azure/msal-common" "13.2.0"
 
-"@azure/msal-browser@^3.0.2", "@azure/msal-browser@^3.11.1":
-  version "3.17.0"
-  resolved "https://registry.yarnpkg.com/@azure/msal-browser/-/msal-browser-3.17.0.tgz#dee9ccae586239e7e0708b261f7ffa5bc7e00fb7"
-  integrity sha512-csccKXmW2z7EkZ0I3yAoW/offQt+JECdTIV/KrnRoZyM7wCSsQWODpwod8ZhYy7iOyamcHApR9uCh0oD1M+0/A==
+"@azure/msal-browser@^3.0.2", "@azure/msal-browser@^3.14.0":
+  version "3.19.1"
+  resolved "https://registry.yarnpkg.com/@azure/msal-browser/-/msal-browser-3.19.1.tgz#c5e5a7996f95cadc11920bffa2bf6321e3a24555"
+  integrity sha512-pqYP2gK0GCEa4OxtOqlS+EdFQqhXV6ZuESgSTYWq2ABXyxBVVdd5KNuqgR5SU0OwI2V1YWdFVvLDe1487dyQ0g==
   dependencies:
-    "@azure/msal-common" "14.12.0"
+    "@azure/msal-common" "14.13.1"
 
 "@azure/msal-common@13.2.0":
   version "13.2.0"
@@ -283,15 +283,10 @@
   resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-13.3.1.tgz#012465bf940d12375dc47387b754ccf9d6b92180"
   integrity sha512-Lrk1ozoAtaP/cp53May3v6HtcFSVxdFrg2Pa/1xu5oIvsIwhxW6zSPibKefCOVgd5osgykMi5jjcZHv8XkzZEQ==
 
-"@azure/msal-common@14.12.0":
-  version "14.12.0"
-  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-14.12.0.tgz#844abe269b071f8fa8949dadc2a7b65bbb147588"
-  integrity sha512-IDDXmzfdwmDkv4SSmMEyAniJf6fDu3FJ7ncOjlxkDuT85uSnLEhZi3fGZpoR7T4XZpOMx9teM9GXBgrfJgyeBw==
-
-"@azure/msal-common@14.13.0":
-  version "14.13.0"
-  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-14.13.0.tgz#7377b4909a46d19ea91dadd24af7705e6aa947af"
-  integrity sha512-b4M/tqRzJ4jGU91BiwCsLTqChveUEyFK3qY2wGfZ0zBswIBZjAxopx5CYt5wzZFKuN15HqRDYXQbztttuIC3nA==
+"@azure/msal-common@14.13.1":
+  version "14.13.1"
+  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-14.13.1.tgz#e296cf8cc556082af9c35d803496424e8a95d8b7"
+  integrity sha512-iUp3BYrsRZ4X3EiaZ2fDjNFjmtYMv9rEQd6c1op6ULn0HWk4ACvDmosL6NaBgWOhl1BAblIbd9vmB5/ilF8d4A==
 
 "@azure/msal-common@^7.0.0":
   version "7.6.0"
@@ -307,12 +302,12 @@
     jsonwebtoken "^9.0.0"
     uuid "^8.3.0"
 
-"@azure/msal-node@^2.11.0", "@azure/msal-node@^2.9.2":
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-2.11.0.tgz#c65b13fd4007a83a8eb780d3d187e5d334cc9444"
-  integrity sha512-yNRCp4Do4CGSBe1WXq4DWhfa/vYZCUgGrweYLC5my/6eDnYMt0fYGPHuTMw0iRslQGXF3CecGAxXp7ab57V4zg==
+"@azure/msal-node@^2.11.1", "@azure/msal-node@^2.9.2":
+  version "2.11.1"
+  resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-2.11.1.tgz#7fea67a1c6904301eb8853fae7df86c34306a9cc"
+  integrity sha512-8ECtug4RL+zsgh20VL8KYHjrRO3MJOeAKEPRXT2lwtiu5U3BdyIdBb50+QZthEkIi60K6pc/pdOx/k5Jp4sLng==
   dependencies:
-    "@azure/msal-common" "14.13.0"
+    "@azure/msal-common" "14.13.1"
     jsonwebtoken "^9.0.0"
     uuid "^8.3.0"
 
@@ -5302,10 +5297,10 @@ gpt-3-encoder@1.1.4:
   resolved "https://registry.yarnpkg.com/gpt-3-encoder/-/gpt-3-encoder-1.1.4.tgz#d6cdaacf5824857e133b6065247c757fc7e4fa72"
   integrity sha512-fSQRePV+HUAhCn7+7HL7lNIXNm6eaFWFbNLOOGtmSJ0qJycyQvj60OvRlH7mee8xAMjBDNRdMXlMwjAbMTDjkg==
 
-gpt-tokenizer@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/gpt-tokenizer/-/gpt-tokenizer-2.1.2.tgz#14f7ce424cf2309fb5be66e112d1836080c2791a"
-  integrity sha512-HSuI5d6uey+c7x/VzQlPfCoGrfLyAc28vxWofKbjR9PJHm0AjQGSWkKw/OJnb+8S1g7nzgRsf0WH3dK+NNWYbg==
+gpt-tokenizer@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/gpt-tokenizer/-/gpt-tokenizer-2.2.1.tgz#195edebcc60b20c76f25075ffc87cb6b74cbdf3f"
+  integrity sha512-JYvLWTpPtFGz7eS7uixHslv3L96zka0n18MlQeH5YVl5F6mNhssxzSBTeqwNfW8A0AQIMYEaOfbSr+MaoCUvpg==
   dependencies:
     rfc4648 "^1.5.2"
 
@@ -6967,10 +6962,10 @@ mocha-junit-reporter@^2.0.0:
     strip-ansi "^6.0.1"
     xml "^1.0.1"
 
-mocha@10.6.0, mocha@^10.6.0:
-  version "10.6.0"
-  resolved "https://registry.yarnpkg.com/mocha/-/mocha-10.6.0.tgz#465fc66c52613088e10018989a3b98d5e11954b9"
-  integrity sha512-hxjt4+EEB0SA0ZDygSS015t65lJw/I2yRCS3Ae+SJ5FrbzrXgfYwJr96f0OvIXdj7h4lv/vLCrH3rkiuizFSvw==
+mocha@10.7.0, mocha@^10.7.0:
+  version "10.7.0"
+  resolved "https://registry.yarnpkg.com/mocha/-/mocha-10.7.0.tgz#9e5cbed8fa9b37537a25bd1f7fb4f6fc45458b9a"
+  integrity sha512-v8/rBWr2VO5YkspYINnvu81inSz2y3ODJrhO175/Exzor1RcEZZkizgE2A+w/CAXXoESS8Kys5E62dOHGHzULA==
   dependencies:
     ansi-colors "^4.1.3"
     browser-stdout "^1.3.1"

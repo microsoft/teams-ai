@@ -180,6 +180,7 @@ class MockAsyncRuns:
             cancelled_at=5312321,
             failed_at=31712312,
             object="thread.run",
+            parallel_tool_calls=True,
         )
 
         if thread_id in self._runs:
@@ -658,6 +659,7 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
                         model=ASSISTANT_MODEL,
                         object="thread.run",
                         tools=ASSISTANT_TOOLS,
+                        parallel_tool_calls=True,
                     )
                 ]
             },
