@@ -3,24 +3,80 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Dict, List, Union, cast
+from typing import List, Union, cast
 from unittest import IsolatedAsyncioTestCase
 
 from botbuilder.core import TurnContext
 from openai.types import chat
-from openai.types.chat.chat_completion_message_tool_call import Function
+from openai.types.chat.chat_completion_message_tool_call_param import Function
 
 from teams.ai.augmentations.tools_augmentation import ToolsAugmentation
-from teams.ai.augmentations.tools_constants import (
-    SUBMIT_TOOL_OUTPUTS_MAP,
-    SUBMIT_TOOL_OUTPUTS_VARIABLE,
-)
+from teams.ai.augmentations.tools_constants import ACTIONS_HISTORY, TOOL_CHOICE
 from teams.ai.models.chat_completion_action import ChatCompletionAction
 from teams.ai.models.prompt_response import PromptResponse
 from teams.ai.planners.plan import PredictedDoCommand, PredictedSayCommand
-from teams.ai.prompts.message import Message
+from teams.ai.prompts.message import ActionCall, ActionFunction, Message
 from teams.ai.tokenizers.gpt_tokenizer import GPTTokenizer
 from teams.state import TurnState
+
+action_call_one = ActionCall(
+    id="1",
+    type="function",
+    function=ActionFunction(
+        name="LightsOn",
+        arguments="{}",
+    ),
+)
+chat_completion_tool_one = chat.ChatCompletionMessageToolCallParam(
+    id="1",
+    function=Function(
+        name="LightsOn",
+        arguments="{}",
+    ),
+    type="function",
+)
+action_call_two = ActionCall(
+    id="2",
+    function=ActionFunction(arguments='{"time": 10}', name="Pause"),
+    type="function",
+)
+chat_completion_tool_two = chat.ChatCompletionMessageToolCallParam(
+    id="2",
+    function=Function(
+        name="Pause",
+        arguments='{"time": 10}',
+    ),
+    type="function",
+)
+action_call_two_missing_params = ActionCall(
+    id="2",
+    function=ActionFunction(arguments="{}", name="Pause"),
+    type="function",
+)
+chat_completion_tool_two_missing_params = chat.ChatCompletionMessageToolCallParam(
+    id="2",
+    function=Function(
+        name="Pause",
+        arguments="",
+    ),
+    type="function",
+)
+action_call_three = ActionCall(
+    id="3",
+    type="function",
+    function=ActionFunction(
+        name="Lights",
+        arguments="{}",
+    ),
+)
+chat_completion_tool_three = chat.ChatCompletionMessageToolCallParam(
+    id="3",
+    function=Function(
+        name="Lights",
+        arguments="{}",
+    ),
+    type="function",
+)
 
 
 class TestToolsAugmentation(IsolatedAsyncioTestCase):
@@ -33,7 +89,9 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
 
     async def test_validate_str_response(self):
         state = TurnState()
-        prompt_response = PromptResponse[Union[str, List[chat.ChatCompletionMessageToolCall]]](
+        state.conversation = {}
+        state.temp = {}
+        prompt_response = PromptResponse[Union[str, List[ActionCall]]](
             status="success",
             input=Message(
                 role="user",
@@ -41,7 +99,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=None,
+                action_calls=None,
             ),
             message=Message(
                 role="assistant",
@@ -51,7 +109,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=None,
+                action_calls=None,
             ),
             error=None,
         )
@@ -69,9 +127,17 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
 
     async def test_validate_str_response_with_null_tools_array(self):
         state = TurnState()
+        state.conversation = {}
         state.temp = {}
-        state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
-        prompt_response = PromptResponse[Union[str, List[chat.ChatCompletionMessageToolCall]]](
+        state.set(
+            ACTIONS_HISTORY,
+            [
+                chat.ChatCompletionAssistantMessageParam(
+                    role="assistant", tool_calls=[chat_completion_tool_one]
+                )
+            ],
+        )
+        prompt_response = PromptResponse[Union[str, List[ActionCall]]](
             status="success",
             input=Message(
                 role="user",
@@ -79,7 +145,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=None,
+                action_calls=None,
             ),
             message=Message(
                 role="assistant",
@@ -89,7 +155,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=[],
+                action_calls=[],
             ),
             error=None,
         )
@@ -105,9 +171,10 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         self.assertEqual(validation.valid, True)
         self.assertEqual(validation.value, None)
 
-    async def test_validate_tool_call_response_state_not_set(self):
+    async def test_validate_tool_history_state_not_set(self):
         state = TurnState()
         state.temp = {}
+        state.conversation = {}
         prompt_response = PromptResponse(
             status="success",
             input=Message(
@@ -116,7 +183,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=None,
+                action_calls=None,
             ),
             message=Message(
                 role="assistant",
@@ -124,10 +191,10 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=[
-                    chat.ChatCompletionMessageToolCall(
-                        id="call_3PqbuK5OrvmImKb6VURn2jXz",
-                        function=Function(arguments="{}", name="LightsOn"),
+                action_calls=[
+                    ActionCall(
+                        id="1",
+                        function=ActionFunction(arguments="{}", name="LightsOn"),
                         type="function",
                     )
                 ],
@@ -148,8 +215,16 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
 
     async def test_validate_tool_call_response_missing_tool_actions(self):
         state = TurnState()
+        state.conversation = {}
         state.temp = {}
-        state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
+        state.set(
+            ACTIONS_HISTORY,
+            [
+                chat.ChatCompletionAssistantMessageParam(
+                    role="assistant", tool_calls=[chat_completion_tool_one]
+                )
+            ],
+        )
         prompt_response = PromptResponse(
             status="success",
             input=Message(
@@ -158,7 +233,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=None,
+                action_calls=None,
             ),
             message=Message(
                 role="assistant",
@@ -166,10 +241,10 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=[
-                    chat.ChatCompletionMessageToolCall(
-                        id="call_3PqbuK5OrvmImKb6VURn2jXz",
-                        function=Function(arguments="{}", name="LightsOn"),
+                action_calls=[
+                    ActionCall(
+                        id="1",
+                        function=ActionFunction(arguments="{}", name="LightsOn"),
                         type="function",
                     )
                 ],
@@ -187,19 +262,23 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         )
         self.assertEqual(validation.valid, True)
         self.assertEqual(validation.value, None)
-        self.assertEqual(state.get(SUBMIT_TOOL_OUTPUTS_MAP), {})
-        self.assertEqual(state.get(SUBMIT_TOOL_OUTPUTS_VARIABLE), False)
+        if state.get(ACTIONS_HISTORY):
+            history = cast(List[chat.ChatCompletionMessageParam], state.get(ACTIONS_HISTORY))
+            self.assertEqual(len(history), 0)
 
     async def test_validate_tool_call_response_single_tool(self):
         state = TurnState()
+        state.conversation = {}
         state.temp = {}
-        state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
-        state.set("temp.tool_choice", {"type": "function", "function": {"name": "LightsOn"}})
-        tool_call_one = chat.ChatCompletionMessageToolCall(
-            id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(arguments="{}", name="LightsOn"),
-            type="function",
+        state.set(
+            ACTIONS_HISTORY,
+            [
+                chat.ChatCompletionAssistantMessageParam(
+                    role="assistant", tool_calls=[chat_completion_tool_one]
+                )
+            ],
         )
+        state.set(TOOL_CHOICE, {"type": "function", "function": {"name": "LightsOn"}})
 
         prompt_response = PromptResponse(
             status="success",
@@ -209,7 +288,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=None,
+                action_calls=None,
             ),
             message=Message(
                 role="assistant",
@@ -217,7 +296,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=[tool_call_one],
+                action_calls=[action_call_one],
             ),
             error=None,
         )
@@ -233,18 +312,21 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
             remaining_attempts=0,
         )
         self.assertEqual(validation.valid, True)
-        self.assertEqual(validation.value, [tool_call_one])
+        self.assertEqual(validation.value, [action_call_one])
 
     async def test_validate_tool_call_response_single_tool_with_params(self):
         state = TurnState()
+        state.conversation = {}
         state.temp = {}
-        state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
-        state.set("temp.tool_choice", {"type": "function", "function": {"name": "Pause"}})
-        tool_call_one = chat.ChatCompletionMessageToolCall(
-            id="call_Y3M0cw8T8LRuINOiLaQHs5jk",
-            function=Function(arguments='{"time": 10}', name="Pause"),
-            type="function",
+        state.set(
+            ACTIONS_HISTORY,
+            [
+                chat.ChatCompletionAssistantMessageParam(
+                    role="assistant", tool_calls=[chat_completion_tool_two]
+                )
+            ],
         )
+        state.set(TOOL_CHOICE, {"type": "function", "function": {"name": "Pause"}})
 
         prompt_response = PromptResponse(
             status="success",
@@ -254,7 +336,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=None,
+                action_calls=None,
             ),
             message=Message(
                 role="assistant",
@@ -262,7 +344,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=[tool_call_one],
+                action_calls=[action_call_two],
             ),
             error=None,
         )
@@ -293,18 +375,21 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
             remaining_attempts=0,
         )
         self.assertEqual(validation.valid, True)
-        self.assertEqual(validation.value, [tool_call_one])
+        self.assertEqual(validation.value, [action_call_two])
 
     async def test_validate_tool_call_response_single_tool_missing_params(self):
         state = TurnState()
+        state.conversation = {}
         state.temp = {}
-        state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
-        state.set("temp.tool_choice", {"type": "function", "function": {"name": "Pause"}})
-        tool_call_one = chat.ChatCompletionMessageToolCall(
-            id="call_Y3M0cw8T8LRuINOiLaQHs5jk",
-            function=Function(arguments="{}", name="Pause"),
-            type="function",
+        state.set(
+            ACTIONS_HISTORY,
+            [
+                chat.ChatCompletionAssistantMessageParam(
+                    role="assistant", tool_calls=[chat_completion_tool_two_missing_params]
+                )
+            ],
         )
+        state.set(TOOL_CHOICE, {"type": "function", "function": {"name": "Pause"}})
 
         prompt_response = PromptResponse(
             status="success",
@@ -314,7 +399,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=None,
+                action_calls=None,
             ),
             message=Message(
                 role="assistant",
@@ -322,7 +407,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=[tool_call_one],
+                action_calls=[action_call_two_missing_params],
             ),
             error=None,
         )
@@ -354,19 +439,23 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         )
         self.assertEqual(validation.valid, True)
         self.assertEqual(validation.value, None)
-        self.assertEqual(state.get(SUBMIT_TOOL_OUTPUTS_MAP), {})
-        self.assertEqual(state.get(SUBMIT_TOOL_OUTPUTS_VARIABLE), False)
+        if state.get(ACTIONS_HISTORY):
+            history = cast(List[chat.ChatCompletionMessageParam], state.get(ACTIONS_HISTORY))
+            self.assertEqual(len(history), 0)
 
     async def test_validate_tool_call_response_single_tool_missing(self):
         state = TurnState()
+        state.conversation = {}
         state.temp = {}
-        state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
-        state.set("temp.tool_choice", {"type": "function", "function": {"name": "Pause"}})
-        tool_call_one = chat.ChatCompletionMessageToolCall(
-            id="call_Y3M0cw8T8LRuINOiLaQHs5jk",
-            function=Function(arguments="{}", name="Pause"),
-            type="function",
+        state.set(
+            ACTIONS_HISTORY,
+            [
+                chat.ChatCompletionAssistantMessageParam(
+                    role="assistant", tool_calls=[chat_completion_tool_two]
+                )
+            ],
         )
+        state.set(TOOL_CHOICE, {"type": "function", "function": {"name": "Pause"}})
 
         prompt_response = PromptResponse(
             status="success",
@@ -376,7 +465,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=None,
+                action_calls=None,
             ),
             message=Message(
                 role="assistant",
@@ -384,7 +473,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=[tool_call_one],
+                action_calls=[action_call_two],
             ),
             error=None,
         )
@@ -404,12 +493,15 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
 
     async def test_validate_tool_call_response_multiple_tools(self):
         state = TurnState()
+        state.conversation = {}
         state.temp = {}
-        state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
-        tool_call_one = chat.ChatCompletionMessageToolCall(
-            id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(arguments="{}", name="LightsOn"),
-            type="function",
+        state.set(
+            ACTIONS_HISTORY,
+            [
+                chat.ChatCompletionAssistantMessageParam(
+                    role="assistant", tool_calls=[chat_completion_tool_one]
+                )
+            ],
         )
 
         prompt_response = PromptResponse(
@@ -420,7 +512,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=None,
+                action_calls=None,
             ),
             message=Message(
                 role="assistant",
@@ -428,7 +520,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=[tool_call_one],
+                action_calls=[action_call_one],
             ),
             error=None,
         )
@@ -447,16 +539,19 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
             remaining_attempts=0,
         )
         self.assertEqual(validation.valid, True)
-        self.assertEqual(validation.value, [tool_call_one])
+        self.assertEqual(validation.value, [action_call_one])
 
     async def test_validate_tool_call_response_multiple_tools_invalid_tool(self):
         state = TurnState()
+        state.conversation = {}
         state.temp = {}
-        state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
-        tool_call_one = chat.ChatCompletionMessageToolCall(
-            id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(arguments="{}", name="Lights"),
-            type="function",
+        state.set(
+            ACTIONS_HISTORY,
+            [
+                chat.ChatCompletionAssistantMessageParam(
+                    role="assistant", tool_calls=[chat_completion_tool_three]
+                )
+            ],
         )
 
         prompt_response = PromptResponse(
@@ -467,7 +562,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=None,
+                action_calls=None,
             ),
             message=Message(
                 role="assistant",
@@ -475,7 +570,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=[tool_call_one],
+                action_calls=[action_call_three],
             ),
             error=None,
         )
@@ -495,22 +590,23 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         )
         self.assertEqual(validation.valid, True)
         self.assertEqual(validation.value, None)
-        self.assertEqual(state.get(SUBMIT_TOOL_OUTPUTS_MAP), {})
-        self.assertEqual(state.get(SUBMIT_TOOL_OUTPUTS_VARIABLE), False)
+        if state.get(ACTIONS_HISTORY):
+            history = cast(List[chat.ChatCompletionMessageParam], state.get(ACTIONS_HISTORY))
+            self.assertEqual(len(history), 0)
 
     async def test_validate_tool_call_response_multiple_tools_with_params(self):
         state = TurnState()
         state.temp = {}
-        state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
-        tool_call_one = chat.ChatCompletionMessageToolCall(
-            id="call_Y3M0cw8T8LRuINOiLaQHs5jk",
-            function=Function(arguments='{"time": 10}', name="Pause"),
-            type="function",
-        )
-        tool_call_two = chat.ChatCompletionMessageToolCall(
-            id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(arguments="{}", name="LightsOn"),
-            type="function",
+        state.conversation = {}
+        state.temp = {}
+        state.set(
+            ACTIONS_HISTORY,
+            [
+                chat.ChatCompletionAssistantMessageParam(
+                    role="assistant",
+                    tool_calls=[chat_completion_tool_one, chat_completion_tool_two],
+                )
+            ],
         )
 
         prompt_response = PromptResponse(
@@ -521,7 +617,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=None,
+                action_calls=None,
             ),
             message=Message(
                 role="assistant",
@@ -529,7 +625,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=[tool_call_one, tool_call_two],
+                action_calls=[action_call_one, action_call_two],
             ),
             error=None,
         )
@@ -561,21 +657,20 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
             remaining_attempts=0,
         )
         self.assertEqual(validation.valid, True)
-        self.assertEqual(validation.value, [tool_call_one, tool_call_two])
+        self.assertEqual(validation.value, [action_call_one, action_call_two])
 
     async def test_validate_tool_call_response_multiple_tools_missing_params(self):
         state = TurnState()
+        state.conversation = {}
         state.temp = {}
-        state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
-        tool_call_one = chat.ChatCompletionMessageToolCall(
-            id="call_Y3M0cw8T8LRuINOiLaQHs5jk",
-            function=Function(arguments="{}", name="Pause"),
-            type="function",
-        )
-        tool_call_two = chat.ChatCompletionMessageToolCall(
-            id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(arguments="{}", name="LightsOn"),
-            type="function",
+        state.set(
+            ACTIONS_HISTORY,
+            [
+                chat.ChatCompletionAssistantMessageParam(
+                    role="assistant",
+                    tool_calls=[chat_completion_tool_one, chat_completion_tool_two_missing_params],
+                )
+            ],
         )
 
         prompt_response = PromptResponse(
@@ -586,7 +681,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=None,
+                action_calls=None,
             ),
             message=Message(
                 role="assistant",
@@ -594,7 +689,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=[tool_call_one, tool_call_two],
+                action_calls=[action_call_one, action_call_two_missing_params],
             ),
             error=None,
         )
@@ -626,12 +721,12 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
             remaining_attempts=0,
         )
         self.assertEqual(validation.valid, True)
-        self.assertEqual(validation.value, [tool_call_two])
+        self.assertEqual(validation.value, [action_call_one])
 
     async def test_create_plan_from_response_missing_response_message(self):
         state = TurnState()
         state.temp = {}
-        state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, False)
+        state.conversation = {}
 
         tools_augmentation = ToolsAugmentation()
         plan = await tools_augmentation.create_plan_from_response(
@@ -645,7 +740,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                     context=None,
                     function_call=None,
                     name=None,
-                    action_tool_calls=None,
+                    action_calls=None,
                 ),
                 message=None,
             ),
@@ -653,16 +748,10 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
 
         self.assertEqual(len(plan.commands), 0)
 
-    async def test_create_plan_from_response_with_tool_set_false(self):
+    async def test_create_plan_from_response_with_no_tool_history(self):
         state = TurnState()
         state.temp = {}
-        state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, False)
-        tool_call_one = chat.ChatCompletionMessageToolCall(
-            id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(arguments="{}", name="LightsOn"),
-            type="function",
-        )
-        tools = [tool_call_one]
+        state.conversation = {}
 
         tools_augmentation = ToolsAugmentation()
         plan = await tools_augmentation.create_plan_from_response(
@@ -676,15 +765,15 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                     context=None,
                     function_call=None,
                     name=None,
-                    action_tool_calls=None,
+                    action_calls=None,
                 ),
                 message=Message(
                     role="assistant",
-                    content=tools,
+                    content=[action_call_one],
                     context=None,
                     function_call=None,
                     name=None,
-                    action_tool_calls=tools,
+                    action_calls=[action_call_one],
                 ),
                 error=None,
             ),
@@ -697,24 +786,26 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
             plan.commands[0].response,
             Message(
                 role="assistant",
-                content=tools,
+                content=[action_call_one],
                 context=None,
                 function_call=None,
                 name=None,
-                action_tool_calls=tools,
+                action_calls=[action_call_one],
             ),
         )
 
     async def test_create_plan_from_response_with_tool_set_true(self):
         state = TurnState()
         state.temp = {}
-        state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
-        tool_call_one = chat.ChatCompletionMessageToolCall(
-            id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(arguments="{}", name="LightsOn"),
-            type="function",
+        state.conversation = {}
+        state.set(
+            ACTIONS_HISTORY,
+            [
+                chat.ChatCompletionAssistantMessageParam(
+                    role="assistant", tool_calls=[chat_completion_tool_one]
+                )
+            ],
         )
-        tools = [tool_call_one]
 
         tools_augmentation = ToolsAugmentation()
         plan = await tools_augmentation.create_plan_from_response(
@@ -728,15 +819,15 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                     context=None,
                     function_call=None,
                     name=None,
-                    action_tool_calls=None,
+                    action_calls=None,
                 ),
                 message=Message(
                     role="assistant",
-                    content=tools,
+                    content=[action_call_one],
                     context=None,
                     function_call=None,
                     name=None,
-                    action_tool_calls=tools,
+                    action_calls=[action_call_one],
                 ),
                 error=None,
             ),
@@ -748,27 +839,19 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         self.assertEqual(plan.commands[0].action, "LightsOn")
         self.assertEqual(plan.commands[0].parameters, {})
 
-        tool_map = cast(
-            Dict[str, chat.ChatCompletionToolMessageParam], state.get(SUBMIT_TOOL_OUTPUTS_MAP)
-        )
-        self.assertTrue("LightsOn" in tool_map)
-        self.assertEqual(tool_map["LightsOn"], "call_3PqbuK5OrvmImKb6VURn2jXz")
-
     async def test_create_plan_from_response_with_multiple_tools(self):
         state = TurnState()
         state.temp = {}
-        state.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
-        tool_call_one = chat.ChatCompletionMessageToolCall(
-            id="call_Y3M0cw8T8LRuINOiLaQHs5jk",
-            function=Function(arguments='{"time": 10}', name="Pause"),
-            type="function",
+        state.conversation = {}
+        state.set(
+            ACTIONS_HISTORY,
+            [
+                chat.ChatCompletionAssistantMessageParam(
+                    role="assistant",
+                    tool_calls=[chat_completion_tool_one, chat_completion_tool_one],
+                )
+            ],
         )
-        tool_call_two = chat.ChatCompletionMessageToolCall(
-            id="call_3PqbuK5OrvmImKb6VURn2jXz",
-            function=Function(arguments="{}", name="LightsOn"),
-            type="function",
-        )
-        tools = [tool_call_one, tool_call_two]
 
         tools_augmentation = ToolsAugmentation()
         plan = await tools_augmentation.create_plan_from_response(
@@ -782,15 +865,15 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                     context=None,
                     function_call=None,
                     name=None,
-                    action_tool_calls=None,
+                    action_calls=None,
                 ),
                 message=Message(
                     role="assistant",
-                    content=tools,
+                    content=[action_call_one, action_call_two],
                     context=None,
                     function_call=None,
                     name=None,
-                    action_tool_calls=tools,
+                    action_calls=[action_call_one, action_call_two],
                 ),
                 error=None,
             ),
@@ -799,17 +882,9 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         self.assertEqual(len(plan.commands), 2)
         self.assertEqual(plan.commands[0].type, "DO")
         assert isinstance(plan.commands[0], PredictedDoCommand)
-        self.assertEqual(plan.commands[0].action, "Pause")
-        self.assertEqual(plan.commands[0].parameters, {"time": 10})
+        self.assertEqual(plan.commands[0].action, "LightsOn")
+        self.assertEqual(plan.commands[0].parameters, {})
         self.assertEqual(plan.commands[1].type, "DO")
         assert isinstance(plan.commands[1], PredictedDoCommand)
-        self.assertEqual(plan.commands[1].action, "LightsOn")
-        self.assertEqual(plan.commands[1].parameters, {})
-
-        tool_map = cast(
-            Dict[str, chat.ChatCompletionToolMessageParam], state.get(SUBMIT_TOOL_OUTPUTS_MAP)
-        )
-        self.assertTrue("Pause" in tool_map)
-        self.assertEqual(tool_map["Pause"], "call_Y3M0cw8T8LRuINOiLaQHs5jk")
-        self.assertTrue("LightsOn" in tool_map)
-        self.assertEqual(tool_map["LightsOn"], "call_3PqbuK5OrvmImKb6VURn2jXz")
+        self.assertEqual(plan.commands[1].action, "Pause")
+        self.assertEqual(plan.commands[1].parameters, {"time": 10})

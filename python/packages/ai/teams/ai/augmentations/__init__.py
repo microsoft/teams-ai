@@ -8,12 +8,7 @@ from .default_augmentation import DefaultAugmentation
 from .monologue_augmentation import MonologueAugmentation
 from .sequence_augmentation import SequenceAugmentation
 from .tools_augmentation import ToolsAugmentation
-from .tools_constants import (
-    SUBMIT_TOOL_HISTORY,
-    SUBMIT_TOOL_OUTPUTS_MAP,
-    SUBMIT_TOOL_OUTPUTS_MESSAGES,
-    SUBMIT_TOOL_OUTPUTS_VARIABLE,
-)
+from .tools_constants import ACTIONS_HISTORY, PARALLEL_TOOL_CALLS, TOOL_CHOICE
 
 __all__ = [
     "Augmentation",
@@ -21,8 +16,7 @@ __all__ = [
     "MonologueAugmentation",
     "SequenceAugmentation",
     "ToolsAugmentation",
-    "SUBMIT_TOOL_OUTPUTS_VARIABLE",
-    "SUBMIT_TOOL_OUTPUTS_MAP",
-    "SUBMIT_TOOL_OUTPUTS_MESSAGES",
-    "SUBMIT_TOOL_HISTORY",
+    "ACTIONS_HISTORY",
+    "TOOL_CHOICE",
+    "PARALLEL_TOOL_CALLS",
 ]

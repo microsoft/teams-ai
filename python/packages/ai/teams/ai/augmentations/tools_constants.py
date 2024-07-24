@@ -7,14 +7,11 @@ from __future__ import annotations
 
 # Set of constants used for action tool handling
 
-SUBMIT_TOOL_OUTPUTS_VARIABLE = "temp.submit_tool_outputs"
-# Boolean flag to denote roundtrip tool calls
+ACTIONS_HISTORY = "conversation.actions_history"
+# Array of messages sent to/from the model
 
-SUBMIT_TOOL_OUTPUTS_MAP = "temp.submit_tool_map"
-# Map of tool_name to tool_id
+TOOL_CHOICE = "temp.tool_choice"
+# Choice of tools
 
-SUBMIT_TOOL_OUTPUTS_MESSAGES = "temp.submit_tool_messages"
-# List of tool_output messages
-
-SUBMIT_TOOL_HISTORY = "temp.tool_history"
-# List of all the messages from the model
+PARALLEL_TOOL_CALLS = "temp.parallel_tool_calls"
+# Boolean flag to denote whether parallel tool calls is enabled

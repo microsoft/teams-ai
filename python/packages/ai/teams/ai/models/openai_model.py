@@ -15,13 +15,8 @@ from botbuilder.core import TurnContext
 from openai.types import chat, shared_params
 
 from ...state import MemoryBase
-from ..augmentations.tools_constants import (
-    SUBMIT_TOOL_HISTORY,
-    SUBMIT_TOOL_OUTPUTS_MAP,
-    SUBMIT_TOOL_OUTPUTS_MESSAGES,
-    SUBMIT_TOOL_OUTPUTS_VARIABLE,
-)
-from ..prompts.message import Message, MessageContext
+from ..augmentations.tools_constants import ACTIONS_HISTORY
+from ..prompts.message import ActionCall, ActionFunction, Message, MessageContext
 from ..prompts.prompt_functions import PromptFunctions
 from ..prompts.prompt_template import PromptTemplate
 from ..tokenizers import Tokenizer
@@ -131,12 +126,11 @@ class OpenAIModel(PromptCompletionModel):
     ) -> PromptResponse[str]:
         max_tokens = template.config.completion.max_input_tokens
 
-        # Setup action tools if enabled
+        # Setup actions if enabled
         is_tools_aug = (
             template.config.augmentation
             and template.config.augmentation.augmentation_type == "tools"
         )
-        is_tools_enabled = template.config.completion.include_tools and is_tools_aug
         tool_choice = (
             template.config.completion.tool_choice
             if template.config.completion.tool_choice is not None
@@ -150,10 +144,10 @@ class OpenAIModel(PromptCompletionModel):
         tools: List[chat.ChatCompletionToolParam] = []
 
         # If tools is enabled, reformat actions to schema
-        if is_tools_enabled:
+        if is_tools_aug:
             if not template.actions or len(template.actions) == 0:
                 return PromptResponse[str](
-                    status="tools_error", error="Missing tools in template.actions"
+                    status="error", error="Missing tools in template.actions"
                 )
             for action in template.actions:
                 curr_tool = chat.ChatCompletionToolParam(
@@ -195,18 +189,12 @@ class OpenAIModel(PromptCompletionModel):
         messages: List[chat.ChatCompletionMessageParam] = []
 
         # Submit tool outputs, if previously invoked
-        if memory.get(SUBMIT_TOOL_OUTPUTS_VARIABLE) is True:
-            prev_messages = memory.get(SUBMIT_TOOL_HISTORY) or []
-            messages.extend(prev_messages)
-            tool_outputs: List[chat.ChatCompletionToolMessageParam] = (
-                memory.get(SUBMIT_TOOL_OUTPUTS_MESSAGES) or []
+        if memory.has(ACTIONS_HISTORY):
+            tools_messages = cast(
+                List[chat.ChatCompletionMessageParam], memory.get(ACTIONS_HISTORY)
             )
-            for message in tool_outputs:
-                messages.append(message)
-            memory.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, False)
-            memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, [])
-            memory.set(SUBMIT_TOOL_OUTPUTS_MAP, {})
-            memory.set(SUBMIT_TOOL_HISTORY, [])
+            messages.extend(tools_messages)
+            memory.set(ACTIONS_HISTORY, [])
 
         for msg in res.output:
             param: Union[
@@ -263,31 +251,48 @@ class OpenAIModel(PromptCompletionModel):
                 self._options.logger.debug("COMPLETION:\n%s", completion.model_dump_json())
 
             # Handle tools flow
-            tool_calls: Optional[List[chat.ChatCompletionMessageToolCall]] = []
+            action_calls: List[ActionCall] = []
             response_message = completion.choices[0].message
 
-            if is_tools_enabled:
+            if is_tools_aug:
                 tool_calls = response_message.tool_calls
                 if tool_calls and len(tool_calls) > 0:
                     if not parallel_tool_calls and len(tool_calls) > 1:
-                        tool_calls = []
+                        return PromptResponse[str](
+                            status="error", error="Model returned more than one tool."
+                        )
 
                     if isinstance(tool_choice, dict) and len(tool_calls) > 1:
-                        tool_calls = []
+                        return PromptResponse[str](
+                            status="error", error="Model returned more than one tool."
+                        )
 
                     if tool_choice == "none":
-                        tool_calls = []
+                        return PromptResponse[str](status="error", error="Model returned tools.")
 
                     if len(tool_calls) > 0:
-                        memory.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, True)
                         messages.append(
                             cast(chat.ChatCompletionAssistantMessageParam, response_message)
                         )
-                        memory.set(SUBMIT_TOOL_HISTORY, messages)
+                        if not memory.has("conversation"):
+                            memory.set("conversation", {})
+                        memory.set(ACTIONS_HISTORY, messages)
+
+                        for tool_call in tool_calls:
+                            action_calls.append(
+                                ActionCall(
+                                    id=tool_call.id,
+                                    type=tool_call.type,
+                                    function=ActionFunction(
+                                        name=tool_call.function.name,
+                                        arguments=tool_call.function.arguments,
+                                    ),
+                                )
+                            )
                 else:
                     if tool_choice == "required":
                         return PromptResponse[str](
-                            status="tools_error", error="Model did not return any tools"
+                            status="error", error="Model did not return any tools"
                         )
 
             input: Optional[Message] = None
@@ -302,9 +307,9 @@ class OpenAIModel(PromptCompletionModel):
                 message=Message(
                     role=completion.choices[0].message.role,
                     content=completion.choices[0].message.content,
-                    action_tool_calls=(
-                        tool_calls
-                        if is_tools_enabled and tool_calls and len(tool_calls) > 0
+                    action_calls=(
+                        action_calls
+                        if is_tools_aug and action_calls and len(action_calls) > 0
                         else None
                     ),
                     context=(

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from logging import Logger
-from typing import Awaitable, Callable, List, Optional, TypeVar, Union
+from typing import Awaitable, Callable, Iterable, List, Optional, TypeVar, Union, cast
 
 from botbuilder.core import TurnContext
 from openai.types import chat
@@ -16,10 +16,9 @@ from ...app_error import ApplicationError
 from ...state import MemoryBase, TurnState
 from ..augmentations.default_augmentation import DefaultAugmentation
 from ..augmentations.tools_constants import (
-    SUBMIT_TOOL_HISTORY,
-    SUBMIT_TOOL_OUTPUTS_MAP,
-    SUBMIT_TOOL_OUTPUTS_MESSAGES,
-    SUBMIT_TOOL_OUTPUTS_VARIABLE,
+    ACTIONS_HISTORY,
+    PARALLEL_TOOL_CALLS,
+    TOOL_CHOICE,
 )
 from ..clients import LLMClient, LLMClientOptions
 from ..models.prompt_completion_model import PromptCompletionModel
@@ -159,40 +158,41 @@ class ActionPlanner(Planner[StateT]):
         )
 
     def _handle_action_tools(self, memory: MemoryBase, template: PromptTemplate) -> MemoryBase:
-        if not memory.get(SUBMIT_TOOL_OUTPUTS_VARIABLE):
-            memory.set("temp.tool_choice", template.config.completion.tool_choice)
-            memory.set("temp.parallel_tool_calls", template.config.completion.parallel_tool_calls)
-
-            # Ensure clean state
-            memory.set(SUBMIT_TOOL_OUTPUTS_MAP, {})
-            memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, [])
-            memory.set(SUBMIT_TOOL_HISTORY, [])
-
-        elif memory.get(SUBMIT_TOOL_OUTPUTS_VARIABLE) is True:
+        if not memory.has(ACTIONS_HISTORY):
+            memory.set(TOOL_CHOICE, template.config.completion.tool_choice)
+            memory.set(PARALLEL_TOOL_CALLS, template.config.completion.parallel_tool_calls)
+        else:
             # Submit tool outputs
             action_outputs = memory.get("temp.action_outputs") or {}
-            tool_map = memory.get(SUBMIT_TOOL_OUTPUTS_MAP) or {}
+            tool_messages = cast(List[chat.ChatCompletionMessageParam], memory.get(ACTIONS_HISTORY))
+            curr_message = cast(chat.ChatCompletionAssistantMessageParam, tool_messages[-1])
+            tools: Iterable[chat.ChatCompletionMessageToolCallParam] = (
+                curr_message.get("tool_calls") or []
+            )
             tool_outputs: List[chat.ChatCompletionToolMessageParam] = []
 
             for action in action_outputs:
                 output = action_outputs[action]
-                if tool_map:
-                    tool_call_id = tool_map[action] if action in tool_map else None
-                    if tool_call_id is not None:
-                        tool_outputs.append(
-                            chat.ChatCompletionToolMessageParam(
-                                tool_call_id=tool_call_id, role="tool", content=output
-                            )
+                tool_call_id = None
+
+                for tool in tools:
+                    if tool["function"]["name"] == action:
+                        tool_call_id = tool["id"]
+                        break
+
+                if tool_call_id is not None:
+                    tool_outputs.append(
+                        chat.ChatCompletionToolMessageParam(
+                            tool_call_id=tool_call_id, role="tool", content=output
                         )
+                    )
 
             if len(tool_outputs) > 0:
-                memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, tool_outputs)
+                tool_messages.extend(tool_outputs)
+                memory.set(ACTIONS_HISTORY, tool_messages)
             else:
                 # Reset state
-                memory.set(SUBMIT_TOOL_OUTPUTS_VARIABLE, False)
-                memory.set(SUBMIT_TOOL_OUTPUTS_MAP, {})
-                memory.set(SUBMIT_TOOL_OUTPUTS_MESSAGES, [])
-                memory.set(SUBMIT_TOOL_HISTORY, [])
+                memory.set(ACTIONS_HISTORY, [])
         return memory
 
     def add_semantic_function(

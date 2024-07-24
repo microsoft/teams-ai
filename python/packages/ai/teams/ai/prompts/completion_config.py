@@ -60,9 +60,6 @@ class CompletionConfig:
         top_p (float): The model's top_p as a number between 0 and 2.
           Defaults to 0.
 
-        include_tools (Optional[bool]): If True, function calling will be enabled with the LLM.
-          Defaults to False.
-
         tool_choice (Optional[chat.ChatCompletionToolChoiceOptionParam]):
           Defines function calling behavior. Defaults to "auto".
 
@@ -84,7 +81,6 @@ class CompletionConfig:
     stop_sequences: Optional[List[str]] = None
     temperature: float = 0
     top_p: float = 0
-    include_tools: Optional[bool] = False
     tool_choice: Optional[chat.ChatCompletionToolChoiceOptionParam] = "auto"
     parallel_tool_calls: Optional[bool] = True
     data_sources: Optional[List[object]] = None
@@ -104,7 +100,6 @@ class CompletionConfig:
             stop_sequences=data.get("stop_sequences"),
             temperature=data.get("temperature", 0),
             top_p=data.get("top_p", 0),
-            include_tools=data.get("include_tools", False),
             tool_choice=data.get("tool_choice", "auto"),
             parallel_tool_calls=data.get("parallel_tool_calls", True),
             data_sources=data.get("data_sources", None),
