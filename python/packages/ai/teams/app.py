@@ -38,6 +38,7 @@ from .ai import AI
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
 from .auth import AuthManager, OAuth, OAuthOptions
+from .feedback_loop_data import FeedbackLoopData
 from .meetings.meetings import Meetings
 from .message_extensions.message_extensions import MessageExtensions
 from .route import Route, RouteHandler
@@ -245,12 +246,12 @@ class Application(Bot, Generic[StateT]):
             if context.activity.type != ActivityTypes.message:
                 return False
 
+            text = context.activity.text if context.activity.text else ""
             if isinstance(select, Pattern):
-                text = context.activity.text if context.activity.text else ""
                 hits = re.match(select, text)
                 return hits is not None
 
-            i = context.activity.text.find(select)
+            i = text.find(select)
             return i > -1
 
         def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
@@ -572,6 +573,56 @@ class Application(Bot, Generic[StateT]):
 
         return __call__
 
+    def feedback_loop(
+        self,
+    ) -> Callable[
+        [Callable[[TurnContext, StateT, FeedbackLoopData], Awaitable[None]]],
+        Callable[[TurnContext, StateT, FeedbackLoopData], Awaitable[None]],
+    ]:
+        """
+        Registers a handler for feedback loop events when a user clicks the thumbs
+        up or down button on a response from AI.
+        enable_feedback_loop must be set to true in the AI Module.
+         ```python
+        # Use this method as a decorator
+        @app.feedback_loop
+        async def feedback_loop(
+            context: TurnContext, state: TurnState, feedback_data: FeedbackLoopData
+        ):
+            print(feedback_data)
+        # Pass a function to this method
+        app.feedback_loop()(feedback_loop)
+        ```
+        """
+
+        def __selector__(context: TurnContext) -> bool:
+            return (
+                context.activity.type == ActivityTypes.invoke
+                and context.activity.name == "message/submitAction"
+                and context.activity.value.action_name == "feedback"
+            )
+
+        def __call__(
+            func: Callable[[TurnContext, StateT, FeedbackLoopData], Awaitable[None]],
+        ) -> Callable[[TurnContext, StateT, FeedbackLoopData], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: StateT):
+                if not context.activity.value:
+                    return False
+
+                feedback = context.activity.value
+                feedback.reply_to_id=context.activity.reply_to_id
+
+                await func(context, state, feedback)
+                await context.send_activity(
+                    Activity(type=ActivityTypes.invoke_response, value=InvokeResponse(status=200))
+                )
+                return True
+
+            self._routes.append(Route[StateT](__selector__, __handler__, True))
+            return func
+
+        return __call__
+
     def before_turn(self, func: RouteHandler[StateT]) -> RouteHandler[StateT]:
         """
         Registers a new event listener that will be executed before turns.
@@ -759,13 +810,18 @@ class Application(Bot, Generic[StateT]):
             self._ai
             and self._options.ai
             and context.activity.type == ActivityTypes.message
-            and context.activity.text
+            and (context.activity.text or self._contains_non_text_attachments(context))
         ):
             is_ok = await self._ai.run(context, state)
             if not is_ok:
                 await state.save(context, self._options.storage)
                 return False
         return True
+
+    def _contains_non_text_attachments(self, context):
+        non_text_attachments = filter(lambda a: not a.content_type.startswith(
+            "text/html"), context.activity.attachments)
+        return len(list(non_text_attachments)) > 0
 
     async def _run_after_turn_middleware(self, context: TurnContext, state):
         for after_turn in self._after_turn:
