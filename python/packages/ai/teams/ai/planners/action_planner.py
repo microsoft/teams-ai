@@ -165,34 +165,35 @@ class ActionPlanner(Planner[StateT]):
             # Submit tool outputs
             action_outputs = memory.get("temp.action_outputs") or {}
             tool_messages = cast(List[chat.ChatCompletionMessageParam], memory.get(ACTIONS_HISTORY))
-            curr_message = cast(chat.ChatCompletionAssistantMessageParam, tool_messages[-1])
-            tools: Iterable[chat.ChatCompletionMessageToolCallParam] = (
-                curr_message.get("tool_calls") or []
-            )
-            tool_outputs: List[chat.ChatCompletionToolMessageParam] = []
+            if len(tool_messages) > 0:
+                curr_message = cast(chat.ChatCompletionAssistantMessageParam, tool_messages[-1])
+                tools: Iterable[chat.ChatCompletionMessageToolCallParam] = (
+                    curr_message.tool_calls or [] # type: ignore[attr-defined]
+                )
+                tool_outputs: List[chat.ChatCompletionToolMessageParam] = []
 
-            for action in action_outputs:
-                output = action_outputs[action]
-                tool_call_id = None
+                for action in action_outputs:
+                    output = action_outputs[action]
+                    tool_call_id = None
 
-                for tool in tools:
-                    if tool["function"]["name"] == action:
-                        tool_call_id = tool["id"]
-                        break
+                    for tool in tools:
+                        if tool.function.name == action: # type: ignore[attr-defined]
+                            tool_call_id = tool.id # type: ignore[attr-defined]
+                            break
 
-                if tool_call_id is not None:
-                    tool_outputs.append(
-                        chat.ChatCompletionToolMessageParam(
-                            tool_call_id=tool_call_id, role="tool", content=output
+                    if tool_call_id is not None:
+                        tool_outputs.append(
+                            chat.ChatCompletionToolMessageParam(
+                                tool_call_id=tool_call_id, role="tool", content=output
+                            )
                         )
-                    )
 
-            if len(tool_outputs) > 0:
-                tool_messages.extend(tool_outputs)
-                memory.set(ACTIONS_HISTORY, tool_messages)
-            else:
-                # Reset state
-                memory.set(ACTIONS_HISTORY, [])
+                if len(tool_outputs) > 0:
+                    tool_messages.extend(tool_outputs)
+                    memory.set(ACTIONS_HISTORY, tool_messages)
+                else:
+                    # Reset state
+                    memory.set(ACTIONS_HISTORY, [])
         return memory
 
     def add_semantic_function(
