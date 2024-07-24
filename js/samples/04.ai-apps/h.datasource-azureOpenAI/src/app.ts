@@ -24,7 +24,12 @@ const model = new OpenAIModel({
 
     // Request logging
     logRequests: true,
-    useSystemMessages: true
+    useSystemMessages: true,
+    requestConfig: {
+        headers: {
+            'User-Agent': 'x-ms-useragent'
+        }
+    }
 });
 
 const prompts = new PromptManager({
