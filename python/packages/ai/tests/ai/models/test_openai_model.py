@@ -621,7 +621,6 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
             )
 
         tool_messages = cast(List[chat.ChatCompletionMessageParam], state.get(ACTIONS_HISTORY))
-
         curr_tool_message = cast(chat.ChatCompletionAssistantMessageParam, tool_messages[1])
         self.assertEqual(curr_tool_message.tool_calls[0].id, "1")  # type: ignore[attr-defined]
 

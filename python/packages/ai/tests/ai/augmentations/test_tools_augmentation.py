@@ -241,13 +241,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 context=None,
                 function_call=None,
                 name=None,
-                action_calls=[
-                    ActionCall(
-                        id="1",
-                        function=ActionFunction(arguments="{}", name="LightsOn"),
-                        type="function",
-                    )
-                ],
+                action_calls=[action_call_one],
             ),
             error=None,
         )
