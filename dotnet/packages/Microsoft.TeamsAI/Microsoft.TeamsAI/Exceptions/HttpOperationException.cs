@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.ClientModel;
+using System.Net;
 
 namespace Microsoft.Teams.AI.Exceptions
 {
@@ -26,6 +27,24 @@ namespace Microsoft.Teams.AI.Exceptions
         public HttpOperationException(string message, HttpStatusCode? httpStatusCode = null, string? responseContent = null) : base(message)
         {
             StatusCode = httpStatusCode;
+            ResponseContent = responseContent;
+        }
+
+        /// <summary>
+        /// Create an instance of the HttpOperationException class using the ClientResultException class
+        /// </summary>
+        /// <param name="exception">The client result exception.</param>
+        internal HttpOperationException(ClientResultException exception) : base(exception.Message)
+        {
+            string? responseContent = null;
+
+            try
+            {
+                responseContent = exception.GetRawResponse()?.Content?.ToString();
+            }
+            catch { }
+
+            StatusCode = (HttpStatusCode)exception.Status;
             ResponseContent = responseContent;
         }
 

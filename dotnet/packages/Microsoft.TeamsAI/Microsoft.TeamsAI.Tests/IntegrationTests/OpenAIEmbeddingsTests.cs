@@ -35,7 +35,7 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
                 .Build();
         }
 
-        [Fact(Skip = "This test should only be run manually.")]
+        [Fact]
         public async Task Test_CreateEmbeddingsAsync_OpenAI()
         {
             // Arrange

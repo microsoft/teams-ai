@@ -32,7 +32,7 @@ namespace Microsoft.Teams.AI.AI.Models
         private readonly OpenAIClient _openAIClient;
         private readonly string _deploymentName;
         private readonly bool _useAzure;
-        private readonly static JsonSerializerOptions _serializerOptions = new()
+        private static readonly JsonSerializerOptions _serializerOptions = new()
         {
             WriteIndented = true,
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
@@ -171,7 +171,7 @@ namespace Microsoft.Teams.AI.AI.Models
                 // Call chat completion API
                 IEnumerable<OAIChat.ChatMessage> chatMessages = prompt.Output.Select(chatMessage => chatMessage.ToOpenAIChatMessage());
 
-                OAIChat.ChatCompletionOptions? chatCompletionOptions = ModelReaderWriter.Read<OAIChat.ChatCompletionOptions>(BinaryData.FromString($@"{{
+                ChatCompletionOptions? chatCompletionOptions = ModelReaderWriter.Read<ChatCompletionOptions>(BinaryData.FromString($@"{{
                     ""max_tokens"": {maxInputTokens},
                     ""temperature"": {(float)promptTemplate.Configuration.Completion.Temperature},
                     ""top_p"": {(float)promptTemplate.Configuration.Completion.TopP},
@@ -195,24 +195,27 @@ namespace Microsoft.Teams.AI.AI.Models
                 //};
 
                 IDictionary<string, JsonElement>? additionalData = promptTemplate.Configuration.Completion.AdditionalData;
-                AddAzureChatExtensionConfigurations(chatCompletionOptions, additionalData);
+                if (_useAzure)
+                {
+                    AddAzureChatExtensionConfigurations(chatCompletionOptions, additionalData);
+                }
 
                 PipelineResponse? rawResponse;
-                ClientResult<OAIChat.ChatCompletion>? chatCompletionsResponse = null;
+                ClientResult<ChatCompletion>? chatCompletionsResponse = null;
                 PromptResponse promptResponse = new();
                 try
                 {
                     chatCompletionsResponse = await _openAIClient.GetChatClient(_deploymentName).CompleteChatAsync(chatMessages, chatCompletionOptions, cancellationToken);
                     rawResponse = chatCompletionsResponse.GetRawResponse();
                     promptResponse.Status = PromptResponseStatus.Success;
-                    promptResponse.Message = chatCompletionsResponse.Value.ToChatMessage();
+                    promptResponse.Message = new ChatMessage(chatCompletionsResponse.Value);
                     promptResponse.Input = input;
                 }
                 catch (ClientResultException e)
                 {
                     // TODO: Verify if RequestFailedException is thrown when request fails.
                     rawResponse = e.GetRawResponse();
-                    HttpOperationException httpOperationException = e.ToHttpOperationException();
+                    HttpOperationException httpOperationException = new(e);
                     if (httpOperationException.StatusCode == (HttpStatusCode)429)
                     {
                         promptResponse.Status = PromptResponseStatus.RateLimited;

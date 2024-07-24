@@ -1,4 +1,5 @@
-﻿using Microsoft.Teams.AI.Utilities;
+﻿using Azure.AI.OpenAI.Chat;
+using Microsoft.Teams.AI.Utilities;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
@@ -16,6 +17,28 @@ namespace Microsoft.Teams.AI.AI.Models
         /// The intent of the message.
         /// </summary>
         public string Intent { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Creates a MessageContext
+        /// </summary>
+        public MessageContext() { }
+
+        /// <summary>
+        /// Creates a MessageContext using OpenAI.Chat.AzureChatMessageContext.
+        /// </summary>
+        /// <param name="azureContext"></param>
+        internal MessageContext(AzureChatMessageContext azureContext)
+        {
+            if (azureContext.Citations != null)
+            {
+                foreach (AzureChatCitation citation in azureContext.Citations)
+                {
+                    this.Citations.Add(new Citation(citation.Content, citation.Title, citation.Url));
+                }
+            }
+
+            this.Intent = azureContext.Intent;
+        }
     }
 
     /// <summary>
