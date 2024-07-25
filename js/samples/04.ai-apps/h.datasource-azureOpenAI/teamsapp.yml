@@ -107,3 +107,4 @@ publish:
   - uses: teamsApp/update
     with:
       appPackagePath: ./appPackage/build/appPackage.${{TEAMSFX_ENV}}.zip
+projectId: 40812f36-6a83-4048-9692-0118aca4816b

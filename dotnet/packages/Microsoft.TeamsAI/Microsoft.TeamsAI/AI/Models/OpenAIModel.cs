@@ -200,6 +200,16 @@ namespace Microsoft.Teams.AI.AI.Models
                 //    FrequencyPenalty = (float)promptTemplate.Configuration.Completion.FrequencyPenalty,
                 //};
 
+                // TODO: Use this once setters are added for the following fields in `OpenAI` package.
+                //OAIChat.ChatCompletionOptions chatCompletionsOptions = new()
+                //{
+                //    MaxTokens = maxInputTokens,
+                //    Temperature = (float)promptTemplate.Configuration.Completion.Temperature,
+                //    TopP = (float)promptTemplate.Configuration.Completion.TopP,
+                //    PresencePenalty = (float)promptTemplate.Configuration.Completion.PresencePenalty,
+                //    FrequencyPenalty = (float)promptTemplate.Configuration.Completion.FrequencyPenalty,
+                //};
+
                 IDictionary<string, JsonElement>? additionalData = promptTemplate.Configuration.Completion.AdditionalData;
                 if (_useAzure)
                 {

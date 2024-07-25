@@ -41,6 +41,7 @@ namespace Microsoft.Teams.AI.AI.Embeddings
             options.RetryPolicy = options.RetryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) };
             _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<OpenAIModel>();
 
+            OpenAIEmbeddingsOptions embeddingsOptions = (OpenAIEmbeddingsOptions)_options;
             OpenAIClientOptions openAIClientOptions = new()
             {
                 RetryPolicy = new SequentialDelayRetryPolicy(options.RetryPolicy!, options.RetryPolicy!.Count)
@@ -112,6 +113,7 @@ namespace Microsoft.Teams.AI.AI.Embeddings
                 throw new ArgumentException("token credential or api key is required.");
             }
 
+            _openAIClient = new AzureOpenAIClient(new Uri(azureEmbeddingsOptions.AzureEndpoint), new ApiKeyCredential(azureEmbeddingsOptions.AzureApiKey), azureOpenAIClientOptions);
             _deploymentName = options.AzureDeployment;
             _options = options;
         }
