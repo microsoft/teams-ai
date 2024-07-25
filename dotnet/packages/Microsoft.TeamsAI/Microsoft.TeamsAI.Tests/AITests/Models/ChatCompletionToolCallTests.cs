@@ -1,18 +1,19 @@
 ﻿using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.Exceptions;
+using OpenAI.Chat;
 
 namespace Microsoft.Teams.AI.Tests.AITests.Models
 {
-    public class AzureSdkChatMessageExtensions
+    internal class ChatCompletionToolCallTests
     {
         [Fact]
         public void Test_ChatCompletionsToolCall_ToFunctionToolCall()
         {
             // Arrange
-            var functionToolCall = new Azure.AI.OpenAI.ChatCompletionsFunctionToolCall("test-id", "test-name", "test-arg1");
+            var functionToolCall = ChatToolCall.CreateFunctionToolCall("test-id", "test-name", "test-arg1");
 
             // Act
-            var azureSdkFunctionToolCall = functionToolCall.ToChatCompletionsToolCall();
+            var azureSdkFunctionToolCall = ChatCompletionsToolCall.FromChatToolCall(functionToolCall);
 
             // Assert
             var toolCall = azureSdkFunctionToolCall as ChatCompletionsFunctionToolCall;
@@ -29,15 +30,15 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             var functionToolCall = new InvalidToolCall();
 
             // Act
-            var ex = Assert.Throws<TeamsAIException>(() => functionToolCall.ToChatCompletionsToolCall());
+            var ex = Assert.Throws<TeamsAIException>(() => functionToolCall.ToChatToolCall());
 
             // Assert
-            Assert.Equal($"Invalid ChatCompletionsToolCall type: {nameof(InvalidToolCall)}", ex.Message);
+            Assert.Equal("Invalid tool type: invalidToolType", ex.Message);
         }
 
-        private sealed class InvalidToolCall : Azure.AI.OpenAI.ChatCompletionsToolCall
+        private sealed class InvalidToolCall : ChatCompletionsToolCall
         {
-            public InvalidToolCall() : base("test-id")
+            public InvalidToolCall() : base("invalidToolType", "test-id")
             {
             }
         }
