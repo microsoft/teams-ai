@@ -113,7 +113,6 @@ namespace Microsoft.Teams.AI.AI.Embeddings
                 throw new ArgumentException("token credential or api key is required.");
             }
 
-            _openAIClient = new AzureOpenAIClient(new Uri(azureEmbeddingsOptions.AzureEndpoint), new ApiKeyCredential(azureEmbeddingsOptions.AzureApiKey), azureOpenAIClientOptions);
             _deploymentName = options.AzureDeployment;
             _options = options;
         }
