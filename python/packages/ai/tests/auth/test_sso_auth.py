@@ -10,7 +10,7 @@ from teams.state import TurnState
 from teams.auth import SsoOptions, ConfidentialClientApplicationOptions
 from teams.auth import SsoAuth
 
-class TestSsoAuthTokenExchange(unittest.IsolatedAsyncioTestCase):
+class TestSsoAuth(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         self.options = SsoOptions(
             scopes=["User.Read"],
