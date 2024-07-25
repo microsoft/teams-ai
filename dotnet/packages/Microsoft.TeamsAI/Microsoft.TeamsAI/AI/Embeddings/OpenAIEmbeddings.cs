@@ -34,21 +34,16 @@ namespace Microsoft.Teams.AI.AI.Embeddings
         public OpenAIEmbeddings(OpenAIEmbeddingsOptions options, ILoggerFactory? loggerFactory = null, HttpClient? httpClient = null)
         {
             Verify.ParamNotNull(options);
-            Verify.ParamNotNull(options.ApiKey, "OpenAIEmbeddingsOptions.ApiKey");
             Verify.ParamNotNull(options.Model, "OpenAIEmbeddingsOptions.Model");
 
-            _options = new OpenAIEmbeddingsOptions(options.ApiKey, options.Model)
-            {
-                Organization = options.Organization,
-                LogRequests = options.LogRequests ?? false,
-                RetryPolicy = options.RetryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) },
-            };
+
+            options.LogRequests = options.LogRequests ?? false;
+            options.RetryPolicy = options.RetryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) };
             _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<OpenAIModel>();
 
-            OpenAIEmbeddingsOptions embeddingsOptions = (OpenAIEmbeddingsOptions)_options;
             OpenAIClientOptions openAIClientOptions = new()
             {
-                RetryPolicy = new SequentialDelayRetryPolicy(embeddingsOptions.RetryPolicy!, embeddingsOptions.RetryPolicy!.Count)
+                RetryPolicy = new SequentialDelayRetryPolicy(options.RetryPolicy!, options.RetryPolicy!.Count)
             };
 
             openAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("User-Agent", _userAgent), PipelinePosition.PerCall);
@@ -57,13 +52,14 @@ namespace Microsoft.Teams.AI.AI.Embeddings
                 openAIClientOptions.Transport = new HttpClientPipelineTransport(httpClient);
             }
 
-            if (!string.IsNullOrEmpty(embeddingsOptions.Organization))
+            if (!string.IsNullOrEmpty(options.Organization))
             {
                 openAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("OpenAI-Organization", options.Organization!), PipelinePosition.PerCall);
             }
-            _openAIClient = new OpenAIClient(new ApiKeyCredential(embeddingsOptions.ApiKey), openAIClientOptions);
+            _openAIClient = new OpenAIClient(new ApiKeyCredential(options.ApiKey), openAIClientOptions);
 
             _deploymentName = options.Model;
+            _options = options;
         }
 
         /// <summary>
@@ -75,7 +71,6 @@ namespace Microsoft.Teams.AI.AI.Embeddings
         public OpenAIEmbeddings(AzureOpenAIEmbeddingsOptions options, ILoggerFactory? loggerFactory = null, HttpClient? httpClient = null)
         {
             Verify.ParamNotNull(options);
-            Verify.ParamNotNull(options.AzureApiKey, "AzureOpenAIEmbeddingsOptions.AzureApiKey");
             Verify.ParamNotNull(options.AzureDeployment, "AzureOpenAIEmbeddingsOptions.AzureDeployment");
             Verify.ParamNotNull(options.AzureEndpoint, "AzureOpenAIEmbeddingsOptions.AzureEndpoint");
 
@@ -86,19 +81,15 @@ namespace Microsoft.Teams.AI.AI.Embeddings
                 throw new ArgumentException($"Model created with an unsupported API version of `{apiVersion}`.");
             }
 
-            _options = new AzureOpenAIEmbeddingsOptions(options.AzureApiKey, options.AzureDeployment, options.AzureEndpoint)
-            {
-                AzureApiVersion = apiVersion,
-                LogRequests = options.LogRequests ?? false,
-                RetryPolicy = options.RetryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) }
-            };
+
+            options.LogRequests = options.LogRequests ?? false;
+            options.RetryPolicy = options.RetryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) };
             _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<OpenAIModel>();
 
 
-            AzureOpenAIEmbeddingsOptions azureEmbeddingsOptions = (AzureOpenAIEmbeddingsOptions)_options;
             AzureOpenAIClientOptions azureOpenAIClientOptions = new(serviceVersion.Value)
             {
-                RetryPolicy = new SequentialDelayRetryPolicy(_options.RetryPolicy, _options.RetryPolicy.Count)
+                RetryPolicy = new SequentialDelayRetryPolicy(options.RetryPolicy, options.RetryPolicy.Count)
             };
 
             azureOpenAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("User-Agent", _userAgent), PipelinePosition.PerCall);
@@ -107,8 +98,22 @@ namespace Microsoft.Teams.AI.AI.Embeddings
                 azureOpenAIClientOptions.Transport = new HttpClientPipelineTransport(httpClient);
             }
 
-            _openAIClient = new AzureOpenAIClient(new Uri(azureEmbeddingsOptions.AzureEndpoint), new ApiKeyCredential(azureEmbeddingsOptions.AzureApiKey), azureOpenAIClientOptions);
+            Uri uri = new(options.AzureEndpoint);
+            if (options.TokenCredential != null)
+            {
+                _openAIClient = new AzureOpenAIClient(uri, options.TokenCredential, azureOpenAIClientOptions);
+            }
+            else if (options.AzureApiKey != null && options.AzureApiKey != string.Empty)
+            {
+                _openAIClient = new AzureOpenAIClient(uri, new ApiKeyCredential(options.AzureApiKey), azureOpenAIClientOptions);
+            }
+            else
+            {
+                throw new ArgumentException("token credential or api key is required.");
+            }
+
             _deploymentName = options.AzureDeployment;
+            _options = options;
         }
 
         /// <inheritdoc/>
