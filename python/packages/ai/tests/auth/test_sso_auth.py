@@ -63,7 +63,8 @@ class TestSsoAuth(unittest.IsolatedAsyncioTestCase):
         )
 
         self.assertIsNotNone(token_result)
-        self.assertEqual(token_result.token, "new_access_token")
+        if token_result:
+            self.assertEqual(token_result.token, "new_access_token")
 
     async def test_exchange_token_failure(self):
         self.mock_msal_instance.acquire_token_on_behalf_of.return_value = None
@@ -76,6 +77,3 @@ class TestSsoAuth(unittest.IsolatedAsyncioTestCase):
         )
 
         self.assertIsNone(token_result)
-
-if __name__ == '__main__':
-    unittest.main()
