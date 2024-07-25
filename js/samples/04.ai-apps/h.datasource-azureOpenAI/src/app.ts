@@ -11,6 +11,16 @@ error.log = console.log.bind(console);
 interface ConversationState {}
 type ApplicationTurnState = TurnState<ConversationState>;
 
+const adapter = new TeamsAdapter(
+    {},
+    new ConfigurationServiceClientCredentialFactory({
+        MicrosoftAppId: process.env.BOT_ID,
+        MicrosoftAppPassword: process.env.BOT_PASSWORD,
+        MicrosoftAppTenantId: process.env.BOT_TENANT_ID,
+        MicrosoftAppType: process.env.BOT_TYPE
+    })
+);
+
 // Create AI components
 const model = new OpenAIModel({
     // Azure OpenAI Support
@@ -27,7 +37,7 @@ const model = new OpenAIModel({
     useSystemMessages: true,
     requestConfig: {
         headers: {
-            'User-Agent': 'x-ms-useragent'
+            'x-ms-useragent': adapter.userAgent
         }
     }
 });
@@ -45,20 +55,12 @@ const planner = new ActionPlanner({
 // Define storage and application
 const storage = new MemoryStorage();
 export const app = new Application<ApplicationTurnState>({
+    adapter,
     storage,
     ai: {
         planner: planner,
         enable_feedback_loop: true
-    },
-    adapter: new TeamsAdapter(
-        {},
-        new ConfigurationServiceClientCredentialFactory({
-            MicrosoftAppId: process.env.BOT_ID,
-            MicrosoftAppPassword: process.env.BOT_PASSWORD,
-            MicrosoftAppTenantId: process.env.BOT_TENANT_ID,
-            MicrosoftAppType: process.env.BOT_TYPE
-        })
-    )
+    }
 });
 
 app.conversationUpdate('membersAdded', async (context: TurnContext) => {
