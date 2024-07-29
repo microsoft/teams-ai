@@ -11,7 +11,7 @@ from openai.types import chat
 from openai.types.chat.chat_completion_message_tool_call_param import Function
 
 from teams.ai.augmentations.tools_augmentation import ToolsAugmentation
-from teams.ai.augmentations.tools_constants import ACTIONS_HISTORY, TOOL_CHOICE
+from teams.ai.augmentations.tools_constants import ACTIONS_HISTORY
 from teams.ai.models.chat_completion_action import ChatCompletionAction
 from teams.ai.models.prompt_response import PromptResponse
 from teams.ai.planners.plan import PredictedDoCommand, PredictedSayCommand
@@ -48,19 +48,6 @@ chat_completion_tool_two = chat.ChatCompletionMessageToolCallParam(
     ),
     type="function",
 )
-action_call_two_missing_params = ActionCall(
-    id="2",
-    function=ActionFunction(arguments="{}", name="Pause"),
-    type="function",
-)
-chat_completion_tool_two_missing_params = chat.ChatCompletionMessageToolCallParam(
-    id="2",
-    function=Function(
-        name="Pause",
-        arguments="",
-    ),
-    type="function",
-)
 action_call_three = ActionCall(
     id="3",
     type="function",
@@ -84,7 +71,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         self.tokenizer = GPTTokenizer()
 
     def test_create_prompt_section(self):
-        tools_augmentation = ToolsAugmentation()
+        tools_augmentation = ToolsAugmentation(actions=None)
         self.assertEqual(tools_augmentation.create_prompt_section(), None)
 
     async def test_validate_str_response(self):
@@ -114,7 +101,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
             error=None,
         )
 
-        tools_augmentation = ToolsAugmentation()
+        tools_augmentation = ToolsAugmentation(actions=None)
         validation = await tools_augmentation.validate_response(
             cast(TurnContext, {}),
             memory=state,
@@ -160,7 +147,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
             error=None,
         )
 
-        tools_augmentation = ToolsAugmentation()
+        tools_augmentation = ToolsAugmentation(actions=None)
         validation = await tools_augmentation.validate_response(
             cast(TurnContext, {}),
             memory=state,
@@ -202,7 +189,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
             error=None,
         )
 
-        tools_augmentation = ToolsAugmentation()
+        tools_augmentation = ToolsAugmentation(actions=None)
         validation = await tools_augmentation.validate_response(
             cast(TurnContext, {}),
             memory=state,
@@ -246,7 +233,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
             error=None,
         )
 
-        tools_augmentation = ToolsAugmentation()
+        tools_augmentation = ToolsAugmentation(actions=None)
         validation = await tools_augmentation.validate_response(
             cast(TurnContext, {}),
             memory=state,
@@ -272,7 +259,6 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 )
             ],
         )
-        state.set(TOOL_CHOICE, {"type": "function", "function": {"name": "LightsOn"}})
 
         prompt_response = PromptResponse(
             status="success",
@@ -320,7 +306,6 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 )
             ],
         )
-        state.set(TOOL_CHOICE, {"type": "function", "function": {"name": "Pause"}})
 
         prompt_response = PromptResponse(
             status="success",
@@ -371,120 +356,6 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         self.assertEqual(validation.valid, True)
         self.assertEqual(validation.value, [action_call_two])
 
-    async def test_validate_tool_call_response_single_tool_missing_params(self):
-        state = TurnState()
-        state.conversation = {}
-        state.temp = {}
-        state.set(
-            ACTIONS_HISTORY,
-            [
-                chat.ChatCompletionAssistantMessageParam(
-                    role="assistant", tool_calls=[chat_completion_tool_two_missing_params]
-                )
-            ],
-        )
-        state.set(TOOL_CHOICE, {"type": "function", "function": {"name": "Pause"}})
-
-        prompt_response = PromptResponse(
-            status="success",
-            input=Message(
-                role="user",
-                content='"hi, can you turn on the lights"',
-                context=None,
-                function_call=None,
-                name=None,
-                action_calls=None,
-            ),
-            message=Message(
-                role="assistant",
-                content=None,
-                context=None,
-                function_call=None,
-                name=None,
-                action_calls=[action_call_two_missing_params],
-            ),
-            error=None,
-        )
-
-        tools_augmentation = ToolsAugmentation(
-            [
-                ChatCompletionAction(
-                    name="Pause",
-                    description="",
-                    parameters={
-                        "type": "object",
-                        "properties": {
-                            "time": {
-                                "type": "number",
-                                "description": "The amount of time to delay in milliseconds",
-                            }
-                        },
-                        "required": ["time"],
-                    },
-                )
-            ]
-        )
-        validation = await tools_augmentation.validate_response(
-            cast(TurnContext, {}),
-            memory=state,
-            tokenizer=self.tokenizer,
-            response=prompt_response,
-            remaining_attempts=0,
-        )
-        self.assertEqual(validation.valid, True)
-        self.assertEqual(validation.value, None)
-        if state.get(ACTIONS_HISTORY):
-            history = cast(List[chat.ChatCompletionMessageParam], state.get(ACTIONS_HISTORY))
-            self.assertEqual(len(history), 0)
-
-    async def test_validate_tool_call_response_single_tool_missing(self):
-        state = TurnState()
-        state.conversation = {}
-        state.temp = {}
-        state.set(
-            ACTIONS_HISTORY,
-            [
-                chat.ChatCompletionAssistantMessageParam(
-                    role="assistant", tool_calls=[chat_completion_tool_two]
-                )
-            ],
-        )
-        state.set(TOOL_CHOICE, {"type": "function", "function": {"name": "Pause"}})
-
-        prompt_response = PromptResponse(
-            status="success",
-            input=Message(
-                role="user",
-                content='"hi, can you turn on the lights"',
-                context=None,
-                function_call=None,
-                name=None,
-                action_calls=None,
-            ),
-            message=Message(
-                role="assistant",
-                content=None,
-                context=None,
-                function_call=None,
-                name=None,
-                action_calls=[action_call_two],
-            ),
-            error=None,
-        )
-
-        tools_augmentation = ToolsAugmentation(
-            [ChatCompletionAction(name="LightsOn", description="", parameters={})]
-        )
-        validation = await tools_augmentation.validate_response(
-            cast(TurnContext, {}),
-            memory=state,
-            tokenizer=self.tokenizer,
-            response=prompt_response,
-            remaining_attempts=0,
-        )
-        self.assertEqual(validation.valid, False)
-        self.assertEqual(validation.feedback, "The invoked tool does not exist.")
-
     async def test_validate_tool_call_response_multiple_tools(self):
         state = TurnState()
         state.conversation = {}
@@ -534,59 +405,6 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         )
         self.assertEqual(validation.valid, True)
         self.assertEqual(validation.value, [action_call_one])
-
-    async def test_validate_tool_call_response_multiple_tools_invalid_tool(self):
-        state = TurnState()
-        state.conversation = {}
-        state.temp = {}
-        state.set(
-            ACTIONS_HISTORY,
-            [
-                chat.ChatCompletionAssistantMessageParam(
-                    role="assistant", tool_calls=[chat_completion_tool_three]
-                )
-            ],
-        )
-
-        prompt_response = PromptResponse(
-            status="success",
-            input=Message(
-                role="user",
-                content='"hi, can you turn on the lights"',
-                context=None,
-                function_call=None,
-                name=None,
-                action_calls=None,
-            ),
-            message=Message(
-                role="assistant",
-                content=None,
-                context=None,
-                function_call=None,
-                name=None,
-                action_calls=[action_call_three],
-            ),
-            error=None,
-        )
-
-        tools_augmentation = ToolsAugmentation(
-            [
-                ChatCompletionAction(name="LightsOn", description="", parameters={}),
-                ChatCompletionAction(name="LightsOff", description="", parameters={}),
-            ]
-        )
-        validation = await tools_augmentation.validate_response(
-            cast(TurnContext, {}),
-            memory=state,
-            tokenizer=self.tokenizer,
-            response=prompt_response,
-            remaining_attempts=0,
-        )
-        self.assertEqual(validation.valid, True)
-        self.assertEqual(validation.value, None)
-        if state.get(ACTIONS_HISTORY):
-            history = cast(List[chat.ChatCompletionMessageParam], state.get(ACTIONS_HISTORY))
-            self.assertEqual(len(history), 0)
 
     async def test_validate_tool_call_response_multiple_tools_with_params(self):
         state = TurnState()
@@ -653,76 +471,12 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         self.assertEqual(validation.valid, True)
         self.assertEqual(validation.value, [action_call_one, action_call_two])
 
-    async def test_validate_tool_call_response_multiple_tools_missing_params(self):
-        state = TurnState()
-        state.conversation = {}
-        state.temp = {}
-        state.set(
-            ACTIONS_HISTORY,
-            [
-                chat.ChatCompletionAssistantMessageParam(
-                    role="assistant",
-                    tool_calls=[chat_completion_tool_one, chat_completion_tool_two_missing_params],
-                )
-            ],
-        )
-
-        prompt_response = PromptResponse(
-            status="success",
-            input=Message(
-                role="user",
-                content='"hi, can you turn on the lights"',
-                context=None,
-                function_call=None,
-                name=None,
-                action_calls=None,
-            ),
-            message=Message(
-                role="assistant",
-                content=None,
-                context=None,
-                function_call=None,
-                name=None,
-                action_calls=[action_call_one, action_call_two_missing_params],
-            ),
-            error=None,
-        )
-
-        tools_augmentation = ToolsAugmentation(
-            [
-                ChatCompletionAction(name="LightsOn", description="", parameters={}),
-                ChatCompletionAction(
-                    name="Pause",
-                    description="",
-                    parameters={
-                        "type": "object",
-                        "properties": {
-                            "time": {
-                                "type": "number",
-                                "description": "The amount of time to delay in milliseconds",
-                            }
-                        },
-                        "required": ["time"],
-                    },
-                ),
-            ]
-        )
-        validation = await tools_augmentation.validate_response(
-            cast(TurnContext, {}),
-            memory=state,
-            tokenizer=self.tokenizer,
-            response=prompt_response,
-            remaining_attempts=0,
-        )
-        self.assertEqual(validation.valid, True)
-        self.assertEqual(validation.value, [action_call_one])
-
     async def test_create_plan_from_response_missing_response_message(self):
         state = TurnState()
         state.temp = {}
         state.conversation = {}
 
-        tools_augmentation = ToolsAugmentation()
+        tools_augmentation = ToolsAugmentation(actions=None)
         plan = await tools_augmentation.create_plan_from_response(
             cast(TurnContext, {}),
             memory=state,
@@ -747,7 +501,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         state.temp = {}
         state.conversation = {}
 
-        tools_augmentation = ToolsAugmentation()
+        tools_augmentation = ToolsAugmentation(actions=None)
         plan = await tools_augmentation.create_plan_from_response(
             cast(TurnContext, {}),
             memory=state,
@@ -801,7 +555,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
             ],
         )
 
-        tools_augmentation = ToolsAugmentation()
+        tools_augmentation = ToolsAugmentation(actions=None)
         plan = await tools_augmentation.create_plan_from_response(
             cast(TurnContext, {}),
             memory=state,
@@ -847,7 +601,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
             ],
         )
 
-        tools_augmentation = ToolsAugmentation()
+        tools_augmentation = ToolsAugmentation(actions=None)
         plan = await tools_augmentation.create_plan_from_response(
             cast(TurnContext, {}),
             memory=state,

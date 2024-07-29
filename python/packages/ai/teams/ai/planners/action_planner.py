@@ -15,11 +15,7 @@ from openai.types import chat
 from ...app_error import ApplicationError
 from ...state import MemoryBase, TurnState
 from ..augmentations.default_augmentation import DefaultAugmentation
-from ..augmentations.tools_constants import (
-    ACTIONS_HISTORY,
-    PARALLEL_TOOL_CALLS,
-    TOOL_CHOICE,
-)
+from ..augmentations.tools_constants import ACTIONS_HISTORY
 from ..clients import LLMClient, LLMClientOptions
 from ..models.prompt_completion_model import PromptCompletionModel
 from ..models.prompt_response import PromptResponse
@@ -134,7 +130,7 @@ class ActionPlanner(Planner[StateT]):
                 self._options.prompts.add_prompt(prompt)
 
         template = await self._options.prompts.get_prompt(name)
-        memory = self._handle_action_tools(memory, template)
+        memory = self._handle_action_tools(memory)
 
         include_history = template.config.completion.include_history
         client = LLMClient(
@@ -157,18 +153,15 @@ class ActionPlanner(Planner[StateT]):
             template=template,
         )
 
-    def _handle_action_tools(self, memory: MemoryBase, template: PromptTemplate) -> MemoryBase:
-        if not memory.has(ACTIONS_HISTORY):
-            memory.set(TOOL_CHOICE, template.config.completion.tool_choice)
-            memory.set(PARALLEL_TOOL_CALLS, template.config.completion.parallel_tool_calls)
-        else:
+    def _handle_action_tools(self, memory: MemoryBase) -> MemoryBase:
+        if memory.has(ACTIONS_HISTORY):
             # Submit tool outputs
             action_outputs = memory.get("temp.action_outputs") or {}
             tool_messages = cast(List[chat.ChatCompletionMessageParam], memory.get(ACTIONS_HISTORY))
             if len(tool_messages) > 0:
                 curr_message = cast(chat.ChatCompletionAssistantMessageParam, tool_messages[-1])
-                tools: Iterable[chat.ChatCompletionMessageToolCallParam] = (
-                    curr_message.tool_calls or [] # type: ignore[attr-defined]
+                tools: Iterable[chat.ChatCompletionMessageToolCallParam] = getattr(
+                    curr_message, "tool_calls", []
                 )
                 tool_outputs: List[chat.ChatCompletionToolMessageParam] = []
 
@@ -177,8 +170,9 @@ class ActionPlanner(Planner[StateT]):
                     tool_call_id = None
 
                     for tool in tools:
-                        if tool.function.name == action: # type: ignore[attr-defined]
-                            tool_call_id = tool.id # type: ignore[attr-defined]
+                        func = getattr(tool, "function", None)
+                        if func and getattr(func, "name", "") == action:
+                            tool_call_id = getattr(tool, "id")
                             break
 
                     if tool_call_id is not None:

@@ -257,42 +257,25 @@ class OpenAIModel(PromptCompletionModel):
             if is_tools_aug:
                 tool_calls = response_message.tool_calls
                 if tool_calls and len(tool_calls) > 0:
-                    if not parallel_tool_calls and len(tool_calls) > 1:
-                        return PromptResponse[str](
-                            status="error", error="Model returned more than one tool."
-                        )
+                    messages.append(
+                        cast(chat.ChatCompletionAssistantMessageParam, response_message)
+                    )
 
-                    if isinstance(tool_choice, dict) and len(tool_calls) > 1:
-                        return PromptResponse[str](
-                            status="error", error="Model returned more than one tool."
-                        )
+                    if not memory.has("conversation"):
+                        memory.set("conversation", {})
 
-                    if tool_choice == "none":
-                        return PromptResponse[str](status="error", error="Model returned tools.")
+                    memory.set(ACTIONS_HISTORY, messages)
 
-                    if len(tool_calls) > 0:
-                        messages.append(
-                            cast(chat.ChatCompletionAssistantMessageParam, response_message)
-                        )
-                        if not memory.has("conversation"):
-                            memory.set("conversation", {})
-                        memory.set(ACTIONS_HISTORY, messages)
-
-                        for tool_call in tool_calls:
-                            action_calls.append(
-                                ActionCall(
-                                    id=tool_call.id,
-                                    type=tool_call.type,
-                                    function=ActionFunction(
-                                        name=tool_call.function.name,
-                                        arguments=tool_call.function.arguments,
-                                    ),
-                                )
+                    for tool_call in tool_calls:
+                        action_calls.append(
+                            ActionCall(
+                                id=tool_call.id,
+                                type=tool_call.type,
+                                function=ActionFunction(
+                                    name=tool_call.function.name,
+                                    arguments=tool_call.function.arguments,
+                                ),
                             )
-                else:
-                    if tool_choice == "required":
-                        return PromptResponse[str](
-                            status="error", error="Model did not return any tools"
                         )
 
             input: Optional[Message] = None

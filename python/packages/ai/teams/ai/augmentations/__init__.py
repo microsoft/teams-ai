@@ -8,7 +8,6 @@ from .default_augmentation import DefaultAugmentation
 from .monologue_augmentation import MonologueAugmentation
 from .sequence_augmentation import SequenceAugmentation
 from .tools_augmentation import ToolsAugmentation
-from .tools_constants import ACTIONS_HISTORY, PARALLEL_TOOL_CALLS, TOOL_CHOICE
 
 __all__ = [
     "Augmentation",
@@ -16,7 +15,4 @@ __all__ = [
     "MonologueAugmentation",
     "SequenceAugmentation",
     "ToolsAugmentation",
-    "ACTIONS_HISTORY",
-    "TOOL_CHOICE",
-    "PARALLEL_TOOL_CALLS",
 ]

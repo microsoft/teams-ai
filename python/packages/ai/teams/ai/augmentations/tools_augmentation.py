@@ -24,7 +24,7 @@ from ..prompts.sections.prompt_section import PromptSection
 from ..tokenizers.tokenizer import Tokenizer
 from ..validators.validation import Validation
 from .augmentation import Augmentation
-from .tools_constants import ACTIONS_HISTORY, TOOL_CHOICE
+from .tools_constants import ACTIONS_HISTORY
 
 
 class ToolsAugmentation(Augmentation[Union[str, List[ActionCall]]]):
@@ -32,10 +32,9 @@ class ToolsAugmentation(Augmentation[Union[str, List[ActionCall]]]):
     A server-side 'tools' augmentation.
     """
 
-    _actions: List[ChatCompletionAction] = []
+    _actions: Optional[List[ChatCompletionAction]]
 
-    def __init__(self, actions: List[ChatCompletionAction] = []) -> None:
-        # pylint: disable=dangerous-default-value
+    def __init__(self, actions: Optional[List[ChatCompletionAction]]) -> None:
         self._actions = actions
 
     def create_prompt_section(self) -> Optional[PromptSection]:
@@ -66,66 +65,17 @@ class ToolsAugmentation(Augmentation[Union[str, List[ActionCall]]]):
         Returns:
             Validation: A 'Validation' object.
         """
-        valid_action_calls: List[ActionCall] = []
-
-        if (
-            response.message
-            and response.message.action_calls
-            and len(response.message.action_calls) > 0
-            and memory.has(ACTIONS_HISTORY)
-        ):
+        if response.message and response.message.action_calls and memory.has(ACTIONS_HISTORY):
             tool_calls = response.message.action_calls
             tools = self._actions
 
             if tools and len(tool_calls) > 0:
-                tool_choice = memory.get(TOOL_CHOICE) or "auto"
+                return Validation(
+                    valid=True,
+                    value=tool_calls,
+                )
 
-                # Calling a single tool
-                if isinstance(tool_choice, dict):
-                    function_name = tool_choice["function"]["name"]
-                    tool_call = tool_calls[0]
-                    curr_tool = None
-
-                    for tool in tools:
-                        if tool.name == function_name:
-                            curr_tool = tool
-                            break
-
-                    if curr_tool:
-                        valid_action_calls = self._validate_function_and_args(
-                            curr_tool, tool_call, valid_action_calls
-                        )
-                    else:
-                        return Validation(valid=False, feedback="The invoked tool does not exist.")
-
-                # Calling multiple tools
-                else:
-                    for tool_call in tool_calls:
-                        function_name = tool_call.function.name
-                        curr_tool = None
-
-                        for tool in tools:
-                            if tool.name == function_name:
-                                curr_tool = tool
-                                break
-
-                        # Validate function name
-                        if not curr_tool:
-                            continue
-
-                        # Validate function arguments
-                        valid_action_calls = self._validate_function_and_args(
-                            curr_tool, tool_call, valid_action_calls
-                        )
-
-            # No tools were valid
-            if len(valid_action_calls) == 0:
-                memory.set(ACTIONS_HISTORY, [])
-
-            return Validation(
-                valid=True,
-                value=valid_action_calls if len(valid_action_calls) > 0 else None,
-            )
+        memory.set(ACTIONS_HISTORY, [])
         return Validation(valid=True)
 
     async def create_plan_from_response(
@@ -163,27 +113,3 @@ class ToolsAugmentation(Augmentation[Union[str, List[ActionCall]]]):
             say_response = cast(Message[str], response.message)
             return Plan(commands=[PredictedSayCommand(response=say_response)])
         return Plan()
-
-    def _validate_function_and_args(
-        self,
-        curr_tool: ChatCompletionAction,
-        tool_call: ActionCall,
-        valid_action_calls: List[ActionCall],
-    ) -> List[ActionCall]:
-        # Validate function arguments
-        required_args: List[str] = (
-            curr_tool.parameters["required"]
-            if curr_tool.parameters and "required" in curr_tool.parameters
-            else None
-        )
-
-        curr_args = json.loads(tool_call.function.arguments)
-
-        # Contains all required args
-        if required_args:
-            if all(args in curr_args for args in required_args):
-                valid_action_calls.append(tool_call)
-        else:
-            valid_action_calls.append(tool_call)
-
-        return valid_action_calls

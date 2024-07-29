@@ -344,7 +344,7 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
             template=PromptTemplate(
                 name="default",
                 prompt=TextSection(text="this is a test prompt", role="system", tokens=1),
-                augmentation=ToolsAugmentation(),
+                augmentation=ToolsAugmentation(actions=None),
                 config=PromptTemplateConfig(
                     schema=1.0,
                     type="completion",
@@ -376,7 +376,7 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
                 name="default",
                 actions=[],
                 prompt=TextSection(text="this is a test prompt", role="system", tokens=1),
-                augmentation=ToolsAugmentation(),
+                augmentation=ToolsAugmentation(actions=None),
                 config=PromptTemplateConfig(
                     schema=1.0,
                     type="completion",
@@ -431,153 +431,6 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
         self.assertEqual(res.status, "success")
         if res.message:
             self.assertEqual(res.message.action_calls, None)
-
-    @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAIWithTools)
-    async def test_no_tools_called_with_no_parallel_calls(self, mock_async_openai):
-        context = self.create_mock_context()
-        state = TurnState()
-        state.temp = {}
-        actions = [
-            ChatCompletionAction(name="tool_one", description="", parameters={}),
-            ChatCompletionAction(name="tool_two", description="", parameters={}),
-        ]
-        await state.load(context)
-
-        model = OpenAIModel(OpenAIModelOptions(api_key="", default_model="model"))
-        res = await model.complete_prompt(
-            context=context,
-            memory=state,
-            functions=cast(PromptFunctions, {}),
-            tokenizer=GPTTokenizer(),
-            template=PromptTemplate(
-                name="default",
-                augmentation=ToolsAugmentation(actions),
-                prompt=TextSection(text="this is a test prompt", role="system", tokens=1),
-                actions=actions,
-                config=PromptTemplateConfig(
-                    schema=1.0,
-                    augmentation=AugmentationConfig("tools"),
-                    type="completion",
-                    description="test",
-                    completion=CompletionConfig(completion_type="chat", parallel_tool_calls=False),
-                ),
-            ),
-        )
-
-        self.assertTrue(mock_async_openai.called)
-        self.assertEqual(res.status, "error")
-        self.assertEqual(res.error, "Model returned more than one tool.")
-
-    @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAIWithTools)
-    async def test_no_tools_called_with_dict_tool_choice(self, mock_async_openai):
-        context = self.create_mock_context()
-        state = TurnState()
-        state.temp = {}
-        actions = [
-            ChatCompletionAction(name="tool_one", description="", parameters={}),
-            ChatCompletionAction(name="tool_two", description="", parameters={}),
-        ]
-        await state.load(context)
-
-        model = OpenAIModel(OpenAIModelOptions(api_key="", default_model="model"))
-        res = await model.complete_prompt(
-            context=context,
-            memory=state,
-            functions=cast(PromptFunctions, {}),
-            tokenizer=GPTTokenizer(),
-            template=PromptTemplate(
-                name="default",
-                augmentation=ToolsAugmentation(actions),
-                prompt=TextSection(text="this is a test prompt", role="system", tokens=1),
-                actions=actions,
-                config=PromptTemplateConfig(
-                    schema=1.0,
-                    augmentation=AugmentationConfig("tools"),
-                    type="completion",
-                    description="test",
-                    completion=CompletionConfig(
-                        completion_type="chat",
-                        tool_choice={"type": "function", "function": {"name": "tool_one"}},
-                    ),
-                ),
-            ),
-        )
-
-        self.assertTrue(mock_async_openai.called)
-        self.assertEqual(res.status, "error")
-        self.assertEqual(res.error, "Model returned more than one tool.")
-
-    @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
-    async def test_no_tools_called_with_required_tool_choice(self, mock_async_openai):
-        context = self.create_mock_context()
-        state = TurnState()
-        state.temp = {}
-        actions = [
-            ChatCompletionAction(name="tool_one", description="", parameters={}),
-            ChatCompletionAction(name="tool_two", description="", parameters={}),
-        ]
-        await state.load(context)
-
-        model = OpenAIModel(OpenAIModelOptions(api_key="", default_model="model"))
-        res = await model.complete_prompt(
-            context=context,
-            memory=state,
-            functions=cast(PromptFunctions, {}),
-            tokenizer=GPTTokenizer(),
-            template=PromptTemplate(
-                name="default",
-                augmentation=ToolsAugmentation(actions),
-                prompt=TextSection(text="this is a test prompt", role="system", tokens=1),
-                actions=actions,
-                config=PromptTemplateConfig(
-                    schema=1.0,
-                    augmentation=AugmentationConfig("tools"),
-                    type="completion",
-                    description="test",
-                    completion=CompletionConfig(completion_type="chat", tool_choice="required"),
-                ),
-            ),
-        )
-
-        self.assertTrue(mock_async_openai.called)
-        self.assertEqual(res.status, "error")
-        self.assertEqual(res.error, "Model did not return any tools")
-
-    @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAIWithTool)
-    async def test_no_tools_called_with_tool_choice_none(self, mock_async_openai):
-        context = self.create_mock_context()
-        state = TurnState()
-        state.temp = {}
-        actions = [
-            ChatCompletionAction(name="tool_one", description="", parameters={}),
-            ChatCompletionAction(name="tool_two", description="", parameters={}),
-        ]
-        await state.load(context)
-
-        model = OpenAIModel(OpenAIModelOptions(api_key="", default_model="model"))
-        res = await model.complete_prompt(
-            context=context,
-            memory=state,
-            functions=cast(PromptFunctions, {}),
-            tokenizer=GPTTokenizer(),
-            template=PromptTemplate(
-                name="default",
-                augmentation=ToolsAugmentation(actions),
-                prompt=TextSection(text="this is a test prompt", role="system", tokens=1),
-                actions=actions,
-                config=PromptTemplateConfig(
-                    schema=1.0,
-                    augmentation=AugmentationConfig("tools"),
-                    type="completion",
-                    description="test",
-                    completion=CompletionConfig(completion_type="chat", tool_choice="none"),
-                ),
-            ),
-        )
-
-        self.assertTrue(mock_async_openai.called)
-        self.assertEqual(res.status, "error")
-        self.assertEqual(res.error, "Model returned tools.")
 
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAIWithTool)
     async def test_one_tool_called(self, mock_async_openai_with_tool):
