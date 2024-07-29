@@ -31,7 +31,7 @@
         "shx": "^0.3.4"
     },
     "devDependencies": {
-        "@types/node": "^20.14.11",
+        "@types/node": "^20.14.13",
         "@types/isomorphic-fetch": "^0.0.39",
         "@types/jsonwebtoken": "^8.5.4",
         "@types/restify": "8.5.12",
@@ -43,6 +43,6 @@
         "rimraf": "^5.0.9",
         "ts-node": "^10.9.2",
         "tsc-watch": "^6.2.0",
-        "typescript": "^5.5.3"
+        "typescript": "^5.5.4"
     }
 }
