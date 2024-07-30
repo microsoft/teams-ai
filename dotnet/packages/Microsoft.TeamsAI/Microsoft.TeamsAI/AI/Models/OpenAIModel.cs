@@ -172,7 +172,7 @@ namespace Microsoft.Teams.AI.AI.Models
                 IEnumerable<OAIChat.ChatMessage> chatMessages = prompt.Output.Select(chatMessage => chatMessage.ToOpenAIChatMessage());
 
                 ChatCompletionOptions? chatCompletionOptions = ModelReaderWriter.Read<ChatCompletionOptions>(BinaryData.FromString($@"{{
-                    ""max_tokens"": {maxInputTokens},
+                    ""max_tokens"": {promptTemplate.Configuration.Completion.MaxTokens},
                     ""temperature"": {(float)promptTemplate.Configuration.Completion.Temperature},
                     ""top_p"": {(float)promptTemplate.Configuration.Completion.TopP},
                     ""presence_penalty"": {(float)promptTemplate.Configuration.Completion.PresencePenalty},
