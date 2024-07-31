@@ -7,9 +7,8 @@ using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI;
 using AzureOpenAIBot;
-using Microsoft.Bot.Schema;
-using AdaptiveCards;
 using Microsoft.Teams.AI.AI;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,20 +46,38 @@ if (!string.IsNullOrEmpty(config.OpenAI?.ApiKey))
         sp.GetService<ILoggerFactory>()
     ));
 }
-else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
+else if (!string.IsNullOrEmpty(config.Azure?.OpenAIEndpoint))
 {
-    // Create Azure OpenAI Model
-    builder.Services.AddSingleton<OpenAIModel>(sp => new(
-        new AzureOpenAIModelOptions(
-            config.Azure.OpenAIApiKey,
-            "gpt-35-turbo",
-            config.Azure.OpenAIEndpoint
-        )
-        {
-            LogRequests = true
-        },
-        sp.GetService<ILoggerFactory>()
-    ));
+    if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey))
+    {
+        // Create Azure OpenAI Model with API Key Auth
+        builder.Services.AddSingleton<OpenAIModel>(sp => new(
+            new AzureOpenAIModelOptions(
+                config.Azure.OpenAIApiKey,
+                "gpt-35-turbo",
+                config.Azure.OpenAIEndpoint
+            )
+            {
+                LogRequests = true
+            },
+            sp.GetService<ILoggerFactory>()
+        ));
+    }
+    else
+    {
+        // Create Azure OpenAI Model with Managed Identity Auth
+        builder.Services.AddSingleton<OpenAIModel>(sp => new(
+            new AzureOpenAIModelOptions(
+                new DefaultAzureCredential(),
+                "gpt-4o",
+                config.Azure!.OpenAIEndpoint
+            )
+            {
+                LogRequests = true
+            },
+            sp.GetService<ILoggerFactory>()
+        ));
+    }
 }
 else
 {

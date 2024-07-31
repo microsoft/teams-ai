@@ -7,12 +7,23 @@ using Microsoft.Teams.AI.Exceptions;
 using System.ClientModel;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using System.ClientModel.Primitives;
+using Azure.Identity;
 
 #pragma warning disable CS8604 // Possible null reference argument.
 namespace Microsoft.Teams.AI.Tests.AITests
 {
     public class OpenAIEmbeddingsTests
     {
+        [Fact]
+        public void Test_Constructor_AzureOpenAI_ManagedIdentityAuth()
+        {
+            // Arrange
+            var options = new AzureOpenAIEmbeddingsOptions(new DefaultAzureCredential(), "test-deployment", "https://test.openai.azure.com/");
+
+            // Act
+            new OpenAIEmbeddings(options);
+        }
+
         [Fact]
         public async void Test_OpenAI_CreateEmbeddings_ReturnEmbeddings()
         {
