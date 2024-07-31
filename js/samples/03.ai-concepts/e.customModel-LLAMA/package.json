@@ -30,15 +30,15 @@
         "restify": "~11.1.0"
     },
     "devDependencies": {
-        "@types/node": "^20.14.11",
+        "@types/node": "^20.14.13",
         "@types/restify": "8.5.12",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
         "eslint": "^8.57.0",
         "nodemon": "~1.19.4",
         "prettier": "^3.3.3",
-        "rimraf": "^5.0.9",
-        "typescript": "^5.5.3",
+        "rimraf": "^5.0.10",
+        "typescript": "^5.5.4",
         "shx": "^0.3.4",
         "ts-node": "^10.9.2"
     }
