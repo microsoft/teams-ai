@@ -7,18 +7,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from logging import Logger
-from typing import Awaitable, Callable, Iterable, List, Optional, TypeVar, Union, cast
+from typing import Awaitable, Callable, List, Optional, TypeVar, Union
 
 from botbuilder.core import TurnContext
-from openai.types import chat
 
 from ...app_error import ApplicationError
 from ...state import MemoryBase, TurnState
 from ..augmentations.default_augmentation import DefaultAugmentation
-from ..augmentations.tools_constants import ACTIONS_HISTORY
 from ..clients import LLMClient, LLMClientOptions
 from ..models.prompt_completion_model import PromptCompletionModel
 from ..models.prompt_response import PromptResponse
+from ..prompts.message import Message
 from ..prompts.prompt_functions import PromptFunctions
 from ..prompts.prompt_manager import PromptManager
 from ..prompts.prompt_template import PromptTemplate
@@ -130,15 +129,14 @@ class ActionPlanner(Planner[StateT]):
                 self._options.prompts.add_prompt(prompt)
 
         template = await self._options.prompts.get_prompt(name)
-        memory = self._handle_action_tools(memory)
-
         include_history = template.config.completion.include_history
+        history_var = f"conversation.{name}_history" if include_history else f"temp.{name}_history"
+        memory = self._handle_action_calls(memory, history_var)
+
         client = LLMClient(
             LLMClientOptions(
                 model=self._options.model,
-                history_variable=(
-                    f"conversation.{name}_history" if include_history else f"temp.{name}_history"
-                ),
+                history_variable=history_var,
                 input_variable="temp.input",
                 validator=validator,
                 logger=self._options.logger,
@@ -153,41 +151,36 @@ class ActionPlanner(Planner[StateT]):
             template=template,
         )
 
-    def _handle_action_tools(self, memory: MemoryBase) -> MemoryBase:
-        if memory.has(ACTIONS_HISTORY):
+    def _handle_action_calls(self, memory: MemoryBase, history_var: str) -> MemoryBase:
+        history: List[Message] = memory.get(history_var) or []
+
+        if history and len(history) > 1:
             # Submit tool outputs
             action_outputs = memory.get("temp.action_outputs") or {}
-            tool_messages = cast(List[chat.ChatCompletionMessageParam], memory.get(ACTIONS_HISTORY))
-            if len(tool_messages) > 0:
-                curr_message = cast(chat.ChatCompletionAssistantMessageParam, tool_messages[-1])
-                tools: Iterable[chat.ChatCompletionMessageToolCallParam] = getattr(
-                    curr_message, "tool_calls", []
-                )
-                tool_outputs: List[chat.ChatCompletionToolMessageParam] = []
+            # TODO: add tool_call_id to DO COMMAND
+            action_calls = history[-1].action_calls
+            prev_length = len(history)
 
+            if action_calls:
                 for action in action_outputs:
                     output = action_outputs[action]
                     tool_call_id = None
 
-                    for tool in tools:
-                        func = getattr(tool, "function", None)
-                        if func and getattr(func, "name", "") == action:
-                            tool_call_id = getattr(tool, "id")
+                    for action_call in action_calls:
+                        if action_call.function.name == action:
+                            tool_call_id = action_call.id
                             break
 
                     if tool_call_id is not None:
-                        tool_outputs.append(
-                            chat.ChatCompletionToolMessageParam(
-                                tool_call_id=tool_call_id, role="tool", content=output
-                            )
+                        history.append(
+                            Message(action_call_id=tool_call_id, role="tool", action_output=output)
                         )
-
-                if len(tool_outputs) > 0:
-                    tool_messages.extend(tool_outputs)
-                    memory.set(ACTIONS_HISTORY, tool_messages)
+                if prev_length == len(history):
+                    # No actions were properly called, remove actions request
+                    # TODO: send back error string to model
+                    history.pop()
                 else:
-                    # Reset state
-                    memory.set(ACTIONS_HISTORY, [])
+                    memory.set(history_var, history)
         return memory
 
     def add_semantic_function(

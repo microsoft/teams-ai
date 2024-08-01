@@ -8,14 +8,15 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from logging import Logger
-from typing import Callable, List, Optional, Union, cast
+from typing import Callable, List, Optional, Union
 
 import openai
 from botbuilder.core import TurnContext
+from openai import NOT_GIVEN
 from openai.types import chat, shared_params
+from openai.types.chat.chat_completion_message_tool_call_param import Function
 
 from ...state import MemoryBase
-from ..augmentations.tools_constants import ACTIONS_HISTORY
 from ..prompts.message import ActionCall, ActionFunction, Message, MessageContext
 from ..prompts.prompt_functions import PromptFunctions
 from ..prompts.prompt_template import PromptTemplate
@@ -144,11 +145,7 @@ class OpenAIModel(PromptCompletionModel):
         tools: List[chat.ChatCompletionToolParam] = []
 
         # If tools is enabled, reformat actions to schema
-        if is_tools_aug:
-            if not template.actions or len(template.actions) == 0:
-                return PromptResponse[str](
-                    status="error", error="Missing tools in template.actions"
-                )
+        if is_tools_aug and template.actions:
             for action in template.actions:
                 curr_tool = chat.ChatCompletionToolParam(
                     type="function",
@@ -188,26 +185,19 @@ class OpenAIModel(PromptCompletionModel):
 
         messages: List[chat.ChatCompletionMessageParam] = []
 
-        # Submit tool outputs, if previously invoked
-        if memory.has(ACTIONS_HISTORY):
-            tools_messages = cast(
-                List[chat.ChatCompletionMessageParam], memory.get(ACTIONS_HISTORY)
-            )
-            messages.extend(tools_messages)
-            memory.set(ACTIONS_HISTORY, [])
-
         for msg in res.output:
             param: Union[
                 chat.ChatCompletionUserMessageParam,
                 chat.ChatCompletionAssistantMessageParam,
                 chat.ChatCompletionSystemMessageParam,
+                chat.ChatCompletionToolMessageParam,
             ] = chat.ChatCompletionUserMessageParam(
                 role="user",
                 content=msg.content if msg.content is not None else "",
             )
 
             if msg.name:
-                param["name"] = msg.name
+                setattr(param, "name", msg.name)
 
             if msg.role == "assistant":
                 param = chat.ChatCompletionAssistantMessageParam(
@@ -215,8 +205,32 @@ class OpenAIModel(PromptCompletionModel):
                     content=msg.content if msg.content is not None else "",
                 )
 
+                tool_call_params: List[chat.ChatCompletionMessageToolCallParam] = []
+
+                if msg.action_calls and len(msg.action_calls) > 0:
+                    for tool_call in msg.action_calls:
+                        tool_call_params.append(
+                            chat.ChatCompletionMessageToolCallParam(
+                                id=tool_call.id,
+                                function=Function(
+                                    name=tool_call.function.name,
+                                    arguments=tool_call.function.arguments,
+                                ),
+                                type=tool_call.type,
+                            )
+                        )
+                    param["content"] = None
+                    param["tool_calls"] = tool_call_params
+
                 if msg.name:
                     param["name"] = msg.name
+
+            elif msg.role == "tool":
+                param = chat.ChatCompletionToolMessageParam(
+                    role="tool",
+                    tool_call_id=msg.action_call_id if msg.action_call_id else "",
+                    content=msg.action_output if msg.action_output else "",
+                )
             elif msg.role == "system":
                 param = chat.ChatCompletionSystemMessageParam(
                     role="system",
@@ -232,6 +246,8 @@ class OpenAIModel(PromptCompletionModel):
             extra_body = {}
             if template.config.completion.data_sources is not None:
                 extra_body["data_sources"] = template.config.completion.data_sources
+            
+            # TODO: need to deal with max in conversation history
 
             completion = await self._client.chat.completions.create(
                 messages=messages,
@@ -241,9 +257,9 @@ class OpenAIModel(PromptCompletionModel):
                 top_p=template.config.completion.top_p,
                 temperature=template.config.completion.temperature,
                 max_tokens=max_tokens,
-                tools=tools,
-                tool_choice=tool_choice,
-                parallel_tool_calls=parallel_tool_calls,
+                tools=tools if len(tools) > 0 else NOT_GIVEN,
+                tool_choice=tool_choice if len(tools) > 0 else NOT_GIVEN,
+                parallel_tool_calls=parallel_tool_calls if len(tools) > 0 else NOT_GIVEN,
                 extra_body=extra_body,
             )
 
@@ -251,32 +267,22 @@ class OpenAIModel(PromptCompletionModel):
                 self._options.logger.debug("COMPLETION:\n%s", completion.model_dump_json())
 
             # Handle tools flow
-            action_calls: List[ActionCall] = []
+            action_calls = []
             response_message = completion.choices[0].message
+            tool_calls = response_message.tool_calls
 
-            if is_tools_aug:
-                tool_calls = response_message.tool_calls
-                if tool_calls and len(tool_calls) > 0:
-                    messages.append(
-                        cast(chat.ChatCompletionAssistantMessageParam, response_message)
-                    )
-
-                    if not memory.has("conversation"):
-                        memory.set("conversation", {})
-
-                    memory.set(ACTIONS_HISTORY, messages)
-
-                    for tool_call in tool_calls:
-                        action_calls.append(
-                            ActionCall(
-                                id=tool_call.id,
-                                type=tool_call.type,
-                                function=ActionFunction(
-                                    name=tool_call.function.name,
-                                    arguments=tool_call.function.arguments,
-                                ),
-                            )
+            if is_tools_aug and tool_calls:
+                for tool_call in tool_calls:
+                    action_calls.append(
+                        ActionCall(
+                            id=tool_call.id,
+                            type=tool_call.type,
+                            function=ActionFunction(
+                                name=tool_call.function.name,
+                                arguments=tool_call.function.arguments,
+                            ),
                         )
+                    )
 
             input: Optional[Message] = None
             last_message = len(res.output) - 1

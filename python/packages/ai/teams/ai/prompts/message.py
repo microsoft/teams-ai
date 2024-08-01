@@ -23,6 +23,8 @@ class Message(Generic[T], DataClassJsonMixin):
 
     Attributes:
         role (str): The messages role. Typically 'system', 'user', 'assistant', 'function'.
+        action_call_id (Optional[str]): The id of the action called.
+        action_output (Optional[str]): The output of the action called.
         content (Optional[T]): Text of the message.
         function_call (Optional[FunctionCall]): A named function to call.
         name (Optional[str]): Name of the function that was called.
@@ -31,6 +33,8 @@ class Message(Generic[T], DataClassJsonMixin):
     """
 
     role: str
+    action_call_id: Optional[str] = None
+    action_output: Optional[str] = None
     content: Optional[T] = None
     context: Optional[MessageContext] = None
     function_call: Optional[FunctionCall] = None

@@ -24,7 +24,6 @@ from ..prompts.sections.prompt_section import PromptSection
 from ..tokenizers.tokenizer import Tokenizer
 from ..validators.validation import Validation
 from .augmentation import Augmentation
-from .tools_constants import ACTIONS_HISTORY
 
 
 class ToolsAugmentation(Augmentation[Union[str, List[ActionCall]]]):
@@ -65,17 +64,11 @@ class ToolsAugmentation(Augmentation[Union[str, List[ActionCall]]]):
         Returns:
             Validation: A 'Validation' object.
         """
-        if response.message and response.message.action_calls and memory.has(ACTIONS_HISTORY):
-            tool_calls = response.message.action_calls
-            tools = self._actions
-
-            if tools and len(tool_calls) > 0:
-                return Validation(
-                    valid=True,
-                    value=tool_calls,
-                )
-
-        memory.set(ACTIONS_HISTORY, [])
+        if response.message and response.message.action_calls and self._actions:
+            return Validation(
+                valid=True,
+                value=response.message.action_calls,
+            )
         return Validation(valid=True)
 
     async def create_plan_from_response(
@@ -100,7 +93,7 @@ class ToolsAugmentation(Augmentation[Union[str, List[ActionCall]]]):
         commands: List[PredictedCommand] = []
 
         if response.message and response.message.content:
-            if memory.has(ACTIONS_HISTORY) and isinstance(response.message.content, list):
+            if isinstance(response.message.content, list):
                 tool_calls: List[ActionCall] = response.message.content
 
                 for tool in tool_calls:
