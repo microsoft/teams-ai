@@ -14,7 +14,7 @@ from botbuilder.dialogs import (
     WaterfallDialog,
     WaterfallStepContext,
 )
-from botbuilder.core import TurnContext, tokenExchangeOperationName
+from botbuilder.core import TurnContext
 
 from .sso_prompt import SsoPrompt
 from ..auth_component import AuthComponent
