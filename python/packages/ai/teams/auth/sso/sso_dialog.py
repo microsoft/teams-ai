@@ -7,14 +7,14 @@ from __future__ import annotations
 from typing import Generic, Optional, TypeVar, cast
 
 from msal import ConfidentialClientApplication
-from botbuilder.schema import Activity, ActivityTypes
+from botbuilder.schema import Activity, ActivityTypes, SignInConstants
 from botbuilder.dialogs import (
     DialogTurnResult,
     DialogTurnStatus,
     WaterfallDialog,
     WaterfallStepContext,
 )
-from botbuilder.core import TurnContext
+from botbuilder.core import TurnContext, tokenExchangeOperationName
 
 from .sso_prompt import SsoPrompt
 from ..auth_component import AuthComponent
@@ -109,11 +109,14 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
             raise ValueError("Invalid context, cannot get storage key!")
 
         activity = context.activity
-        channel_id = activity.channel_id
-        conversation_id = activity.conversation.id
-        value_id = activity.value.get("id")
+        if activity.type != ActivityTypes.invoke or activity.name != SignInConstants.token_exchange_operation_name:
+            raise ValueError("TokenExchangeState can only be used with Invokes of signin/tokenExchange.")
 
+
+        value_id = activity.value.get("id")
         if not value_id:
             raise ValueError("Invalid signin/tokenExchange. Missing activity.value.id.")
 
+        channel_id = activity.channel_id
+        conversation_id = activity.conversation.id
         return f"{channel_id}/{conversation_id}/{value_id}"
