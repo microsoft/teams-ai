@@ -5,7 +5,7 @@
     "id": "${{TEAMS_APP_ID}}",
     "packageName": "com.package.name",
     "name": {
-        "short": "Message Extension SSO-${{TEAMSFX_ENV}}",
+        "short": "Message Extension SSO${{APP_NAME_SUFFIX}}",
         "full": "Message Exension SSO"
     },
     "developer": {
