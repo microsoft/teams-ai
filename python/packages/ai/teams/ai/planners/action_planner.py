@@ -164,7 +164,7 @@ class ActionPlanner(Planner[StateT]):
 
                 if output:
                     history.append(
-                        Message(action_call_id=action_call.id, role="tool", action_output=output)
+                        Message(action_call_id=action_call.id, role="tool", content=output)
                     )
 
         memory.set(history_var, history)
