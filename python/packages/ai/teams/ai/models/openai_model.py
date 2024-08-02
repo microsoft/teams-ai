@@ -229,7 +229,7 @@ class OpenAIModel(PromptCompletionModel):
                 param = chat.ChatCompletionToolMessageParam(
                     role="tool",
                     tool_call_id=msg.action_call_id if msg.action_call_id else "",
-                    content=msg.action_output if msg.action_output else "",
+                    content=msg.content if msg.content else "",
                 )
             elif msg.role == "system":
                 param = chat.ChatCompletionSystemMessageParam(
@@ -246,8 +246,6 @@ class OpenAIModel(PromptCompletionModel):
             extra_body = {}
             if template.config.completion.data_sources is not None:
                 extra_body["data_sources"] = template.config.completion.data_sources
-            
-            # TODO: need to deal with max in conversation history
 
             completion = await self._client.chat.completions.create(
                 messages=messages,
@@ -288,7 +286,7 @@ class OpenAIModel(PromptCompletionModel):
             last_message = len(res.output) - 1
 
             # Skips the first message which is the prompt
-            if last_message > 0 and res.output[last_message].role == "user":
+            if last_message > 0 and res.output[last_message].role != "assistant":
                 input = res.output[last_message]
 
             return PromptResponse[str](

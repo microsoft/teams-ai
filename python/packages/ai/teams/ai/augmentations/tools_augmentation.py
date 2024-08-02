@@ -64,11 +64,6 @@ class ToolsAugmentation(Augmentation[Union[str, List[ActionCall]]]):
         Returns:
             Validation: A 'Validation' object.
         """
-        if response.message and response.message.action_calls and self._actions:
-            return Validation(
-                valid=True,
-                value=response.message.action_calls,
-            )
         return Validation(valid=True)
 
     async def create_plan_from_response(
@@ -92,17 +87,15 @@ class ToolsAugmentation(Augmentation[Union[str, List[ActionCall]]]):
 
         commands: List[PredictedCommand] = []
 
-        if response.message and response.message.content:
-            if isinstance(response.message.content, list):
-                tool_calls: List[ActionCall] = response.message.content
+        if response.message and response.message.action_calls:
+            tool_calls: List[ActionCall] = response.message.action_calls
 
-                for tool in tool_calls:
-                    command = PredictedDoCommand(
-                        action=tool.function.name,
-                        parameters=json.loads(tool.function.arguments),
-                    )
-                    commands.append(command)
-                return Plan(commands=commands)
-            say_response = cast(Message[str], response.message)
-            return Plan(commands=[PredictedSayCommand(response=say_response)])
-        return Plan()
+            for tool in tool_calls:
+                command = PredictedDoCommand(
+                    action=tool.function.name,
+                    parameters=json.loads(tool.function.arguments),
+                )
+                commands.append(command)
+            return Plan(commands=commands)
+        say_response = cast(Message[str], response.message)
+        return Plan(commands=[PredictedSayCommand(response=say_response)])

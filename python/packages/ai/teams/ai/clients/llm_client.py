@@ -111,7 +111,7 @@ class LLMClient:
         self._add_message_to_history(
             memory=memory,
             variable=self._options.history_variable,
-            message=Message(role="function", name=name, content=content),
+            message=Message(role="tool", name=name, content=content),
         )
 
     async def complete_prompt(
