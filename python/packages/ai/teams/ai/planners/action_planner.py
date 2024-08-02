@@ -157,28 +157,17 @@ class ActionPlanner(Planner[StateT]):
         if history and len(history) > 1:
             # Submit tool outputs
             action_outputs = memory.get("temp.action_outputs") or {}
-            action_calls = history[-1].action_calls
-            prev_length = len(history)
+            action_calls = history[-1].action_calls or []
 
-            if action_calls:
-                for action in action_outputs:
-                    output = action_outputs[action] or ""
-                    tool_call_id = None
+            for action_call in action_calls:
+                output = action_outputs[action_call.function.name]
 
-                    for action_call in action_calls:
-                        if action_call.function.name == action:
-                            tool_call_id = action_call.id
-                            break
+                if output:
+                    history.append(
+                        Message(action_call_id=action_call.id, role="tool", action_output=output)
+                    )
 
-                    if tool_call_id is not None:
-                        history.append(
-                            Message(action_call_id=tool_call_id, role="tool", content=output)
-                        )
-                if prev_length == len(history):
-                    # No actions were properly called, remove actions request
-                    history.pop()
-                else:
-                    memory.set(history_var, history)
+        memory.set(history_var, history)
         return memory
 
     def add_semantic_function(
