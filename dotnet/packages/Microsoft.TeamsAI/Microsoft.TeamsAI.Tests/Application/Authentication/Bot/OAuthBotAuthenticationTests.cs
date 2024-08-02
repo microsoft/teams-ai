@@ -44,7 +44,8 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
 
             var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var authSettings = new OAuthSettings() {
+            var authSettings = new OAuthSettings()
+            {
                 ConnectionName = "connectionName",
                 Title = "title",
                 Text = "text",
@@ -131,7 +132,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_VerifyStateRouteSelector_IncorrectActivity_ReturnsFalse ()
+        public async void Test_VerifyStateRouteSelector_IncorrectActivity_ReturnsFalse()
         {
             // Arrange
             var testAdapter = new SimpleAdapter();

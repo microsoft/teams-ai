@@ -28,7 +28,11 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
 
         private readonly AssistantsPlannerOptions _options;
         private readonly AssistantClient _client;
+
+        // TODO: Write trace logs
+#pragma warning disable IDE0052 // Remove unread private members
         private readonly ILogger _logger;
+#pragma warning restore IDE0052 // Remove unread private members
 
         /// <summary>
         /// Create new AssistantsPlanner.

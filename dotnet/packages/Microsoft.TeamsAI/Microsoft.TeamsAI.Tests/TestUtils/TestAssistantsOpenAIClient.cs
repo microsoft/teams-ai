@@ -53,7 +53,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return Task.FromResult(ClientResult.FromValue(newThread, Mock.Of<PipelineResponse>()));
         }
 
-        public override Task<ClientResult<ThreadMessage>> CreateMessageAsync(string threadId, MessageRole role, IEnumerable<MessageContent> content, MessageCreationOptions options = null, CancellationToken cancellationToken = default)
+        public override Task<ClientResult<ThreadMessage>> CreateMessageAsync(string threadId, MessageRole role, IEnumerable<MessageContent> content, MessageCreationOptions options = null!, CancellationToken cancellationToken = default)
         {
             ThreadMessage newMessage = _CreateMessage(threadId, content.First().Text);
 

@@ -4,7 +4,7 @@ using System.ClientModel.Primitives;
 
 namespace Microsoft.Teams.AI.Tests.TestUtils
 {
-    internal class OpenAIModelFactory
+    internal sealed class OpenAIModelFactory
     {
         public static RunCreationOptions CreateRunOptions()
         {
@@ -52,7 +52,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return ModelReaderWriter.Read<ThreadMessage>(BinaryData.FromString(json))!;
         }
 
-        public static ThreadRun CreateThreadRun(string threadId, string runStatus, string? runId = null, IList<RequiredAction> requiredActions = null)
+        public static ThreadRun CreateThreadRun(string threadId, string runStatus, string? runId = null, IList<RequiredAction> requiredActions = null!)
         {
             var raJson = "{}";
             if (requiredActions != null && requiredActions.Count > 0)
@@ -91,7 +91,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
         }
     }
 
-    internal class TestRequiredAction : RequiredAction
+    internal sealed class TestRequiredAction : RequiredAction
     {
         public new string FunctionName;
 
@@ -107,7 +107,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
         }
     }
 
-    internal class TestAsyncPageableCollection<T> : AsyncPageableCollection<T> where T : class
+    internal sealed class TestAsyncPageableCollection<T> : AsyncPageableCollection<T> where T : class
     {
         public List<T> Items;
 
