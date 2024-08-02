@@ -49,23 +49,19 @@ namespace Microsoft.Teams.AI.AI.Models
         public OpenAIModel(OpenAIModelOptions options, ILoggerFactory? loggerFactory = null, HttpClient? httpClient = null)
         {
             Verify.ParamNotNull(options);
-            Verify.ParamNotNull(options.ApiKey, "OpenAIModelOptions.ApiKey");
             Verify.ParamNotNull(options.DefaultModel, "OpenAIModelOptions.DefaultModel");
 
             _useAzure = false;
-            _options = new OpenAIModelOptions(options.ApiKey, options.DefaultModel)
-            {
-                Organization = options.Organization,
-                CompletionType = options.CompletionType ?? CompletionType.Chat,
-                LogRequests = options.LogRequests ?? false,
-                RetryPolicy = options.RetryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) },
-                UseSystemMessages = options.UseSystemMessages ?? false,
-            };
             _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<OpenAIModel>();
+
+            options.CompletionType = options.CompletionType ?? CompletionType.Chat;
+            options.LogRequests = options.LogRequests ?? false;
+            options.RetryPolicy = options.RetryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) };
+            options.UseSystemMessages = options.UseSystemMessages ?? false;
 
             OpenAIClientOptions openAIClientOptions = new()
             {
-                RetryPolicy = new SequentialDelayRetryPolicy(_options.RetryPolicy, _options.RetryPolicy.Count)
+                RetryPolicy = new SequentialDelayRetryPolicy(options.RetryPolicy, options.RetryPolicy.Count)
             };
 
             openAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("User-Agent", _userAgent), PipelinePosition.PerCall);
@@ -73,14 +69,14 @@ namespace Microsoft.Teams.AI.AI.Models
             {
                 openAIClientOptions.Transport = new HttpClientPipelineTransport(httpClient);
             }
-            OpenAIModelOptions openAIModelOptions = (OpenAIModelOptions)_options;
-            if (!string.IsNullOrEmpty(openAIModelOptions.Organization))
+            if (!string.IsNullOrEmpty(options.Organization))
             {
-                openAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("OpenAI-Organization", openAIModelOptions.Organization!), PipelinePosition.PerCall);
+                openAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("OpenAI-Organization", options.Organization!), PipelinePosition.PerCall);
             }
-            _openAIClient = new OpenAIClient(new ApiKeyCredential(openAIModelOptions.ApiKey), openAIClientOptions);
+            _openAIClient = new OpenAIClient(new ApiKeyCredential(options.ApiKey), openAIClientOptions);
 
             _deploymentName = options.DefaultModel;
+            _options = options;
         }
 
         /// <summary>
@@ -92,7 +88,6 @@ namespace Microsoft.Teams.AI.AI.Models
         public OpenAIModel(AzureOpenAIModelOptions options, ILoggerFactory? loggerFactory = null, HttpClient? httpClient = null)
         {
             Verify.ParamNotNull(options);
-            Verify.ParamNotNull(options.AzureApiKey, "AzureOpenAIModelOptions.AzureApiKey");
             Verify.ParamNotNull(options.AzureDefaultDeployment, "AzureOpenAIModelOptions.AzureDefaultDeployment");
             Verify.ParamNotNull(options.AzureEndpoint, "AzureOpenAIModelOptions.AzureEndpoint");
             string apiVersion = options.AzureApiVersion ?? "2024-06-01";
@@ -103,19 +98,17 @@ namespace Microsoft.Teams.AI.AI.Models
             }
 
             _useAzure = true;
-            _options = new AzureOpenAIModelOptions(options.AzureApiKey, options.AzureDefaultDeployment, options.AzureEndpoint)
-            {
-                AzureApiVersion = apiVersion,
-                CompletionType = options.CompletionType ?? CompletionType.Chat,
-                LogRequests = options.LogRequests ?? false,
-                RetryPolicy = options.RetryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) },
-                UseSystemMessages = options.UseSystemMessages ?? false,
-            };
             _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<OpenAIModel>();
+
+            options.AzureApiVersion = apiVersion;
+            options.CompletionType = options.CompletionType ?? CompletionType.Chat;
+            options.LogRequests = options.LogRequests ?? false;
+            options.RetryPolicy = options.RetryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) };
+            options.UseSystemMessages = options.UseSystemMessages ?? false;
 
             AzureOpenAIClientOptions azureOpenAIClientOptions = new(serviceVersion.Value)
             {
-                RetryPolicy = new SequentialDelayRetryPolicy(_options.RetryPolicy, _options.RetryPolicy.Count)
+                RetryPolicy = new SequentialDelayRetryPolicy(options.RetryPolicy, options.RetryPolicy.Count)
             };
 
             azureOpenAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("User-Agent", _userAgent), PipelinePosition.PerCall);
@@ -123,10 +116,23 @@ namespace Microsoft.Teams.AI.AI.Models
             {
                 azureOpenAIClientOptions.Transport = new HttpClientPipelineTransport(httpClient);
             }
-            AzureOpenAIModelOptions azureOpenAIModelOptions = (AzureOpenAIModelOptions)_options;
-            _openAIClient = new AzureOpenAIClient(new Uri(azureOpenAIModelOptions.AzureEndpoint), new ApiKeyCredential(azureOpenAIModelOptions.AzureApiKey), azureOpenAIClientOptions);
+
+            Uri uri = new(options.AzureEndpoint);
+            if (options.TokenCredential != null)
+            {
+                _openAIClient = new AzureOpenAIClient(uri, options.TokenCredential, azureOpenAIClientOptions);
+            }
+            else if (options.AzureApiKey != null && options.AzureApiKey != string.Empty)
+            {
+                _openAIClient = new AzureOpenAIClient(uri, new ApiKeyCredential(options.AzureApiKey), azureOpenAIClientOptions);
+            }
+            else
+            {
+                throw new ArgumentException("token credential or api key is required.");
+            }
 
             _deploymentName = options.AzureDefaultDeployment;
+            _options = options;
         }
 
         /// <inheritdoc/>
@@ -172,7 +178,7 @@ namespace Microsoft.Teams.AI.AI.Models
                 IEnumerable<OAIChat.ChatMessage> chatMessages = prompt.Output.Select(chatMessage => chatMessage.ToOpenAIChatMessage());
 
                 ChatCompletionOptions? chatCompletionOptions = ModelReaderWriter.Read<ChatCompletionOptions>(BinaryData.FromString($@"{{
-                    ""max_tokens"": {maxInputTokens},
+                    ""max_tokens"": {promptTemplate.Configuration.Completion.MaxTokens},
                     ""temperature"": {(float)promptTemplate.Configuration.Completion.Temperature},
                     ""top_p"": {(float)promptTemplate.Configuration.Completion.TopP},
                     ""presence_penalty"": {(float)promptTemplate.Configuration.Completion.PresencePenalty},
@@ -183,6 +189,16 @@ namespace Microsoft.Teams.AI.AI.Models
                 {
                     throw new TeamsAIException("Failed to create chat completions options");
                 }
+
+                // TODO: Use this once setters are added for the following fields in `OpenAI` package.
+                //OAIChat.ChatCompletionOptions chatCompletionsOptions = new()
+                //{
+                //    MaxTokens = maxInputTokens,
+                //    Temperature = (float)promptTemplate.Configuration.Completion.Temperature,
+                //    TopP = (float)promptTemplate.Configuration.Completion.TopP,
+                //    PresencePenalty = (float)promptTemplate.Configuration.Completion.PresencePenalty,
+                //    FrequencyPenalty = (float)promptTemplate.Configuration.Completion.FrequencyPenalty,
+                //};
 
                 // TODO: Use this once setters are added for the following fields in `OpenAI` package.
                 //OAIChat.ChatCompletionOptions chatCompletionsOptions = new()
@@ -263,7 +279,7 @@ namespace Microsoft.Teams.AI.AI.Models
             };
         }
 
-        private void AddAzureChatExtensionConfigurations(OAIChat.ChatCompletionOptions options, IDictionary<string, JsonElement>? additionalData)
+        private void AddAzureChatExtensionConfigurations(ChatCompletionOptions options, IDictionary<string, JsonElement>? additionalData)
         {
             if (additionalData == null)
             {
@@ -275,12 +291,19 @@ namespace Microsoft.Teams.AI.AI.Models
                 List<object> entries = array.Deserialize<List<object>>()!;
                 foreach (object item in entries)
                 {
-                    AzureChatDataSource? dataSource = ModelReaderWriter.Read<AzureChatDataSource>(BinaryData.FromObjectAsJson(item));
-                    if (dataSource != null)
+                    try
                     {
+                        AzureChatDataSource? dataSource = ModelReaderWriter.Read<AzureChatDataSource>(BinaryData.FromObjectAsJson(item));
+                        if (dataSource != null)
+                        {
 #pragma warning disable AOAI001
-                        options.AddDataSource(dataSource);
+                            options.AddDataSource(dataSource);
 #pragma warning restore AOAI001
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new ArgumentException($"Invalid azure data source configuration {ex.Message}", ex);
                     }
                 }
             }

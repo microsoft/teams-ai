@@ -610,7 +610,7 @@ class Application(Bot, Generic[StateT]):
                     return False
 
                 feedback = context.activity.value
-                feedback.reply_to_id=context.activity.reply_to_id
+                feedback.reply_to_id = context.activity.reply_to_id
 
                 await func(context, state, feedback)
                 await context.send_activity(
@@ -819,8 +819,9 @@ class Application(Bot, Generic[StateT]):
         return True
 
     def _contains_non_text_attachments(self, context):
-        non_text_attachments = filter(lambda a: not a.content_type.startswith(
-            "text/html"), context.activity.attachments)
+        non_text_attachments = filter(
+            lambda a: not a.content_type.startswith("text/html"), context.activity.attachments
+        )
         return len(list(non_text_attachments)) > 0
 
     async def _run_after_turn_middleware(self, context: TurnContext, state):

@@ -14,6 +14,7 @@ using System.ClientModel.Primitives;
 using System.Reflection;
 using ChatMessage = Microsoft.Teams.AI.AI.Models.ChatMessage;
 using ChatRole = Microsoft.Teams.AI.AI.Models.ChatRole;
+using Azure.Identity;
 
 namespace Microsoft.Teams.AI.Tests.AITests.Models
 {
@@ -50,6 +51,16 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
 
             // Assert
             Assert.Equal("Model created with an unsupported API version of `2023-12-01-preview`.", exception.Message);
+        }
+
+        [Fact]
+        public void Test_Constructor_AzureOpenAI_ManagedIdentityAuth()
+        {
+            // Arrange
+            var options = new AzureOpenAIModelOptions(new DefaultAzureCredential(), "test-deployment", "https://test.openai.azure.com/");
+
+            // Act
+            new OpenAIModel(options);
         }
 
         [Fact]
