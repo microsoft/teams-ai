@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 import json
-from typing import List, Optional, Union, cast
+from typing import List, Optional
 
 from botbuilder.core import TurnContext
 
@@ -19,14 +19,13 @@ from ..planners.plan import (
     PredictedDoCommand,
     PredictedSayCommand,
 )
-from ..prompts.message import ActionCall, Message
 from ..prompts.sections.prompt_section import PromptSection
 from ..tokenizers.tokenizer import Tokenizer
 from ..validators.validation import Validation
 from .augmentation import Augmentation
 
 
-class ToolsAugmentation(Augmentation[Union[str, List[ActionCall]]]):
+class ToolsAugmentation(Augmentation[str]):
     """
     A server-side 'tools' augmentation.
     """
@@ -47,7 +46,7 @@ class ToolsAugmentation(Augmentation[Union[str, List[ActionCall]]]):
         context: TurnContext,
         memory: MemoryBase,
         tokenizer: Tokenizer,
-        response: PromptResponse[Union[str, List[ActionCall]]],
+        response: PromptResponse[str],
         remaining_attempts: int,
     ) -> Validation:
         """
@@ -57,8 +56,7 @@ class ToolsAugmentation(Augmentation[Union[str, List[ActionCall]]]):
             context (TurnContext): Context for the current turn of conversation.
             memory (MemoryBase): Interface for accessing state variables.
             tokenizer (Tokenizer): Tokenizer to use for encoding/decoding text.
-            response (PromptResponse[Union[str, List[ActionCall]]]):
-                Response to validate.
+            response (PromptResponse[str]): Response to validate.
             remaining_attempts (int): Nubmer of remaining attempts to validate the response.
 
         Returns:
@@ -70,7 +68,7 @@ class ToolsAugmentation(Augmentation[Union[str, List[ActionCall]]]):
         self,
         turn_context: TurnContext,
         memory: MemoryBase,
-        response: PromptResponse[Union[str, List[ActionCall]]],
+        response: PromptResponse[str],
     ) -> Plan:
         """
         Creates a plan given validated response value.
@@ -78,7 +76,7 @@ class ToolsAugmentation(Augmentation[Union[str, List[ActionCall]]]):
         Args:
             turn_context (TurnContext): Context for the current turn of conversation.
             memory (MemoryBase): Interface for accessing state variables.
-            response (PromptResponse[Union[str, List[ActionCall]]]):
+            response (PromptResponse[str]):
                 The validated and transformed response for the prompt.
 
         Returns:
@@ -88,14 +86,15 @@ class ToolsAugmentation(Augmentation[Union[str, List[ActionCall]]]):
         commands: List[PredictedCommand] = []
 
         if response.message and response.message.action_calls:
-            tool_calls: List[ActionCall] = response.message.action_calls
+            tool_calls = response.message.action_calls
 
             for tool in tool_calls:
                 command = PredictedDoCommand(
                     action=tool.function.name,
                     parameters=json.loads(tool.function.arguments),
+                    action_id=tool.id,
                 )
                 commands.append(command)
             return Plan(commands=commands)
-        say_response = cast(Message[str], response.message)
-        return Plan(commands=[PredictedSayCommand(response=say_response)])
+
+        return Plan(commands=[PredictedSayCommand(response=response.message)])

@@ -5,7 +5,6 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, field
 from logging import Logger
 from typing import Any, List, Optional
@@ -91,27 +90,19 @@ class LLMClient:
 
         self._options = options
 
-    def add_function_result_to_history(self, memory: MemoryBase, name: str, results: Any) -> None:
+    def add_action_output_to_history(self, memory: MemoryBase, id: str, results: str) -> None:
         """
-        Adds a result from a `function_call` to the history.
+        Adds the result from an `action_call` to the history.
 
         Args:
             memory (MemoryBase): An interface for accessing state values.
-            name (str): Name of the function that was called.
-            results (Any): Results returned by the function.
+            id (str): Id of the action that was called.
+            results (str): Results returned by the action call.
         """
-
-        content = ""
-
-        if isinstance(results, object):
-            content = json.dumps(results)
-        else:
-            content = str(results)
-
         self._add_message_to_history(
             memory=memory,
             variable=self._options.history_variable,
-            message=Message(role="tool", name=name, content=content),
+            message=Message(role="tool", action_call_id=id, content=results),
         )
 
     async def complete_prompt(
@@ -223,5 +214,9 @@ class LLMClient:
 
         if len(history) > self._options.max_history_messages:
             del history[0 : len(history) - self._options.max_history_messages]
+
+        # Remove completed partial action outputs
+        while history and history[0].role == "tool":
+            del history[0]
 
         memory.set(variable, history)

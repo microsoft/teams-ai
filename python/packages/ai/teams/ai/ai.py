@@ -169,6 +169,11 @@ class AI(Generic[StateT]):
                     )
                     loop = len(output) > 0
                     state.temp.action_outputs[command.action] = output
+
+                    # Set output for action call
+                    if command.action_id:
+                        loop = True
+                        state.temp.action_outputs[command.action_id] = output or ""
                 else:
                     output = await self._actions[ActionTypes.UNKNOWN_ACTION].invoke(
                         context, state, plan, command.action

@@ -94,5 +94,7 @@ class TextSection(PromptSectionBase):
             self._length = len(tokenizer.encode(self.text))
 
         # Return output
-        messages: List[Message] = [Message(role=self.role, content=self.text)] if self._length > 0 else []
+        messages: List[Message] = (
+            [Message(role=self.role, content=self.text)] if self._length > 0 else []
+        )
         return self._return_messages(messages, self._length, tokenizer, max_tokens)

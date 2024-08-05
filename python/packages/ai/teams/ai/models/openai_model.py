@@ -127,7 +127,7 @@ class OpenAIModel(PromptCompletionModel):
     ) -> PromptResponse[str]:
         max_input_tokens = template.config.completion.max_input_tokens
 
-        # Setup actions if enabled
+        # Setup tools if enabled
         is_tools_aug = (
             template.config.augmentation
             and template.config.augmentation.augmentation_type == "tools"
@@ -270,14 +270,14 @@ class OpenAIModel(PromptCompletionModel):
             tool_calls = response_message.tool_calls
 
             if is_tools_aug and tool_calls:
-                for tool_call in tool_calls:
+                for curr_tool_call in tool_calls:
                     action_calls.append(
                         ActionCall(
-                            id=tool_call.id,
-                            type=tool_call.type,
+                            id=curr_tool_call.id,
+                            type=curr_tool_call.type,
                             function=ActionFunction(
-                                name=tool_call.function.name,
-                                arguments=tool_call.function.arguments,
+                                name=curr_tool_call.function.name,
+                                arguments=curr_tool_call.function.arguments,
                             ),
                         )
                     )
@@ -294,11 +294,7 @@ class OpenAIModel(PromptCompletionModel):
                 message=Message(
                     role=completion.choices[0].message.role,
                     content=completion.choices[0].message.content,
-                    action_calls=(
-                        action_calls
-                        if is_tools_aug and action_calls and len(action_calls) > 0
-                        else None
-                    ),
+                    action_calls=(action_calls if is_tools_aug and len(action_calls) > 0 else None),
                     context=(
                         MessageContext.from_dict(completion.choices[0].message.context)
                         if hasattr(completion.choices[0].message, "context")

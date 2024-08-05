@@ -4,20 +4,18 @@ Licensed under the MIT License.
 """
 
 import json
-from typing import List, cast
+from typing import cast
 from unittest import IsolatedAsyncioTestCase, mock
 
 import httpx
 import openai
 from openai.types import chat
 from openai.types.chat import (
-    chat_completion_message_tool_call,
-    chat_completion_message_tool_call_param,
+    chat_completion_message_tool_call
 )
 
 from teams.ai.augmentations.monologue_augmentation import MonologueAugmentation
 from teams.ai.augmentations.tools_augmentation import ToolsAugmentation
-from teams.ai.augmentations.tools_constants import ACTIONS_HISTORY
 from teams.ai.models import AzureOpenAIModelOptions, OpenAIModel, OpenAIModelOptions
 from teams.ai.models.chat_completion_action import ChatCompletionAction
 from teams.ai.prompts import (
@@ -35,21 +33,6 @@ from teams.state import TurnState
 chat_completion_tool_one = chat.ChatCompletionMessageToolCall(
     id="1",
     function=chat_completion_message_tool_call.Function(
-        name="tool_one",
-        arguments=json.dumps(
-            {
-                "arg_one": "hi",
-                "arg_two": 3,
-                "action_turn_context": None,
-                "state": None,
-            }
-        ),
-    ),
-    type="function",
-)
-tool_call_one = chat.ChatCompletionMessageToolCallParam(
-    id="1",
-    function=chat_completion_message_tool_call_param.Function(
         name="tool_one",
         arguments=json.dumps(
             {
@@ -356,40 +339,9 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
         )
 
         self.assertTrue(mock_async_openai.called)
-        self.assertEqual(res.status, "error")
-        self.assertEqual(res.error, "Missing tools in template.actions")
-
-    @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
-    async def test_include_tools_empty_actions(self, mock_async_openai):
-        context = self.create_mock_context()
-        state = TurnState()
-        state.temp = {}
-        await state.load(context)
-
-        model = OpenAIModel(OpenAIModelOptions(api_key="", default_model="model"))
-        res = await model.complete_prompt(
-            context=context,
-            memory=state,
-            functions=cast(PromptFunctions, {}),
-            tokenizer=GPTTokenizer(),
-            template=PromptTemplate(
-                name="default",
-                actions=[],
-                prompt=TextSection(text="this is a test prompt", role="system", tokens=1),
-                augmentation=ToolsAugmentation(actions=None),
-                config=PromptTemplateConfig(
-                    schema=1.0,
-                    type="completion",
-                    description="test",
-                    augmentation=AugmentationConfig("tools"),
-                    completion=CompletionConfig(completion_type="chat"),
-                ),
-            ),
-        )
-
-        self.assertTrue(mock_async_openai.called)
-        self.assertEqual(res.status, "error")
-        self.assertEqual(res.error, "Missing tools in template.actions")
+        self.assertEqual(res.status, "success")
+        if res.message:
+            self.assertEqual(res.message.action_calls, None)
 
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
     async def test_no_tools_called_with_optional_configurations(self, mock_async_openai):
@@ -437,7 +389,6 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
         context = self.create_mock_context()
         state = TurnState()
         state.temp = {}
-        state.conversation = {}
         actions = [
             ChatCompletionAction(name="tool_one", description="", parameters={}),
             ChatCompletionAction(name="tool_two"),
@@ -473,16 +424,11 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
                 [action_call_one],
             )
 
-        tool_messages = cast(List[chat.ChatCompletionMessageParam], state.get(ACTIONS_HISTORY))
-        curr_tool_message = cast(chat.ChatCompletionAssistantMessageParam, tool_messages[1])
-        self.assertEqual(curr_tool_message.tool_calls[0].id, "1")  # type: ignore[attr-defined]
-
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAIWithTools)
     async def test_two_tools_called(self, mock_async_openai_with_tools):
         context = self.create_mock_context()
         state = TurnState()
         state.temp = {}
-        state.conversation = {}
         actions = [
             ChatCompletionAction(name="tool_one", description="", parameters={}),
             ChatCompletionAction(name="tool_two"),
@@ -514,58 +460,3 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
         self.assertEqual(res.status, "success")
         if res.message:
             self.assertEqual(res.message.action_calls, [action_call_one, action_call_two])
-
-        tool_messages = cast(List[chat.ChatCompletionMessageParam], state.get(ACTIONS_HISTORY))
-        curr_tool_message = cast(chat.ChatCompletionAssistantMessageParam, tool_messages[1])
-        self.assertEqual(curr_tool_message.tool_calls[0].id, "1")  # type: ignore[attr-defined]
-        self.assertEqual(curr_tool_message.tool_calls[1].id, "2")  # type: ignore[attr-defined]
-
-    @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
-    async def test_round_trip_call(self, mock_async_openai):
-        context = self.create_mock_context()
-        state = TurnState()
-        state.temp = {}
-        state.conversation = {}
-        state.set(
-            ACTIONS_HISTORY,
-            [
-                chat.ChatCompletionAssistantMessageParam(
-                    role="assistant", tool_calls=[tool_call_one]
-                ),
-                chat.ChatCompletionToolMessageParam(tool_call_id="1", role="tool", content=""),
-            ],
-        )
-
-        actions = [
-            ChatCompletionAction(name="tool_one", description="", parameters={}),
-            ChatCompletionAction(name="tool_two"),
-        ]
-        await state.load(context)
-
-        model = OpenAIModel(OpenAIModelOptions(api_key="", default_model="model"))
-        res = await model.complete_prompt(
-            context=context,
-            memory=state,
-            functions=cast(PromptFunctions, {}),
-            tokenizer=GPTTokenizer(),
-            template=PromptTemplate(
-                name="default",
-                augmentation=ToolsAugmentation(actions),
-                prompt=TextSection(text="this is a test prompt", role="system", tokens=1),
-                actions=actions,
-                config=PromptTemplateConfig(
-                    schema=1.0,
-                    type="completion",
-                    description="test",
-                    augmentation=AugmentationConfig("tools"),
-                    completion=CompletionConfig(completion_type="chat"),
-                ),
-            ),
-        )
-
-        self.assertTrue(mock_async_openai.called)
-        self.assertEqual(res.status, "success")
-        if res.message:
-            self.assertEqual(res.message.action_calls, None)
-        tool_history = cast(List[chat.ChatCompletionMessageParam], state.get(ACTIONS_HISTORY))
-        self.assertEqual(len(tool_history), 0)

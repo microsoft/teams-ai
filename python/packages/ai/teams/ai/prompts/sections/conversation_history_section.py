@@ -194,4 +194,8 @@ class ConversationHistorySection(PromptSectionBase):
             tokens += length
             messages.insert(0, message)
 
+        # Remove completed partial action outputs
+        while messages and messages[0].role == "tool":
+            del messages[0]
+
         return RenderedPromptSection(messages, tokens, tokens > max_tokens)
