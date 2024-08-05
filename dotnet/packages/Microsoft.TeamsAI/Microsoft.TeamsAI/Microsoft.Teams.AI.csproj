@@ -44,10 +44,10 @@
     <PackageReference Include="Microsoft.Bot.Builder" Version="4.22.7" />
     <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.22.7" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.7" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.61.3" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.62.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Microsoft.ML.Tokenizers" Version="0.22.0-preview.24271.1" />
-    <PackageReference Include="OpenAI" Version="2.0.0-beta.7" />
+    <PackageReference Include="Microsoft.ML.Tokenizers" Version="0.22.0-preview.24378.1" />
+    <PackageReference Include="OpenAI" Version="2.0.0-beta.8" />
     <PackageReference Include="System.Text.Json" Version="7.0.4" />
   </ItemGroup>
 
