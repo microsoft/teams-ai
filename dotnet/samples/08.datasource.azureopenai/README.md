@@ -43,6 +43,8 @@ Note that, this sample requires AI service so you need one more pre-step before 
 ]
 ```
 
+You can also use `system_assigned_managed_identity` or `user_assigned_managed_identity` authentication methods.
+
 ## Further reading
 
 - [Teams Toolkit overview](https://aka.ms/vs-teams-toolkit-getting-started)

@@ -1,15 +1,29 @@
-﻿using Azure;
-using Moq;
+﻿using Moq;
 using System.Reflection;
 using Microsoft.Teams.AI.AI.Embeddings;
-using Azure.AI.OpenAI;
+using OpenAI.Embeddings;
+using OpenAI;
 using Microsoft.Teams.AI.Exceptions;
+using System.ClientModel;
+using Microsoft.Teams.AI.Tests.TestUtils;
+using System.ClientModel.Primitives;
+using Azure.Identity;
 
 #pragma warning disable CS8604 // Possible null reference argument.
 namespace Microsoft.Teams.AI.Tests.AITests
 {
     public class OpenAIEmbeddingsTests
     {
+        [Fact]
+        public void Test_Constructor_AzureOpenAI_ManagedIdentityAuth()
+        {
+            // Arrange
+            var options = new AzureOpenAIEmbeddingsOptions(new DefaultAzureCredential(), "test-deployment", "https://test.openai.azure.com/");
+
+            // Act
+            new OpenAIEmbeddings(options);
+        }
+
         [Fact]
         public async void Test_OpenAI_CreateEmbeddings_ReturnEmbeddings()
         {
@@ -21,15 +35,22 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAiEmbeddings = new OpenAIEmbeddings(options);
 
             IList<string> inputs = new List<string> { "test" };
-            var clientMock = new Mock<OpenAIClient>(It.IsAny<string>());
-            IEnumerable<EmbeddingItem> data = new List<EmbeddingItem>()
-            {
-                AzureOpenAIModelFactory.EmbeddingItem()
-            };
-            EmbeddingsUsage usage = AzureOpenAIModelFactory.EmbeddingsUsage();
-            Embeddings embeddingsResult = AzureOpenAIModelFactory.Embeddings(data, usage);
-            Response? response = null;
-            clientMock.Setup(client => client.GetEmbeddingsAsync(It.IsAny<EmbeddingsOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(embeddingsResult, response));
+            var clientMock = new Mock<OpenAIClient>(new ApiKeyCredential(apiKey), It.IsAny<OpenAIClientOptions>());
+            var response = new TestResponse(200, string.Empty);
+            var embeddingCollection = ModelReaderWriter.Read<EmbeddingCollection>(BinaryData.FromString(@"{
+                ""data"": [
+                    {
+                        ""object"": ""embedding"",
+                        ""index"": 0,
+                        ""embedding"": ""MC4wMDIzMDY0MjU1""
+                    }
+                ]
+            }"));
+            // MC4wMDIzMDY0MjU1= the base64 encoded float 0.0023064255
+            clientMock.Setup(client => client
+                .GetEmbeddingClient(It.IsAny<string>())
+                .GenerateEmbeddingsAsync(It.IsAny<IEnumerable<string>>(), It.IsAny<EmbeddingGenerationOptions>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(ClientResult.FromValue(embeddingCollection, response));
             openAiEmbeddings.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAiEmbeddings, clientMock.Object);
 
             // Act
@@ -53,15 +74,22 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAiEmbeddings = new OpenAIEmbeddings(options);
 
             IList<string> inputs = new List<string> { "test" };
-            IEnumerable<EmbeddingItem> data = new List<EmbeddingItem>()
-            {
-                AzureOpenAIModelFactory.EmbeddingItem()
-            };
-            EmbeddingsUsage usage = AzureOpenAIModelFactory.EmbeddingsUsage();
-            Embeddings embeddingsResult = AzureOpenAIModelFactory.Embeddings(data, usage);
-            Response? response = null;
-            var clientMock = new Mock<OpenAIClient>(It.IsAny<string>());
-            clientMock.Setup(client => client.GetEmbeddingsAsync(It.IsAny<EmbeddingsOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(embeddingsResult, response));
+            var clientMock = new Mock<OpenAIClient>(new ApiKeyCredential(apiKey), It.IsAny<OpenAIClientOptions>());
+            var response = new TestResponse(200, string.Empty);
+            var embeddingCollection = ModelReaderWriter.Read<EmbeddingCollection>(BinaryData.FromString(@"{
+                ""data"": [
+                    {
+                        ""object"": ""embedding"",
+                        ""index"": 0,
+                        ""embedding"": ""MC4wMDIzMDY0MjU1""
+                    }
+                ]
+            }"));
+            // MC4wMDIzMDY0MjU1= the base64 encoded float 0.0023064255
+            clientMock.Setup(client => client
+                .GetEmbeddingClient(It.IsAny<string>())
+                .GenerateEmbeddingsAsync(It.IsAny<IEnumerable<string>>(), It.IsAny<EmbeddingGenerationOptions>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(ClientResult.FromValue(embeddingCollection, response));
             openAiEmbeddings.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAiEmbeddings, clientMock.Object);
 
             // Act
@@ -76,7 +104,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         [Theory]
         [InlineData(429, "too many requests", EmbeddingsResponseStatus.RateLimited)]
         [InlineData(502, "service error", EmbeddingsResponseStatus.Failure)]
-        public async void Test_CreateEmbeddings_ThrowRequestFailedException(int statusCode, string errorMsg, EmbeddingsResponseStatus responseStatus)
+        public async void Test_CreateEmbeddings_ThrowClientResultException(int statusCode, string errorMsg, EmbeddingsResponseStatus responseStatus)
         {
             // Arrange
             var apiKey = "randomApiKey";
@@ -86,9 +114,12 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAiEmbeddings = new OpenAIEmbeddings(options);
 
             IList<string> inputs = new List<string> { "test" };
-            var exception = new RequestFailedException(statusCode, errorMsg);
-            var clientMock = new Mock<OpenAIClient>(It.IsAny<string>());
-            clientMock.Setup(client => client.GetEmbeddingsAsync(It.IsAny<EmbeddingsOptions>(), It.IsAny<CancellationToken>())).ThrowsAsync(exception);
+            var clientMock = new Mock<OpenAIClient>(new ApiKeyCredential(apiKey), It.IsAny<OpenAIClientOptions>());
+            var response = new TestResponse(statusCode, errorMsg);
+            clientMock.Setup(client => client
+                .GetEmbeddingClient(It.IsAny<string>())
+                .GenerateEmbeddingsAsync(It.IsAny<IEnumerable<string>>(), It.IsAny<EmbeddingGenerationOptions>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new ClientResultException(response));
             openAiEmbeddings.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAiEmbeddings, clientMock.Object);
 
             // Act
@@ -96,11 +127,12 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             // Assert
             Assert.NotNull(result);
+            Assert.Equal(responseStatus, result.Status);
             Assert.Null(result.Output);
-            Assert.Equal(result.Status, responseStatus);
         }
 
         [Fact]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "<Pending>")]
         public async void Test_CreateEmbeddings_ThrowException()
         {
             // Arrange
@@ -111,16 +143,19 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAiEmbeddings = new OpenAIEmbeddings(options);
 
             IList<string> inputs = new List<string> { "test" };
-            var exception = new InvalidOperationException("other exception");
-            var clientMock = new Mock<OpenAIClient>(It.IsAny<string>());
-            clientMock.Setup(client => client.GetEmbeddingsAsync(It.IsAny<EmbeddingsOptions>(), It.IsAny<CancellationToken>())).ThrowsAsync(exception);
+            var clientMock = new Mock<OpenAIClient>(new ApiKeyCredential(apiKey), It.IsAny<OpenAIClientOptions>());
+            clientMock.Setup(client => client
+                .GetEmbeddingClient(It.IsAny<string>())
+                .GenerateEmbeddingsAsync(It.IsAny<IEnumerable<string>>(), It.IsAny<EmbeddingGenerationOptions>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new Exception("test-exception"));
             openAiEmbeddings.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAiEmbeddings, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<TeamsAIException>(async () => await openAiEmbeddings.CreateEmbeddingsAsync(inputs));
+            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await openAiEmbeddings.CreateEmbeddingsAsync(inputs));
 
             // Assert
-            Assert.Equal("Error while executing openAI Embeddings execution: other exception", result.Message);
+            Assert.NotNull(exception);
+            Assert.Equal("Error while executing openAI Embeddings execution: test-exception", exception.Message);
         }
     }
 }

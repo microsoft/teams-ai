@@ -35,7 +35,7 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
                 .Build();
         }
 
-        [Theory(Skip = "This test should only be run manually.")]
+        [Fact(Skip = "This test should only be run manually.")]
         public async Task Test_CreateEmbeddingsAsync_OpenAI()
         {
             // Arrange
@@ -60,7 +60,7 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             Assert.Equal(dimension, result.Output[1].Length);
         }
 
-        [Theory(Skip = "This test should only be run manually.")]
+        [Fact(Skip = "This test should only be run manually.")]
         public async Task Test_CreateEmbeddingsAsync_AzureOpenAI()
         {
             // Arrange

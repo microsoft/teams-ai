@@ -1,4 +1,4 @@
-# Azure OpenAI On Your Data
+# Azure OpenAI On Your Data (OYD)
 
 The following is a custom copilot that uses the Azure OpenAI Chat Completions API ‘Azure OpenAI On Your Data’ feature to facilitate RAG (retrieval augmented generation).
 You can chat with your data in Azure AI Search, Azure Blob Storage, URL/web address, Azure Cosmos DB for MongoDB vCore, uploaded files, and Elasticsearch.
@@ -21,6 +21,91 @@ You can chat with your data in Azure AI Search, Azure Blob Storage, URL/web addr
 This sample shows how to integrate your search index as a data source into prompt templates through the Azure Chat Completions API.
 
 > Note: this sample uses managed identity, ensure your Azure OpenAI and AI Search services are configured properly https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/use-your-data-securely
+
+### Add your data to the prompt template
+
+The Azure OpenAI OYD configuration can be added to the prompt templates `config.json`:
+
+```json
+{
+  "schema": 1.1,
+  "description": "Chat with Teams RAG",
+  "type": "completion",
+  "completion": {
+      "model": "gpt-4o",
+      "completion_type": "chat",
+      "include_history": true,
+      "include_input": true,
+      "max_input_tokens": 4096,
+      "max_tokens": 1000,
+      "temperature": 0.9,
+      "top_p": 0.0,
+      "presence_penalty": 0.6,
+      "frequency_penalty": 0.0,
+      "stop_sequences": [],
+      "data_sources": [
+          {
+              "type": 'azure_search',
+              "parameters": {
+                  "endpoint": "",
+                  "index_name": "",
+                  "semantic_configuration": 'default',
+                  "query_type": 'simple',
+                  "fields_mapping": { },
+                  "in_scope": True,
+                  "strictness": 3,
+                  "top_n_documents": 5,
+                  "authentication": {
+                      "type": 'system_assigned_managed_identity'
+                  }
+              }  
+          }
+      ]
+  },
+  "augmentation": {
+      "augmentation_type": "none"
+  }
+}
+```
+
+You can also dynamically add this configuration like this:
+
+```py
+# gets prompt template and adds data source config
+async def get_default_prompt(context: TurnContext, state: AppTurnState, planner: ActionPlanner) -> PromptTemplate:
+    prompt = await prompts.get_prompt("chat")
+
+    prompt.config.completion.model = 'gpt-4o'
+
+    if config.AZURE_SEARCH_ENDPOINT:
+        prompt.config.completion.data_sources = [
+            {
+                "type": 'azure_search',
+                "parameters": {
+                    "endpoint": config.AZURE_SEARCH_ENDPOINT,
+                    "index_name": config.AZURE_SEARCH_INDEX,
+                    "semantic_configuration": 'default',
+                    "query_type": 'simple',
+                    "fields_mapping": { },
+                    "in_scope": True,
+                    "strictness": 3,
+                    "top_n_documents": 5,
+                    "role_information": Path(__file__).resolve().parent.joinpath('../src/prompts/chat/skprompt.txt').read_text(encoding='utf-8'),
+                    "authentication": {
+                        "type": 'system_assigned_managed_identity'
+                    }
+                }  
+            }
+        ]
+
+    return prompt
+```
+
+Then in the `ActionPlannerOptions`, set `default_prompt=get_default_prompt`:
+
+```py
+ActionPlannerOptions(model=model, prompts=prompts, default_prompt=get_default_prompt)
+```
 
 ### Example Interaction
 

@@ -8,7 +8,7 @@ provision:
     - uses: teamsApp/create
       with:
           # Teams app name
-          name: WhoBot-${{TEAMSFX_ENV}}
+          name: WhoBot${{APP_NAME_SUFFIX}}
       # Write the information of created resources into environment file for
       # the specified environment variable(s).
       writeToEnvironmentFile:
@@ -16,7 +16,7 @@ provision:
 
     - uses: aadApp/create
       with:
-          name: WhoBot-${{TEAMSFX_ENV}}
+          name: WhoBot${{APP_NAME_SUFFIX}}
           generateClientSecret: true
           signInAudience: AzureADMultipleOrgs
 
