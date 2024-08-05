@@ -6,7 +6,7 @@ version: 1.0.0
 provision:
     - uses: teamsApp/create # Creates a Teams app
       with:
-          name: CardGazer-${{TEAMSFX_ENV}} # Teams app name
+          name: CardGazer${{APP_NAME_SUFFIX}} # Teams app name
       writeToEnvironmentFile: # Write the information of installed dependencies into environment file for the specified environment variable(s).
           teamsAppId: TEAMS_APP_ID
 

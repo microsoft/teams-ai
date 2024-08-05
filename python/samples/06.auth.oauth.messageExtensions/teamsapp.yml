@@ -16,7 +16,7 @@ provision:
   # Automates the creation of a Teams app registration and saves the App ID to an environment file.
   - uses: teamsApp/create
     with:
-      name: OAuthMessageExtensions-${{TEAMSFX_ENV}}
+      name: OAuthMessageExtensions${{APP_NAME_SUFFIX}}
     writeToEnvironmentFile:
       teamsAppId: TEAMS_APP_ID
 
@@ -28,7 +28,7 @@ provision:
       # based on the definition in manifest. If you don't want to change the
       # name, make sure the name in Microsoft Entra manifest is the same with the name
       # defined here.
-      name: OAuthMessageExtensions-${{TEAMSFX_ENV}}
+      name: OAuthMessageExtensions${{APP_NAME_SUFFIX}}
       # If the value is false, the driver will not generate client secret for you
       generateClientSecret: true
       # organization's Microsoft Entra tenant (for example, single tenant).

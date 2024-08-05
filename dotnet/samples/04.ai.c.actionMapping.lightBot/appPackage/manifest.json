@@ -15,7 +15,7 @@
         "outline": "outline.png"
     },
     "name": {
-        "short": "LightBot-${{TEAMSFX_ENV}}",
+        "short": "LightBot${{APP_NAME_SUFFIX}}",
         "full": "Light Bot"
     },
   "description": {
