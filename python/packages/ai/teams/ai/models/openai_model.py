@@ -123,7 +123,7 @@ class OpenAIModel(PromptCompletionModel):
         tokenizer: Tokenizer,
         template: PromptTemplate,
     ) -> PromptResponse[str]:
-        max_tokens = template.config.completion.max_input_tokens
+        max_input_tokens = template.config.completion.max_input_tokens
         model = (
             template.config.completion.model
             if template.config.completion.model is not None
@@ -134,7 +134,7 @@ class OpenAIModel(PromptCompletionModel):
             memory=memory,
             functions=functions,
             tokenizer=tokenizer,
-            max_tokens=max_tokens,
+            max_tokens=max_input_tokens,
         )
 
         if res.too_long:
@@ -142,7 +142,7 @@ class OpenAIModel(PromptCompletionModel):
                 status="too_long",
                 error=f"""
                 the generated chat completion prompt had a length of {res.length} tokens
-                which exceeded the max_input_tokens of {max_tokens}
+                which exceeded the max_input_tokens of {max_input_tokens}
                 """,
             )
 
@@ -194,7 +194,7 @@ class OpenAIModel(PromptCompletionModel):
                 frequency_penalty=template.config.completion.frequency_penalty,
                 top_p=template.config.completion.top_p,
                 temperature=template.config.completion.temperature,
-                max_tokens=max_tokens,
+                max_tokens=template.config.completion.max_tokens,
                 extra_body=extra_body,
             )
 

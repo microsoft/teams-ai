@@ -8,7 +8,7 @@ provision:
   - uses: teamsApp/create
     with:
       # Teams app name
-      name: BotAuth-${{TEAMSFX_ENV}}
+      name: BotAuth${{APP_NAME_SUFFIX}}
     # Write the information of created resources into environment file for
     # the specified environment variable(s).
     writeToEnvironmentFile: 
@@ -18,7 +18,7 @@ provision:
   - uses: aadApp/create
     with:
   # Note: when you run aadApp/update, the AAD app name will be updated based on the definition in manifest. If you don't want to change the name, make sure the name in AAD manifest is the same with the name defined here.
-      name: SsoAuthBot-${{TEAMSFX_ENV}}
+      name: SsoAuthBot${{APP_NAME_SUFFIX}}
       # If the value is false, the action will not generate client secret for you
       generateClientSecret: true
       # Authenticate users with a Microsoft work or school account in your organization's Azure AD tenant (for example, single tenant).

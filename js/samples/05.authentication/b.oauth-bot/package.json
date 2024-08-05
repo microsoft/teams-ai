@@ -23,21 +23,21 @@
         "botbuilder": "^4.22.3",
         "botbuilder-dialogs": "^4.22.3",
         "dotenv": "^16.4.5",
-        "openai": "^4.41.0",
+        "openai": "4.28.4",
         "replace": "~1.2.0",
         "restify": "~11.1.0"
     },
     "devDependencies": {
         "@types/jsonwebtoken": "^8.5.4",
-        "@types/node": "^20.14.10",
+        "@types/node": "^20.14.13",
         "@types/restify": "8.5.12",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
         "nodemon": "~3.0.1",
-        "prettier": "^3.3.2",
-        "rimraf": "^5.0.8",
+        "prettier": "^3.3.3",
+        "rimraf": "^5.0.10",
         "ts-node": "^10.9.2",
         "tsc-watch": "^6.2.0",
-        "typescript": "^5.5.3"
+        "typescript": "^5.5.4"
     }
 }
