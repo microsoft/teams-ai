@@ -94,6 +94,12 @@ export interface PredictedDoCommand extends PredictedCommand {
      * Any parameters that the AI system should use to perform the action.
      */
     parameters: Record<string, any>;
+
+    /**
+     * The id mapped to the name action that the AI system should perform.
+     * In OpenAI, this is associated with the action_id tool calls.
+     */
+    actionId?: string;
 }
 
 /**
