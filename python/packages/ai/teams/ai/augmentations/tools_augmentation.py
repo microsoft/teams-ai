@@ -11,7 +11,6 @@ from typing import List, Optional
 from botbuilder.core import TurnContext
 
 from ...state import MemoryBase
-from ..models.chat_completion_action import ChatCompletionAction
 from ..models.prompt_response import PromptResponse
 from ..planners.plan import (
     Plan,
@@ -29,11 +28,6 @@ class ToolsAugmentation(Augmentation[str]):
     """
     A server-side 'tools' augmentation.
     """
-
-    _actions: Optional[List[ChatCompletionAction]]
-
-    def __init__(self, actions: Optional[List[ChatCompletionAction]]) -> None:
-        self._actions = actions
 
     def create_prompt_section(self) -> Optional[PromptSection]:
         """

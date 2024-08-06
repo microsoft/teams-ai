@@ -35,7 +35,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
         self.tokenizer = GPTTokenizer()
 
     def test_create_prompt_section(self):
-        tools_augmentation = ToolsAugmentation(actions=None)
+        tools_augmentation = ToolsAugmentation()
         self.assertEqual(tools_augmentation.create_prompt_section(), None)
 
     async def test_validate_response(self):
@@ -63,7 +63,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
             error=None,
         )
 
-        tools_augmentation = ToolsAugmentation(actions=None)
+        tools_augmentation = ToolsAugmentation()
         validation = await tools_augmentation.validate_response(
             cast(TurnContext, {}),
             memory=state,
@@ -76,7 +76,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
 
     async def test_create_plan_from_response_missing_response_message(self):
         state = TurnState()
-        tools_augmentation = ToolsAugmentation(actions=None)
+        tools_augmentation = ToolsAugmentation()
         plan = await tools_augmentation.create_plan_from_response(
             cast(TurnContext, {}),
             memory=state,
@@ -99,7 +99,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
 
     async def test_create_plan_from_response_missing_action_calls(self):
         state = TurnState()
-        tools_augmentation = ToolsAugmentation(actions=None)
+        tools_augmentation = ToolsAugmentation()
         plan = await tools_augmentation.create_plan_from_response(
             cast(TurnContext, {}),
             memory=state,
@@ -130,7 +130,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
 
     async def test_create_plan_from_response_with_tool(self):
         state = TurnState()
-        tools_augmentation = ToolsAugmentation(actions=None)
+        tools_augmentation = ToolsAugmentation()
         plan = await tools_augmentation.create_plan_from_response(
             cast(TurnContext, {}),
             memory=state,
@@ -164,7 +164,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
 
     async def test_create_plan_from_response_with_multiple_tools(self):
         state = TurnState()
-        tools_augmentation = ToolsAugmentation(actions=None)
+        tools_augmentation = ToolsAugmentation()
         plan = await tools_augmentation.create_plan_from_response(
             cast(TurnContext, {}),
             memory=state,

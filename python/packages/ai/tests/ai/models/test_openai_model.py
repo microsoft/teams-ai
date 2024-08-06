@@ -10,9 +10,7 @@ from unittest import IsolatedAsyncioTestCase, mock
 import httpx
 import openai
 from openai.types import chat
-from openai.types.chat import (
-    chat_completion_message_tool_call
-)
+from openai.types.chat import chat_completion_message_tool_call
 
 from teams.ai.augmentations.monologue_augmentation import MonologueAugmentation
 from teams.ai.augmentations.tools_augmentation import ToolsAugmentation
@@ -327,7 +325,7 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
             template=PromptTemplate(
                 name="default",
                 prompt=TextSection(text="this is a test prompt", role="system", tokens=1),
-                augmentation=ToolsAugmentation(actions=None),
+                augmentation=ToolsAugmentation(),
                 config=PromptTemplateConfig(
                     schema=1.0,
                     type="completion",
@@ -361,7 +359,7 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
             functions=cast(PromptFunctions, {}),
             tokenizer=GPTTokenizer(),
             template=PromptTemplate(
-                augmentation=ToolsAugmentation(actions),
+                augmentation=ToolsAugmentation(),
                 name="default",
                 prompt=TextSection(text="this is a test prompt", role="system", tokens=1),
                 actions=actions,
@@ -403,7 +401,7 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
             tokenizer=GPTTokenizer(),
             template=PromptTemplate(
                 name="default",
-                augmentation=ToolsAugmentation(actions),
+                augmentation=ToolsAugmentation(),
                 prompt=TextSection(text="this is a test prompt", role="system", tokens=1),
                 actions=actions,
                 config=PromptTemplateConfig(
@@ -443,7 +441,7 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
             tokenizer=GPTTokenizer(),
             template=PromptTemplate(
                 name="default",
-                augmentation=ToolsAugmentation(actions),
+                augmentation=ToolsAugmentation(),
                 prompt=TextSection(text="this is a test prompt", role="system", tokens=1),
                 actions=actions,
                 config=PromptTemplateConfig(

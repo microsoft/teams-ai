@@ -401,7 +401,7 @@ class PromptManager(PromptFunctions):
             elif augmentation_type == "sequence":
                 curr_augmentation = teams.ai.augmentations.SequenceAugmentation(curr_actions)
             elif augmentation_type == "tools":
-                curr_augmentation = teams.ai.augmentations.ToolsAugmentation(curr_actions)
+                curr_augmentation = teams.ai.augmentations.ToolsAugmentation()
 
             # Append the augmentations prompt section
             if curr_augmentation:
