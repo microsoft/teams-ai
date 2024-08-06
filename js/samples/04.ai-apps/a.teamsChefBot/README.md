@@ -32,19 +32,20 @@ git clone https://github.com/Microsoft/teams-ai.git
 
 > [!IMPORTANT]
 > To prevent issues when installing dependencies after cloning the repo, copy or move the sample directory to it's own location first.
-> If you opened this sample from the Sample Gallery in Teams Toolkit, you can skip to step 3.
+> If you opened this sample from the Sample Gallery in Teams Toolkit, you can skip to step 2.
 
 ```bash
 cd path/to/04.ai-apps/a.teamsChefBot
 code .
 ```
 
-1. Add your OpenAI key to the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
+2. Add your OpenAI key to the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
 
 If you are using Azure OpenAI then follow these steps:
 
 -   Comment the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
--   Add your Azure OpenAI key and endpoint values to the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables
+-   Add your Azure OpenAI key and endpoint values to the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables.
+-   Open `./src/index.ts` and uncomment lines 90-93.
 -   Open the `teamsapp.local.yml` file and modify the last step to use Azure OpenAI variables instead:
 
 ```yml
@@ -73,7 +74,7 @@ If you are using Azure OpenAI then follow these steps:
 
 > Please note: If you are using Azure OpenAI, you will need both a GPT model and embedding model deployment to get this sample working. See `OpenAIModel` in `index.ts` and `OpenAIEmbeddings` in `VectraDataSource.ts`.
 
-4. Update `./src/prompts/chat/config.json` and `/.src/index.ts` with your model deployment name.
+3. Update `./src/prompts/chat/config.json` and `./src/index.ts` with your model deployment name.
 
 ## Testing the sample
 
