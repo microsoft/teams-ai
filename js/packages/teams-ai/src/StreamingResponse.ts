@@ -6,16 +6,16 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder-core";
+import { TurnContext } from 'botbuilder-core';
 
 /**
  * A helper class for streaming responses to the client.
  * @remarks
  * This class is used to send a series of updates to the client in a single response. The expected
- * sequence of calls is: 
- * 
+ * sequence of calls is:
+ *
  * `sendInformativeUpdate()`, `sendTextChunk()`, `sendTextChunk()`, ..., `endStream()`.
- * 
+ *
  * Once `endStream()` is called, the stream is considered ended and no further updates can be sent.
  */
 export class StreamingResponse {
@@ -27,7 +27,8 @@ export class StreamingResponse {
 
     /**
      * Creates a new StreamingResponse instance.
-     * @param context Context for the current turn of conversation with the user.
+     * @param {TurnContext} context - Context for the current turn of conversation with the user.
+     * @returns {TurnContext} - The context for the current turn of conversation with the user.
      */
     public constructor(context: TurnContext) {
         this._context = context;
@@ -35,6 +36,7 @@ export class StreamingResponse {
 
     /**
      * Gets the stream ID of the current response.
+     * @returns {string | undefined} - The stream ID of the current response.
      * @remarks
      * Assigned after the initial update is sent.
      */
@@ -44,6 +46,7 @@ export class StreamingResponse {
 
     /**
      * Gets the number of updates sent for the stream.
+     * @returns {number} - The number of updates sent for the stream.
      */
     public get updatesSent(): number {
         return this._nextSequence - 1;
@@ -51,7 +54,8 @@ export class StreamingResponse {
 
     /**
      * Sends an informative update to the client.
-     * @param text Text of the update to send.
+     * @param {string} text Text of the update to send.
+     * @returns {Promise<void>} - A promise representing the async operation.
      */
     public sendInformativeUpdate(text: string): Promise<void> {
         if (this._ended) {
@@ -69,7 +73,8 @@ export class StreamingResponse {
      * Sends a chunk of partial message text to the client.
      * @remarks
      * The text is appended to the full message text which will be sent when endStream() is called.
-     * @param text Partial text of the message to send.
+     * @param {string} text Partial text of the message to send.
+     * @returns {Promise<void>} - A promise representing the async operation
      */
     public sendTextChunk(text: string): Promise<void> {
         if (this._ended) {
@@ -83,12 +88,12 @@ export class StreamingResponse {
         return this.sendActivity('typing', text, {
             streamType: 'streaming',
             streamSequence: this._nextSequence++
-        });        
+        });
     }
 
     /**
      * Ends the stream by sending the final message to the client.
-     * @param text Partial text of the message to send.
+     * @returns {Promise<void>} - A promise representing the async operation
      */
     public endStream(): Promise<void> {
         if (this._ended) {
@@ -100,13 +105,21 @@ export class StreamingResponse {
         return this.sendActivity('message', this._message, {
             streamType: 'final',
             streamSequence: this._nextSequence++
-        });        
+        });
     }
 
     /**
+     * @param {'typing' | 'message'} type - The type of activity to send.
+     * @param {string} text - The text of the activity to send.
+     * @param {StreamingChannelData} channelData - The channel data for the activity to send.
+     * @returns {Promise<void>} - A promise representing the async operation.
      * @private
      */
-    private async sendActivity(type: 'typing' | 'message', text: string, channelData: StreamingChannelData): Promise<void> {
+    private async sendActivity(
+        type: 'typing' | 'message',
+        text: string,
+        channelData: StreamingChannelData
+    ): Promise<void> {
         // Add stream ID
         if (this._streamId) {
             channelData.streamId = this._streamId;
@@ -123,17 +136,17 @@ export class StreamingResponse {
         if (!this._streamId) {
             this._streamId = response?.id;
         }
-    }   
+    }
 }
 
 /**
  * @private
  * Structure of the outgoing channelData field for streaming responses.
  * @remarks
- * The expected sequence of streamTypes is: 
- * 
+ * The expected sequence of streamTypes is:
+ *
  * `informative`, `streaming`, `streaming`, ..., `final`.
- * 
+ *
  * Once a `final` message is sent, the stream is considered ended.
  */
 interface StreamingChannelData {
