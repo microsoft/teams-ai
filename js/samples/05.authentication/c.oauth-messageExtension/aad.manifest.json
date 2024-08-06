@@ -1,7 +1,7 @@
 {
     "id": "${{AAD_APP_OBJECT_ID}}",
     "appId": "${{BOT_ID}}",
-    "name": "MessageExtensionSSO-${{TEAMSFX_ENV}}",
+    "name": "MessageExtensionSSO${{APP_NAME_SUFFIX}}",
     "accessTokenAcceptedVersion": 2,
     "signInAudience": "AzureADMultipleOrgs",
     "optionalClaims": {
