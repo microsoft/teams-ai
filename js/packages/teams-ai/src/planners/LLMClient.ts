@@ -230,6 +230,21 @@ export class LLMClient<TContent = any> {
     }
 
     /**
+     * Adds a result from an `action_call` to the history.
+     * @param {Memory} memory - An interface for accessing state values.
+     * @param {string} id - Id of the action that was called.
+     * @param {string} results - Results returned by the action call.
+     */
+     //TODO: NEED TO CALL ADDACTIONOUTPUT TO HISTORY -- 145 in Python
+    public addActionOutputToHistory(memory: Memory, id: string, results: string): void {
+        this.addMessageToHistory(memory, this.options.history_variable, {
+            role: 'action',
+            action_call_id: id,
+            content: results
+        });
+    }
+
+    /**
      * Adds a result from a `function_call` to the history.
      * @param {Memory} memory - An interface for accessing state values.
      * @param {string} name - Name of the function that was called.
@@ -358,6 +373,7 @@ export class LLMClient<TContent = any> {
 
         try {
             // Complete the prompt
+            /// nneed to addActionOUtputTOHistory inside callCompletePrompt before first try catch statement
             const response = await this.callCompletePrompt(context, memory, functions);
             if (response.status == 'success' && isStreaming) {
                 // Delete message from response to avoid sending it twice
@@ -426,8 +442,8 @@ export class LLMClient<TContent = any> {
                 }
 
                 // Update history and return
-                this.addInputToHistory(memory, history_variable, inputMsg!);
-                this.addResponseToHistory(memory, history_variable, response.message!);
+                this.addMessageToHistory(memory, history_variable, inputMsg!);
+                this.addMessageToHistory(memory, history_variable, response.message!);
                 return response;
             }
 
@@ -469,8 +485,8 @@ export class LLMClient<TContent = any> {
             // - we never want to save an invalid response to conversation history.
             // - the caller can take further corrective action, including simply re-trying.
             if (repair.status === 'success') {
-                this.addInputToHistory(memory, history_variable, inputMsg!);
-                this.addResponseToHistory(memory, history_variable, repair.message!);
+                this.addMessageToHistory(memory, history_variable, inputMsg!);
+                this.addMessageToHistory(memory, history_variable, repair.message!);
             }
 
             return repair;
@@ -485,33 +501,20 @@ export class LLMClient<TContent = any> {
 
     /**
      * @param {Memory} memory - Current memory.
-     * @param {string} variable - Variable to fetch from memory.
-     * @param {Message<any>} input - The current input.
-     * @private
-     */
-    private addInputToHistory(memory: Memory, variable: string, input: Message<any>): void {
-        if (variable) {
-            const history: Message[] = memory.getValue(variable) ?? [];
-            history.push(input);
-            if (history.length > this.options.max_history_messages) {
-                history.splice(0, history.length - this.options.max_history_messages);
-            }
-            memory.setValue(variable, history);
-        }
-    }
-
-    /**
-     * @param {Memory} memory - Current memory.
      * @param {string} variable - Variable to fetch value from memory.
-     * @param {Message<TContent>} message - The Message to be added to history.
+     * @param {Message<any>} message - The Message to be added to history.
      * @private
      */
-    private addResponseToHistory(memory: Memory, variable: string, message: Message<TContent>): void {
+    private addMessageToHistory(memory: Memory, variable: string, message: Message<any>): void {
         if (variable) {
-            const history: Message<TContent>[] = memory.getValue(variable) ?? [];
+            const history: Message<any>[] = memory.getValue(variable) ?? [];
             history.push(message);
             if (history.length > this.options.max_history_messages) {
                 history.splice(0, history.length - this.options.max_history_messages);
+            }
+
+            while (history && history[0].role === 'tool') {
+                history.shift();
             }
             memory.setValue(variable, history);
         }
@@ -539,8 +542,8 @@ export class LLMClient<TContent = any> {
 
         // Add response and feedback to repair history
         const feedback = validation.feedback ?? 'The response was invalid. Try another strategy.';
-        this.addResponseToHistory(fork, `${history_variable}-repair`, response.message!);
-        this.addInputToHistory(fork, `${history_variable}-repair`, { role: 'user', content: feedback });
+        this.addMessageToHistory(fork, `${history_variable}-repair`, response.message!);
+        this.addMessageToHistory(fork, `${history_variable}-repair`, { role: 'user', content: feedback });
 
         // Append repair history to prompt
         const repairTemplate = Object.assign({}, template, {

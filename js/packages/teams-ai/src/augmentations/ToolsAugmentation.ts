@@ -9,7 +9,6 @@
 import { TurnContext } from 'botbuilder-core';
 
 import { Memory } from '../MemoryFork';
-import { ChatCompletionAction } from '../models';
 import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from '../planners';
 import { PromptSection } from '../prompts';
 import { Tokenizer } from '../tokenizers';
@@ -28,11 +27,6 @@ import { Augmentation } from './Augmentation';
  * Server-side tool-calling is not compatible with other augmentation types.
  */
 export class ToolsAugmentation implements Augmentation<string | ActionCall[]> {
-    private readonly _actions: ChatCompletionAction[];
-
-    public constructor(actions: ChatCompletionAction[]) {
-        this._actions = actions ?? [];
-    }
     /**
      * @returns {PromptSection|undefined} Returns an optional prompt section for the augmentation.
      */
@@ -77,8 +71,8 @@ export class ToolsAugmentation implements Augmentation<string | ActionCall[]> {
         const toolsMap = new Map<string, string>();
         const commands: PredictedCommand[] = [];
 
-        if (response.message && response.message.action_tool_calls) {
-            const actionToolCalls: ActionCall[] = response.message.action_tool_calls ?? [];
+        if (response.message && response.message.action_calls) {
+            const actionToolCalls: ActionCall[] = response.message.action_calls ?? [];
             for (const toolCall of actionToolCalls) {
                 toolsMap.set(toolCall.function.name, toolCall.id);
                 let parameters;

@@ -41,7 +41,12 @@ export interface Message<TContent = string> {
     /**
      * Optional. The action or tool to be called by the model when using 'tools' augmentation. In OpenAI, this is the tool_calls property returned from the model.
      */
-    action_tool_calls?: ActionCall[];
+    action_calls?: ActionCall[];
+
+    /**
+     * Optional. The id of the action called.
+     */
+    action_call_id?: string | undefined;
 }
 
 /**

@@ -13,6 +13,7 @@ import { ClientOptions, AzureOpenAI, OpenAI } from 'openai';
 import {
     type ChatCompletionCreateParams,
     ChatCompletionMessageParam,
+    ChatCompletionMessageToolCall,
     ChatCompletionChunk,
     ChatCompletion,
     ChatCompletionTool
@@ -23,7 +24,7 @@ import { Colorize } from '../internals';
 import { Memory } from '../MemoryFork';
 import { Message, PromptFunctions, PromptTemplate } from '../prompts';
 import { Tokenizer } from '../tokenizers';
-import { ActionCall, PromptResponse, ToolsAugmentationConstants } from '../types';
+import { ActionCall, PromptResponse } from '../types';
 
 import { PromptCompletionModel, PromptCompletionModelEmitter } from './PromptCompletionModel';
 
@@ -96,9 +97,6 @@ export interface BaseOpenAIModelOptions {
      */
     stream?: boolean;
 }
-
-const { SUBMIT_TOOL_OUTPUTS_MAP, SUBMIT_TOOL_OUTPUTS_MESSAGES, SUBMIT_TOOL_OUTPUTS_VARIABLE } =
-    ToolsAugmentationConstants;
 
 /**
  * Options for configuring an `OpenAIModel` to call an OpenAI hosted model.
@@ -323,17 +321,18 @@ export class OpenAIModel implements PromptCompletionModel {
         // Get input message
         // - we're doing this here because the input message can be complex and include images.
         const input = this.getInputMessage(result.output);
-        const isToolsEnabled = template.actions && template.config.augmentation?.augmentation_type == 'tools';
-        const toolChoice = template.config.completion.tool_choice;
-        const parallelToolCalls = template.config.completion.parallel_tool_calls ?? true;
 
-        if (isToolsEnabled && template.actions!.length === 0) {
-            return this.returnError('noActions', input);
-        }
+        const isToolsAugmentation =
+            template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
+        const toolChoice = template.config.completion.tool_choice;
+        const toolCallParams: ChatCompletionMessageToolCall[] = [];
+        const responseMessage = []  // iterate through res.output for type assistant with tool_calls[] in the response
 
         try {
             // Call chat completion API
             let message: Message<string>;
+            // filter through messages from res looking for role assistant and param_action_calls
+            // action_calls (response) needs to also return the response from the model
             const params = this.getChatCompletionParams(model, result.output, template, memory);
 
             const completion = await this._client.chat.completions.create(params);
@@ -354,9 +353,16 @@ export class OpenAIModel implements PromptCompletionModel {
                     if (delta.content) {
                         message.content += delta.content;
                     }
+                    // Map tool_calls to action_tool_calls
+                    if (isToolsAugmentation && delta.tool_calls) {
+                        message.action_calls = delta.tool_calls.map((toolCall) => {
+                            toolCallParams.push({
+                               id: toolCall.id,
+                               function: {
 
-                    if (isToolsEnabled && delta.tool_calls) {
-                        message.action_tool_calls = delta.tool_calls.map((toolCall) => {
+                               }
+                            });
+
                             return {
                                 id: toolCall.id,
                                 function: {
@@ -386,10 +392,10 @@ export class OpenAIModel implements PromptCompletionModel {
                     role: 'assistant',
                     content: ''
                 };
-
-                if (isToolsEnabled && toolCalls.length > 0) {
+                // If tools is enabled, reformat actions to schema
+                if (isToolsAugmentation && toolCalls.length > 0) {
                     // Map tool_calls to action_tool_calls
-                    message.action_tool_calls = toolCalls?.map((toolCall) => {
+                    message.action_calls = toolCalls?.map((toolCall) => {
                         return {
                             id: toolCall.id,
                             function: {
@@ -408,16 +414,8 @@ export class OpenAIModel implements PromptCompletionModel {
                 }
             }
 
-            if (isToolsEnabled && message.action_tool_calls) {
-                if (!parallelToolCalls && message.action_tool_calls.length > 1) {
-                    return {
-                        status: 'error',
-                        input,
-                        error: new Error('Model returned multiple tool calls but parallel_tool_calls is false')
-                    } as PromptResponse<string>;
-                }
-
-                if (message.action_tool_calls.length === 0) {
+            if (isToolsAugmentation && message.action_calls) {
+                if (message.action_calls.length === 0) {
                     return {
                         status: 'error',
                         input,
@@ -425,14 +423,14 @@ export class OpenAIModel implements PromptCompletionModel {
                     } as PromptResponse<string>;
                 }
 
-                if (toolChoice === 'none' && message.action_tool_calls.length > 0) {
-                    message.action_tool_calls = [];
+                if (toolChoice === 'none' && message.action_calls.length > 0) {
+                    message.action_calls = [];
                 }
 
-                if (message.action_tool_calls.length > 0) {
-                    memory.setValue(SUBMIT_TOOL_OUTPUTS_VARIABLE, true);
-                    memory.setValue(SUBMIT_TOOL_OUTPUTS_MAP, message.action_tool_calls);
-                    memory.setValue(SUBMIT_TOOL_OUTPUTS_MESSAGES, result.output);
+                if (message.action_calls.length > 0) {
+                    // memory.setValue(SUBMIT_TOOL_OUTPUTS_VARIABLE, true);
+                    // memory.setValue(SUBMIT_TOOL_OUTPUTS_MAP, message.action_calls);
+                    // memory.setValue(SUBMIT_TOOL_OUTPUTS_MESSAGES, result.output);
                 }
             }
 
@@ -478,9 +476,10 @@ export class OpenAIModel implements PromptCompletionModel {
         memory: Memory
     ): ChatCompletionCreateParams {
         // Validate Tools Augmentation
-        const isToolsEnabled = template.actions && template.config.augmentation?.augmentation_type == 'tools';
+        const isToolsAugmentation =
+            template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
 
-        const chatCompletionTools = isToolsEnabled
+        const chatCompletionTools = isToolsAugmentation
             ? template.actions?.map((action) => {
                   return {
                       type: 'function',
@@ -498,12 +497,13 @@ export class OpenAIModel implements PromptCompletionModel {
             tool_choice: template.config.completion.tool_choice ?? 'auto',
             tools: chatCompletionTools,
             // Only include parallel_tool_calls if tools are enabled and the template has it set; otherwise, it will default to true without being added to the API call
-            parallel_tool_calls: isToolsEnabled ? template.config.completion.parallel_tool_calls : undefined
+            parallel_tool_calls: isToolsAugmentation ? template.config.completion.parallel_tool_calls : undefined
         };
 
         const params: ChatCompletionCreateParams = this.copyOptionsToRequest<ChatCompletionCreateParams>(
             {
                 messages: messages as ChatCompletionMessageParam[]
+                // find message that has assistant and convert action calls to tool calls
             },
             completion,
             [
@@ -545,7 +545,7 @@ export class OpenAIModel implements PromptCompletionModel {
 
     private getInputMessage(messages: Message<string>[]): Message<string> | undefined {
         const last = messages.length - 1;
-        if (last > 0 && messages[last].role == 'user') {
+        if (last > 0 && messages[last].role !== 'user') {
             return messages[last];
         }
 
@@ -563,20 +563,6 @@ export class OpenAIModel implements PromptCompletionModel {
     }
 
     private returnError(err: unknown, input: Message<string> | undefined): PromptResponse<string> {
-        if (err === 'noActions') {
-            return {
-                status: 'error',
-                input,
-                error: new Error('Missing actions/tools from template.actions')
-            };
-        } else if (err === 'noToolsFromModel') {
-            return {
-                status: 'error',
-                input,
-                error: new Error(`Model did not return any tools`)
-            };
-        }
-
         if (err instanceof OpenAI.APIError) {
             if (err.status == 429) {
                 if (this.options.logRequests) {

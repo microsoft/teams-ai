@@ -16,14 +16,12 @@ import { PromptTemplate, PromptManager } from '../prompts';
 import { Tokenizer } from '../tokenizers';
 import { TurnState } from '../TurnState';
 import { Utilities } from '../Utilities';
-import { ChatCompletionActionResponse, PromptResponse, ToolsAugmentationConstants } from '../types';
+import { ChatCompletionActionResponse, PromptResponse } from '../types';
 import { PromptResponseValidator } from '../validators';
 
 import { LLMClient } from './LLMClient';
 import { Planner, Plan } from './Planner';
 
-const { SUBMIT_TOOL_OUTPUTS_MAP, SUBMIT_TOOL_OUTPUTS_MESSAGES, SUBMIT_TOOL_OUTPUTS_VARIABLE } =
-    ToolsAugmentationConstants;
 /**
  * Factory function used to create a prompt template.
  * @template TState Optional. Type of application state.
