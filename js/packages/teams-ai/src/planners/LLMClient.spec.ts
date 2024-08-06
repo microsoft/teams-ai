@@ -8,15 +8,13 @@ import { Prompt, PromptTemplate, PromptTemplateConfig, UserMessage } from '../pr
 import { JSONResponseValidator } from '../validators';
 import { TestTurnState } from '../internals/testing/TestTurnState';
 
-describe('LLMClient', function() {
+describe('LLMClient', function () {
     const functions = new TestPromptManager();
     const tokenizer = new GPTTokenizer();
     const validator = new JSONResponseValidator();
     const template: PromptTemplate = {
         name: 'test',
-        prompt: new Prompt([
-            new UserMessage('hello')
-        ]),
+        prompt: new Prompt([new UserMessage('hello')]),
         config: {} as PromptTemplateConfig
     };
     const model = TestModel.returnContent('hi! how are you?');
@@ -44,7 +42,7 @@ describe('LLMClient', function() {
                 max_repair_attempts: 11,
                 tokenizer,
                 validator,
-                logRepairs: true,
+                logRepairs: true
             });
             assert(client, 'client should not be null');
             assert.equal(client.options.model, model, 'model should match');
@@ -92,7 +90,7 @@ describe('LLMClient', function() {
                 assert.equal(response.error.message, 'some error occurred!', 'response error message should match');
             });
         });
-        
+
         it('should successfully complete a streaming prompt', async () => {
             const adapter = new TestAdapter();
             await adapter.sendTextToBot('hello', async (context) => {

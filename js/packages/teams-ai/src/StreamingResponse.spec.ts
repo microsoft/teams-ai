@@ -1,8 +1,8 @@
 import assert from 'assert';
-import { TestAdapter } from "botbuilder";
+import { TestAdapter } from 'botbuilder';
 import { StreamingResponse } from './StreamingResponse';
 
-describe('StreamingResponse', function() {
+describe('StreamingResponse', function () {
     describe('constructor()', () => {
         it('should create a StreamingResponse instance', async () => {
             const adapter = new TestAdapter();
@@ -11,7 +11,7 @@ describe('StreamingResponse', function() {
                 assert(response, 'response should not be null');
                 assert.equal(response.streamId, undefined, 'streamId should be undefined');
                 assert.equal(response.updatesSent, 0, 'updatesSent should be 0');
-            });;
+            });
         });
     });
 
@@ -29,7 +29,11 @@ describe('StreamingResponse', function() {
                 const activity = adapter.getNextReply();
                 assert.equal(activity.type, 'typing', 'activity.type should be "typing"');
                 assert.equal(activity.text, 'starting', 'activity.text should be "starting"');
-                assert.deepEqual(activity.channelData, { streamType: 'informative', streamSequence: 1 }, 'activity.channelData should match');
+                assert.deepEqual(
+                    activity.channelData,
+                    { streamType: 'informative', streamSequence: 1 },
+                    'activity.channelData should match'
+                );
             });
         });
 
@@ -78,10 +82,18 @@ describe('StreamingResponse', function() {
                 assert.equal(activities.length, 2, 'should have sent 2 activities');
                 assert.equal(activities[0].type, 'typing', 'first activity type should be "typing"');
                 assert.equal(activities[0].text, 'first', 'first activity text should be "first"');
-                assert.deepEqual(activities[0].channelData, { streamType: 'streaming', streamSequence: 1 }, 'first activity channelData should match');
+                assert.deepEqual(
+                    activities[0].channelData,
+                    { streamType: 'streaming', streamSequence: 1 },
+                    'first activity channelData should match'
+                );
                 assert.equal(activities[1].type, 'typing', 'second activity type should be "typing"');
                 assert.equal(activities[1].text, 'second', 'second activity text should be "second"');
-                assert.deepEqual(activities[1].channelData, { streamType: 'streaming', streamSequence: 2, streamId: response.streamId }, 'second activity channelData should match');
+                assert.deepEqual(
+                    activities[1].channelData,
+                    { streamType: 'streaming', streamSequence: 2, streamId: response.streamId },
+                    'second activity channelData should match'
+                );
             });
         });
 
@@ -112,11 +124,15 @@ describe('StreamingResponse', function() {
                 const activity = adapter.getNextReply();
                 assert.equal(activity.type, 'message', 'activity.type should be "message"');
                 assert.equal(activity.text, '', 'activity.text should be ""');
-                assert.deepEqual(activity.channelData, { streamType: 'final', streamSequence: 1 }, 'activity.channelData should match');
+                assert.deepEqual(
+                    activity.channelData,
+                    { streamType: 'final', streamSequence: 1 },
+                    'activity.channelData should match'
+                );
             });
         });
 
-        it ('should send a final message with text', async () => {
+        it('should send a final message with text', async () => {
             const adapter = new TestAdapter();
             await adapter.sendTextToBot('test', async (context) => {
                 const response = new StreamingResponse(context);
@@ -133,7 +149,11 @@ describe('StreamingResponse', function() {
                 assert.equal(activities[2].channelData.streamSequence, 3, 'final activity streamSequence should be 3');
                 assert.equal(activities[2].type, 'message', 'final activity type should be "message"');
                 assert.equal(activities[2].text, 'firstsecond', 'final activity text should be "firstsecond"');
-                assert.deepEqual(activities[2].channelData, { streamType: 'final', streamSequence: 3, streamId: response.streamId }, 'final activity channelData should match');
+                assert.deepEqual(
+                    activities[2].channelData,
+                    { streamType: 'final', streamSequence: 3, streamId: response.streamId },
+                    'final activity channelData should match'
+                );
             });
         });
     });
