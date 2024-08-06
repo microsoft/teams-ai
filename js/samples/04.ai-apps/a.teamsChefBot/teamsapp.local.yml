@@ -54,6 +54,7 @@ deploy:
           envs:
               BOT_ID: ${{BOT_ID}}
               BOT_PASSWORD: ${{SECRET_BOT_PASSWORD}}
+              BOT_TYPE: 'MultiTenant'
               OPENAI_KEY: ${{SECRET_OPENAI_KEY}}
               #AZURE_OPENAI_KEY: ${{SECRET_AZURE_OPENAI_KEY}}
               #AZURE_OPENAI_ENDPOINT: ${{SECRET_AZURE_OPENAI_ENDPOINT}}
