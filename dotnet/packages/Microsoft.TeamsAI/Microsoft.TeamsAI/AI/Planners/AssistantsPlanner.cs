@@ -2,6 +2,7 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
@@ -52,7 +53,6 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             };
             _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<AssistantsPlanner<TState>>();
             _client = _CreateClient(options.ApiKey, options.Endpoint);
-
         }
 
         /// <summary>
@@ -151,7 +151,8 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             // Loop until the last run is completed
             while (true)
             {
-                AsyncPageableCollection<ThreadRun>? runs = _client.GetRunsAsync(threadId, ListOrder.NewestFirst, cancellationToken);
+                RunCollectionOptions options = new() { Order = ListOrder.NewestFirst };
+                AsyncPageCollection<ThreadRun>? runs = _client.GetRunsAsync(threadId, options, cancellationToken);
 
                 if (runs == null)
                 {
@@ -159,7 +160,7 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
                 }
 
                 // TODO: Confirm pointer is on the first object.
-                ThreadRun? run = runs.GetAsyncEnumerator().Current;
+                ThreadRun? run = runs.GetAllValuesAsync().GetAsyncEnumerator().Current;
                 if (run == null || _IsRunCompleted(run))
                 {
                     return;
@@ -173,8 +174,14 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
         private async Task<Plan> _GeneratePlanFromMessagesAsync(string threadId, string lastMessageId, CancellationToken cancellationToken)
         {
             // Find the new messages
-            AsyncPageableCollection<ThreadMessage> messages = _client.GetMessagesAsync(threadId, ListOrder.NewestFirst, cancellationToken);
+            MessageCollectionOptions options = new()
+            {
+                Order = ListOrder.NewestFirst
+            };
+            IAsyncEnumerable<ThreadMessage> messages = _client.GetMessagesAsync(threadId, options, cancellationToken).GetAllValuesAsync();
             List<ThreadMessage> newMessages = new();
+
+
             await foreach (ThreadMessage message in messages)
             {
                 if (string.Equals(message.Id, lastMessageId))
@@ -196,10 +203,8 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             {
                 foreach (MessageContent content in message.Content)
                 {
-                    if (content.Text != null)
-                    {
-                        plan.Commands.Add(new PredictedSayCommand(content.Text ?? string.Empty));
-                    }
+                    ChatMessage chatMessage = new AssistantsMessage(content);
+                    plan.Commands.Add(new PredictedSayCommand(chatMessage));
                 }
             }
             return plan;

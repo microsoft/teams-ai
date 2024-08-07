@@ -43,13 +43,43 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
                     {{
                         ""type"": ""text"",
                         ""text"": {{
-                        ""value"": ""{message}"",
-                        ""annotations"": []
+                            ""value"": ""{message}"",
+                            ""annotations"": []
                         }}
                     }}
                 ]
             }}";
             return ModelReaderWriter.Read<ThreadMessage>(BinaryData.FromString(json))!;
+        }
+
+        public static MessageContent CreateMessageContent(string message, string fileId)
+        {
+            var json = @$"{{
+                ""id"": ""test"",
+                ""thread_id"": ""test"",
+                ""created_at"": 0,
+                ""content"": [
+                    {{
+                        ""type"": ""text"",
+                        ""text"": {{
+                            ""value"": ""{message}"",
+                            ""annotations"": [
+                                {{
+                                    ""type"": ""file_citation"",
+                                    ""file_citation"": {{
+                                        ""file_id"": ""{fileId}""
+                                    }}
+                                }}
+                            ]
+                        }}
+                    }}
+                ]
+            }}";
+
+            // Unable to directly read `MessageContent`.
+            var threadMessage = ModelReaderWriter.Read<ThreadMessage>(BinaryData.FromString(json))!;
+
+            return threadMessage.Content[0];
         }
 
         public static ThreadRun CreateThreadRun(string threadId, string runStatus, string? runId = null, IList<RequiredAction> requiredActions = null!)
@@ -107,23 +137,27 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
         }
     }
 
-    internal sealed class TestAsyncPageableCollection<T> : AsyncPageableCollection<T> where T : class
+    internal sealed class TestAsyncPageCollection<T> : AsyncPageCollection<T> where T : class
     {
         public List<T> Items;
-
+        private List<PageResult<T>> _result;
         internal PipelineResponse _pipelineResponse;
 
-        public TestAsyncPageableCollection(List<T> items, PipelineResponse response)
+        public TestAsyncPageCollection(List<T> items, PipelineResponse response)
         {
             Items = items;
             _pipelineResponse = response;
+            _result = new List<PageResult<T>>() { PageResult<T>.Create(Items, ContinuationToken.FromBytes(BinaryData.FromString("test")), null, response) };
         }
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public override async IAsyncEnumerable<ResultPage<T>> AsPages(string? continuationToken = null, int? pageSizeHint = null)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        protected override IAsyncEnumerator<PageResult<T>> GetAsyncEnumeratorCore(CancellationToken cancellationToken = default)
         {
-            yield return ResultPage<T>.Create(Items, null, _pipelineResponse);
+            return _result.ToAsyncEnumerable().GetAsyncEnumerator();
+        }
+
+        protected override Task<PageResult<T>> GetCurrentPageAsyncCore()
+        {
+            return Task.FromResult(_result[0]);
         }
     }
 }
