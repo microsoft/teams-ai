@@ -10,7 +10,7 @@ import { TurnContext } from 'botbuilder';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-import { MonologueAugmentation, SequenceAugmentation } from '../augmentations';
+import { MonologueAugmentation, SequenceAugmentation, ToolsAugmentation } from '../augmentations';
 import { DataSource } from '../dataSources';
 import { Memory } from '../MemoryFork';
 import { Tokenizer } from '../tokenizers';
@@ -442,6 +442,8 @@ export class PromptManager implements PromptFunctions {
                 case 'sequence':
                     template.augmentation = new SequenceAugmentation(template.actions ?? []);
                     break;
+                case 'tools':
+                    template.augmentation = new ToolsAugmentation();
             }
 
             // Append the augmentations prompt section
