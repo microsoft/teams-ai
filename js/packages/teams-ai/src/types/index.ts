@@ -7,5 +7,4 @@
  */
 
 export * from './CompletionConfig';
-export * from './OpenAIFunction';
 export * from './PromptResponse';
