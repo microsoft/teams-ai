@@ -409,7 +409,7 @@ export class AI<TState extends TurnState = TurnState> {
                 const cmd = plan.commands[i];
                 switch (cmd.type) {
                     case 'DO': {
-                        const { action } = cmd as PredictedDoCommand;
+                        const { action, actionId } = cmd as PredictedDoCommand;
                         if (this._actions.has(action)) {
                             // Call action handler
                             const handler = this._actions.get(action)!.handler;
@@ -418,6 +418,12 @@ export class AI<TState extends TurnState = TurnState> {
                                 .handler(context, state, { handler, ...(cmd as PredictedDoCommand) }, action);
                             should_loop = output.length > 0;
                             state.temp.actionOutputs[action] = output;
+
+                            // Set output for action call
+                            if (actionId) {
+                                should_loop = true;
+                                state.temp.actionOutputs[actionId] = output;
+                            }
                         } else {
                             // Redirect to UnknownAction handler
                             output = await this._actions
