@@ -87,10 +87,10 @@ const model = new OpenAIModel({
     defaultModel: 'gpt-3.5-turbo',
 
     // Azure OpenAI Support
-    // azureApiKey: process.env.AZURE_OPENAI_KEY!,
-    // azureDefaultDeployment: 'gpt-3.5-turbo',
-    // azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
-    // azureApiVersion: '2023-03-15-preview',
+    azureApiKey: process.env.AZURE_OPENAI_KEY!,
+    azureDefaultDeployment: 'gpt-3.5-turbo',
+    azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
+    azureApiVersion: '2023-03-15-preview',
 
     // Request logging
     logRequests: true
