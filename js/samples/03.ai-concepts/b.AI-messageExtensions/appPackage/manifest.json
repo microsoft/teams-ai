@@ -5,7 +5,7 @@
     "id": "${{TEAMS_APP_ID}}",
     "packageName": "com.package.name",
     "name": {
-        "short": "AI ME-${{TEAMSFX_ENV}}",
+        "short": "AI ME${{APP_NAME_SUFFIX}}",
         "full": "AI Message Extensions"
     },
     "developer": {

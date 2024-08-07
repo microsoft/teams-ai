@@ -43,8 +43,8 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
                     {{
                         ""type"": ""text"",
                         ""text"": {{
-                            ""value"": ""{message}"",
-                            ""annotations"": []
+                        ""value"": ""{message}"",
+                        ""annotations"": []
                         }}
                     }}
                 ]
