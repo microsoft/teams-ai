@@ -35,12 +35,12 @@ const DEFAULT_ASSISTANTS_STATE_VARIABLE = 'conversation.assistants_state';
 /**
  * @private
  */
-const SUBMIT_TOOL_OUTPUTS_VARIABLE = 'temp.submit_tool_outputs';
+const SUBMIT_TOOL_OUTPUTS_VARIABLE = 'temp.submitToolOutputs';
 
 /**
  * @private
  */
-const SUBMIT_TOOL_OUTPUTS_MAP = 'temp.submit_tool_map';
+const SUBMIT_TOOL_OUTPUTS_MAP = 'temp.submitToolMap';
 
 /**
  * Options for configuring the AssistantsPlanner.
@@ -378,7 +378,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
                             content: content.text.value,
                             context: {
                                 intent: '',
-                                citations: content.text.annotations.map(annotation => ({
+                                citations: content.text.annotations.map((annotation) => ({
                                     title: '',
                                     url: '',
                                     filepath: '',

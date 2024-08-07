@@ -7,3 +7,9 @@ dotnet_diagnostic.VSTHRD111.severity = none # Use .ConfigureAwait(bool)
 
 # CA1859: Use concrete types when possible for improved performance
 dotnet_diagnostic.CA1859.severity = none
+
+# CS0618: Type or member is obsolete
+dotnet_diagnostic.CS0618.severity = none
+
+# IDE0090: Use 'new(...)'
+dotnet_diagnostic.IDE0090.severity = none
