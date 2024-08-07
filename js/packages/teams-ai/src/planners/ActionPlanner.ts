@@ -12,11 +12,11 @@ import { AI } from '../AI';
 import { DefaultAugmentation } from '../augmentations';
 import { Memory } from '../MemoryFork';
 import { PromptCompletionModel } from '../models';
-import { PromptTemplate, PromptManager } from '../prompts';
+import { PromptTemplate, PromptManager, Message } from '../prompts';
 import { Tokenizer } from '../tokenizers';
 import { TurnState } from '../TurnState';
 import { Utilities } from '../Utilities';
-import { PromptResponse } from '../types';
+import { ActionCall, PromptResponse } from '../types';
 import { PromptResponseValidator } from '../validators';
 
 import { LLMClient } from './LLMClient';
@@ -262,8 +262,25 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
             startStreamingMessage: this._options.startStreamingMessage
         });
 
+        this.addActionOutputs(memory, history_variable, client);
+
         // Complete prompt
         return await client.completePrompt(context, memory, this.prompts);
+    }
+
+    private addActionOutputs(memory: Memory, historyVariable: string, client: LLMClient): void {
+        const history: Message[] = memory.getValue(historyVariable);
+
+        if (history && history.length > 0) {
+            // Submit action outputs
+            const actionOutputs: string[] = memory.getValue('temp.actionOutputs') ?? [];
+            const actionCalls: ActionCall[] = history[history.length - 1].action_calls ?? [];
+
+            for (const actionCall of actionCalls) {
+                const output = actionOutputs[actionCall.id as unknown as number];
+                client.addActionOutputToHistory(memory, actionCall.id, output);
+            }
+        }
     }
 
     /**

@@ -422,7 +422,7 @@ export class AI<TState extends TurnState = TurnState> {
                             // Set output for action call
                             if (actionId) {
                                 should_loop = true;
-                                state.temp.actionOutputs[actionId] = output;
+                                state.temp.actionOutputs[actionId] = output ?? '';
                             }
                         } else {
                             // Redirect to UnknownAction handler
