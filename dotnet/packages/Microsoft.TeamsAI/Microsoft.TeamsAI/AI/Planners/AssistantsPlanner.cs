@@ -151,8 +151,7 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             // Loop until the last run is completed
             while (true)
             {
-                RunCollectionOptions options = new() { Order = ListOrder.NewestFirst };
-                AsyncPageCollection<ThreadRun>? runs = _client.GetRunsAsync(threadId, options, cancellationToken);
+                AsyncPageableCollection<ThreadRun>? runs = _client.GetRunsAsync(threadId, ListOrder.NewestFirst, cancellationToken);
 
                 if (runs == null)
                 {
@@ -160,7 +159,7 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
                 }
 
                 // TODO: Confirm pointer is on the first object.
-                ThreadRun? run = runs.GetAllValuesAsync().GetAsyncEnumerator().Current;
+                ThreadRun? run = runs.GetAsyncEnumerator().Current;
                 if (run == null || _IsRunCompleted(run))
                 {
                     return;
@@ -174,14 +173,8 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
         private async Task<Plan> _GeneratePlanFromMessagesAsync(string threadId, string lastMessageId, CancellationToken cancellationToken)
         {
             // Find the new messages
-            MessageCollectionOptions options = new()
-            {
-                Order = ListOrder.NewestFirst
-            };
-            IAsyncEnumerable<ThreadMessage> messages = _client.GetMessagesAsync(threadId, options, cancellationToken).GetAllValuesAsync();
+            AsyncPageableCollection<ThreadMessage> messages = _client.GetMessagesAsync(threadId, ListOrder.NewestFirst, cancellationToken);
             List<ThreadMessage> newMessages = new();
-
-
             await foreach (ThreadMessage message in messages)
             {
                 if (string.Equals(message.Id, lastMessageId))

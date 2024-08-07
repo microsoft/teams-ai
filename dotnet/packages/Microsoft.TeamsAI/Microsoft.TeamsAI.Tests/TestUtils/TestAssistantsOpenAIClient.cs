@@ -76,7 +76,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return newMessage;
         }
 
-        public override AsyncPageCollection<ThreadMessage> GetMessagesAsync(string threadId, MessageCollectionOptions options, CancellationToken cancellationToken = default)
+        public override AsyncPageableCollection<ThreadMessage> GetMessagesAsync(string threadId, ListOrder? resultOrder = null, CancellationToken cancellationToken = default)
         {
             while (RemainingMessages.Count > 0)
             {
@@ -86,13 +86,12 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
 
             // Sorted by oldest first
             List<ThreadMessage> messages = Messages[threadId].ToList();
-            ListOrder? resultOrder = options.Order;
             if (resultOrder != null && resultOrder.Value == ListOrder.NewestFirst)
             {
                 messages.Reverse();
             }
 
-            return new TestAsyncPageCollection<ThreadMessage>(messages, Mock.Of<PipelineResponse>());
+            return new TestAsyncPageableCollection<ThreadMessage>(messages, Mock.Of<PipelineResponse>());
         }
 
         public override Task<ClientResult<ThreadRun>> CreateRunAsync(string threadId, string assistantId, RunCreationOptions createRunOptions, CancellationToken cancellationToken = default)
@@ -153,14 +152,14 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return runWithUpdatedStatus;
         }
 
-        public override AsyncPageCollection<ThreadRun> GetRunsAsync(string threadId, RunCollectionOptions options, CancellationToken cancellationToken = default)
+        public override AsyncPageableCollection<ThreadRun> GetRunsAsync(string threadId, ListOrder? resultOrder = null, CancellationToken cancellationToken = default)
         {
-            AsyncPageCollection<ThreadRun> response;
+            AsyncPageableCollection<ThreadRun> response;
 
             // AssistantsPlanner only needs the get the latest.
             if (Runs[threadId].Count() == 0)
             {
-                response = new TestAsyncPageCollection<ThreadRun>(new List<ThreadRun>(), Mock.Of<PipelineResponse>());
+                response = new TestAsyncPageableCollection<ThreadRun>(new List<ThreadRun>(), Mock.Of<PipelineResponse>());
                 return response;
             }
 
@@ -168,7 +167,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             ThreadRun run = Runs[threadId][lastIndex];
             ThreadRun runWithUpdatedStatus = _GetRun(threadId, run.Id)!;
 
-            response = new TestAsyncPageCollection<ThreadRun>(new List<ThreadRun>() { runWithUpdatedStatus }, Mock.Of<PipelineResponse>());
+            response = new TestAsyncPageableCollection<ThreadRun>(new List<ThreadRun>() { runWithUpdatedStatus }, Mock.Of<PipelineResponse>());
             return response;
         }
 

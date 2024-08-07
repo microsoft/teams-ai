@@ -137,27 +137,23 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
         }
     }
 
-    internal sealed class TestAsyncPageCollection<T> : AsyncPageCollection<T> where T : class
+    internal sealed class TestAsyncPageableCollection<T> : AsyncPageableCollection<T> where T : class
     {
         public List<T> Items;
-        private List<PageResult<T>> _result;
+
         internal PipelineResponse _pipelineResponse;
 
-        public TestAsyncPageCollection(List<T> items, PipelineResponse response)
+        public TestAsyncPageableCollection(List<T> items, PipelineResponse response)
         {
             Items = items;
             _pipelineResponse = response;
-            _result = new List<PageResult<T>>() { PageResult<T>.Create(Items, ContinuationToken.FromBytes(BinaryData.FromString("test")), null, response) };
         }
 
-        protected override IAsyncEnumerator<PageResult<T>> GetAsyncEnumeratorCore(CancellationToken cancellationToken = default)
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public override async IAsyncEnumerable<ResultPage<T>> AsPages(string? continuationToken = null, int? pageSizeHint = null)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
-            return _result.ToAsyncEnumerable().GetAsyncEnumerator();
-        }
-
-        protected override Task<PageResult<T>> GetCurrentPageAsyncCore()
-        {
-            return Task.FromResult(_result[0]);
+            yield return ResultPage<T>.Create(Items, null, _pipelineResponse);
         }
     }
 }
