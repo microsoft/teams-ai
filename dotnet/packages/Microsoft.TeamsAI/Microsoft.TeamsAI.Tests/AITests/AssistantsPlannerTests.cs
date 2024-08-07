@@ -8,7 +8,7 @@ using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using System.Reflection;
 using Microsoft.Teams.AI.AI.Planners;
-using Azure.AI.OpenAI.Assistants;
+using OpenAI.Assistants;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
@@ -99,7 +99,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             testClient.RemainingMessages.Enqueue("welcome");
 
             AssistantThread thread = await testClient.CreateThreadAsync(new(), CancellationToken.None);
-            await testClient.CreateRunAsync(thread.Id, AssistantsModelFactory.CreateRunOptions(), CancellationToken.None);
+            await testClient.CreateRunAsync(thread.Id, "", OpenAIModelFactory.CreateRunOptions(), CancellationToken.None);
             turnState.ThreadId = thread.Id;
 
             // Act
@@ -219,8 +219,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var aiOptions = new AIOptions<AssistantsState>(planner);
             var ai = new AI<AssistantsState>(aiOptions);
 
-            var functionToolCall = AssistantsModelFactory.RequiredFunctionToolCall("test-tool-id", "test-action", "{}");
-            var requiredAction = AssistantsModelFactory.SubmitToolOutputsAction(new List<RequiredToolCall>{ functionToolCall });
+            var requiredAction = OpenAIModelFactory.CreateRequiredAction("test-tool-id", "test-action", "{}");
 
             testClient.RemainingActions.Enqueue(requiredAction);
             testClient.RemainingRunStatus.Enqueue("requires_action");
@@ -267,8 +266,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var aiOptions = new AIOptions<AssistantsState>(planner);
             var ai = new AI<AssistantsState>(aiOptions);
 
-            var functionToolCall = AssistantsModelFactory.RequiredFunctionToolCall("test-tool-id", "test-action", "{}");
-            var requiredAction = AssistantsModelFactory.SubmitToolOutputsAction(new List<RequiredToolCall> { functionToolCall });
+            var requiredAction = OpenAIModelFactory.CreateRequiredAction("test-tool-id", "test-action", "{}");
 
             testClient.RemainingActions.Enqueue(requiredAction);
             testClient.RemainingRunStatus.Enqueue("requires_action");
@@ -316,9 +314,9 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var ai = new AI<AssistantsState>(aiOptions);
 
             testClient.RemainingRunStatus.Enqueue("completed");
-            testClient.RemainingMessages.Enqueue("message 2");
-            testClient.RemainingMessages.Enqueue("message 1");
             testClient.RemainingMessages.Enqueue("welcome");
+            testClient.RemainingMessages.Enqueue("message 1");
+            testClient.RemainingMessages.Enqueue("message 2");
 
             // Act
             var plan = await planner.ContinueTaskAsync(turnContextMock.Object, turnState, ai, CancellationToken.None);
