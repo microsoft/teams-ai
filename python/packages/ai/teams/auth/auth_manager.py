@@ -65,7 +65,7 @@ class AuthManager(Generic[StateT]):
         token: Optional[str] = await auth.get_token(context)
         res = SignInResponse("pending")
 
-        if token:
+        if token and not self._is_verify_state_activity(context):
             cast(TempState, state.temp).auth_tokens[key] = token
             return SignInResponse("complete")
 
