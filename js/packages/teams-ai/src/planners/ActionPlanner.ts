@@ -271,7 +271,7 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
     private addActionOutputs(memory: Memory, historyVariable: string, client: LLMClient): void {
         const history: Message[] = memory.getValue(historyVariable);
 
-        if (history && history.length > 0) {
+        if (history && history.length > 1) {
             // Submit action outputs
             const actionOutputs: string[] = memory.getValue('temp.actionOutputs') ?? [];
             const actionCalls: ActionCall[] = history[history.length - 1].action_calls ?? [];
