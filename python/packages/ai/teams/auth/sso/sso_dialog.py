@@ -61,10 +61,15 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
             if hasattr(res.result, "token"):
                 return cast(str, getattr(res.result, "token"))
 
-            return await self.sign_in(context, state)
+            # Ensure we do not call sign_in recursively indefinitely
+            if not getattr(state, 'sign_in_retries', 0):
+                setattr(state, 'sign_in_retries', 1)
+                return await self.sign_in(context, state)
+            else:
+                return None
 
         return None
-    
+
     async def sign_out(self, context: TurnContext, state: StateT) -> None:
         if self.id in state.conversation:
             del state.conversation[self.id]
