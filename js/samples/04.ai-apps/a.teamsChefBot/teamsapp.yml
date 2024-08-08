@@ -20,15 +20,6 @@ provision:
     writeToEnvironmentFile:
       teamsAppId: TEAMS_APP_ID
 
-  # Automates the creation an Azure AD app registration which is required for a bot.
-  # The Bot ID (AAD app client ID) and Bot Password (AAD app client secret) are saved to an environment file.
-  - uses: botAadApp/create
-    with:
-      name: TeamsChef${{APP_NAME_SUFFIX}}
-    writeToEnvironmentFile:
-      botId: BOT_ID
-      botPassword: SECRET_BOT_PASSWORD
-
   # Automates the creation of infrastructure defined in ARM templates to host the bot.
   # The created resource IDs are saved to an environment file.
   - uses: arm/deploy
@@ -38,7 +29,7 @@ provision:
       templates:
         - path: ./infra/azure.bicep
           parameters: ./infra/azure.parameters.json
-          deploymentName: Create-resources-for-tab
+          deploymentName: Create-resources-for-bot
       bicepCliVersion: v0.9.1
 
   # Optional: Automates schema and error checking of the Teams app manifest and outputs the results in the console.

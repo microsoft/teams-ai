@@ -32,9 +32,10 @@ config({ path: ENV_FILE });
 const adapter = new TeamsAdapter(
     {},
     new ConfigurationServiceClientCredentialFactory({
+        MicrosoftAppType: process.env.BOT_TYPE,
         MicrosoftAppId: process.env.BOT_ID,
         MicrosoftAppPassword: process.env.BOT_PASSWORD,
-        MicrosoftAppType: 'MultiTenant'
+        MicrosoftAppTenantId: process.env.BOT_TENANT_ID
     })
 );
 
