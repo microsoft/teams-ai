@@ -118,6 +118,24 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         self.assertEqual(result.length, 30)
         self.assertFalse(result.too_long)
 
+    async def test_render_as_messages_remove_tool_message(self):
+        self.memory.conversation["history"] = [
+            Message(role="tool", content="result", action_call_id="123"),
+            Message(role="assistant", content="Hi! How can I help you?"),
+        ]
+        conversation_history = ConversationHistorySection("conversation.history")
+        result = await conversation_history.render_as_messages(
+            self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 100
+        )
+        self.assertEqual(
+            result.output,
+            [
+                Message(role="assistant", content='"Hi! How can I help you?"'),
+            ],
+        )
+        self.assertEqual(result.length, 12)
+        self.assertFalse(result.too_long)
+
     async def test_render_as_messages_include_initial_line_when_required(self):
         conversation_history = ConversationHistorySection("conversation.history", required=True)
         result = await conversation_history.render_as_messages(

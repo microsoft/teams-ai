@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar, Union
+from typing import Generic, Optional, TypeVar
 
 from botbuilder.core import TurnContext
 
@@ -27,12 +27,12 @@ class Augmentation(PromptResponseValidator, ABC, Generic[ValueT]):
     """
 
     @abstractmethod
-    def create_prompt_section(self) -> Union[PromptSection, None]:
+    def create_prompt_section(self) -> Optional[PromptSection]:
         """
         Creates an optional prompt section for the augmentation.
 
         Returns:
-        Union[PromptSection, None]: The prompt section.
+        Optional[PromptSection]: The prompt section.
         """
 
     @abstractmethod

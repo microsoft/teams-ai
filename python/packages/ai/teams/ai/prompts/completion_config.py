@@ -8,6 +8,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Literal, Optional
 
+from openai.types import chat
+
 
 # pylint: disable=too-many-instance-attributes
 @dataclass
@@ -58,6 +60,12 @@ class CompletionConfig:
         top_p (float): The model's top_p as a number between 0 and 2.
           Defaults to 0.
 
+        tool_choice (Optional[chat.ChatCompletionToolChoiceOptionParam]):
+          Defines function calling behavior. Defaults to "auto".
+
+        parallel_tool_calls (Optional[bool]): Configures parallel function calling.
+          Defaults to True.
+
         data_sources (Optional[List[object]]): List of data sources to ground the answer in.
     """
 
@@ -73,6 +81,8 @@ class CompletionConfig:
     stop_sequences: Optional[List[str]] = None
     temperature: float = 0
     top_p: float = 0
+    tool_choice: Optional[chat.ChatCompletionToolChoiceOptionParam] = "auto"
+    parallel_tool_calls: Optional[bool] = True
     data_sources: Optional[List[object]] = None
 
     @classmethod
@@ -90,5 +100,7 @@ class CompletionConfig:
             stop_sequences=data.get("stop_sequences"),
             temperature=data.get("temperature", 0),
             top_p=data.get("top_p", 0),
+            tool_choice=data.get("tool_choice", "auto"),
+            parallel_tool_calls=data.get("parallel_tool_calls", True),
             data_sources=data.get("data_sources", None),
         )

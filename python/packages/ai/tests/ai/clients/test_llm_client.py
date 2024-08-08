@@ -82,29 +82,19 @@ class TestLLMClient(IsolatedAsyncioTestCase):
         return context
 
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
-    async def test_add_function_result_object(self, mock_async_openai):
+    async def test_add_action_output(self, mock_async_openai):
         context = self.create_mock_context()
         state = await TurnState[ConversationState, UserState, TempState].load(context)
 
         model = OpenAIModel(OpenAIModelOptions(api_key="", default_model="model"))
         client = LLMClient(LLMClientOptions(model))
-        client.add_function_result_to_history(memory=state, name="name", results="results")
+        state.set(client.options.history_variable, [Message(role="assistant", content="results")])
+        client.add_action_output_to_history(memory=state, id="123", results="results")
 
-        expected_history = [Message(role="function", name="name", content='"results"')]
-
-        self.assertTrue(mock_async_openai.called)
-        self.assertEqual(state.get(client.options.history_variable), expected_history)
-
-    @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
-    async def test_add_function_result_bool(self, mock_async_openai):
-        context = self.create_mock_context()
-        state = await TurnState[ConversationState, UserState, TempState].load(context)
-
-        model = OpenAIModel(OpenAIModelOptions(api_key="", default_model="model"))
-        client = LLMClient(LLMClientOptions(model))
-        client.add_function_result_to_history(memory=state, name="name", results=True)
-
-        expected_history = [Message(role="function", name="name", content="true")]
+        expected_history = [
+            Message(role="assistant", content="results"),
+            Message(role="tool", action_call_id="123", content="results"),
+        ]
 
         self.assertTrue(mock_async_openai.called)
         self.assertEqual(state.get(client.options.history_variable), expected_history)

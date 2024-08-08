@@ -17,6 +17,7 @@ from ..augmentations.default_augmentation import DefaultAugmentation
 from ..clients import LLMClient, LLMClientOptions
 from ..models.prompt_completion_model import PromptCompletionModel
 from ..models.prompt_response import PromptResponse
+from ..prompts.message import Message
 from ..prompts.prompt_functions import PromptFunctions
 from ..prompts.prompt_manager import PromptManager
 from ..prompts.prompt_template import PromptTemplate
@@ -129,17 +130,19 @@ class ActionPlanner(Planner[StateT]):
 
         template = await self._options.prompts.get_prompt(name)
         include_history = template.config.completion.include_history
+        history_var = f"conversation.{name}_history" if include_history else f"temp.{name}_history"
+
         client = LLMClient(
             LLMClientOptions(
                 model=self._options.model,
-                history_variable=(
-                    f"conversation.{name}_history" if include_history else f"temp.{name}_history"
-                ),
+                history_variable=history_var,
                 input_variable="temp.input",
                 validator=validator,
                 logger=self._options.logger,
             )
         )
+
+        self._add_action_outputs(memory, history_var, client)
 
         return await client.complete_prompt(
             context=context,
@@ -148,6 +151,18 @@ class ActionPlanner(Planner[StateT]):
             tokenizer=self._options.tokenizer,
             template=template,
         )
+
+    def _add_action_outputs(self, memory: MemoryBase, history_var: str, client: LLMClient) -> None:
+        history: List[Message] = memory.get(history_var) or []
+
+        if history and len(history) > 1:
+            # Submit tool outputs
+            action_outputs = memory.get("temp.action_outputs") or {}
+            action_calls = history[-1].action_calls or []
+
+            for action_call in action_calls:
+                output = action_outputs[action_call.id]
+                client.add_action_output_to_history(memory, action_call.id, output)
 
     def add_semantic_function(
         self, prompt: Union[str, PromptTemplate], _validator: Optional[PromptResponseValidator]
