@@ -2,6 +2,7 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
@@ -52,7 +53,6 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             };
             _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<AssistantsPlanner<TState>>();
             _client = _CreateClient(options.ApiKey, options.Endpoint);
-
         }
 
         /// <summary>
@@ -196,10 +196,8 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             {
                 foreach (MessageContent content in message.Content)
                 {
-                    if (content.Text != null)
-                    {
-                        plan.Commands.Add(new PredictedSayCommand(content.Text ?? string.Empty));
-                    }
+                    ChatMessage chatMessage = new AssistantsMessage(content);
+                    plan.Commands.Add(new PredictedSayCommand(chatMessage));
                 }
             }
             return plan;

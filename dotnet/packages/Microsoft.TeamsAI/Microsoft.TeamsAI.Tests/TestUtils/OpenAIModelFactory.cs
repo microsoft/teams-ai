@@ -52,6 +52,36 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return ModelReaderWriter.Read<ThreadMessage>(BinaryData.FromString(json))!;
         }
 
+        public static MessageContent CreateMessageContent(string message, string fileId)
+        {
+            var json = @$"{{
+                ""id"": ""test"",
+                ""thread_id"": ""test"",
+                ""created_at"": 0,
+                ""content"": [
+                    {{
+                        ""type"": ""text"",
+                        ""text"": {{
+                            ""value"": ""{message}"",
+                            ""annotations"": [
+                                {{
+                                    ""type"": ""file_citation"",
+                                    ""file_citation"": {{
+                                        ""file_id"": ""{fileId}""
+                                    }}
+                                }}
+                            ]
+                        }}
+                    }}
+                ]
+            }}";
+
+            // Unable to directly read `MessageContent`.
+            var threadMessage = ModelReaderWriter.Read<ThreadMessage>(BinaryData.FromString(json))!;
+
+            return threadMessage.Content[0];
+        }
+
         public static ThreadRun CreateThreadRun(string threadId, string runStatus, string? runId = null, IList<RequiredAction> requiredActions = null!)
         {
             var raJson = "{}";
