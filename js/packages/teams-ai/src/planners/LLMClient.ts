@@ -244,35 +244,6 @@ export class LLMClient<TContent = any> {
     }
 
     /**
-     * Adds a result from a `function_call` to the history.
-     * @param {Memory} memory - An interface for accessing state values.
-     * @param {string} name - Name of the function that was called.
-     * @param {any} results - Results returned by the function.
-     */
-    public addFunctionResultToHistory(memory: Memory, name: string, results: any): void {
-        // Convert content to string
-        let content = '';
-        if (typeof results === 'object') {
-            if (typeof results.toISOString == 'function') {
-                content = results.toISOString();
-            } else {
-                content = JSON.stringify(results);
-            }
-        } else if (results !== undefined && results !== null) {
-            content = results.toString();
-        }
-
-        // Add result to history
-        const { history_variable } = this.options;
-        const history: Message[] = memory.getValue(history_variable) ?? [];
-        history.push({ role: 'function', name, content });
-        if (history.length > this.options.max_history_messages) {
-            history.splice(0, history.length - this.options.max_history_messages);
-        }
-        memory.setValue(history_variable, history);
-    }
-
-    /**
      * Completes a prompt.
      * @remarks
      * The `input` parameter is optional but if passed in, will be assigned to memory using the
