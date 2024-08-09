@@ -99,17 +99,12 @@ export interface CompletionConfig {
     top_p: number;
 
     /**
-     * Optional. If true, function calling will be enabled with the LLM. Defaults to false.
-     */
-    include_tools?: boolean;
-
-    /**
      * Optional. Defines the tools function calling behavior. Defaults to 'auto'.
      */
     tool_choice?: Chat.ChatCompletionToolChoiceOption;
 
     /**
-     * Opetional. Enables parallel tools function calling. Defaults to true.
+     * Optional. Enables parallel tools function calling. Defaults to true.
      */
     parallel_tool_calls?: boolean;
 }
