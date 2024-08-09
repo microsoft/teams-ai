@@ -417,7 +417,6 @@ export class OpenAIModel implements PromptCompletionModel {
     private convertMessages(messages: Message<string>[]): ChatCompletionMessageParam[] {
         const params: ChatCompletionMessageParam[] = [];
         // Iterate through the messages and check for action calls
-        // ikterate on result.output and add tool_calls to result.output.messages
         for (const message of messages) {
             let param: ChatCompletionMessageParam = {
                 role: 'user',
