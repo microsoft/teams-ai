@@ -19,6 +19,10 @@ describe('ConversationHistory', () => {
             { role: 'assistant', content: 'Hi! How can I help you?' },
             { role: 'user', content: "I'd like to book a flight" },
             { role: 'assistant', content: 'Sure, where would you like to go?' }
+        ],
+        toolHistory: [
+            { role: 'tool', content: 'result', action_call_id: '123123' },
+            { role: 'assistant', content: 'Hello' }
         ]
     };
 
@@ -93,6 +97,18 @@ describe('ConversationHistory', () => {
                 ]);
                 assert.equal(rendered.length, 9);
                 assert.equal(rendered.tooLong, true);
+            });
+        });
+
+        it('should remove messages with role tool correctly', async () => {
+            await adapter.sendTextToBot('test', async (context) => {
+                const state = await TestTurnState.create(context, { conversation });
+                const section = new ConversationHistory('conversation.toolHistory', 100);
+                const rendered = await section.renderAsMessages(context, state, functions, tokenizer, 100);
+                console.log(rendered);
+                assert.deepEqual(rendered.output, [{ role: 'assistant', content: 'Hello' }]);
+                assert.equal(rendered.length, 2);
+                assert.equal(rendered.tooLong, false);
             });
         });
     });

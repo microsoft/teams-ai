@@ -155,7 +155,7 @@ export class ConversationHistory extends PromptSectionBase {
         }
 
         // Remove completed partial action outputs
-        while (messages && messages[0].role === 'tool') {
+        while (messages.length > 0 && messages[0].role === 'tool') {
             messages.shift();
         }
 
