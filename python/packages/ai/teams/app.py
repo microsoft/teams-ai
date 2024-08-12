@@ -599,7 +599,7 @@ class Application(Bot, Generic[StateT]):
             return (
                 context.activity.type == ActivityTypes.invoke
                 and context.activity.name == "message/submitAction"
-                and context.activity.value.action_name == "feedback"
+                and context.activity.value["action_name"] == "feedback"
             )
 
         def __call__(
@@ -610,7 +610,7 @@ class Application(Bot, Generic[StateT]):
                     return False
 
                 feedback = context.activity.value
-                feedback.reply_to_id = context.activity.reply_to_id
+                feedback["reply_to_id"] = context.activity.reply_to_id
 
                 await func(context, state, feedback)
                 await context.send_activity(
