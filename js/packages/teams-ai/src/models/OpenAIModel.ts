@@ -372,8 +372,10 @@ export class OpenAIModel implements PromptCompletionModel {
             } else {
                 const actionCalls: ActionCall[] = [];
                 const responseMessage = (completion as ChatCompletion).choices![0].message;
+                const isToolsAugmentation =
+                    template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
                 // Log tool calls to be added to message of type Message<string> as action_calls
-                if (responseMessage?.tool_calls) {
+                if (isToolsAugmentation && responseMessage?.tool_calls) {
                     for (const toolCall of responseMessage.tool_calls) {
                         actionCalls.push({
                             id: toolCall.id,
@@ -422,11 +424,12 @@ export class OpenAIModel implements PromptCompletionModel {
                 role: 'user',
                 content: message.content ?? ''
             };
-            const toolCallParams: ChatCompletionMessageToolCall[] = [];
 
             if (message.name) {
                 param.name = message.name;
             }
+
+            const toolCallParams: ChatCompletionMessageToolCall[] = [];
 
             if (message.role === 'assistant') {
                 param = {

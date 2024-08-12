@@ -26,7 +26,7 @@ import { Augmentation } from './Augmentation';
  * To avoid using server-side tool-calling, do not set augmentation to 'tools' in `config.json`.
  * Server-side tool-calling is not compatible with other augmentation types.
  */
-export class ToolsAugmentation implements Augmentation<string | ActionCall[]> {
+export class ToolsAugmentation implements Augmentation<string> {
     /**
      * @returns {PromptSection|undefined} Returns an optional prompt section for the augmentation.
      */
@@ -71,7 +71,7 @@ export class ToolsAugmentation implements Augmentation<string | ActionCall[]> {
         const commands: PredictedCommand[] = [];
 
         if (response.message && response.message.action_calls) {
-            const actionToolCalls: ActionCall[] = response.message.action_calls ?? [];
+            const actionToolCalls: ActionCall[] = response.message.action_calls;
 
             for (const toolCall of actionToolCalls) {
                 let parameters;
@@ -87,6 +87,7 @@ export class ToolsAugmentation implements Augmentation<string | ActionCall[]> {
                 commands.push({
                     type: 'DO',
                     action: toolCall.function.name,
+                    id: toolCall.id,
                     parameters: parameters
                 } as PredictedDoCommand);
             }
