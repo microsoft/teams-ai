@@ -105,7 +105,6 @@ describe('ConversationHistory', () => {
                 const state = await TestTurnState.create(context, { conversation });
                 const section = new ConversationHistory('conversation.toolHistory', 100);
                 const rendered = await section.renderAsMessages(context, state, functions, tokenizer, 100);
-                console.log(rendered);
                 assert.deepEqual(rendered.output, [{ role: 'assistant', content: 'Hello' }]);
                 assert.equal(rendered.length, 2);
                 assert.equal(rendered.tooLong, false);

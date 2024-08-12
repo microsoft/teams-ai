@@ -77,9 +77,9 @@ export class ToolsAugmentation implements Augmentation<string | ActionCall[]> {
                 let parameters;
 
                 try {
-                    parameters = JSON.parse(toolCall.function.arguments);
+                    parameters = JSON.parse(toolCall.function.arguments) ?? {};
                 } catch (err) {
-                    console.error('ToolsAugmentation parameters:', parameters);
+                    console.error('ToolsAugmentation parameters:', toolCall.function.arguments);
                     console.error('ToolsAugmentation createPlanFromResponse: Error parsing tool arguments: ', err);
                     parameters = {};
                 }
