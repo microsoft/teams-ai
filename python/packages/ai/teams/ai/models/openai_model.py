@@ -12,10 +12,12 @@ from typing import Callable, List, Optional, Union
 
 import openai
 from botbuilder.core import TurnContext
-from openai.types import chat
+from openai import NOT_GIVEN
+from openai.types import chat, shared_params
+from openai.types.chat.chat_completion_message_tool_call_param import Function
 
 from ...state import MemoryBase
-from ..prompts.message import Message, MessageContext
+from ..prompts.message import ActionCall, ActionFunction, Message, MessageContext
 from ..prompts.prompt_functions import PromptFunctions
 from ..prompts.prompt_template import PromptTemplate
 from ..tokenizers import Tokenizer
@@ -124,11 +126,43 @@ class OpenAIModel(PromptCompletionModel):
         template: PromptTemplate,
     ) -> PromptResponse[str]:
         max_input_tokens = template.config.completion.max_input_tokens
+
+        # Setup tools if enabled
+        is_tools_aug = (
+            template.config.augmentation
+            and template.config.augmentation.augmentation_type == "tools"
+        )
+        tool_choice = (
+            template.config.completion.tool_choice
+            if template.config.completion.tool_choice is not None
+            else "auto"
+        )
+        parallel_tool_calls = (
+            template.config.completion.parallel_tool_calls
+            if template.config.completion.parallel_tool_calls is not None
+            else True
+        )
+        tools: List[chat.ChatCompletionToolParam] = []
+
+        # If tools is enabled, reformat actions to schema
+        if is_tools_aug and template.actions:
+            for action in template.actions:
+                curr_tool = chat.ChatCompletionToolParam(
+                    type="function",
+                    function=shared_params.FunctionDefinition(
+                        name=action.name,
+                        description=action.description or "",
+                        parameters=action.parameters or {},
+                    ),
+                )
+                tools.append(curr_tool)
+
         model = (
             template.config.completion.model
             if template.config.completion.model is not None
             else self._options.default_model
         )
+
         res = await template.prompt.render_as_messages(
             context=context,
             memory=memory,
@@ -156,13 +190,14 @@ class OpenAIModel(PromptCompletionModel):
                 chat.ChatCompletionUserMessageParam,
                 chat.ChatCompletionAssistantMessageParam,
                 chat.ChatCompletionSystemMessageParam,
+                chat.ChatCompletionToolMessageParam,
             ] = chat.ChatCompletionUserMessageParam(
                 role="user",
                 content=msg.content if msg.content is not None else "",
             )
 
             if msg.name:
-                param["name"] = msg.name
+                setattr(param, "name", msg.name)
 
             if msg.role == "assistant":
                 param = chat.ChatCompletionAssistantMessageParam(
@@ -170,8 +205,32 @@ class OpenAIModel(PromptCompletionModel):
                     content=msg.content if msg.content is not None else "",
                 )
 
+                tool_call_params: List[chat.ChatCompletionMessageToolCallParam] = []
+
+                if msg.action_calls and len(msg.action_calls) > 0:
+                    for tool_call in msg.action_calls:
+                        tool_call_params.append(
+                            chat.ChatCompletionMessageToolCallParam(
+                                id=tool_call.id,
+                                function=Function(
+                                    name=tool_call.function.name,
+                                    arguments=tool_call.function.arguments,
+                                ),
+                                type=tool_call.type,
+                            )
+                        )
+                    param["content"] = None
+                    param["tool_calls"] = tool_call_params
+
                 if msg.name:
                     param["name"] = msg.name
+
+            elif msg.role == "tool":
+                param = chat.ChatCompletionToolMessageParam(
+                    role="tool",
+                    tool_call_id=msg.action_call_id if msg.action_call_id else "",
+                    content=msg.content if msg.content else "",
+                )
             elif msg.role == "system":
                 param = chat.ChatCompletionSystemMessageParam(
                     role="system",
@@ -187,6 +246,7 @@ class OpenAIModel(PromptCompletionModel):
             extra_body = {}
             if template.config.completion.data_sources is not None:
                 extra_body["data_sources"] = template.config.completion.data_sources
+
             completion = await self._client.chat.completions.create(
                 messages=messages,
                 model=model,
@@ -195,17 +255,38 @@ class OpenAIModel(PromptCompletionModel):
                 top_p=template.config.completion.top_p,
                 temperature=template.config.completion.temperature,
                 max_tokens=template.config.completion.max_tokens,
+                tools=tools if len(tools) > 0 else NOT_GIVEN,
+                tool_choice=tool_choice if len(tools) > 0 else NOT_GIVEN,
+                parallel_tool_calls=parallel_tool_calls if len(tools) > 0 else NOT_GIVEN,
                 extra_body=extra_body,
             )
 
             if self._options.logger is not None:
                 self._options.logger.debug("COMPLETION:\n%s", completion.model_dump_json())
 
+            # Handle tools flow
+            action_calls = []
+            response_message = completion.choices[0].message
+            tool_calls = response_message.tool_calls
+
+            if is_tools_aug and tool_calls:
+                for curr_tool_call in tool_calls:
+                    action_calls.append(
+                        ActionCall(
+                            id=curr_tool_call.id,
+                            type=curr_tool_call.type,
+                            function=ActionFunction(
+                                name=curr_tool_call.function.name,
+                                arguments=curr_tool_call.function.arguments,
+                            ),
+                        )
+                    )
+
             input: Optional[Message] = None
             last_message = len(res.output) - 1
 
             # Skips the first message which is the prompt
-            if last_message > 0 and res.output[last_message].role == "user":
+            if last_message > 0 and res.output[last_message].role != "assistant":
                 input = res.output[last_message]
 
             return PromptResponse[str](
@@ -213,6 +294,7 @@ class OpenAIModel(PromptCompletionModel):
                 message=Message(
                     role=completion.choices[0].message.role,
                     content=completion.choices[0].message.content,
+                    action_calls=(action_calls if is_tools_aug and len(action_calls) > 0 else None),
                     context=(
                         MessageContext.from_dict(completion.choices[0].message.context)
                         if hasattr(completion.choices[0].message, "context")
