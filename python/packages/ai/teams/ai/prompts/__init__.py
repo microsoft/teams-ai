@@ -10,6 +10,8 @@ from .function_call import FunctionCall
 from .function_call_message import FunctionCallMessage
 from .function_response_message import FunctionResponseMessage
 from .message import (
+    ActionCall,
+    ActionFunction,
     Citation,
     ImageContentPart,
     ImageUrl,
@@ -41,6 +43,8 @@ __all__ = [
     "ImageUrl",
     "Message",
     "MessageContext",
+    "ActionCall",
+    "ActionFunction",
     "TextContentPart",
     "Prompt",
     "PromptFunction",
