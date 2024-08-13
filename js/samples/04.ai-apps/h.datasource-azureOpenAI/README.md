@@ -13,7 +13,7 @@ You can chat with your data in Azure AI Search, Azure Blob Storage, URL/web addr
     -   [Setting up your custom copilot in Azure OpenAI Studio](#setting-up-your-custom-copilot-in-azure-openai-studio)
     -   [Setting up and testing your custom copilot in Visual Studio Code](#setting-up-and-testing-your-custom-copilot-in-visual-studio-code)
     -   [Provisioning, Deploying, and Publishing your custom copilot](#provisioning-deploying-and-publishing-your-custom-copilot)
-        -   [Assigning Cognitive Service OpenAI User role to your deployed App Service resource](#assigning-cognitive-service-openai-user-role-to-your-deployed-app-service-resource)
+        -   [Assigning Cognitive Service OpenAI User role from your deployed custom copilot User Assigned Managed Identity to your Azure OpenAI resource](#assigning-cognitive-service-openai-user-role-from-your-deployed-custom-copilot-user-assigned-managed-identity-to-your-azure-openai-resource)
     -	[Supplementary Details and Tips](#supplementary-details-and-tips)
         -   [Enable your Custom Copilot for Group Chats and Channels](#enable-your-custom-copilot-for-group-chats-and-channels)
         -   [Enable Out of Scope Conversations](#enable-out-of-scope-conversations)
@@ -62,7 +62,7 @@ Note: Testing this sample requires that you are logged into Azure CLI and you ha
    
 1. Go to the location where you extracted your Teams app folder and select it.
 
-1. If you chose `API key` in data connection, manually copy and paste your Azure AI Search key in `src\prompts\chat\config.json` file. Your **Azure AI Search Key** can be found in Azure OpenAI Studio Playground by clicking the `View code` button and looking under **Azure Search Resource Key**. If you chose `system assigned managed identity`, you can skip this step. Learn more about different data connection options in the [Data connection section](https://review.learn.microsoft.com/en-us/azure/ai-services/openai/concepts/use-your-data?tabs=ai-search%2Ccopilot&branch=pr-en-us-277392#data-connection) .
+1. If you chose `API key` in data connection, manually copy and paste your Azure AI Search key in `src\prompts\chat\config.json` file. Your **Azure AI Search Key** can be found in Azure OpenAI Studio Playground by clicking the `View code` button and looking under **Azure Search Resource Key**. If you chose `system assigned managed identity`, you can skip this step. Learn more about different data connection options in the [Data connection section](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/use-your-data?tabs=ai-search%2Ccopilot#data-connection) .
    
 1. Open the Visual Studio Code terminal by selecting `View > Terminal` and log into Azure CLI selecting the Azure account that you assigned Cognitive Service OpenAI User role to. Use the following command to log in:
    ```bash
@@ -72,27 +72,26 @@ Note: Testing this sample requires that you are logged into Azure CLI and you ha
 1. To debug your app, press the `F5` key or from the left pane, select `RUN AND DEBUG ▷` (Ctrl+Shift+D) and then select `Debug in (Edge)`, `Debug in (Chrome)`, or `Debug in Test Tool` from the dropdown list.  Select `Run > Start Debugging` (F5). A webpage opens where you can chat with your custom copilot.
 	- Note: The citation experience is available in `Debug in (Edge)` or `Debug in (Chrome)` only.
 
-### Provisioning, Deploying, and Publishing your custom Copilot
-**IMPORTANT**: As this sample uses managed identity, for your custom copilot to generate responses you must assign Cognitive Service OpenAI User role to your custom copilot’s App Service resource group after deploying your app to Azure.
+### Provisioning, Deploying, and Publishing your custom copilot
+**IMPORTANT**: As this sample uses managed identity for your custom copilot to generate responses, you must assign Cognitive Service OpenAI User role from the custom copilot's User Assigned Managed Identity to your Azure OpenAI resource after deploying your app to Azure.
 
 1. [Provision your app](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/provision)
 1. [Deploy to Azure](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/deploy)
 1. [Publish to Teams](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/publish)
 
-After you've tested your copilot, you can provision, deploy, and publish your Teams app by selecting the Teams Toolkit Extension on the left pane in Visual Studio. Run the separate provision, deploy, and publish stages in Lifecycle section. You may be asked to sign into your Microsoft 365 account where you have permissions to upload custom apps and your Azure Account.
+After you've tested your copilot, you can provision, deploy, and publish your Teams app by selecting the Teams Toolkit Extension on the left pane in Visual Studio. Run the separate provision, deploy, and publish stages in Lifecycle section.
 
-### Assigning Cognitive Service OpenAI User role to your deployed App Service resource
-As this sample uses managed identity, you must enable assign Cognitive Service OpenAI User role to your custom copilot’s App Service resource group after deploying your app to Azure in order for your deployed custom copilot to receive responses from Azure OpenAI.
+You may be asked to sign into your Microsoft 365 account where you have permissions to upload custom apps and your Azure Account. You must use a Microsoft 365 account with the same tenant as your Azure account used during setup, as this app is securely configured for single-tenant usage.
+
+### Assigning Cognitive Service OpenAI User role from your deployed custom copilot User Assigned Managed Identity to your Azure OpenAI resource
+
+As this sample uses managed identity, you must assign Cognitive Service OpenAI User role from the custom copilot's User Assigned Managed Identity to your Azure OpenAI resource after deploying your app to Azure for your deployed custom copilot to receive responses from Azure OpenAI.
 
 1. Go to [Azure portal](https://portal.azure.com) and select resource groups
    
 1. Select the resource group you deployed your custom copilot to
    
-1. Select the `App Service` resource
-   
-1. Go to `settings > identity` and enable system assigned identity by selecting `On`
-   
-1. Select `Save` to enable system assigned identity.
+1. Select the `Managed Identity` resource
    
 1. Click `Azure role assignments`
    
@@ -102,13 +101,13 @@ As this sample uses managed identity, you must enable assign Cognitive Service O
    
 1. Under Subscription select the Azure subscription of your Azure OpenAI resource
    
-1. Under Resource group select your Azure OpenAI resource
+1. Under Resource group select the resource group with your Azure OpenAI resource
    
 1. Under Role select `Cognitive Service OpenAI user`
    
 1. Select `save` to finish assigning the role
 
-Now, your published custom copilot Teams app is ready for use.
+Now, your published custom copilot Teams app is ready for use in Teams accounts with the same tenant as the Azure account used during setup.
 
 ## Supplementary Details and Tips
 

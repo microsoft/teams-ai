@@ -1,16 +1,19 @@
-﻿using Azure;
-using Azure.AI.OpenAI.Assistants;
+﻿using OpenAI.Assistants;
 using Moq;
+using System.ClientModel;
+using System.ClientModel.Primitives;
+using OpenAI;
 
+#pragma warning disable OPENAI001
 namespace Microsoft.Teams.AI.Tests.TestUtils
 {
-    internal sealed class TestAssistantsOpenAIClient : AssistantsClient
+    internal sealed class TestAssistantsOpenAIClient : AssistantClient
     {
         public TestAssistantsOpenAIClient()
         {
         }
 
-        public Assistant Assistant { get; set; } = AssistantsModelFactory.Assistant();
+        public Assistant Assistant { get; set; } = OpenAIModelFactory.CreateAssistant();
 
         public List<AssistantThread> Threads { get; set; } = new();
 
@@ -34,53 +37,32 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             RemainingMessages.Clear();
         }
 
-        public override Task<Response<Assistant>> GetAssistantAsync(string assistantId, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(Response.FromValue(Assistant, Mock.Of<Response>()));
-        }
+        //public override Task<Response<Assistant>> GetAssistantAsync(string assistantId, CancellationToken cancellationToken = default)
+        //{
+        //    return Task.FromResult(Response.FromValue(Assistant, Mock.Of<Response>()));
+        //}
 
-        public override Task<Response<AssistantThread>> CreateThreadAsync(AssistantThreadCreationOptions options, CancellationToken cancellationToken = default)
+        public override Task<ClientResult<AssistantThread>> CreateThreadAsync(ThreadCreationOptions options, CancellationToken cancellationToken = default)
         {
-            AssistantThread newThread = AssistantsModelFactory.AssistantThread(Guid.NewGuid().ToString(), DateTimeOffset.Now);
+            AssistantThread newThread = OpenAIModelFactory.CreateAssistantThread(Guid.NewGuid().ToString(), DateTimeOffset.Now);
             Threads.Add(newThread);
 
             List<ThreadMessage> messages = new();
-            var annotations = new List<MessageTextAnnotation>() { AssistantsModelFactory.MessageTextAnnotation() };
-            foreach (var m in options.Messages)
-            {
-                ThreadMessage newMessage = AssistantsModelFactory.ThreadMessage(
-                    Guid.NewGuid().ToString(),
-                    DateTimeOffset.Now,
-                    newThread.Id,
-                    MessageRole.User,
-                    new List<MessageContent>() { AssistantsModelFactory.MessageTextContent(m.Content, annotations) },
-                    Assistant.Id,
-                    null,
-                    m.FileIds,
-                    null
-                );
-                messages.Add(newMessage);
-            }
-
             Messages.Add(newThread.Id, messages);
             Runs.Add(newThread.Id, new List<ThreadRun>());
-            return Task.FromResult(Response.FromValue(newThread, Mock.Of<Response>()));
+            return Task.FromResult(ClientResult.FromValue(newThread, Mock.Of<PipelineResponse>()));
         }
 
-        public override Task<Response<ThreadMessage>> CreateMessageAsync(string threadId, MessageRole role, string content, IEnumerable<string>? fileIds = null, IDictionary<string, string>? metadata = null, CancellationToken cancellationToken = default)
+        public override Task<ClientResult<ThreadMessage>> CreateMessageAsync(string threadId, MessageRole role, IEnumerable<MessageContent> content, MessageCreationOptions options = null!, CancellationToken cancellationToken = default)
         {
-            var annotations = new List<MessageTextAnnotation>() { AssistantsModelFactory.MessageTextAnnotation() };
-            ThreadMessage newMessage = AssistantsModelFactory.ThreadMessage(
-                Guid.NewGuid().ToString(),
-                DateTimeOffset.Now,
-                threadId,
-                role,
-                new List<MessageContent> { AssistantsModelFactory.MessageTextContent(content, annotations) },
-                Assistant.Id,
-                null,
-                fileIds,
-                null
-            );
+            ThreadMessage newMessage = _CreateMessage(threadId, content.First().Text);
+
+            return Task.FromResult(ClientResult.FromValue(newMessage, Mock.Of<PipelineResponse>()));
+        }
+
+        private ThreadMessage _CreateMessage(string threadId, string message)
+        {
+            ThreadMessage newMessage = OpenAIModelFactory.CreateThreadMessage(threadId, message);
 
             if (Messages.ContainsKey(threadId))
             {
@@ -91,46 +73,30 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
                 Messages.Add(threadId, new() { newMessage });
             };
 
-            return Task.FromResult(Response.FromValue(newMessage, Mock.Of<Response>()));
+            return newMessage;
         }
 
-        public override async Task<Response<PageableList<ThreadMessage>>> GetMessagesAsync(string threadId, int? limit = null, ListSortOrder? order = null, string? after = null, string? before = null, CancellationToken cancellationToken = default)
+        public override AsyncPageableCollection<ThreadMessage> GetMessagesAsync(string threadId, ListOrder? resultOrder = null, CancellationToken cancellationToken = default)
         {
             while (RemainingMessages.Count > 0)
             {
                 string nextMessage = RemainingMessages.Dequeue();
-                await CreateMessageAsync(threadId, MessageRole.User, nextMessage);
+                _CreateMessage(threadId, nextMessage);
             }
 
-            string lastMessageId = before!;
-            int i = Messages[threadId].FindIndex(m => m.Id == lastMessageId);
-            int remainingItems = Messages[threadId].Count() - (i + 1);
-            var filteredMessages = Messages[threadId].GetRange(i + 1, remainingItems);
+            // Sorted by oldest first
+            List<ThreadMessage> messages = Messages[threadId].ToList();
+            if (resultOrder != null && resultOrder.Value == ListOrder.NewestFirst)
+            {
+                messages.Reverse();
+            }
 
-            var p = AssistantsModelFactory.PageableList(filteredMessages, null, threadId, false);
-            return Response.FromValue(p, Mock.Of<Response>());
+            return new TestAsyncPageableCollection<ThreadMessage>(messages, Mock.Of<PipelineResponse>());
         }
 
-        public override Task<Response<ThreadRun>> CreateRunAsync(string threadId, CreateRunOptions createRunOptions, CancellationToken cancellationToken = default)
+        public override Task<ClientResult<ThreadRun>> CreateRunAsync(string threadId, string assistantId, RunCreationOptions createRunOptions, CancellationToken cancellationToken = default)
         {
-            RequiredAction? remainingActions = null;
-
-            if (RemainingActions.Count > 0)
-            {
-                remainingActions = RemainingActions.Dequeue();
-            }
-
-            var newRun = AssistantsModelFactory.ThreadRun(
-                Guid.NewGuid().ToString(),
-                threadId,
-                createRunOptions.AssistantId,
-                RunStatus.InProgress,
-                remainingActions,
-                null,
-                createRunOptions.OverrideModelName,
-                createRunOptions.OverrideInstructions,
-                createRunOptions.OverrideTools
-            );
+            var newRun = OpenAIModelFactory.CreateThreadRun(threadId, "in_progress");
 
             if (Runs.ContainsKey(threadId))
             {
@@ -141,63 +107,76 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
                 Runs.Add(threadId, new() { newRun });
             }
 
-            return Task.FromResult(Response.FromValue(newRun, Mock.Of<Response>()));
+            return Task.FromResult(ClientResult.FromValue(newRun, Mock.Of<PipelineResponse>()));
         }
 
-        public override Task<Response<ThreadRun>> GetRunAsync(string threadId, string runId, CancellationToken cancellationToken = default)
+        public override Task<ClientResult<ThreadRun>> GetRunAsync(string threadId, string runId, CancellationToken cancellationToken = default)
+        {
+            ThreadRun? run = _GetRun(threadId, runId);
+
+
+            return Task.FromResult(ClientResult.FromValue(run, Mock.Of<PipelineResponse>()))!;
+        }
+
+        private ThreadRun? _GetRun(string threadId, string runId)
         {
             if (Runs[threadId].Count() == 0)
             {
-                return Task.FromResult(Response.FromValue<ThreadRun>(null!, Mock.Of<Response>()));
+                return null;
             }
 
-            RunStatus runStatus = RemainingRunStatus.Dequeue();
+            string runStatus = RemainingRunStatus.Dequeue();
             int i = Runs[threadId].FindIndex(r => string.Equals(r.Id, runId));
 
             ThreadRun run = Runs[threadId][i];
 
+            List<RequiredAction> ras = new();
+            if (runStatus == "requires_action")
+            {
+                while (RemainingActions.Count > 0)
+                {
+                    ras.Add(RemainingActions.Dequeue());
+                }
+            }
+
             // Updates the runStatus. This cannot be done in the original run object.
-            ThreadRun runWithUpdatedStatus = AssistantsModelFactory.ThreadRun(
-                run.Id,
+            ThreadRun runWithUpdatedStatus = OpenAIModelFactory.CreateThreadRun(
                 run.ThreadId,
-                run.AssistantId,
                 runStatus,
-                run.RequiredAction,
-                null,
-                run.Model,
-                run.Instructions,
-                run.Tools
+                run.Id,
+                ras
             );
 
             Runs[threadId][i] = runWithUpdatedStatus;
 
-            return Task.FromResult(Response.FromValue(runWithUpdatedStatus, Mock.Of<Response>()));
+            return runWithUpdatedStatus;
         }
 
-        public override async Task<Response<PageableList<ThreadRun>>> GetRunsAsync(string threadId, int? limit = null, ListSortOrder? order = null, string? after = null, string? before = null, CancellationToken cancellationToken = default)
+        public override AsyncPageableCollection<ThreadRun> GetRunsAsync(string threadId, ListOrder? resultOrder = null, CancellationToken cancellationToken = default)
         {
-            PageableList<ThreadRun> response;
+            AsyncPageableCollection<ThreadRun> response;
 
             // AssistantsPlanner only needs the get the latest.
             if (Runs[threadId].Count() == 0)
             {
-                response = AssistantsModelFactory.PageableList(new List<ThreadRun>(), "null", null, false);
-                return Response.FromValue(response, Mock.Of<Response>());
+                response = new TestAsyncPageableCollection<ThreadRun>(new List<ThreadRun>(), Mock.Of<PipelineResponse>());
+                return response;
             }
 
             int lastIndex = Runs[threadId].Count() - 1;
             ThreadRun run = Runs[threadId][lastIndex];
-            ThreadRun runWithUpdatedStatus = await GetRunAsync(threadId, run.Id);
+            ThreadRun runWithUpdatedStatus = _GetRun(threadId, run.Id)!;
 
-            response = AssistantsModelFactory.PageableList(new List<ThreadRun>() { runWithUpdatedStatus }, "null", null, false);
-            return Response.FromValue(response, Mock.Of<Response>());
+            response = new TestAsyncPageableCollection<ThreadRun>(new List<ThreadRun>() { runWithUpdatedStatus }, Mock.Of<PipelineResponse>());
+            return response;
         }
 
-        public override async Task<Response<ThreadRun>> SubmitToolOutputsToRunAsync(string threadId, string runId, IEnumerable<ToolOutput> toolOutputs, CancellationToken cancellationToken = default)
+        public override Task<ClientResult<ThreadRun>> SubmitToolOutputsToRunAsync(string threadId, string runId, IEnumerable<ToolOutput> toolOutputs, CancellationToken cancellationToken = default)
         {
-            ThreadRun runWithUpdatedStatus = await GetRunAsync(threadId, runId);
+            ThreadRun runWithUpdatedStatus = _GetRun(threadId, runId)!;
             var response = runWithUpdatedStatus;
-            return Response.FromValue(response, Mock.Of<Response>());
+            return Task.FromResult(ClientResult.FromValue(response, Mock.Of<PipelineResponse>()));
         }
     }
 }
+#pragma warning restore OPENAI001

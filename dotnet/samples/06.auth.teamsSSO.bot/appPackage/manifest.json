@@ -15,7 +15,7 @@
     "outline": "outline.png"
   },
   "name": {
-    "short": "BotAuth-${{TEAMSFX_ENV}}",
+    "short": "BotAuth${{APP_NAME_SUFFIX}}",
     "full": "Full name for BotAuth"
   },
   "description": {

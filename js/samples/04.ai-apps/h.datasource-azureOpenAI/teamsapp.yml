@@ -19,7 +19,7 @@ provision:
   # Automates the creation of a Teams app registration and saves the App ID to an environment file.
   - uses: teamsApp/create
     with:
-      name: TeamsAOAI-${{TEAMSFX_ENV}}
+      name: TeamsAOAI${{APP_NAME_SUFFIX}}
     writeToEnvironmentFile:
       teamsAppId: TEAMS_APP_ID
 
