@@ -76,6 +76,7 @@ export interface AdaptiveCardsOptions {
      * Defaults to a value of 'verb'.
      */
     actionSubmitFilter?: string;
+
     /**
      * Data field used to specify how the response card will be presented after an action is executed.
      * @remarks

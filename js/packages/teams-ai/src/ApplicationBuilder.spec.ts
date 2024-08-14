@@ -12,7 +12,7 @@ import { TurnState } from './TurnState';
 describe('ApplicationBuilder', () => {
     const botAppId = 'testBot';
     const adapter = new TeamsAdapter();
-    const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter' };
+    const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter', actionExecuteResponseType: 1 };
     const ai: AIOptions<TurnState> = { planner: new TestPlanner() };
     const longRunningMessages = true;
     const removeRecipientMention = false;

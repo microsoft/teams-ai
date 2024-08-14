@@ -71,7 +71,7 @@ class MockUserTokenClient {
 describe('Application', () => {
     let sandbox: sinon.SinonSandbox;
     const testAdapter = new TestAdapter();
-    const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter' };
+    const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter', actionExecuteResponseType: 1 };
     const ai: AIOptions<TurnState> = { planner: new TestPlanner() };
     const botAppId = 'testBot';
     const longRunningMessages = true;
