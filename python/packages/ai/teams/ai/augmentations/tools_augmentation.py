@@ -5,27 +5,28 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from typing import Optional, TypeVar
+import json
+from typing import List, Optional
 
 from botbuilder.core import TurnContext
 
 from ...state import MemoryBase
 from ..models.prompt_response import PromptResponse
-from ..planners.plan import Plan, PredictedSayCommand
+from ..planners.plan import (
+    Plan,
+    PredictedCommand,
+    PredictedDoCommand,
+    PredictedSayCommand,
+)
 from ..prompts.sections.prompt_section import PromptSection
 from ..tokenizers.tokenizer import Tokenizer
 from ..validators.validation import Validation
 from .augmentation import Augmentation
 
-ContentT = TypeVar("ContentT")
 
-
-class DefaultAugmentation(Augmentation[str]):
+class ToolsAugmentation(Augmentation[str]):
     """
-    The default 'none' augmentation.
-
-    This augmentation does not add any additional functionality to the prompt. It always
-    returns a `Plan` with a single `SAY` command containing the models response.
+    A server-side 'tools' augmentation.
     """
 
     def create_prompt_section(self) -> Optional[PromptSection]:
@@ -58,7 +59,10 @@ class DefaultAugmentation(Augmentation[str]):
         return Validation(valid=True)
 
     async def create_plan_from_response(
-        self, turn_context: TurnContext, memory: MemoryBase, response: PromptResponse[str]
+        self,
+        turn_context: TurnContext,
+        memory: MemoryBase,
+        response: PromptResponse[str],
     ) -> Plan:
         """
         Creates a plan given validated response value.
@@ -66,10 +70,25 @@ class DefaultAugmentation(Augmentation[str]):
         Args:
             turn_context (TurnContext): Context for the current turn of conversation.
             memory (MemoryBase): Interface for accessing state variables.
-            response (PromptResponse[str]): The validated and transformed response for the prompt.
+            response (PromptResponse[str]):
+                The validated and transformed response for the prompt.
 
         Returns:
             Plan: The created plan.
         """
-        say_response = response.message
-        return Plan(commands=[PredictedSayCommand(response=say_response)])
+
+        commands: List[PredictedCommand] = []
+
+        if response.message and response.message.action_calls:
+            tool_calls = response.message.action_calls
+
+            for tool in tool_calls:
+                command = PredictedDoCommand(
+                    action=tool.function.name,
+                    parameters=json.loads(tool.function.arguments),
+                    action_id=tool.id,
+                )
+                commands.append(command)
+            return Plan(commands=commands)
+
+        return Plan(commands=[PredictedSayCommand(response=response.message)])

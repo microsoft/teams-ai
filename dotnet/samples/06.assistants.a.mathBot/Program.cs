@@ -5,9 +5,11 @@ using Microsoft.Teams.AI;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Planners.Experimental;
 using Microsoft.Teams.AI.AI.Planners;
-
 using MathBot;
 using OpenAI.Assistants;
+using Azure.Core;
+using Azure.Identity;
+using System.Runtime.CompilerServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,19 +19,29 @@ builder.Services.AddHttpContextAccessor();
 
 // Load configuration
 var config = builder.Configuration.Get<ConfigOptions>()!;
-var isAzureCredentialsSet = config.Azure != null && !string.IsNullOrEmpty(config.Azure.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint);
+var isAzureCredentialsSet = config.Azure != null && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint);
 var isOpenAICredentialsSet = config.OpenAI != null && !string.IsNullOrEmpty(config.OpenAI.ApiKey);
 
-string apiKey = "";
+string? apiKey = null;
+TokenCredential? tokenCredential = null;
 string? endpoint = null;
 string? assistantId = "";
 
 // If both credentials are set then the Azure credentials will be used.
 if (isAzureCredentialsSet)
 {
-    apiKey = config.Azure!.OpenAIApiKey!;
-    endpoint = config.Azure.OpenAIEndpoint;
+    endpoint = config.Azure!.OpenAIEndpoint;
     assistantId = config.Azure.OpenAIAssistantId;
+
+    if (config.Azure!.OpenAIApiKey != string.Empty)
+    {
+    apiKey = config.Azure!.OpenAIApiKey!;
+    }
+    else
+    {
+        // Using managed identity authentication
+        tokenCredential = new DefaultAzureCredential();
+    }
 }
 else if (isOpenAICredentialsSet)
 {
@@ -45,13 +57,24 @@ else
 // Missing Assistant ID, create new Assistant
 if (string.IsNullOrEmpty(assistantId))
 {
-    Console.WriteLine("No Assistant ID configured, creating new Assistant...");
-    AssistantCreationOptions assistantCreateParams = new()
+    AssistantCreationOptions assistantCreationOptions = new()
     {
         Name = "Math Tutor",
         Instructions = "You are a personal math tutor. Write and run code to answer math questions."
     };
-    assistantCreateParams.Tools.Add(new CodeInterpreterToolDefinition());
+
+    assistantCreationOptions.Tools.Add(new CodeInterpreterToolDefinition());
+
+    string newAssistantId = "";
+    if (apiKey != null)
+    {
+        newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(apiKey, assistantCreationOptions, "gpt-4o-mini", endpoint).Result.Id;
+    }
+    else
+    {
+        // use token credential for authentication
+        newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(tokenCredential!, assistantCreationOptions, "gpt-4o-mini", endpoint!).Result.Id;
+    }
 
     string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(apiKey, assistantCreateParams, "gpt-4", endpoint).Result.Id;
     Console.WriteLine($"Created a new assistant with an ID of: {newAssistantId}");
@@ -77,7 +100,20 @@ builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<Team
 builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<TeamsAdapter>()!);
 
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
-builder.Services.AddSingleton(_ => new AssistantsPlannerOptions(apiKey, assistantId) { Endpoint = endpoint });
+builder.Services.AddSingleton(_ => {
+    if (apiKey != null)
+    {
+        return new AssistantsPlannerOptions(apiKey, assistantId, endpoint);
+    }
+    else if (tokenCredential != null)
+    {
+        return new AssistantsPlannerOptions(tokenCredential, assistantId, endpoint);
+    }
+    else
+    {
+        throw new ArgumentException("The `apiKey` or `tokenCredential` needs to be set");
+    }
+});
 
 // Create the Application.
 builder.Services.AddTransient<IBot>(sp =>

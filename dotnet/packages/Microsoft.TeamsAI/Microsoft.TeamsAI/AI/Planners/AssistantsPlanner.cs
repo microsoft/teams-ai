@@ -1,4 +1,5 @@
 ﻿using Azure.AI.OpenAI;
+using Azure.Core;
 using Microsoft.Bot.Builder;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -43,20 +44,30 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
         public AssistantsPlanner(AssistantsPlannerOptions options, ILoggerFactory? loggerFactory = null)
         {
             Verify.ParamNotNull(options);
-            Verify.ParamNotNull(options.ApiKey, "AssistantsPlannerOptions.ApiKey");
             Verify.ParamNotNull(options.AssistantId, "AssistantsPlannerOptions.AssistantId");
 
-            _options = new AssistantsPlannerOptions(options.ApiKey, options.AssistantId)
-            {
-                Organization = options.Organization,
-                PollingInterval = options.PollingInterval ?? DEFAULT_POLLING_INTERVAL
-            };
+            options.PollingInterval = options.PollingInterval ?? DEFAULT_POLLING_INTERVAL;
+
+            _options = options;
             _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<AssistantsPlanner<TState>>();
-            _client = _CreateClient(options.ApiKey, options.Endpoint);
+
+            if (options.TokenCredential != null)
+            {
+                Verify.ParamNotNull(options.Endpoint, "AssistantsPlannerOptions.Endpoint");
+                _client = _CreateClient(options.TokenCredential, options.Endpoint!);
+            }
+            else if (options.ApiKey != null)
+            {
+                _client = _CreateClient(options.ApiKey, options.Endpoint);
+            }
+            else
+            {
+                throw new ArgumentException("Either `AssistantsPlannerOptions.ApiKey` or `AssistantsPlannerOptions.TokenCredential` should be set.");
+            }
         }
 
         /// <summary>
-        /// Static helper method for programmatically creating an assistant.
+        /// Static helper method for programatically creating an assistant.
         /// </summary>
         /// <param name="apiKey">OpenAI or Azure OpenAI API key.</param>
         /// <param name="request">Definition of the assistant to create.</param>
@@ -72,6 +83,28 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             Verify.ParamNotNull(model);
 
             AssistantClient client = _CreateClient(apiKey, endpoint);
+
+            return await client.CreateAssistantAsync(model, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Static helper method for programatically creating an assistant.
+        /// </summary>
+        /// <param name="tokenCredential">Azure token credential to authenticate requests</param>
+        /// <param name="request">Definition of the assistant to create.</param>
+        /// <param name="model">The underlying LLM model.</param>
+        /// <param name="endpoint">Azure OpenAI API Endpoint.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>The created assistant.</returns>
+        public static async Task<Assistant> CreateAssistantAsync(TokenCredential tokenCredential, AssistantCreationOptions request, string model, string endpoint, CancellationToken cancellationToken = default)
+        {
+            Verify.ParamNotNull(tokenCredential);
+            Verify.ParamNotNull(request);
+            Verify.ParamNotNull(model);
+            Verify.ParamNotNull(endpoint);
+
+            AssistantClient client = _CreateClient(tokenCredential, endpoint);
 
             return await client.CreateAssistantAsync(model, request, cancellationToken);
         }
@@ -333,6 +366,15 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
                 // OpenAI
                 return new AssistantClient(apiKey);
             }
+        }
+
+        internal static AssistantClient _CreateClient(TokenCredential tokenCredential, string endpoint)
+        {
+            Verify.ParamNotNull(tokenCredential);
+            Verify.ParamNotNull(endpoint);
+
+            AzureOpenAIClient azureOpenAI = new(new Uri(endpoint), tokenCredential);
+            return azureOpenAI.GetAssistantClient();
         }
     }
 }
