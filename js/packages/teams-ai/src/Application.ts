@@ -955,7 +955,7 @@ export class Application<TState extends TurnState = TurnState> {
     /**
      * Gets a pagined list of members of one-on-one, group, or team conversation.
      * @param context - The context for the current turn with the user.
-     * @param {number} pageSize - Suggested number of entries on a page.
+     * @param {number} pageSize - Suggested number of entries on a page. Page size less than 50, are treated as 50, and greater than 500, are capped at 500.
      * @param {string} continuationToken - A continuation token.
      * @returns The TeamsPagedMembersResult with the list of members.
      */
@@ -981,6 +981,7 @@ export class Application<TState extends TurnState = TurnState> {
     ): Promise<TeamsPagedMembersResult> {
         let pagedMembers: TeamsPagedMembersResult = { members: [], continuationToken: '' };
         await this.continueConversationAsync(context, async (ctx) => {
+            // Page size less than 50, are treated as 50, and greater than 500, are capped at 500.
             pagedMembers = await TeamsInfo.getPagedMembers(ctx, pageSize, continuationToken);
         });
 
