@@ -10,7 +10,9 @@ import {
     ActivityTypes,
     InvokeResponse,
     INVOKE_RESPONSE_KEY,
-    AdaptiveCardInvokeResponse
+    AdaptiveCardInvokeResponse,
+    MessageFactory,
+    CardFactory
 } from 'botbuilder';
 import { Application, RouteSelector, Query } from './Application';
 import { TurnState } from './TurnState';
@@ -34,6 +36,15 @@ const DEFAULT_ACTION_SUBMIT_FILTER = 'verb';
  * @private
  */
 const SEARCH_INVOKE_NAME = `application/search`;
+
+/**
+ * @private
+ */
+enum AdaptiveCardInvokeResponseType {
+    ADAPTIVE = `application/vnd.microsoft.card.adaptive`,
+    MESSAGE = `application/vnd.microsoft.activity.message`,
+    SEARCH = `application/vnd.microsoft.search.searchResponse`
+}
 
 /**
  * Strongly typed Adaptive Card.
@@ -65,6 +76,30 @@ export interface AdaptiveCardsOptions {
      * Defaults to a value of 'verb'.
      */
     actionSubmitFilter?: string;
+    /**
+     * Data field used to specify how the response card will be presented after an action is executed.
+     * @remarks
+     * When an Action.Execute is triggered, the field name specified here will be used to determine
+     * how the response card will be presented.
+     */
+    actionExecuteResponseType?: AdaptiveCardActionExecuteResponseType;
+}
+
+export enum AdaptiveCardActionExecuteResponseType {
+    /**
+     * The response card will be replaced the current one for the interactor who trigger the action.
+     */
+    REPLACE_FOR_INTERACTOR,
+
+    /**
+     * The response card will be replaced the current one for all users in the chat.
+     */
+    REPLACE_FOR_ALL,
+
+    /**
+     * The response card will be sent as a new message for all users in the chat.
+     */
+    NEW_MESSAGE_FOR_ALL
 }
 
 /**
@@ -127,6 +162,9 @@ export class AdaptiveCards<TState extends TurnState> {
         verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (context: TurnContext, state: TState, data: TData) => Promise<AdaptiveCard | string>
     ): Application<TState> {
+        let actionExecuteResponseType =
+            this._app.options.adaptiveCards?.actionExecuteResponseType ??
+            AdaptiveCardActionExecuteResponseType.REPLACE_FOR_INTERACTOR;
         (Array.isArray(verb) ? verb : [verb]).forEach((v) => {
             const selector = createActionExecuteSelector(v);
             this._app.addRoute(
@@ -153,23 +191,46 @@ export class AdaptiveCards<TState extends TurnState> {
                             // Return message
                             response = {
                                 statusCode: 200,
-                                type: 'application/vnd.microsoft.activity.message',
+                                type: AdaptiveCardInvokeResponseType.MESSAGE,
                                 value: result as any
                             };
+                            await sendInvokeResponse(context, response);
                         } else {
                             // Return card
+                            if (
+                                result.refresh &&
+                                actionExecuteResponseType !== AdaptiveCardActionExecuteResponseType.NEW_MESSAGE_FOR_ALL
+                            ) {
+                                // Card won't be refreshed with AdaptiveCardActionExecuteResponseType.REPLACE_FOR_INTERACTOR.
+                                // So set to AdaptiveCardActionExecuteResponseType.REPLACE_FOR_ALL here.
+                                actionExecuteResponseType = AdaptiveCardActionExecuteResponseType.REPLACE_FOR_ALL;
+                            }
+
+                            const activity = MessageFactory.attachment(CardFactory.adaptiveCard(result));
                             response = {
                                 statusCode: 200,
-                                type: 'application/vnd.microsoft.card.adaptive',
+                                type: AdaptiveCardInvokeResponseType.ADAPTIVE,
                                 value: result
                             };
+                            if (
+                                actionExecuteResponseType === AdaptiveCardActionExecuteResponseType.NEW_MESSAGE_FOR_ALL
+                            ) {
+                                await sendInvokeResponse(context, {
+                                    statusCode: 200,
+                                    type: AdaptiveCardInvokeResponseType.MESSAGE,
+                                    value: 'Your response was sent to the app' as any
+                                });
+                                await context.sendActivity(activity);
+                            } else if (
+                                actionExecuteResponseType === AdaptiveCardActionExecuteResponseType.REPLACE_FOR_ALL
+                            ) {
+                                activity.id = context.activity.replyToId;
+                                await context.updateActivity(activity);
+                                await sendInvokeResponse(context, response);
+                            } else {
+                                await sendInvokeResponse(context, response);
+                            }
                         }
-
-                        // Queue up invoke response
-                        await context.sendActivity({
-                            value: { body: response, status: 200 } as InvokeResponse,
-                            type: ActivityTypes.InvokeResponse
-                        });
                     }
                 },
                 true
@@ -266,7 +327,7 @@ export class AdaptiveCards<TState extends TurnState> {
                     if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
                         // Format invoke response
                         const response = {
-                            type: 'application/vnd.microsoft.search.searchResponse',
+                            type: AdaptiveCardInvokeResponseType.SEARCH,
                             value: {
                                 results: results
                             }
@@ -386,4 +447,16 @@ function createSearchSelector(dataset: string | RegExp | RouteSelector): RouteSe
             return Promise.resolve(isSearch && a?.value?.dataset === dataset);
         };
     }
+}
+
+/**
+ * @param {TurnContext} context - The context of the current turn, providing information about the incoming activity and environment.
+ * @param {AdaptiveCardInvokeResponse} response - The adaptive card invoke response to be sent.
+ * @private
+ */
+async function sendInvokeResponse(context: TurnContext, response: AdaptiveCardInvokeResponse) {
+    await context.sendActivity({
+        value: { body: response, status: 200 } as InvokeResponse,
+        type: ActivityTypes.InvokeResponse
+    });
 }
