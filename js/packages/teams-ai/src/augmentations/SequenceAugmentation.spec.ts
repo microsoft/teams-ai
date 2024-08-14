@@ -245,12 +245,14 @@ describe('SequenceAugmentation', () => {
                         content: validation.value,
                         context: {
                             intent: 'to test citations',
-                            citations: [{
-                                url: '',
-                                title: '',
-                                filepath: '',
-                                content: 'my citation content...'
-                            }]
+                            citations: [
+                                {
+                                    url: '',
+                                    title: '',
+                                    filepath: '',
+                                    content: 'my citation content...'
+                                }
+                            ]
                         }
                     }
                 });
@@ -272,12 +274,14 @@ describe('SequenceAugmentation', () => {
                                 content: 'hello world',
                                 context: {
                                     intent: 'to test citations',
-                                    citations: [{
-                                        url: '',
-                                        title: '',
-                                        filepath: '',
-                                        content: 'my citation content...'
-                                    }]
+                                    citations: [
+                                        {
+                                            url: '',
+                                            title: '',
+                                            filepath: '',
+                                            content: 'my citation content...'
+                                        }
+                                    ]
                                 }
                             }
                         }

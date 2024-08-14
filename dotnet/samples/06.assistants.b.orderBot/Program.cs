@@ -7,7 +7,7 @@ using Microsoft.Teams.AI.AI.Planners.Experimental;
 using Microsoft.Teams.AI.AI.Planners;
 using OrderBot;
 using OrderBot.Models;
-using Azure.AI.OpenAI.Assistants;
+using OpenAI.Assistants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,7 +45,7 @@ else
 // Missing Assistant ID, create new Assistant
 if (string.IsNullOrEmpty(assistantId))
 {
-    AssistantCreationOptions assistantCreationOptions = new("gpt-4")
+    AssistantCreationOptions assistantCreationOptions = new()
     {
         Name = "Order Bot",
         Instructions = string.Join("\n", new[]
@@ -59,7 +59,7 @@ if (string.IsNullOrEmpty(assistantId))
 
     assistantCreationOptions.Tools.Add(new FunctionToolDefinition("place_order", "Creates or updates a food order.", new BinaryData(OrderParameters.GetSchema())));
 
-    string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(apiKey, assistantCreationOptions, endpoint).Result.Id;
+    string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(apiKey, assistantCreationOptions, "gpt-4", endpoint).Result.Id;
 
     Console.WriteLine($"Created a new assistant with an ID of: {newAssistantId}");
     Console.WriteLine("Copy and save above ID, and set `OpenAI:AssistantId` in appsettings.Development.json.");
