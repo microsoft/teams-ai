@@ -273,11 +273,11 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
 
         if (history && history.length > 1) {
             // Submit action outputs
-            const actionOutputs: string[] = memory.getValue('temp.actionOutputs') ?? [];
+            const actionOutputs: Record<string, string> = memory.getValue('temp.actionOutputs') ?? {};
             const actionCalls: ActionCall[] = history[history.length - 1].action_calls ?? [];
 
             for (const actionCall of actionCalls) {
-                const output = actionOutputs[actionCall.id as unknown as number];
+                const output = actionOutputs[actionCall.id];
                 client.addActionOutputToHistory(memory, actionCall.id, output);
             }
         }

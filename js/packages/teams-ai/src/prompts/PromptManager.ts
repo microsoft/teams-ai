@@ -388,10 +388,7 @@ export class PromptManager implements PromptFunctions {
                 max_input_tokens: 2048,
                 presence_penalty: 0.0,
                 temperature: 0.0,
-                top_p: 0.0,
-                include_tools: false,
-                tool_choice: 'auto',
-                parallel_tool_calls: true
+                top_p: 0.0
             } as CompletionConfig,
             template.config.completion
         );
