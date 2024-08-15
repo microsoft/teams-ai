@@ -99,7 +99,7 @@ class Application(Bot, Generic[StateT]):
 
         if options.long_running_messages and (not options.adapter or not options.bot_app_id):
             raise ApplicationError("""
-                The `ApplicationOptions.long_running_messages` property is unavailable because 
+                The `ApplicationOptions.long_running_messages` property is unavailable because
                 no adapter or `bot_app_id` was configured.
                 """)
 
@@ -121,7 +121,7 @@ class Application(Bot, Generic[StateT]):
 
         if not self._adapter:
             raise ApplicationError("""
-                The Application.adapter property is unavailable because it was 
+                The Application.adapter property is unavailable because it was
                 not configured when creating the Application.
                 """)
 
@@ -610,8 +610,8 @@ class Application(Bot, Generic[StateT]):
                 if not context.activity.value:
                     return False
 
-                feedback = context.activity.value
-                feedback['replyToId'] = context.activity.reply_to_id
+                feedback = FeedbackLoopData.from_dict(context.activity.value)
+                feedback.reply_to_id = context.activity.reply_to_id
 
                 await func(context, state, feedback)
                 await context.send_activity(
