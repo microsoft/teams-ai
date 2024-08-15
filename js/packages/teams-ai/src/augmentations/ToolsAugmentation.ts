@@ -84,12 +84,14 @@ export class ToolsAugmentation implements Augmentation<string> {
                     parameters = {};
                 }
 
-                commands.push({
+                const doCommand: PredictedDoCommand = {
                     type: 'DO',
                     action: toolCall.function.name,
-                    id: toolCall.id,
+                    actionId: toolCall.id,
                     parameters: parameters
-                } as PredictedDoCommand);
+                };
+
+                commands.push(doCommand);
             }
             return Promise.resolve({ type: 'plan', commands });
         }
