@@ -374,6 +374,7 @@ export class OpenAIModel implements PromptCompletionModel {
                 const responseMessage = (completion as ChatCompletion).choices![0].message;
                 const isToolsAugmentation =
                     template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
+
                 // Log tool calls to be added to message of type Message<string> as action_calls
                 if (isToolsAugmentation && responseMessage?.tool_calls) {
                     for (const toolCall of responseMessage.tool_calls) {
@@ -388,10 +389,11 @@ export class OpenAIModel implements PromptCompletionModel {
                     }
                 }
                 // Log the generated response
-                message = ((completion as ChatCompletion).choices[0]?.message as Message<string>) ?? {
-                    role: 'assistant',
-                    content: ''
+                message = {
+                    role: responseMessage.role,
+                    content: responseMessage.content ?? ''
                 };
+
                 if (actionCalls.length > 0) {
                     message.action_calls = actionCalls;
                 }
@@ -421,12 +423,13 @@ export class OpenAIModel implements PromptCompletionModel {
     private convertMessages(messages: Message<string>[]): ChatCompletionMessageParam[] {
         const params: ChatCompletionMessageParam[] = [];
         // Iterate through the messages and check for action calls
-        let param: ChatCompletionMessageParam = {
-            role: 'user',
-            content: ''
-        };
 
         for (const message of messages) {
+            let param: ChatCompletionMessageParam = {
+                role: 'user',
+                content: ''
+            };
+
             if (message.role === 'user') {
                 param.content = message.content ?? '';
             } else if (message.role === 'system') {
@@ -470,6 +473,7 @@ export class OpenAIModel implements PromptCompletionModel {
             }
             params.push(param);
         }
+
         return params;
     }
 
