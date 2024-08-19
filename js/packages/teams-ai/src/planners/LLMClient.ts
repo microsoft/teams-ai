@@ -13,8 +13,7 @@ import { Memory, MemoryFork } from '../MemoryFork';
 import {
     PromptCompletionModel,
     PromptCompletionModelBeforeCompletionEvent,
-    PromptCompletionModelChunkReceivedEvent,
-    PromptCompletionModelResponseReceivedEvent
+    PromptCompletionModelChunkReceivedEvent
 } from '../models';
 import { ConversationHistory, Message, Prompt, PromptFunctions, PromptTemplate } from '../prompts';
 import { StreamingResponse } from '../StreamingResponse';
@@ -339,21 +338,10 @@ export class LLMClient<TContent = any> {
             }
         };
 
-        const responseReceived: PromptCompletionModelResponseReceivedEvent = async (ctx, memory, response) => {
-            // Ignore events for other contexts
-            if (context !== ctx || !streamer) {
-                return;
-            }
-
-            // End the stream
-            await streamer.endStream();
-        };
-
         // Subscribe to model events
         if (this.options.model.events) {
             this.options.model.events.on('beforeCompletion', beforeCompletion);
             this.options.model.events.on('chunkReceived', chunkReceived);
-            this.options.model.events.on('responseReceived', responseReceived);
         }
 
         try {
@@ -364,13 +352,18 @@ export class LLMClient<TContent = any> {
                 delete response.message;
             }
 
+            // End the stream if streaming
+            // - We're not listening for the response received event because we can't await the completion of events.
+            if (streamer) {
+                await streamer.endStream();
+            }
+
             return response;
         } finally {
             // Unsubscribe from model events
             if (this.options.model.events) {
                 this.options.model.events.off('beforeCompletion', beforeCompletion);
                 this.options.model.events.off('chunkReceived', chunkReceived);
-                this.options.model.events.off('responseReceived', responseReceived);
             }
         }
     }

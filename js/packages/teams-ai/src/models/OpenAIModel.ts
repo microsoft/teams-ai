@@ -288,9 +288,9 @@ export class OpenAIModel implements PromptCompletionModel {
                 : (this.options as OpenAIModelOptions).defaultModel);
 
         // Check for legacy completion type
-        if (template.config.type == 'completion') {
+        if (template.config.completion.completion_type == 'text') {
             throw new Error(
-                `The completion type 'completion' is no longer supported. Only 'chat' based models are supported.`
+                `The completion_type 'text' is no longer supported. Only 'chat' based models are supported.`
             );
         }
 
@@ -354,8 +354,10 @@ export class OpenAIModel implements PromptCompletionModel {
                 }
 
                 // Log stream completion
-                console.log(Colorize.title('STREAM COMPLETED:'));
-                console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
+                if (this.options.logRequests) {
+                    console.log(Colorize.title('STREAM COMPLETED:'));
+                    console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
+                }
             } else {
                 // Log the generated response
                 message = ((completion as ChatCompletion).choices[0]?.message as Message<string>) ?? {
@@ -372,6 +374,9 @@ export class OpenAIModel implements PromptCompletionModel {
             // Signal response received
             const response: PromptResponse<string> = { status: 'success', input, message };
             this._events.emit('responseReceived', context, memory, response);
+
+            // Let any pending events flush before returning
+            await new Promise((resolve) => setTimeout(resolve, 0));
             return response;
         } catch (err: unknown) {
             return this.returnError(err, input);
@@ -446,6 +451,13 @@ export class OpenAIModel implements PromptCompletionModel {
         }
         params.model = model;
 
+        // Remove tool params if not using tools
+        if (!Array.isArray(params.tools) || params.tools.length == 0) {
+            if (params.tool_choice) {
+                delete params.tool_choice;
+            }           
+        }
+
         return params;
     }
 
@@ -470,11 +482,13 @@ export class OpenAIModel implements PromptCompletionModel {
 
     private returnError(err: unknown, input: Message<string> | undefined): PromptResponse<string> {
         if (err instanceof OpenAI.APIError) {
+            if (this.options.logRequests) {
+                console.log(Colorize.title('ERROR:'));
+                console.log(Colorize.output(err.message));
+                console.log(Colorize.title('HEADERS:'));
+                console.log(Colorize.output(err.headers as any));
+            }
             if (err.status == 429) {
-                if (this.options.logRequests) {
-                    console.log(Colorize.title('HEADERS:'));
-                    console.log(Colorize.output(err.headers as any));
-                }
                 return {
                     status: 'rate_limited',
                     input,
