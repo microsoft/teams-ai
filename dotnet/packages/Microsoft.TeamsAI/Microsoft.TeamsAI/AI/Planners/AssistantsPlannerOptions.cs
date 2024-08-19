@@ -1,4 +1,5 @@
-﻿using Microsoft.Teams.AI.Utilities;
+﻿using Azure.Core;
+using Microsoft.Teams.AI.Utilities;
 
 // Assistants API is currently in beta and is subject to change.
 #pragma warning disable IDE0130 // Namespace does not match folder structure
@@ -13,12 +14,17 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
         /// <summary>
         /// OpenAI API key or Azure OpenAI API key.
         /// </summary>
-        public string ApiKey { get; set; }
+        public string? ApiKey { get; set; }
 
         /// <summary>
         /// Optional. Azure OpenAI Endpoint.
         /// </summary>
         public string? Endpoint { get; set; }
+
+        /// <summary>
+        /// Optional. The token credential to use when making requests to Azure OpenAI.
+        /// </summary>
+        public TokenCredential? TokenCredential { get; set; }
 
         /// <summary>
         /// The Assistant ID.
@@ -48,6 +54,22 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             Verify.ParamNotNull(assistantId);
 
             ApiKey = apiKey;
+            AssistantId = assistantId;
+            Endpoint = endpoint;
+        }
+
+        /// <summary>
+        /// Create an instance of the AsssistantsPlannerOptions class.
+        /// </summary>
+        /// <param name="tokenCredential">The token credential object. This can be set to DefaultAzureCredential to use managed identity auth.</param>
+        /// <param name="assistantId">The Assistant ID.</param>
+        /// <param name="endpoint">Optional. The Azure OpenAI Endpoint</param>
+        public AssistantsPlannerOptions(TokenCredential tokenCredential, string assistantId, string? endpoint = null)
+        {
+            Verify.ParamNotNull(tokenCredential);
+            Verify.ParamNotNull(assistantId);
+
+            TokenCredential = tokenCredential;
             AssistantId = assistantId;
             Endpoint = endpoint;
         }

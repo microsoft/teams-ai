@@ -8,6 +8,9 @@ using Microsoft.Teams.AI.AI.Planners;
 using OrderBot;
 using OrderBot.Models;
 using OpenAI.Assistants;
+using Azure.Core;
+using Azure.Identity;
+using System.Runtime.CompilerServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,19 +20,28 @@ builder.Services.AddHttpContextAccessor();
 
 // Load configuration
 var config = builder.Configuration.Get<ConfigOptions>()!;
-var isAzureCredentialsSet = config.Azure != null && !string.IsNullOrEmpty(config.Azure.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint);
+var isAzureCredentialsSet = config.Azure != null && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint);
 var isOpenAICredentialsSet = config.OpenAI != null && !string.IsNullOrEmpty(config.OpenAI.ApiKey);
 
-string apiKey = "";
+string? apiKey = null;
+TokenCredential? tokenCredential = null;
 string? endpoint = null;
 string? assistantId = "";
 
 // If both credentials are set then the Azure credentials will be used.
 if (isAzureCredentialsSet)
 {
-    apiKey = config.Azure!.OpenAIApiKey!;
-    endpoint = config.Azure.OpenAIEndpoint;
+    endpoint = config.Azure!.OpenAIEndpoint;
     assistantId = config.Azure.OpenAIAssistantId;
+
+    if (config.Azure!.OpenAIApiKey != string.Empty)
+    {
+        apiKey = config.Azure!.OpenAIApiKey!;
+    } else
+    {
+        // Using managed identity authentication
+        tokenCredential = new DefaultAzureCredential();
+    }
 }
 else if (isOpenAICredentialsSet)
 {
@@ -59,7 +71,16 @@ if (string.IsNullOrEmpty(assistantId))
 
     assistantCreationOptions.Tools.Add(new FunctionToolDefinition("place_order", "Creates or updates a food order.", new BinaryData(OrderParameters.GetSchema())));
 
-    string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(apiKey, assistantCreationOptions, "gpt-4", endpoint).Result.Id;
+    string newAssistantId = "";
+    if (apiKey != null)
+    {
+        newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(apiKey, assistantCreationOptions, "gpt-4o-mini", endpoint).Result.Id;
+    } 
+    else
+    {
+        // use token credential for authentication
+        newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(tokenCredential!, assistantCreationOptions, "gpt-4o-mini", endpoint!).Result.Id;
+    }
 
     Console.WriteLine($"Created a new assistant with an ID of: {newAssistantId}");
     Console.WriteLine("Copy and save above ID, and set `OpenAI:AssistantId` in appsettings.Development.json.");
@@ -70,8 +91,8 @@ if (string.IsNullOrEmpty(assistantId))
 
 // Prepare Configuration for ConfigurationBotFrameworkAuthentication
 builder.Configuration["MicrosoftAppType"] = "MultiTenant";
-builder.Configuration["MicrosoftAppId"] = config.BOT_ID;
-builder.Configuration["MicrosoftAppPassword"] = config.BOT_PASSWORD;
+builder.Configuration["MicrosoftAppId"] = ""; // config.BOT_ID;
+builder.Configuration["MicrosoftAppPassword"] = ""; // config.BOT_PASSWORD;
 
 // Create the Bot Framework Authentication to be used with the Bot Adapter.
 builder.Services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFrameworkAuthentication>();
@@ -84,7 +105,18 @@ builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<Team
 builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<TeamsAdapter>()!);
 
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
-builder.Services.AddSingleton(_ => new AssistantsPlannerOptions(apiKey, assistantId, endpoint));
+builder.Services.AddSingleton(_ => {
+    if (apiKey != null)
+    {
+        return new AssistantsPlannerOptions(apiKey, assistantId, endpoint);
+    } else if (tokenCredential != null)
+    {
+        return new AssistantsPlannerOptions(tokenCredential, assistantId, endpoint);
+    } else
+    {
+        throw new ArgumentException("The `apiKey` or `tokenCredential` needs to be set");
+    }
+});
 
 // Create the Application.
 builder.Services.AddTransient<IBot>(sp =>
