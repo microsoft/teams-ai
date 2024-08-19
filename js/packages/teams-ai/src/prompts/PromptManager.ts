@@ -16,6 +16,7 @@ import { Memory } from '../MemoryFork';
 import { Tokenizer } from '../tokenizers';
 import { CompletionConfig } from '../types';
 
+import { ActionOutputMessage } from './ActionOutputMessage';
 import { ConversationHistory } from './ConversationHistory';
 import { PromptTemplate } from './PromptTemplate';
 import { DataSourceSection } from './DataSourceSection';
@@ -339,6 +340,9 @@ export class PromptManager implements PromptFunctions {
                 sections.push(new UserInputMessage(this.options.max_input_tokens));
             } else if (template.config.completion.include_input) {
                 sections.push(new UserMessage('{{$temp.input}}', this.options.max_input_tokens));
+            }
+            if (template.config.augmentation && template.config.augmentation.augmentation_type === 'tools') {
+                sections.push(new ActionOutputMessage(this.options.max_input_tokens));
             }
 
             // Create prompt

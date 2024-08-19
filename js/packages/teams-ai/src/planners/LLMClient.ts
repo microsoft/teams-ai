@@ -230,20 +230,6 @@ export class LLMClient<TContent = any> {
     }
 
     /**
-     * Adds a result from an `action_call` to the history.
-     * @param {Memory} memory - An interface for accessing state values.
-     * @param {string} id - Id of the action that was called.
-     * @param {string} results - Results returned by the action call.
-     */
-    public addActionOutputToHistory(memory: Memory, id: string, results: string): void {
-        this.addMessageToHistory(memory, this.options.history_variable, {
-            role: 'tool',
-            action_call_id: id,
-            content: results
-        });
-    }
-
-    /**
      * Completes a prompt.
      * @remarks
      * The `input` parameter is optional but if passed in, will be assigned to memory using the

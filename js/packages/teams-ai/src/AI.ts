@@ -416,13 +416,14 @@ export class AI<TState extends TurnState = TurnState> {
                             output = await this._actions
                                 .get(AI.DoCommandActionName)!
                                 .handler(context, state, { handler, ...(cmd as PredictedDoCommand) }, action);
-                            should_loop = output.length > 0;
-                            state.temp.actionOutputs[action] = output;
 
                             // Set output for action call
                             if (actionId) {
                                 should_loop = true;
                                 state.temp.actionOutputs[actionId] = output ?? '';
+                            } else {
+                                should_loop = output.length > 0;
+                                state.temp.actionOutputs[action] = output;
                             }
                         } else {
                             // Redirect to UnknownAction handler
@@ -450,8 +451,13 @@ export class AI<TState extends TurnState = TurnState> {
 
                 // Copy the actions output to the input
                 state.temp.lastOutput = output;
-                state.temp.input = output;
                 state.temp.inputFiles = [];
+
+                if (cmd.type === 'DO' && (cmd as PredictedDoCommand).actionId) {
+                    state.deleteValue(state.temp.input);
+                } else {
+                    state.temp.input = output;
+                }
             }
 
             // Check for looping
