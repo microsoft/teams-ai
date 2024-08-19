@@ -15,5 +15,8 @@
         "frequency_penalty": 0.0,
         "stop_sequences": []
     },
-    "default_backends": ["defaultBackends"]
+    "default_backends": ["defaultBackends"],
+    "augmentation": {
+        "augmentation_type": "none"
+    }
 }
