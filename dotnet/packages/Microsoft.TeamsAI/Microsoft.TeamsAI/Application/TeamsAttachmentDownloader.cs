@@ -69,14 +69,11 @@ namespace Microsoft.Teams.AI.Application
             return files;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="attachment"></param>
-        /// <param name="accessToken"></param>
-        /// <returns></returns>
+
         private async Task<InputFile?> _DownloadFile(Attachment attachment, string accessToken)
         {
+            string? name = attachment.Name;
+
             if (attachment.ContentUrl != null && (attachment.ContentUrl.StartsWith("https://") || attachment.ContentUrl.StartsWith("http://localhost")))
             {
                 // Get downloadable content link
@@ -111,6 +108,7 @@ namespace Microsoft.Teams.AI.Application
                     return new InputFile(new BinaryData(content), contentType)
                     {
                         ContentUrl = attachment.ContentUrl,
+                        Filename = name
                     };
                 }
             }
@@ -119,6 +117,7 @@ namespace Microsoft.Teams.AI.Application
                 return new InputFile(new BinaryData(attachment.Content), attachment.ContentType)
                 {
                     ContentUrl = attachment.ContentUrl,
+                    Filename = name
                 };
             }
         }

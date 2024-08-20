@@ -22,11 +22,7 @@ namespace Microsoft.Teams.AI.AI.Models
 
             if (content != null)
             {
-                string? textContent = content.Text;
-                if (content.Text != null && content.Text != string.Empty)
-                {
-                    this.Content = content.Text;
-                }
+                string textContent = content.Text ?? "";
 
                 MessageContext context = new();
                 for (int i = 0; i < content.TextAnnotations.Count; i++)
@@ -34,14 +30,14 @@ namespace Microsoft.Teams.AI.AI.Models
                     TextAnnotation annotation = content.TextAnnotations[i];
                     if (annotation?.TextToReplace != null)
                     {
-                        textContent.Replace(annotation.TextToReplace, $"[{i}]");
+                        textContent = textContent.Replace(annotation.TextToReplace, $"[{i + 1}]");
                     }
 
                     if (annotation?.InputFileId != null)
                     {
                         // Retrieve file info object
-                        // Neither `content` or `title` is provided in the annotations
-                        context.Citations.Add(new("", "", annotation.InputFileId));
+                        // Neither `content` or `title` is provided in the annotations.
+                        context.Citations.Add(new("Content not available", $"File {i + 1}", annotation.InputFileId));
                     }
 
                     if (annotation?.OutputFileId != null)
@@ -51,6 +47,7 @@ namespace Microsoft.Teams.AI.AI.Models
                     }
                 }
 
+                Content = textContent;
                 Context = context;
             }
         }
