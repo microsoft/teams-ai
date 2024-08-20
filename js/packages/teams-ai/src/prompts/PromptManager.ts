@@ -342,7 +342,9 @@ export class PromptManager implements PromptFunctions {
                 sections.push(new UserMessage('{{$temp.input}}', this.options.max_input_tokens));
             }
             if (template.config.augmentation && template.config.augmentation.augmentation_type === 'tools') {
-                sections.push(new ActionOutputMessage(this.options.max_input_tokens));
+                const includeHistory: boolean = template.config.completion.include_history;
+                const historyVariable = includeHistory ? `conversation.${name}_history` : 'temp.history';
+                sections.push(new ActionOutputMessage(historyVariable));
             }
 
             // Create prompt

@@ -14,21 +14,22 @@ import { Message } from './Message';
 import { PromptFunctions } from './PromptFunctions';
 import { RenderedPromptSection } from './PromptSection';
 import { PromptSectionBase } from './PromptSectionBase';
+import { ActionCall } from '../types';
 
 /**
  * A section capable of rendering user input text and images as a user message.
  */
 export class ActionOutputMessage extends PromptSectionBase {
-    private readonly _inputVariable: string;
+    private readonly _historyVariable: string;
 
     /**
      * Creates a new 'ActionOutputMessage' instance.
+     * @param {string} historyVariable Optional. Name of the variable containing the conversation history.
      * @param {number} tokens Optional. Sizing strategy for this section. Defaults to `auto`.
-     * @param {string} inputVariable Optional. Name of the variable containing the user input text. Defaults to `input`.
      */
-    public constructor(tokens: number = -1, inputVariable = 'actionOutputs') {
+    public constructor(historyVariable = 'temp.history', tokens: number = -1) {
         super(tokens, true, '\n', 'action: ');
-        this._inputVariable = inputVariable;
+        this._historyVariable = historyVariable;
     }
 
     /**
@@ -47,14 +48,20 @@ export class ActionOutputMessage extends PromptSectionBase {
         tokenizer: Tokenizer,
         maxTokens: number
     ): Promise<RenderedPromptSection<Message<any>[]>> {
-        const actionOutputs: Record<string, string> = memory.getValue(this._inputVariable) || {};
+        let actionOutputs: Record<string, string> = {};
+        let actionCalls: ActionCall[] = [];
+        const history: Message[] = memory.getValue(this._historyVariable) ?? [];
         const messages: Message<string>[] = [];
 
-        for (const action in actionOutputs) {
+        if (history.length > 1) {
+            actionOutputs = memory.getValue('temp.actionOutputs');
+            actionCalls = history[history.length - 1].action_calls ?? [];
+        }
+        for (const actionCall of actionCalls) {
             const message: Message<string> = {
                 role: 'tool',
-                content: actionOutputs[action],
-                action_call_id: action
+                content: actionOutputs[actionCall.id],
+                action_call_id: actionCall.id
             };
             messages.push(message);
         }

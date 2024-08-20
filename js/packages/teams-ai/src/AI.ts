@@ -454,7 +454,7 @@ export class AI<TState extends TurnState = TurnState> {
                 state.temp.inputFiles = [];
 
                 if (cmd.type === 'DO' && (cmd as PredictedDoCommand).actionId) {
-                    state.deleteValue(state.temp.input);
+                    state.deleteValue('temp.input');
                 } else {
                     state.temp.input = output;
                 }
