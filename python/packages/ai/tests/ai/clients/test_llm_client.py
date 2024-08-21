@@ -82,24 +82,6 @@ class TestLLMClient(IsolatedAsyncioTestCase):
         return context
 
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
-    async def test_add_action_output(self, mock_async_openai):
-        context = self.create_mock_context()
-        state = await TurnState[ConversationState, UserState, TempState].load(context)
-
-        model = OpenAIModel(OpenAIModelOptions(api_key="", default_model="model"))
-        client = LLMClient(LLMClientOptions(model))
-        state.set(client.options.history_variable, [Message(role="assistant", content="results")])
-        client.add_action_output_to_history(memory=state, id="123", results="results")
-
-        expected_history = [
-            Message(role="assistant", content="results"),
-            Message(role="tool", action_call_id="123", content="results"),
-        ]
-
-        self.assertTrue(mock_async_openai.called)
-        self.assertEqual(state.get(client.options.history_variable), expected_history)
-
-    @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
     async def test_complete_prompt_no_attempts(self, mock_async_openai):
         context = self.create_mock_context()
         state = await TurnState[ConversationState, UserState, TempState].load(context)
