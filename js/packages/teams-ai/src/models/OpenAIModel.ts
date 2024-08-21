@@ -507,31 +507,37 @@ export class OpenAIModel implements PromptCompletionModel {
         messages: ChatCompletionMessageParam[],
         template: PromptTemplate
     ): ChatCompletionCreateParams {
+        let completion = template.config.completion;
+
         // Validate Tools Augmentation
         const isToolsAugmentation =
             template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
 
-        const chatCompletionTools = isToolsAugmentation
-            ? template.actions?.map((action) => {
-                  return {
-                      type: 'function',
-                      function: {
-                          name: action.name,
-                          description: action.description ?? '',
-                          parameters: action.parameters ?? {}
-                      }
-                  } as ChatCompletionTool;
-              })
-            : [];
+        if (isToolsAugmentation) {
+            const chatCompletionTools = isToolsAugmentation
+                ? template.actions?.map((action) => {
+                      const chatCompletionTool: ChatCompletionTool = {
+                          type: 'function',
+                          function: {
+                              name: action.name,
+                              description: action.description ?? '',
+                              parameters: (action.parameters as Record<string, any>) ?? {}
+                          }
+                      };
+                      return chatCompletionTool;
+                  })
+                : [];
 
-        const parallelToolCalls = isToolsAugmentation ? template.config.completion.parallel_tool_calls : undefined;
-        const completion = {
-            ...template.config.completion,
-            tool_choice: isToolsAugmentation ? (template.config.completion.tool_choice ?? 'auto') : undefined,
-            tools: chatCompletionTools,
-            // Only include parallel_tool_calls if tools are enabled and the template has it set; otherwise, it will default to true without being added to the API call
-            ...(!!parallelToolCalls && { parallel_tool_calls: parallelToolCalls })
-        };
+            const parallelToolCalls = template.config.completion.parallel_tool_calls || undefined;
+
+            completion = {
+                ...completion,
+                tool_choice: template.config.completion.tool_choice ?? 'auto',
+                ...(chatCompletionTools && chatCompletionTools.length > 0 && { tools: chatCompletionTools }),
+                // Only include parallel_tool_calls if tools are enabled and the template has it set; otherwise, it will default to true without being added to the API call
+                ...(!!parallelToolCalls && { parallel_tool_calls: parallelToolCalls })
+            };
+        }
 
         const params: ChatCompletionCreateParams = this.copyOptionsToRequest<ChatCompletionCreateParams>(
             {
