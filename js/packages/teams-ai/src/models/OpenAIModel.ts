@@ -592,7 +592,7 @@ export class OpenAIModel implements PromptCompletionModel {
                     if (messages[i].action_calls) {
                         break;
                     }
-                    toolsInput.push(messages[i]);
+                    toolsInput.unshift(messages[i]);
                 }
                 return toolsInput;
             }

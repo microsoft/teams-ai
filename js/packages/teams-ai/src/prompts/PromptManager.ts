@@ -343,7 +343,7 @@ export class PromptManager implements PromptFunctions {
             }
             if (template.config.augmentation && template.config.augmentation.augmentation_type === 'tools') {
                 const includeHistory: boolean = template.config.completion.include_history;
-                const historyVariable = includeHistory ? `conversation.${name}_history` : 'temp.history';
+                const historyVariable = includeHistory ? `conversation.${name}_history` : 'temp.${name}_history';
                 sections.push(new ActionOutputMessage(historyVariable));
             }
 
