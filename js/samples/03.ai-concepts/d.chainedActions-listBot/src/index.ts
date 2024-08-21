@@ -89,11 +89,11 @@ if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
 const model = new OpenAIModel({
     // OpenAI Support
     apiKey: process.env.OPENAI_KEY!,
-    defaultModel: 'gpt-3.5-turbo',
+    defaultModel: 'gpt-4o',
 
     // Azure OpenAI Support
     azureApiKey: process.env.AZURE_OPENAI_KEY!,
-    azureDefaultDeployment: 'gpt-3.5-turbo',
+    azureDefaultDeployment: 'gpt-4o',
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
     azureApiVersion: '2023-03-15-preview',
 
