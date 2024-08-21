@@ -575,9 +575,22 @@ export class OpenAIModel implements PromptCompletionModel {
         return params;
     }
 
-    private getInputMessage(messages: Message<string>[]): Message<string> | undefined {
+    private getInputMessage(messages: Message<string>[]): Message<string>[] | Message<string> | undefined {
         const last = messages.length - 1;
         if (last > 0 && messages[last].role !== 'assistant') {
+            // Handling for when there are multiple action output responses (e.g. user message instantiated multiple tool calls)
+            if (messages[last].role === 'tool') {
+                const toolsInput: Message<string>[] = [];
+
+                for (let i = messages.length - 1; i >= 0; i--) {
+                    if (messages[i].action_calls) {
+                        break;
+                    }
+                    toolsInput.push(messages[i]);
+                }
+                return toolsInput;
+            }
+
             return messages[last];
         }
 
@@ -594,7 +607,7 @@ export class OpenAIModel implements PromptCompletionModel {
         };
     }
 
-    private returnError(err: unknown, input: Message<string> | undefined): PromptResponse<string> {
+    private returnError(err: unknown, input: Message<string>[] | Message<string> | undefined): PromptResponse<string> {
         if (err instanceof OpenAI.APIError) {
             if (err.status == 429) {
                 if (this.options.logRequests) {

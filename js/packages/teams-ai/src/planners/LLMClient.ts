@@ -458,13 +458,18 @@ export class LLMClient<TContent = any> {
     /**
      * @param {Memory} memory - Current memory.
      * @param {string} variable - Variable to fetch value from memory.
-     * @param {Message<any>} message - The Message to be added to history.
+     * @param {Message<any> | Message<any>[]} message - The Message to be added to history.
      * @private
      */
-    private addMessageToHistory(memory: Memory, variable: string, message: Message<any>): void {
+    private addMessageToHistory(memory: Memory, variable: string, message: Message<any> | Message<any>[]): void {
         if (variable) {
             const history: Message[] = memory.getValue(variable) ?? [];
-            history.push(message);
+
+            if (Array.isArray(message)) {
+                history.push(...message);
+            } else {
+                history.push(message);
+            }
 
             if (history.length > this.options.max_history_messages) {
                 history.splice(0, history.length - this.options.max_history_messages);
