@@ -14,7 +14,6 @@ from botbuilder.dialogs import (
     WaterfallDialog,
     WaterfallStepContext,
 )
-
 from botbuilder.schema import Activity, ActivityTypes, SignInConstants
 from msal import ConfidentialClientApplication
 
@@ -45,7 +44,15 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
         self._options = options
         self.initial_dialog_id = SSO_DIALOG_ID
 
+        self.after_turn_callbacks = []
         self.after_turn(self._handle_duplicate_token_exchange)
+
+    def after_turn(self, callback):
+        self.after_turn_callbacks.append(callback)
+
+    async def run_after_turn_callbacks(self, context: TurnContext, state: StateT) -> None:
+        for callback in self.after_turn_callbacks:
+            await callback(context, state)
 
     async def _handle_duplicate_token_exchange(self, context: TurnContext, state: StateT) -> bool:
         return state.temp.duplicate_token_exchange != True
