@@ -4,27 +4,29 @@ Licensed under the MIT License.
 """
 
 from __future__ import annotations
+
 from typing import Generic, Optional, TypeVar, cast
 
-from msal import ConfidentialClientApplication
-from botbuilder.schema import Activity, ActivityTypes, SignInConstants
+from botbuilder.core import TurnContext
 from botbuilder.dialogs import (
     DialogTurnResult,
     DialogTurnStatus,
     WaterfallDialog,
     WaterfallStepContext,
 )
-from botbuilder.core import TurnContext
+from botbuilder.schema import Activity, ActivityTypes, SignInConstants
+from msal import ConfidentialClientApplication
 
-from .sso_prompt import SsoPrompt
+from ...dialogs import Dialog
+from ...state import TurnState
 from ..auth_component import AuthComponent
 from .sso_options import SsoOptions
-from ...state import TurnState
-from ...dialogs import Dialog
+from .sso_prompt import SsoPrompt
 
 StateT = TypeVar("StateT", bound=TurnState)
 
-SSO_DIALOG_ID = '_TeamsSsoDialog'
+SSO_DIALOG_ID = "_TeamsSsoDialog"
+
 
 class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
     "handles dialog sso authentication"
@@ -42,8 +44,7 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
         self._options = options
         self.initial_dialog_id = SSO_DIALOG_ID
 
-        # TODO - duplicate token exchange afterturn state 
-
+        # TODO - duplicate token exchange afterturn state
 
     def is_sign_in_activity(self, activity: Activity) -> bool:
         return (
@@ -51,7 +52,7 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
             and activity.text is not None
             and activity.text != ""
         )
-    
+
     async def sign_in(self, context: TurnContext, state: StateT) -> Optional[str]:
         res = await self.run_dialog(context, state)
 
@@ -62,8 +63,8 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
                 return cast(str, getattr(res.result, "token"))
 
             # Ensure we do not call sign_in recursively indefinitely
-            if not getattr(state, 'sign_in_retries', 0):
-                setattr(state, 'sign_in_retries', 1)
+            if not getattr(state, "sign_in_retries", 0):
+                setattr(state, "sign_in_retries", 1)
                 return await self.sign_in(context, state)
             else:
                 return None
@@ -73,12 +74,10 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
     async def sign_out(self, context: TurnContext, state: StateT) -> None:
         if self.id in state.conversation:
             del state.conversation[self.id]
-    
+
     async def _step_one(self, context: WaterfallStepContext) -> DialogTurnResult:
-        return await context.begin_dialog(
-            "TeamsSsoPrompt"
-        )
-    
+        return await context.begin_dialog("TeamsSsoPrompt")
+
     async def _step_two(self, context: WaterfallStepContext) -> DialogTurnResult:
         token_response = context.result
 
@@ -100,7 +99,7 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
         try:
             await self._options.storage.write({key: store_item})
         except Exception as e:
-            if 'eTag conflict' in str(e):
+            if "eTag conflict" in str(e):
                 return True
             raise e
 
@@ -114,9 +113,13 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
             raise ValueError("Invalid context, cannot get storage key!")
 
         activity = context.activity
-        if activity.type != ActivityTypes.invoke or activity.name != SignInConstants.token_exchange_operation_name:
-            raise ValueError("TokenExchangeState can only be used with Invokes of signin/tokenExchange.")
-
+        if (
+            activity.type != ActivityTypes.invoke
+            or activity.name != SignInConstants.token_exchange_operation_name
+        ):
+            raise ValueError(
+                "TokenExchangeState can only be used with Invokes of signin/tokenExchange."
+            )
 
         value_id = activity.value.get("id")
         if not value_id:
