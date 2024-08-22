@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from typing import Generic, Optional, TypeVar, cast
+from typing import Callable, Generic, List, Optional, TypeVar, cast
 
 from botbuilder.core import TurnContext
 from botbuilder.dialogs import (
@@ -44,7 +44,7 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
         self._options = options
         self.initial_dialog_id = SSO_DIALOG_ID
 
-        self.after_turn_callbacks = []
+        self.after_turn_callbacks: List[Callable] = []
         self.after_turn(self._handle_duplicate_token_exchange)
 
     def after_turn(self, callback):
@@ -54,8 +54,8 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
         for callback in self.after_turn_callbacks:
             await callback(context, state)
 
-    async def _handle_duplicate_token_exchange(self, context: TurnContext, state: StateT) -> bool:
-        return state.temp.duplicate_token_exchange != True
+    async def _handle_duplicate_token_exchange(self, state: StateT) -> bool:
+        return state.temp.duplicate_token_exchange is not True
 
     def is_sign_in_activity(self, activity: Activity) -> bool:
         return (
@@ -76,8 +76,6 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
             if not getattr(state, "sign_in_retries", 0):
                 setattr(state, "sign_in_retries", 1)
                 return await self.sign_in(context, state)
-            else:
-                return None
 
         return None
 
@@ -91,19 +89,19 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
     async def _step_two(self, context: WaterfallStepContext) -> DialogTurnResult:
         token_response = context.result
 
-        if token_response and await self._should_dedup(context.context, context.state):
+        if token_response and await self._should_dedup(context.context):
             context.state.temp.duplicate_token_exchange = True
             return DialogTurnResult(DialogTurnStatus.Waiting)
 
         context.state.temp.duplicate_token_exchange = False
         return await context.end_dialog(token_response)
 
-    async def _should_dedup(self, context: TurnContext, state: StateT) -> bool:
+    async def _should_dedup(self, context: TurnContext) -> bool:
         """
         Checks if deduplication should be performed for token exchange.
         """
-        eTag = context.activity.value.get("id")
-        store_item = {"eTag": eTag}
+        etag = context.activity.value.get("id")
+        store_item = {"eTag": etag}
         key = self._get_storage_key(context)
 
         try:
