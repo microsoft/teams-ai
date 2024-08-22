@@ -1,24 +1,30 @@
+"""
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the MIT License.
+"""
+
 import unittest
-from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
 from botbuilder.dialogs import DialogTurnResult, DialogTurnStatus
 from msal import ConfidentialClientApplication
 
-from teams.auth import SsoDialog, SsoOptions
+from teams.auth import SsoDialog, SsoOptions, ConfidentialClientApplicationOptions
 from teams.state import TurnState
 
 
 class TestSsoDialog(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         self.storage_mock = AsyncMock()
+        self.msal_config = ConfidentialClientApplicationOptions(
+            client_id="client_id",
+            authority="https://login.microsoftonline.com/common",
+            client_secret="client_secret",
+        )
+
         self.options = SsoOptions(
             scopes=["User.Read"],
-            msal_config={
-                "client_id": "client_id",
-                "authority": "https://login.microsoftonline.com/common",
-                "client_secret": "client_secret",
-            },
+            msal_config=self.msal_config,
             sign_in_link="https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
             timeout=900000,
             end_on_invalid_message=True,
