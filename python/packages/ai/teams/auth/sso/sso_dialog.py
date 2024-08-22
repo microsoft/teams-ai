@@ -14,6 +14,7 @@ from botbuilder.dialogs import (
     WaterfallDialog,
     WaterfallStepContext,
 )
+
 from botbuilder.schema import Activity, ActivityTypes, SignInConstants
 from msal import ConfidentialClientApplication
 

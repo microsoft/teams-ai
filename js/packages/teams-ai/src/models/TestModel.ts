@@ -7,11 +7,8 @@
  */
 
 import { PromptFunctions, PromptTemplate } from '../prompts';
-import { 
-    PromptCompletionModel, 
-    PromptCompletionModelEmitter, 
-    PromptResponse 
-} from './PromptCompletionModel';
+import { PromptCompletionModel, PromptCompletionModelEmitter } from './PromptCompletionModel';
+import { PromptResponse } from '../types';
 import { Tokenizer } from '../tokenizers';
 import { TurnContext } from 'botbuilder';
 import { Memory } from '../MemoryFork';
@@ -22,18 +19,36 @@ import EventEmitter from 'events';
  */
 export class TestModel implements PromptCompletionModel {
     private readonly _events: PromptCompletionModelEmitter = new EventEmitter() as PromptCompletionModelEmitter;
-    private readonly _handler: (model: TestModel, context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate) => Promise<PromptResponse<string>>;
+    private readonly _handler: (
+        model: TestModel,
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        template: PromptTemplate
+    ) => Promise<PromptResponse<string>>;
 
     /**
      * Creates a new `OpenAIModel` instance.
      * @param {OpenAIModelOptions} options - Options for configuring the model client.
+     * @param handler
      */
-    public constructor(handler: (model: TestModel, context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate) => Promise<PromptResponse<string>>) {
+    public constructor(
+        handler: (
+            model: TestModel,
+            context: TurnContext,
+            memory: Memory,
+            functions: PromptFunctions,
+            tokenizer: Tokenizer,
+            template: PromptTemplate
+        ) => Promise<PromptResponse<string>>
+    ) {
         this._handler = handler;
     }
 
     /**
      * Events emitted by the model.
+     * @returns {PromptCompletionModelEmitter} An event emitter for the model.
      */
     public get events(): PromptCompletionModelEmitter {
         return this._events;
@@ -58,7 +73,16 @@ export class TestModel implements PromptCompletionModel {
         return this._handler(this, context, memory, functions, tokenizer, template);
     }
 
-    public static createTestModel(handler: (model: TestModel, context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate) => Promise<PromptResponse<string>>): TestModel {
+    public static createTestModel(
+        handler: (
+            model: TestModel,
+            context: TurnContext,
+            memory: Memory,
+            functions: PromptFunctions,
+            tokenizer: Tokenizer,
+            template: PromptTemplate
+        ) => Promise<PromptResponse<string>>
+    ): TestModel {
         return new TestModel(handler);
     }
 
@@ -87,12 +111,14 @@ export class TestModel implements PromptCompletionModel {
         return new TestModel(async (model, context, memory, functions, tokenizer, template) => {
             model.events.emit('beforeCompletion', context, memory, functions, tokenizer, template, true);
             let content: string = '';
-            for (let i = 0; i <chunks.length; i++) {
+            for (let i = 0; i < chunks.length; i++) {
                 await new Promise((resolve) => setTimeout(resolve, delay));
                 const text = chunks[i];
                 content += text;
                 if (i === 0) {
-                    model.events.emit('chunkReceived', context, memory, { delta: { role: 'assistant', content: text } });
+                    model.events.emit('chunkReceived', context, memory, {
+                        delta: { role: 'assistant', content: text }
+                    });
                 } else {
                     model.events.emit('chunkReceived', context, memory, { delta: { content: text } });
                 }

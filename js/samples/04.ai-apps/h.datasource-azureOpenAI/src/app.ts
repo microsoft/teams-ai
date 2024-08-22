@@ -1,4 +1,4 @@
-import { OpenAIModel, PromptManager, ActionPlanner, Application, TurnState, TeamsAdapter } from '@microsoft/teams-ai';
+import { OpenAIModel, PromptManager, ActionPlanner, Application, TurnState, TeamsAdapter, FeedbackLoopData } from '@microsoft/teams-ai';
 import { DefaultAzureCredential, getBearerTokenProvider } from '@azure/identity';
 import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
 import axios from 'axios';
@@ -11,10 +11,20 @@ error.log = console.log.bind(console);
 interface ConversationState {}
 type ApplicationTurnState = TurnState<ConversationState>;
 
+const adapter = new TeamsAdapter(
+    {},
+    new ConfigurationServiceClientCredentialFactory({
+        MicrosoftAppId: process.env.BOT_ID,
+        MicrosoftAppPassword: process.env.BOT_PASSWORD,
+        MicrosoftAppTenantId: process.env.BOT_TENANT_ID,
+        MicrosoftAppType: process.env.BOT_TYPE
+    })
+);
+
 // Create AI components
 const model = new OpenAIModel({
     // Azure OpenAI Support
-    azureDefaultDeployment: 'gpt-35-turbo',
+    azureDefaultDeployment: process.env.AZURE_OPENAI_DEPLOYMENT!,
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
     azureApiVersion: '2024-02-15-preview',
     azureADTokenProvider: getBearerTokenProvider(
@@ -24,7 +34,12 @@ const model = new OpenAIModel({
 
     // Request logging
     logRequests: true,
-    useSystemMessages: true
+    useSystemMessages: true,
+    requestConfig: {
+        headers: {
+            'x-ms-useragent': adapter.userAgent
+        }
+    }
 });
 
 const prompts = new PromptManager({
@@ -40,28 +55,21 @@ const planner = new ActionPlanner({
 // Define storage and application
 const storage = new MemoryStorage();
 export const app = new Application<ApplicationTurnState>({
+    adapter,
     storage,
     ai: {
         planner: planner,
         enable_feedback_loop: true
-    },
-    adapter: new TeamsAdapter(
-        {},
-        new ConfigurationServiceClientCredentialFactory({
-            MicrosoftAppId: process.env.BOT_ID, // Set to "" if using the Teams Test Tool
-            MicrosoftAppPassword: process.env.BOT_PASSWORD, // Set to "" if using the Teams Test Tool
-            MicrosoftAppType: 'MultiTenant'
-        })
-    )
+    }
 });
 
-app.conversationUpdate('membersAdded', async (context) => {
+app.conversationUpdate('membersAdded', async (context: TurnContext) => {
     await context.sendActivity(
         "Welcome! I'm a conversational bot that can tell you about your data. You can also type `/clear` to clear the conversation history."
     );
 });
 
-app.message('/clear', async (context, state) => {
+app.message('/clear', async (context: TurnContext, state: TurnState) => {
     state.deleteConversationState();
     await context.sendActivity("New chat session started: Previous messages won't be used as context for new queries.");
 });
@@ -78,7 +86,7 @@ app.error(async (context: TurnContext, err: any) => {
     } else {
         error(err);
     }
-
+    
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
@@ -92,7 +100,7 @@ app.error(async (context: TurnContext, err: any) => {
     await context.sendActivity('To continue to run this bot, please fix the bot source code.');
 });
 
-app.feedbackLoop(async (_context, _state, feedbackLoopData) => {
+app.feedbackLoop(async (_context: TurnContext, _state: TurnState, feedbackLoopData: FeedbackLoopData ) => {
     if (feedbackLoopData.actionValue.reaction === 'like') {
         console.log('👍');
     } else {

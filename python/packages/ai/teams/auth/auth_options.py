@@ -10,8 +10,8 @@ from typing import Callable, Dict, Optional, Union
 
 from botbuilder.core import TurnContext
 
-from .sso import SsoOptions
 from .oauth import OAuthOptions
+from .sso import SsoOptions
 
 
 @dataclass
