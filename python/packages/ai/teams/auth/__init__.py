@@ -7,10 +7,8 @@ from .auth import Auth
 from .auth_manager import AuthManager
 from .auth_options import AuthOptions
 from .oauth import OAuth, OAuthDialog, OAuthOptions
-
-from .sso import SsoAuth, SsoOptions, SsoDialog, ConfidentialClientApplicationOptions
 from .sign_in_response import AuthErrorReason, SignInResponse, SignInStatus
-from .sso import ConfidentialClientApplicationOptions, SsoAuth, SsoOptions
+from .sso import ConfidentialClientApplicationOptions, SsoAuth, SsoDialog, SsoOptions
 
 __all__ = [
     "SignInStatus",
@@ -25,5 +23,5 @@ __all__ = [
     "SsoAuth",
     "SsoOptions",
     "SsoDialog",
-    "ConfidentialClientApplicationOptions"
+    "ConfidentialClientApplicationOptions",
 ]

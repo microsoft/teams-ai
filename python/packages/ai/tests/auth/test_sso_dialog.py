@@ -9,7 +9,7 @@ from unittest.mock import AsyncMock, MagicMock
 from botbuilder.dialogs import DialogTurnResult, DialogTurnStatus
 from msal import ConfidentialClientApplication
 
-from teams.auth import SsoDialog, SsoOptions, ConfidentialClientApplicationOptions
+from teams.auth import ConfidentialClientApplicationOptions, SsoDialog, SsoOptions
 from teams.state import TurnState
 
 

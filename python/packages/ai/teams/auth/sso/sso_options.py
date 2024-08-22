@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Any
+from typing import Any, List
 
 from dataclasses_json import DataClassJsonMixin, dataclass_json
 
@@ -36,8 +36,8 @@ class SsoOptions(DataClassJsonMixin):
     # Whether auth should end upon receiving an invalid message.
     # Only works in conversational bot scenario.
 
-
     storage: Any = None
+
 
 @dataclass_json
 @dataclass
