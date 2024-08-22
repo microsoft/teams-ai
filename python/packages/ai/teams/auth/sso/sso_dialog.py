@@ -65,7 +65,6 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
             if hasattr(res.result, "token"):
                 return cast(str, getattr(res.result, "token"))
 
-            # Ensure we do not call sign_in recursively indefinitely
             if not getattr(state, "sign_in_retries", 0):
                 setattr(state, "sign_in_retries", 1)
                 return await self.sign_in(context, state)
