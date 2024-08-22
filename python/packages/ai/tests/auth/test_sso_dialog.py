@@ -70,11 +70,6 @@ class TestSsoDialog(unittest.IsolatedAsyncioTestCase):
 
         result = await self.sso_dialog._step_two(waterfall_step_context)
 
-        print(
-            "duplicate_token_exchange after _step_two:",
-            waterfall_step_context.context.state.temp.duplicate_token_exchange,
-        )
-
         self.sso_dialog._should_dedup.assert_called_once_with(
             waterfall_step_context.context, waterfall_step_context.state
         )
