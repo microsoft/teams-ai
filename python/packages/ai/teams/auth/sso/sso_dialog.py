@@ -44,7 +44,10 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
         self._options = options
         self.initial_dialog_id = SSO_DIALOG_ID
 
-        # TODO - duplicate token exchange afterturn state
+        self.after_turn(self._handle_duplicate_token_exchange)
+
+    async def _handle_duplicate_token_exchange(self, context: TurnContext, state: StateT) -> bool:
+        return state.temp.duplicate_token_exchange != True
 
     def is_sign_in_activity(self, activity: Activity) -> bool:
         return (
