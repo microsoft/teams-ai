@@ -1,4 +1,5 @@
-﻿using Microsoft.Teams.AI.Utilities;
+﻿using Azure.Core;
+using Microsoft.Teams.AI.Utilities;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
@@ -10,7 +11,12 @@ namespace Microsoft.Teams.AI.AI.Models
         /// <summary>
         /// API key to use when making requests to Azure OpenAI.
         /// </summary>
-        public string AzureApiKey { get; set; }
+        public string? AzureApiKey { get; set; }
+
+        /// <summary>
+        /// The token credential to use when making requests to Azure OpenAI.
+        /// </summary>
+        public TokenCredential? TokenCredential { get; set; }
 
         /// <summary>
         /// Default name of the Azure OpenAI deployment (model) to use.
@@ -46,6 +52,23 @@ namespace Microsoft.Teams.AI.AI.Models
             azureEndpoint = azureEndpoint.Trim();
 
             this.AzureApiKey = azureApiKey;
+            this.AzureDefaultDeployment = azureDefaultDeployment;
+            this.AzureEndpoint = azureEndpoint;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AzureOpenAIModelOptions"/> class.
+        /// </summary>
+        /// <param name="tokenCredential">token credential</param>
+        /// <param name="azureDefaultDeployment">the deployment name</param>
+        /// <param name="azureEndpoint">azure endpoint</param>
+        public AzureOpenAIModelOptions(TokenCredential tokenCredential, string azureDefaultDeployment, string azureEndpoint)
+        {
+            Verify.ParamNotNull(tokenCredential);
+            Verify.ParamNotNull(azureDefaultDeployment);
+            Verify.ParamNotNull(azureEndpoint);
+
+            this.TokenCredential = tokenCredential;
             this.AzureDefaultDeployment = azureDefaultDeployment;
             this.AzureEndpoint = azureEndpoint;
         }

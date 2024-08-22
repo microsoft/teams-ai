@@ -15,7 +15,7 @@
         "outline": "outline.png"
     },
     "name": {
-        "short": "EchoBot-${{TEAMSFX_ENV}}",
+        "short": "EchoBot${{APP_NAME_SUFFIX}}",
         "full": "Full name for EchoBot"
     },
     "description": {

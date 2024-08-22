@@ -1,4 +1,11 @@
-﻿namespace Microsoft.Teams.AI.AI.Models
+﻿using Azure.AI.OpenAI;
+using Azure.AI.OpenAI.Chat;
+using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.Utilities;
+using OpenAI.Chat;
+using OAI = OpenAI;
+
+namespace Microsoft.Teams.AI.AI.Models
 {
     /// <summary>
     /// Represents a message that will be passed to the Chat Completions API
@@ -53,11 +60,171 @@
             return (TContent)Content!;
         }
 
-        /// <summary> Initializes a new instance of ChatMessage. </summary>
+        /// <summary>
+        /// Initializes a new instance of ChatMessage.
+        /// </summary>
         /// <param name="role"> The role associated with this message payload. </param>
         public ChatMessage(ChatRole role)
         {
             this.Role = role;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of ChatMessage using OpenAI.Chat.ChatCompletion.
+        /// </summary>
+        /// <param name="chatCompletion"></param>
+        internal ChatMessage(ChatCompletion chatCompletion)
+        {
+            this.Role = ChatRole.Assistant;
+            this.Content = chatCompletion.Content[0].Text;
+
+            if (chatCompletion.FunctionCall != null && chatCompletion.FunctionCall.FunctionName != string.Empty)
+            {
+                this.Name = chatCompletion.FunctionCall.FunctionName;
+                this.FunctionCall = new FunctionCall(chatCompletion.FunctionCall.FunctionName, chatCompletion.FunctionCall.FunctionArguments);
+            }
+
+            if (chatCompletion.ToolCalls != null && chatCompletion.ToolCalls.Count > 0)
+            {
+                this.ToolCalls = new List<ChatCompletionsToolCall>();
+                foreach (ChatToolCall toolCall in chatCompletion.ToolCalls)
+                {
+                    this.ToolCalls.Add(ChatCompletionsToolCall.FromChatToolCall(toolCall));
+                }
+            }
+
+#pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            AzureChatMessageContext? azureContext = chatCompletion.GetAzureMessageContext();
+#pragma warning restore AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            if (azureContext != null)
+            {
+                MessageContext? context = new(azureContext);
+                if (context != null)
+                {
+                    this.Context = context;
+                }
+            }
+        }
+
+        internal OAI.Chat.ChatMessage ToOpenAIChatMessage()
+        {
+            Verify.NotNull(this.Content);
+            Verify.NotNull(this.Role);
+
+            ChatRole role = this.Role;
+            OAI.Chat.ChatMessage? message = null;
+
+            string? content = null;
+            List<ChatMessageContentPart> contentItems = new();
+
+            // Content is a text
+            if (this.Content is string textContent)
+            {
+                content = textContent;
+            }
+            else if (this.Content is IEnumerable<MessageContentParts> contentParts)
+            {
+                // Content is has multiple possibly multi-modal parts.
+                foreach (MessageContentParts contentPart in contentParts)
+                {
+                    if (contentPart is TextContentPart textPart)
+                    {
+                        contentItems.Add(ChatMessageContentPart.CreateTextMessageContentPart(textPart.Text));
+                    }
+                    else if (contentPart is ImageContentPart imagePart)
+                    {
+                        contentItems.Add(ChatMessageContentPart.CreateImageMessageContentPart(new Uri(imagePart.ImageUrl)));
+                    }
+                }
+            }
+
+            // Different roles map to different classes
+            if (role == ChatRole.User)
+            {
+                UserChatMessage userMessage;
+                if (content != null)
+                {
+                    userMessage = new(content);
+                }
+                else
+                {
+                    userMessage = new(contentItems);
+                }
+
+                if (this.Name != null)
+                {
+                    // TODO: Currently no way to set `ParticipantName` come and change it eventually.
+                    //userMessage.ParticipantName = this.Name;
+                }
+
+                message = userMessage;
+            }
+
+            if (role == ChatRole.Assistant)
+            {
+                AssistantChatMessage assistantMessage;
+
+                if (this.FunctionCall != null)
+                {
+                    ChatFunctionCall functionCall = new(this.FunctionCall.Name ?? "", this.FunctionCall.Arguments ?? "");
+                    assistantMessage = new AssistantChatMessage(functionCall, this.GetContent<string>());
+                }
+                else if (this.ToolCalls != null)
+                {
+                    List<ChatToolCall> toolCalls = new();
+                    foreach (ChatCompletionsToolCall toolCall in this.ToolCalls)
+                    {
+                        toolCalls.Add(toolCall.ToChatToolCall());
+                    }
+                    assistantMessage = new AssistantChatMessage(toolCalls, this.GetContent<string>());
+                }
+                else
+                {
+                    assistantMessage = new AssistantChatMessage(this.GetContent<string>());
+                }
+
+                if (this.Name != null)
+                {
+                    // TODO: Currently no way to set `ParticipantName` come and change it eventually.
+                    // assistantMessage.ParticipantName = this.Name;
+                }
+
+                message = assistantMessage;
+            }
+
+            if (role == ChatRole.System)
+            {
+                SystemChatMessage systemMessage = new(this.GetContent<string>());
+
+                if (this.Name != null)
+                {
+                    // TODO: Currently no way to set `ParticipantName` come and change it eventually.
+                    // systemMessage.ParticipantName = chatMessage.Name;
+                }
+
+                message = systemMessage;
+            }
+
+            if (role == ChatRole.Function)
+            {
+                // TODO: Clean up
+#pragma warning disable CS0618 // Type or member is obsolete
+                message = new FunctionChatMessage(this.Name ?? "", this.GetContent<string>());
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+
+            if (role == ChatRole.Tool)
+            {
+
+                message = new ToolChatMessage(this.ToolCallId ?? "", this.GetContent<string>());
+            }
+
+            if (message == null)
+            {
+                throw new TeamsAIException($"Invalid chat message role: {role}");
+            }
+
+            return message;
         }
     }
 

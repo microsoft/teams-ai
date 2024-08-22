@@ -91,6 +91,17 @@ Application<TurnState> app = new ApplicationBuilder<TurnState>()
     .Build();
 ```
 
+### Python
+```python
+app = Application[AppTurnState](
+    ApplicationOptions(
+        ...,
+        ai=AIOptions(
+           enable_feedback_loop=True
+        ),
+    )
+)
+```
 
 This feature is set to false by default. When enabled, all SAY commands from the AI will have the following added to the activity:
 
@@ -122,6 +133,15 @@ app.OnFeedbackLoop(async (turnContext, turnState, feedbackLoopData, cancellation
 {
     // custom logic here...
 });
+```
+
+### Python
+```python
+@app.feedback_loop
+async def feedback_loop(
+    context: TurnContext, state: TurnState, feedback_data: FeedbackLoopData
+):
+    # custom logic here...
 ```
 
 The `feedbackLoopData` payload will contain the following properties:
@@ -184,4 +204,15 @@ public class AIActions
 
 // Program.cs
 app.AI.ImportActions(new AIActions());
+```
+
+### Python
+```python
+@app.ai.action(ActionTypes.SAY_COMMAND)
+async def on_say(
+    _context: ActionTurnContext,
+    _state: AppTurnState,
+):
+    # Custom logic here...
+    return ""
 ```

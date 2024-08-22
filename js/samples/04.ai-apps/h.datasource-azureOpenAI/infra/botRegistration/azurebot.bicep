@@ -8,8 +8,10 @@ param botDisplayName string
 
 param botServiceName string = resourceBaseName
 param botServiceSku string = 'F0'
-param botAadAppClientId string
 param botAppDomain string
+param identityResourceId string
+param identityClientId string
+param identityTenantId string
 
 // Register your web service as a bot with the Bot Framework
 resource botService 'Microsoft.BotService/botServices@2021-03-01' = {
@@ -19,7 +21,10 @@ resource botService 'Microsoft.BotService/botServices@2021-03-01' = {
   properties: {
     displayName: botDisplayName
     endpoint: 'https://${botAppDomain}/api/messages'
-    msaAppId: botAadAppClientId
+    msaAppId: identityClientId
+    msaAppMSIResourceId: identityResourceId
+    msaAppTenantId:identityTenantId
+    msaAppType:'UserAssignedMSI'
   }
   sku: {
     name: botServiceSku

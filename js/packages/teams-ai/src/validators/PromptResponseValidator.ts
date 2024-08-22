@@ -7,9 +7,10 @@
  */
 
 import { TurnContext } from 'botbuilder';
-import { Tokenizer } from '../tokenizers';
-import { PromptResponse } from '../models';
+
 import { Memory } from '../MemoryFork';
+import { Tokenizer } from '../tokenizers';
+import { PromptResponse } from '../types';
 
 /**
  * A validator that can be used to validate prompt responses.
