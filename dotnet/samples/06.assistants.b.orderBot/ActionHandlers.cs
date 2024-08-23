@@ -31,5 +31,14 @@ namespace OrderBot
 
             return "order placed";
         }
+
+        [Action(AIConstants.UnknownActionName, false)]
+        public string UnknownAction([ActionTurnContext] ITurnContext turnContext)
+        {
+            ArgumentNullException.ThrowIfNull(turnContext);
+
+            // Continues execution of next command in the plan.
+            return "The predicted function tool call doesn't exist. Please try again.";
+        }
     }
 }

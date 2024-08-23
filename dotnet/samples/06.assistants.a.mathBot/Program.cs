@@ -35,7 +35,7 @@ if (isAzureCredentialsSet)
 
     if (config.Azure!.OpenAIApiKey != string.Empty)
     {
-    apiKey = config.Azure!.OpenAIApiKey!;
+        apiKey = config.Azure!.OpenAIApiKey!;
     }
     else
     {
@@ -76,7 +76,6 @@ if (string.IsNullOrEmpty(assistantId))
         newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(tokenCredential!, assistantCreationOptions, "gpt-4o-mini", endpoint!).Result.Id;
     }
 
-    string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(apiKey, assistantCreateParams, "gpt-4", endpoint).Result.Id;
     Console.WriteLine($"Created a new assistant with an ID of: {newAssistantId}");
     Console.WriteLine("Copy and save above ID, and set `OpenAI:AssistantId` in appsettings.Development.json.");
     Console.WriteLine("Press any key to exit.");
