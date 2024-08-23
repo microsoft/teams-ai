@@ -141,12 +141,19 @@ namespace Microsoft.Teams.AI.AI.Action
                 entity.Citation = referencedCitations;
             }
 
+            List<Attachment>? attachments = new();
+            if (command.Response.Attachments != null)
+            {
+                attachments = command.Response.Attachments;
+            }
+
             await turnContext.SendActivityAsync(new Activity()
             {
                 Type = ActivityTypes.Message,
                 Text = contentText,
                 ChannelData = channelData,
-                Entities = new List<Entity>() { entity }
+                Entities = new List<Entity>() { entity },
+                Attachments = attachments
             }, cancellationToken);
 
             return string.Empty;

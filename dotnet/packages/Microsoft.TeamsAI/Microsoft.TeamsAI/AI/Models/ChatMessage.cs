@@ -1,5 +1,6 @@
 ﻿using Azure.AI.OpenAI;
 using Azure.AI.OpenAI.Chat;
+using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.Utilities;
 using OpenAI.Chat;
@@ -49,6 +50,10 @@ namespace Microsoft.Teams.AI.AI.Models
         /// </summary>
         public IList<ChatCompletionsToolCall>? ToolCalls { get; set; }
 
+        /// <summary>
+        /// Attachments for the bot to send back.
+        /// </summary>
+        public List<Attachment>? Attachments { get; set; }
 
         /// <summary>
         /// Gets the content with the given type.
