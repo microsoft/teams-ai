@@ -26,6 +26,9 @@ To learn more about it you can read the [Assistants API Overview](https://platfo
 
 The Assistants Planner connects your Assistant to the Teams AI library which allows you to deploy it as a chat bot in Microsoft Teams.
 
+## When would you use the Assistants Planner?
+If you want to connect an OpenAI/Azure OpenAI Assistant to Microsoft Teams.  
+
 ## Samples
 
 The best way to try the Assistants Planner is to setup and run one of the samples:
