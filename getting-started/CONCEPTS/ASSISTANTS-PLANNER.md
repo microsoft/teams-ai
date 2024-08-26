@@ -20,7 +20,7 @@
 
 The [Assistants API](https://platform.openai.com/docs/assistants/overview) allows you to build AI assistants within your own applications. An Assistant has instructions and can leverage models, tools, and files to respond to user queries. The Assistants API currently supports three types of tools: Code Interpreter, File Search, and Function calling.
 
-It is highly recommended that you have basic familiarity with the Assistants API. You can read the [Assistants API Overview](https://platform.openai.com/docs/assistants/overview) and try it out in the [OpenAI Assistants Playground](https://platform.openai.com/playground/assistants). 
+To learn more about it you can read the [Assistants API Overview](https://platform.openai.com/docs/assistants/overview) and try it out in the [OpenAI Assistants Playground](https://platform.openai.com/playground/assistants). 
 
 The Assistants Planner connects your Assistant to the Teams AI library which allows you to deploy it as a chat bot in Microsoft Teams.
 
