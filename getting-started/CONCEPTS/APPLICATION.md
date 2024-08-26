@@ -71,7 +71,7 @@ The `Application` groups the route registration methods based on the specific fe
 | AdaptiveCards     | Adaptive card activities like `adaptiveCard/action`.             |
 | General           | Generic activites like `message`.                                |
 
-> To see all the route registration methods supported, see the migration docs ([JS](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/JS.md#activity-handler-methods) | [C#](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/DOTNET.md#activity-handler-methods)).
+> To see all the route registration methods supported, see the migration docs ([JS](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/01.JS.md#activity-handler-methods) | [C#](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/02.DOTNET.md#activity-handler-methods)).
 
 In general, the activity handler system is all that is needed to have a functional bot or message extension.
 

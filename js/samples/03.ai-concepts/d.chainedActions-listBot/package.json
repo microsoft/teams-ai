@@ -12,7 +12,9 @@
         "start": "tsc --build && node ./lib/index.js",
         "test": "echo \"Error: no test specified\" && exit 1",
         "watch": "nodemon --watch ./src -e ts --exec \"yarn start\"",
-        "dev:teamsfx": "nodemon --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts"
+        "dev:teamsfx": "nodemon --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts",
+        "dev:teamsfx:testtool": "env-cmd --silent -f .localConfigs.testTool npm run dev:teamsfx",
+        "dev:teamsfx:launch-testtool": "env-cmd --silent -f env/.env.testtool teamsapptester start"
     },
     "repository": {
         "type": "git",
@@ -27,11 +29,12 @@
         "restify": "~11.1.0"
     },
     "devDependencies": {
-        "@types/node": "^20.14.14",
         "@types/jsonwebtoken": "^9.0.4",
+        "@types/node": "^20.16.1",
         "@types/restify": "8.5.12",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
+        "env-cmd": "^10.1.0",
         "eslint": "^8.57.0",
         "nodemon": "~1.19.4",
         "prettier": "^3.3.3",
