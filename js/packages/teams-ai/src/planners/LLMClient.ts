@@ -320,7 +320,7 @@ export class LLMClient<TContent = any> {
                 // Create streamer and send initial message
                 streamer = new StreamingResponse(context);
                 if (this._startStreamingMessage) {
-                    await streamer.sendInformativeUpdate(this._startStreamingMessage);
+                    streamer.queueInformativeUpdate(this._startStreamingMessage);
                 }
             }
         };
@@ -334,7 +334,7 @@ export class LLMClient<TContent = any> {
             // Send chunk to client
             const text = chunk.delta?.content ?? '';
             if (text.length > 0) {
-                await streamer.sendTextChunk(text);
+                streamer.queueTextChunk(text);
             }
         };
 
