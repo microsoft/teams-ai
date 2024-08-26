@@ -18,6 +18,8 @@
 - [**Assistants Planner**](./ASSISTANTS-PLANNER.md)
 ---
 
+> As of 2024-08-26 The latest features of Assistants Planner is only available in the .NET SDK. Javascript and Python SDKs will be brought to parity in the near future.
+
 The [Assistants API](https://platform.openai.com/docs/assistants/overview) allows you to build AI assistants within your own applications. An Assistant has instructions and can leverage models, tools, and files to respond to user queries. The Assistants API currently supports three types of tools: Code Interpreter, File Search, and Function calling.
 
 To learn more about it you can read the [Assistants API Overview](https://platform.openai.com/docs/assistants/overview) and try it out in the [OpenAI Assistants Playground](https://platform.openai.com/playground/assistants). 
@@ -36,7 +38,7 @@ From the [samples catalogue](https://github.com/microsoft/teams-ai/blob/main/get
 ## High Level Features
 In this section terms like `Assistant`, `Thread`, `Message`, `Run` will refer to Assistants API concepts.
 
-
+* `beta-v2` API is used by default.
 * A Thread is created for every single conversation.
 * Supports both OpenAI and Azure OpenAI Assistants API.
 * Authentication using API Keys and Microsoft Entra ID managed identity (Azure OpenAI only)  
