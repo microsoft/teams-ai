@@ -1,5 +1,23 @@
 # Assistants Planner
 
+<small>**Navigation**</small>
+
+- [00.OVERVIEW](./README.md)
+- [Action Planner](./ACTION-PLANNER.md)
+- [Actions](./ACTIONS.md)
+- [AI System](./AI-SYSTEM.md)
+- [Application class](./APPLICATION.md)
+- [Augmentations](./AUGMENTATIONS.md)
+- [Data Sources](./DATA-SOURCES.md)
+- [Moderator](./MODERATOR.md)
+- [Planner](./PLANNER.md)
+- [Powered by AI](./POWERED-BY-AI.md)
+- [Prompts](./PROMPTS.md)
+- [Turns](./TURNS.md)
+- [User Authentication](./USER-AUTH.md)
+- [**Assistants Planner**](./ASSISTANTS-PLANNER.md)
+---
+
 The [Assistants API](https://platform.openai.com/docs/assistants/overview) allows you to build AI assistants within your own applications. An Assistant has instructions and can leverage models, tools, and files to respond to user queries. The Assistants API currently supports three types of tools: Code Interpreter, File Search, and Function calling.
 
 It is highly recommended that you have basic familiarity with the Assistants API. You can read the [Assistants API Overview](https://platform.openai.com/docs/assistants/overview) and try it out in the [OpenAI Assistants Playground](https://platform.openai.com/playground/assistants). 
