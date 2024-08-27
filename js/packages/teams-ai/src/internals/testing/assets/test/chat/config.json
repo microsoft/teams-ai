@@ -1,21 +1,24 @@
 {
     "schema": 1.1,
-    "description": "A bot that can manage lists of items",
+    "description": "Chat with Teams RAG",
     "type": "completion",
     "completion": {
-        "model": "gpt-4o",
+        "model": "gpt-35-turbo",
         "completion_type": "chat",
         "include_history": true,
         "include_input": true,
-        "max_input_tokens": 2800,
+        "max_input_tokens": 5000,
         "max_tokens": 1000,
-        "temperature": 0.2,
+        "temperature": 0.9,
         "top_p": 0.0,
         "presence_penalty": 0.6,
         "frequency_penalty": 0.0,
         "stop_sequences": []
     },
     "augmentation": {
-        "augmentation_type": "monologue"
+        "augmentation_type": "none",
+        "data_sources": {
+            "azure-ai-search": 2500
+        }
     }
 }
