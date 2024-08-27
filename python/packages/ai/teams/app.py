@@ -610,11 +610,11 @@ class Application(Bot, Generic[StateT]):
                 if not context.activity.value:
                     return False
 
-                activity_value = context.activity.value
-                if isinstance(activity_value, dict) and activity_value.get("actionValue"):
-                    activity_value["action_value"] = activity_value.get("actionValue")
-                feedback = FeedbackLoopData.from_dict(activity_value)
-                feedback.reply_to_id = context.activity.reply_to_id
+                activity_value: dict = context.activity.value
+                feedback = FeedbackLoopData.from_dict({
+                    **activity_value,
+                    "reply_to_id": context.activity.reply_to_id,
+                })
 
                 await func(context, state, feedback)
                 await context.send_activity(
