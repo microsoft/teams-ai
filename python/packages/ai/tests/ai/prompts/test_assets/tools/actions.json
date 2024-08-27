@@ -1,0 +1,25 @@
+[
+    {
+        "name": "createList",
+        "description": "Creates a new list with an optional set of initial items",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "string",
+                    "description": "The name of the list to create"
+                },
+                "items": {
+                    "type": "array",
+                    "description": "The items to add to the list",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "list"
+            ]
+        }
+    }
+]
