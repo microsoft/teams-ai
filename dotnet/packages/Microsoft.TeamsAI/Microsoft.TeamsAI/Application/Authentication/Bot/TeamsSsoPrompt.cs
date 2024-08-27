@@ -29,7 +29,7 @@ namespace Microsoft.Teams.AI
             int timeout = _settings.Timeout;
 
             IDictionary<string, object> state = dc.ActiveDialog.State;
-            state[_expiresKey] = DateTime.Now.AddMilliseconds(timeout);
+            state[_expiresKey] = DateTime.UtcNow.AddMilliseconds(timeout);
 
             // Send OAuth card to get SSO token
             await this.SendOAuthCardToObtainTokenAsync(dc.Context, cancellationToken);
