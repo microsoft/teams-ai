@@ -600,7 +600,7 @@ class Application(Bot, Generic[StateT]):
                 context.activity.type == ActivityTypes.invoke
                 and context.activity.name == "message/submitAction"
                 and isinstance(context.activity.value, dict)
-                and context.activity.value.get("action_name") == "feedback"
+                and context.activity.value.get("actionName") == "feedback"
             )
 
         def __call__(
@@ -611,6 +611,7 @@ class Application(Bot, Generic[StateT]):
                     return False
 
                 feedback = FeedbackLoopData.from_dict(context.activity.value)
+                feedback.action_value = context.activity.value.get("actionValue")
                 feedback.reply_to_id = context.activity.reply_to_id
 
                 await func(context, state, feedback)
