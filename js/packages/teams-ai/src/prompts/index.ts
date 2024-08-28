@@ -6,6 +6,7 @@
  * Licensed under the MIT License.
  */
 
+export * from './ActionOutputMessage';
 export * from './AssistantMessage';
 export * from './DataSourceSection';
 export * from './ConversationHistory';
