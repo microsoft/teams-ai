@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Generic, Literal, Optional, TypeVar
+from typing import Any, Generic, List, Literal, Optional, TypeVar, Union
 
 from ..prompts.message import Message
 
@@ -25,9 +25,9 @@ class PromptResponse(Generic[ContentT]):
     Status of the prompt response.
     """
 
-    input: Optional[Message[Any]] = None
+    input: Optional[Union[Message[Any], List[Message[Any]]]] = None
     """
-    User input message sent to the model. `undefined` if no input was sent.
+    Input message sent to the model. `undefined` if no input was sent.
     """
 
     message: Optional[Message[ContentT]] = None
