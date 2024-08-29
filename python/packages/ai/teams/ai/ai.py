@@ -167,8 +167,14 @@ class AI(Generic[StateT]):
                     output = await self._actions[ActionTypes.DO_COMMAND].invoke(
                         context, state, command, command.action
                     )
-                    loop = len(output) > 0
-                    state.temp.action_outputs[command.action] = output
+
+                    # Set output for action call
+                    if command.action_id:
+                        loop = True
+                        state.temp.action_outputs[command.action_id] = output or ""
+                    else:
+                        loop = len(output) > 0
+                        state.temp.action_outputs[command.action] = output
                 else:
                     output = await self._actions[ActionTypes.UNKNOWN_ACTION].invoke(
                         context, state, plan, command.action
@@ -185,7 +191,12 @@ class AI(Generic[StateT]):
                 return False
 
             state.temp.last_output = output
-            state.temp.input = output
+
+            if isinstance(command, PredictedDoCommand) and command.action_id:
+                state.delete("temp.input")
+            else:
+                state.temp.input = output
+
             state.temp.input_files = []
 
         if loop and self._options.allow_looping:

@@ -14,6 +14,7 @@ from typing import Any, Callable, Dict, List, Optional
 from botbuilder.core import TurnContext
 
 import teams.ai.augmentations
+from teams.ai.prompts.action_output_message import ActionOutputMessage
 
 from ...app_error import ApplicationError
 from ...state import MemoryBase
@@ -322,6 +323,16 @@ class PromptManager(PromptFunctions):
             elif template_config.completion.include_input:
                 sections.append(UserMessage("{{$temp.input}}", self._options.max_input_tokens))
 
+            if (
+                template_config.augmentation
+                and template_config.augmentation.augmentation_type == "tools"
+            ):
+                include_history = template_config.completion.include_history
+                history_var = (
+                    f"conversation.{name}_history" if include_history else f"temp.{name}_history"
+                )
+                sections.append(ActionOutputMessage(history_variable=history_var))
+
             template = PromptTemplate(
                 template_name, Prompt(sections), template_config, template_actions
             )
@@ -400,6 +411,8 @@ class PromptManager(PromptFunctions):
                 curr_augmentation = teams.ai.augmentations.MonologueAugmentation(curr_actions)
             elif augmentation_type == "sequence":
                 curr_augmentation = teams.ai.augmentations.SequenceAugmentation(curr_actions)
+            elif augmentation_type == "tools":
+                curr_augmentation = teams.ai.augmentations.ToolsAugmentation()
 
             # Append the augmentations prompt section
             if curr_augmentation:

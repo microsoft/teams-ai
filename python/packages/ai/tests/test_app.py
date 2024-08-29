@@ -12,7 +12,6 @@ from botbuilder.core import TurnContext
 from botbuilder.schema import Activity, ChannelAccount, ConversationAccount
 
 from teams import Application
-from teams.feedback_loop_data import FeedbackLoopActionValue, FeedbackLoopData
 from teams.message_reaction_types import MessageReactionTypes
 from tests.utils import SimpleAdapter
 
@@ -797,13 +796,11 @@ class TestApp(IsolatedAsyncioTestCase):
                     channel_id="UnitTest",
                     locale="en-uS",
                     service_url="https://example.org",
-                    value=FeedbackLoopData(
-                        action_name="feedback",
-                        action_value=FeedbackLoopActionValue(
-                            reaction="like", feedback="Thanks for liking this"
-                        ),
-                        reply_to_id="5678",
-                    ),
+                    value={
+                        "actionName": "feedback",
+                        "actionValue": {"reaction": "like", "feedback": "Thanks for liking this"},
+                        "reply_to_id": "5678",
+                    },
                 ),
             )
         )

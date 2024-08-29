@@ -5,10 +5,9 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, field
 from logging import Logger
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union
 
 from botbuilder.core import TurnContext
 
@@ -90,29 +89,6 @@ class LLMClient:
         """
 
         self._options = options
-
-    def add_function_result_to_history(self, memory: MemoryBase, name: str, results: Any) -> None:
-        """
-        Adds a result from a `function_call` to the history.
-
-        Args:
-            memory (MemoryBase): An interface for accessing state values.
-            name (str): Name of the function that was called.
-            results (Any): Results returned by the function.
-        """
-
-        content = ""
-
-        if isinstance(results, object):
-            content = json.dumps(results)
-        else:
-            content = str(results)
-
-        self._add_message_to_history(
-            memory=memory,
-            variable=self._options.history_variable,
-            message=Message(role="function", name=name, content=content),
-        )
 
     async def complete_prompt(
         self,
@@ -216,12 +192,20 @@ class LLMClient:
             return PromptResponse(status="error", error=str(err))
 
     def _add_message_to_history(
-        self, memory: MemoryBase, variable: str, message: Message[Any]
+        self, memory: MemoryBase, variable: str, messages: Union[Message[Any], List[Message[Any]]]
     ) -> None:
+
         history: List[Message] = memory.get(variable) or []
-        history.append(message)
+        if isinstance(messages, list):
+            history.extend(messages)
+        else:
+            history.append(messages)
 
         if len(history) > self._options.max_history_messages:
             del history[0 : len(history) - self._options.max_history_messages]
+
+        # Remove completed partial action outputs
+        while history and history[0].role == "tool":
+            del history[0]
 
         memory.set(variable, history)

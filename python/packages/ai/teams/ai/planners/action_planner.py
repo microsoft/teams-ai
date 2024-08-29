@@ -129,12 +129,12 @@ class ActionPlanner(Planner[StateT]):
 
         template = await self._options.prompts.get_prompt(name)
         include_history = template.config.completion.include_history
+        history_var = f"conversation.{name}_history" if include_history else f"temp.{name}_history"
+
         client = LLMClient(
             LLMClientOptions(
                 model=self._options.model,
-                history_variable=(
-                    f"conversation.{name}_history" if include_history else f"temp.{name}_history"
-                ),
+                history_variable=history_var,
                 input_variable="temp.input",
                 validator=validator,
                 logger=self._options.logger,

@@ -36,12 +36,12 @@
         "openai": "4.28.4",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
-        "vectra": "^0.7.6"
+        "vectra": "^0.9.0"
     },
     "devDependencies": {
         "@types/debug": "^4.1.12",
         "@types/jsonwebtoken": "^8.5.0",
-        "@types/node": "^20.14.14",
+        "@types/node": "^20.16.1",
         "@types/restify": "8.5.12",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",

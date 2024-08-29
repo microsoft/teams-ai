@@ -87,11 +87,11 @@ if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
 const model = new OpenAIModel({
     // OpenAI Support
     apiKey: process.env.OPENAI_KEY!,
-    defaultModel: 'gpt-3.5-turbo',
+    defaultModel: 'gpt-4o',
 
     // Azure OpenAI Support
     azureApiKey: process.env.AZURE_OPENAI_KEY!,
-    azureDefaultDeployment: 'gpt-3.5-turbo',
+    azureDefaultDeployment: 'gpt-4o',
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
     azureApiVersion: '2023-03-15-preview',
 
@@ -103,10 +103,15 @@ const prompts = new PromptManager({
     promptsFolder: path.join(__dirname, '../src/prompts')
 });
 
+// Define a prompt function for getting the current status of the lights
+prompts.addFunction('getLightStatus', async (context: TurnContext, memory: Memory) => {
+    return memory.getValue('conversation.lightsOn') ? 'on' : 'off';
+});
+
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'sequence'
+    defaultPrompt: 'tools'
 });
 
 // Define storage and application
@@ -118,9 +123,9 @@ const app = new Application<ApplicationTurnState>({
     }
 });
 
-// Define a prompt function for getting the current status of the lights
-planner.prompts.addFunction('getLightStatus', async (context: TurnContext, memory: Memory) => {
-    return memory.getValue('conversation.lightsOn') ? 'on' : 'off';
+app.ai.action('LightStatus', async (context: TurnContext, state: ApplicationTurnState) => {
+    const status = state.conversation.lightsOn ? 'on' : 'off';
+    return `the lights are ${status}`;
 });
 
 // Register action handlers
