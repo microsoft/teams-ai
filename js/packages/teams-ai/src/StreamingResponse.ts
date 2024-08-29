@@ -206,6 +206,7 @@ export class StreamingResponse {
         // Set activity ID to the assigned stream ID
         if (this._streamId) {
             activity.id = this._streamId;
+            activity.channelData = Object.assign({}, activity.channelData, { streamId: this._streamId });
         }
 
         // Send activity

@@ -271,7 +271,7 @@ export class LLMClient<TContent = any> {
         // Define event handlers
         let isStreaming = false;
         let streamer: StreamingResponse | undefined;
-        const beforeCompletion: PromptCompletionModelBeforeCompletionEvent = async (
+        const beforeCompletion: PromptCompletionModelBeforeCompletionEvent = (
             ctx,
             memory,
             functions,
@@ -296,7 +296,7 @@ export class LLMClient<TContent = any> {
             }
         };
 
-        const chunkReceived: PromptCompletionModelChunkReceivedEvent = async (ctx, memory, chunk) => {
+        const chunkReceived: PromptCompletionModelChunkReceivedEvent = (ctx, memory, chunk) => {
             // Ignore events for other contexts
             if (context !== ctx || !streamer) {
                 return;
