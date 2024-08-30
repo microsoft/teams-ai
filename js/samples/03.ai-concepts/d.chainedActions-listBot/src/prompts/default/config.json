@@ -16,6 +16,6 @@
         "stop_sequences": []
     },
     "augmentation": {
-        "augmentation_type": "monologue"
+        "augmentation_type": "tools"
     }
 }
