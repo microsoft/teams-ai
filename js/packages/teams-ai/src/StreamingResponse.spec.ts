@@ -20,7 +20,8 @@ describe('StreamingResponse', function () {
             const adapter = new TestAdapter();
             await adapter.sendTextToBot('test', async (context) => {
                 const response = new StreamingResponse(context);
-                await response.sendInformativeUpdate('starting');
+                response.queueInformativeUpdate('starting');
+                await response.waitForQueue();
                 assert.equal(typeof response.streamId, 'string', 'streamId should be a string');
                 assert(response.streamId!.length > 0, 'streamId should not be empty');
                 assert.equal(response.updatesSent, 1, 'updatesSent should be 1');
@@ -41,8 +42,9 @@ describe('StreamingResponse', function () {
             const adapter = new TestAdapter();
             await adapter.sendTextToBot('test', async (context) => {
                 const response = new StreamingResponse(context);
-                await response.sendInformativeUpdate('first');
-                await response.sendInformativeUpdate('second');
+                response.queueInformativeUpdate('first');
+                response.queueInformativeUpdate('second');
+                await response.waitForQueue();
                 assert(response.updatesSent == 2, 'updatesSent should be 2');
 
                 // Validate sent activities
@@ -59,7 +61,8 @@ describe('StreamingResponse', function () {
                 const response = new StreamingResponse(context);
                 response.endStream();
                 try {
-                    await response.sendInformativeUpdate('test');
+                    response.queueInformativeUpdate('test');
+                    await response.waitForQueue();
                     assert.fail('should have thrown an error');
                 } catch (err) {
                     assert.equal((err as Error).message, 'The stream has already ended.', 'error message should match');
@@ -73,8 +76,9 @@ describe('StreamingResponse', function () {
             const adapter = new TestAdapter();
             await adapter.sendTextToBot('test', async (context) => {
                 const response = new StreamingResponse(context);
-                await response.sendTextChunk('first');
-                await response.sendTextChunk('second');
+                response.queueTextChunk('first');
+                response.queueTextChunk('second');
+                await response.waitForQueue();
                 assert(response.updatesSent == 2, 'updatesSent should be 2');
 
                 // Validate sent activities
@@ -103,7 +107,8 @@ describe('StreamingResponse', function () {
                 const response = new StreamingResponse(context);
                 response.endStream();
                 try {
-                    await response.sendTextChunk('test');
+                    response.queueTextChunk('test');
+                    await response.waitForQueue();
                     assert.fail('should have thrown an error');
                 } catch (err) {
                     assert.equal((err as Error).message, 'The stream has already ended.', 'error message should match');
@@ -136,8 +141,8 @@ describe('StreamingResponse', function () {
             const adapter = new TestAdapter();
             await adapter.sendTextToBot('test', async (context) => {
                 const response = new StreamingResponse(context);
-                await response.sendTextChunk('first');
-                await response.sendTextChunk('second');
+                response.queueTextChunk('first');
+                response.queueTextChunk('second');
                 await response.endStream();
                 assert(response.updatesSent == 3, 'updatesSent should be 3');
 
