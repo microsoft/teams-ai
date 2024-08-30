@@ -35,13 +35,13 @@ model: OpenAIModel
 
 if config.OPENAI_KEY:
     model = OpenAIModel(
-        OpenAIModelOptions(api_key=config.OPENAI_KEY, default_model="gpt-3.5-turbo")
+        OpenAIModelOptions(api_key=config.OPENAI_KEY, default_model="gpt-4o")
     )
 elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
     model = OpenAIModel(
         AzureOpenAIModelOptions(
             api_key=config.AZURE_OPENAI_KEY,
-            default_model="gpt-35-turbo",
+            default_model="gpt-4o",
             api_version="2023-03-15-preview",
             endpoint=config.AZURE_OPENAI_ENDPOINT,
         )
@@ -55,7 +55,7 @@ app = Application[AppTurnState](
         storage=storage,
         adapter=TeamsAdapter(config),
         ai=AIOptions(planner=ActionPlanner(
-            ActionPlannerOptions(model=model, prompts=prompts, default_prompt="monologue")
+            ActionPlannerOptions(model=model, prompts=prompts, default_prompt="tools")
         )),
     )
 )
