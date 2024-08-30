@@ -3,7 +3,7 @@
     "description": "Chat with Teams Chef",
     "type": "completion",
     "completion": {
-        "model": "gpt-3.5-turbo",
+        "model": "gpt-4o",
         "completion_type": "chat",
         "include_history": true,
         "include_input": true,
@@ -16,7 +16,7 @@
         "stop_sequences": []
     },
     "augmentation": {
-        "augmentation_type": "none",
+        "augmentation_type": "default",
         "data_sources": {
             "teams-ai": 1200
         }

@@ -1,6 +1,6 @@
 # Microsoft Teams Conversational Bot with AI: Teams Chef
 
-This is a conversational bot for Microsoft Teams that thinks it's a Chef to help you cook apps using the Teams AI Library. The bot uses the `gpt-3.5-turbo` model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
+This is a conversational streaming bot for Microsoft Teams that thinks it's a Chef to help you cook apps using the Teams AI Library. The bot uses the `gpt-4o` model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
@@ -20,6 +20,8 @@ This is a conversational bot for Microsoft Teams that thinks it's a Chef to help
 This sample illustrates how to use [Retrieval Augmented Generation (RAG)](https://en.wikipedia.org/wiki/Prompt_engineering#Retrieval-augmented_generation) to easily inject contextual relevant information into the prompt sent to the model. This results in better and more accurate replies from the bot.
 
 The sample uses a local Vector Database, called [Vectra](https://github.com/Stevenic/vectra), and [Semantic Search](https://en.wikipedia.org/wiki/Semantic_search) to find the most relevant information to include in the prompt for the users input. The index can be found in `./index/teams-ai` and includes all of the projects Getting Started docs and the source code for the Teams AI Library. This means you can ask the Teams Chef Bot anything about the library and it can answer it. You can even ask it to write sample code for you!
+
+In addition, the sample illustrates our streaming feature. This is enabled via using our `DefaultAugmentation` class, and by setting `stream: true` in the OpenAIModel declaration. The informative message can be set in the `ActionPlanner` declaration via the `startStreamingMessage` config. Custom logic is available through the `StreamingResponse` class.
 
 ![Teams Chef Bot](./assets/TeamsChef003.png?raw=1)
 
