@@ -13,8 +13,7 @@ import { Memory, MemoryFork } from '../MemoryFork';
 import {
     PromptCompletionModel,
     PromptCompletionModelBeforeCompletionEvent,
-    PromptCompletionModelChunkReceivedEvent,
-    PromptCompletionModelResponseReceivedEvent
+    PromptCompletionModelChunkReceivedEvent
 } from '../models';
 import { ConversationHistory, Message, Prompt, PromptFunctions, PromptTemplate } from '../prompts';
 import { StreamingResponse } from '../StreamingResponse';
@@ -272,7 +271,7 @@ export class LLMClient<TContent = any> {
         // Define event handlers
         let isStreaming = false;
         let streamer: StreamingResponse | undefined;
-        const beforeCompletion: PromptCompletionModelBeforeCompletionEvent = async (
+        const beforeCompletion: PromptCompletionModelBeforeCompletionEvent = (
             ctx,
             memory,
             functions,
@@ -292,12 +291,12 @@ export class LLMClient<TContent = any> {
                 // Create streamer and send initial message
                 streamer = new StreamingResponse(context);
                 if (this._startStreamingMessage) {
-                    await streamer.sendInformativeUpdate(this._startStreamingMessage);
+                    streamer.queueInformativeUpdate(this._startStreamingMessage);
                 }
             }
         };
 
-        const chunkReceived: PromptCompletionModelChunkReceivedEvent = async (ctx, memory, chunk) => {
+        const chunkReceived: PromptCompletionModelChunkReceivedEvent = (ctx, memory, chunk) => {
             // Ignore events for other contexts
             if (context !== ctx || !streamer) {
                 return;
@@ -306,25 +305,14 @@ export class LLMClient<TContent = any> {
             // Send chunk to client
             const text = chunk.delta?.content ?? '';
             if (text.length > 0) {
-                await streamer.sendTextChunk(text);
+                streamer.queueTextChunk(text);
             }
-        };
-
-        const responseReceived: PromptCompletionModelResponseReceivedEvent = async (ctx, memory, response) => {
-            // Ignore events for other contexts
-            if (context !== ctx || !streamer) {
-                return;
-            }
-
-            // End the stream
-            await streamer.endStream();
         };
 
         // Subscribe to model events
         if (this.options.model.events) {
             this.options.model.events.on('beforeCompletion', beforeCompletion);
             this.options.model.events.on('chunkReceived', chunkReceived);
-            this.options.model.events.on('responseReceived', responseReceived);
         }
 
         try {
@@ -335,13 +323,18 @@ export class LLMClient<TContent = any> {
                 delete response.message;
             }
 
+            // End the stream if streaming
+            // - We're not listening for the response received event because we can't await the completion of events.
+            if (streamer) {
+                await streamer.endStream();
+            }
+
             return response;
         } finally {
             // Unsubscribe from model events
             if (this.options.model.events) {
                 this.options.model.events.off('beforeCompletion', beforeCompletion);
                 this.options.model.events.off('chunkReceived', chunkReceived);
-                this.options.model.events.off('responseReceived', responseReceived);
             }
         }
     }
