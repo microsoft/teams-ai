@@ -3,7 +3,7 @@
   "description": "A bot that can turn the lights on and off",
   "type": "completion",
   "completion": {
-    "model": "gpt-4-turbo",
+    "model": "gpt-4o",
     "completion_type": "chat",
     "include_history": true,
     "include_input": true,
@@ -16,6 +16,6 @@
     "stop_sequences": []
   },
   "augmentation": {
-    "augmentation_type": "none"
+    "augmentation_type": "tools"
   }
 }

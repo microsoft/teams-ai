@@ -5,10 +5,10 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal
 
-from dataclasses_json import DataClassJsonMixin, dataclass_json
+from dataclasses_json import DataClassJsonMixin, dataclass_json, config
 
 
 @dataclass_json
@@ -20,7 +20,7 @@ class FeedbackLoopData(DataClassJsonMixin):
     is set to true in the AI Module.
     """
 
-    action_value: FeedbackLoopActionValue
+    action_value: FeedbackLoopActionValue = field(metadata=config(field_name="actionValue"))
 
     reply_to_id: str
     "The activity ID that the feedback was provided on."

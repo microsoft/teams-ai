@@ -9,6 +9,7 @@
 - [Application class](./APPLICATION.md)
 - [Augmentations](./AUGMENTATIONS.md)
 - [Data Sources](./DATA-SOURCES.md)
+- [Function Calls](./FUNCTION-CALLS.md)
 - [Moderator](./MODERATOR.md)
 - [Planner](./PLANNER.md)
 - [Powered by AI](./POWERED-BY-AI.md)
@@ -17,6 +18,8 @@
 - [User Authentication](./USER-AUTH.md)
 
 ---
+
+*NOTE: If you are adding custom actions to your AI system, please use [Function Calls](./FUNCTION-CALLS.md) instead.* 
 
 An action is an atomic function that is registered to the AI System. It is a fundamental building block of a plan. Actions are used to perform tasks such as creating a list, adding items to a list, or sending a message to the user. Actions are executed in the order they are defined in the plan.
 

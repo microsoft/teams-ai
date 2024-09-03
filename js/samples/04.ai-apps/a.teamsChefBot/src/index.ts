@@ -84,7 +84,10 @@ if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
 const model = new OpenAIModel({
     // OpenAI Support
     apiKey: process.env.OPENAI_KEY!,
-    defaultModel: 'gpt-3.5-turbo',
+    defaultModel: 'gpt-4o',
+    stream: true,
+    project: process.env.OPENAI_PROJECT_KEY!,
+    clientOptions: { apiKey: process.env.OPENAI_KEY! },
 
     // Azure OpenAI Support
     azureApiKey: process.env.AZURE_OPENAI_KEY!,
@@ -103,7 +106,8 @@ const prompts = new PromptManager({
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'chat'
+    defaultPrompt: 'default',
+    startStreamingMessage: 'Loading stream results...'
 });
 
 // Define storage and application
