@@ -618,7 +618,7 @@ class Application(Bot, Generic[StateT]):
 
                 await func(context, state, feedback)
                 await context.send_activity(
-                    Activity(type=ActivityTypes.invoke_response, value=InvokeResponse(status=200))
+                    Activity(type=ActivityTypes.invoke_response, value=InvokeResponse(status=200, body={}))
                 )
                 return True
 
