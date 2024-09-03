@@ -92,11 +92,11 @@ if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
 const model = new OpenAIModel({
     // OpenAI Support
     apiKey: process.env.OPENAI_KEY!,
-    defaultModel: 'gpt-3.5-turbo',
+    defaultModel: 'gpt-4o',
 
     // Azure OpenAI Support
     azureApiKey: process.env.AZURE_OPENAI_KEY!,
-    azureDefaultDeployment: 'gpt-3.5-turbo',
+    azureDefaultDeployment: 'gpt-4o',
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
     azureApiVersion: '2023-03-15-preview',
 
@@ -111,7 +111,7 @@ const prompts = new PromptManager({
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'sequence'
+    defaultPrompt: 'default'
 });
 
 // Define storage and application
@@ -159,9 +159,9 @@ app.ai.action('updateMembers', async (context: TurnContext, state: ApplicationTu
                 conversation.members.push(user);
             }
         });
-        return `members updated. think about your next action`;
+        return `members updated.`;
     } else {
-        return `no member changes made. think about your next action`;
+        return `no member changes made.`;
     }
 });
 
@@ -179,9 +179,9 @@ app.ai.action('createWI', async (context: TurnContext, state: ApplicationTurnSta
     parameters.status = 'proposed';
     conversation.workItems.push(parameters);
     if (parameters.assignedTo) {
-        return `work item created with id ${parameters.id}. think about your next action`;
+        return `work item created with id ${parameters.id}.`;
     } else {
-        return `work item created with id ${parameters.id} but needs to be assigned. think about your next action`;
+        return `work item created with id ${parameters.id} but needs to be assigned.`;
     }
 });
 
@@ -193,7 +193,7 @@ app.ai.action('updateWI', async (context: TurnContext, state: ApplicationTurnSta
         if (parameters.assignedTo) workItem.assignedTo = parameters.assignedTo;
         if (parameters.status) workItem.status = parameters.status;
     }
-    return `work item ${parameters.id} was updated. think about your next action`;
+    return `work item ${parameters.id} was updated.`;
 });
 
 // Listen for incoming server requests.
