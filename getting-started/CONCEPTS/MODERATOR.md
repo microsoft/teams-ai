@@ -9,6 +9,7 @@
 - [Application class](./APPLICATION.md)
 - [Augmentations](./AUGMENTATIONS.md)
 - [Data Sources](./DATA-SOURCES.md)
+- [Function Calls](./FUNCTION-CALLS.md)
 - [**Moderator**](./MODERATOR.md)
 - [Planner](./PLANNER.md)
 - [Powered by AI](./POWERED-BY-AI.md)
