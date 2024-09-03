@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Literal
 
-from dataclasses_json import DataClassJsonMixin, dataclass_json, config
+from dataclasses_json import DataClassJsonMixin, config, dataclass_json
 
 
 @dataclass_json
