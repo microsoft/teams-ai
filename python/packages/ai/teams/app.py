@@ -611,14 +611,19 @@ class Application(Bot, Generic[StateT]):
                     return False
 
                 activity_value: dict = context.activity.value
-                feedback = FeedbackLoopData.from_dict({
-                    **activity_value,
-                    "reply_to_id": context.activity.reply_to_id,
-                })
+                feedback = FeedbackLoopData.from_dict(
+                    {
+                        **activity_value,
+                        "reply_to_id": context.activity.reply_to_id,
+                    }
+                )
 
                 await func(context, state, feedback)
                 await context.send_activity(
-                    Activity(type=ActivityTypes.invoke_response, value=InvokeResponse(status=200, body={}))
+                    Activity(
+                        type=ActivityTypes.invoke_response,
+                        value=InvokeResponse(status=200, body={}),
+                    )
                 )
                 return True
 
