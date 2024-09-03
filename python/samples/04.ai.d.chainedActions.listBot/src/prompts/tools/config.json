@@ -1,9 +1,9 @@
 {
     "schema": 1.1,
-    "description": "A bot that can manage a list of work items.",
+    "description": "A bot that can manage lists of items",
     "type": "completion",
     "completion": {
-        "model": "gpt-3.5-turbo",
+        "model": "gpt-4o",
         "completion_type": "chat",
         "include_history": true,
         "include_input": true,
@@ -16,6 +16,6 @@
         "stop_sequences": []
     },
     "augmentation": {
-        "augmentation_type": "sequence"
+        "augmentation_type": "tools"
     }
   }
