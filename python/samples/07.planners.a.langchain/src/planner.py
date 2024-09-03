@@ -33,7 +33,7 @@ class LangChainPlanner(Planner[AppTurnState]):
         model: BaseChatModel,
         prompts: PromptManager,
         tokenizer: Tokenizer = GPTTokenizer(),
-        default_prompt: Union[str, LangChainPlannerPromptFactory] = "default",
+        default_prompt: Union[str, LangChainPlannerPromptFactory] = "tools",
         logger: Logger = Logger("langchain:planner", DEBUG),
     ) -> None:
         self.model = model

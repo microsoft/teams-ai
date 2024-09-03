@@ -8,17 +8,18 @@ import * as restify from 'restify';
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
-import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
+import { ActivityTypes, ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
 
 import {
     ActionPlanner,
-    Application,
+    ApplicationBuilder,
     LlamaModel,
-    Memory,
     PromptManager,
     TeamsAdapter,
     TurnState
 } from '@microsoft/teams-ai';
+
+import * as responses from './responses';
 
 // Read botFilePath and botFileSecret from .env file.
 const ENV_FILE = path.join(__dirname, '..', '.env');
@@ -69,8 +70,11 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
+// Strongly type the applications turn state
 interface ConversationState {
-    lightsOn: boolean;
+    secretWord: string;
+    guessCount: number;
+    remainingGuesses: number;
 }
 type ApplicationTurnState = TurnState<ConversationState>;
 
@@ -97,29 +101,56 @@ const planner = new ActionPlanner({
 // Define storage and application
 // - Note that we're not passing a prompt for our AI options as we won't be chatting with the app.
 const storage = new MemoryStorage();
-const app = new Application<ApplicationTurnState>({
-    storage,
-    ai: {
-        planner
+const app = new ApplicationBuilder<ApplicationTurnState>().withStorage(storage).build();
+
+// List for /reset command and then delete the conversation state
+app.message('/quit', async (context: TurnContext, state: ApplicationTurnState) => {
+    const { secretWord } = state.conversation;
+    state.deleteConversationState();
+    await context.sendActivity(responses.quitGame(secretWord));
+});
+
+app.activity(ActivityTypes.Message, async (context: TurnContext, state: ApplicationTurnState) => {
+    let { secretWord, guessCount, remainingGuesses } = state.conversation;
+    if (secretWord && secretWord.length < 1) {
+        throw new Error('No secret word is assigned.');
     }
-});
+    if (secretWord) {
+        guessCount++;
+        remainingGuesses--;
 
-// Define a prompt function for getting the current status of the lights
-planner.prompts.addFunction('getLightStatus', async (context: TurnContext, memory: Memory) => {
-    return memory.getValue('conversation.lightsOn') ? 'on' : 'off';
-});
+        // Check for correct guess
+        if (context.activity.text.toLowerCase().indexOf(secretWord.toLowerCase()) >= 0) {
+            await context.sendActivity(responses.youWin(secretWord));
+            secretWord = '';
+            guessCount = remainingGuesses = 0;
+        } else if (remainingGuesses == 0) {
+            await context.sendActivity(responses.youLose(secretWord));
+            secretWord = '';
+            guessCount = remainingGuesses = 0;
+        } else {
+            // Ask GPT for a hint
+            const response = await getHint(context, state);
+            if (response.toLowerCase().indexOf(secretWord.toLowerCase()) >= 0) {
+                await context.sendActivity(`[${guessCount}] ${responses.blockSecretWord()}`);
+            } else if (remainingGuesses == 1) {
+                await context.sendActivity(`[${guessCount}] ${responses.lastGuess(response)}`);
+            } else {
+                await context.sendActivity(`[${guessCount}] ${response}`);
+            }
+        }
+    } else {
+        // Start new game
+        secretWord = responses.pickSecretWord();
+        guessCount = 0;
+        remainingGuesses = 20;
+        await context.sendActivity(responses.startGame());
+    }
 
-// Register action handlers
-app.ai.action('LightsOn', async (context: TurnContext, state: ApplicationTurnState) => {
-    state.conversation.lightsOn = true;
-    await context.sendActivity(`[lights on]`);
-    return `the lights are now on`;
-});
-
-app.ai.action('LightsOff', async (context: TurnContext, state: ApplicationTurnState) => {
-    state.conversation.lightsOn = false;
-    await context.sendActivity(`[lights off]`);
-    return `the lights are now off`;
+    // Save game state
+    state.conversation.secretWord = secretWord;
+    state.conversation.guessCount = guessCount;
+    state.conversation.remainingGuesses = remainingGuesses;
 });
 
 // Listen for incoming server requests.
@@ -130,3 +161,21 @@ server.post('/api/messages', async (req, res) => {
         await app.run(context);
     });
 });
+
+/**
+ * Generates a hint for the user based on their input.
+ * @param {TurnContext} context The current turn context.
+ * @param {ApplicationTurnState} state The current turn state.
+ * @returns {Promise<string>} A promise that resolves to a string containing the generated hint.
+ * @throws {Error} If the request to LLM was rate limited.
+ */
+async function getHint(context: TurnContext, state: ApplicationTurnState): Promise<string> {
+    state.temp.input = context.activity.text;
+    const result = await planner.completePrompt(context, state, 'hint');
+
+    if (result.status !== 'success') {
+        throw result.error!;
+    }
+
+    return result.message!.content!;
+}
