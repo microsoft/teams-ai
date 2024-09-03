@@ -20,11 +20,7 @@ You can interact with the bot by asking questions to lead towards the secret wor
 
 ## Setting up the sample
 
-1. Clone the repository
-
-    ```bash
-    git clone https://github.com/Microsoft/teams-ai.git
-    ```
+1. Follow the instructions in the [Python quickstart guide](../../../getting-started/QUICKSTART.md#python-quickstart) to set up your environment and install the necessary dependencies.
 
 2. Duplicate the `sample.env` in the `teams-ai/python/samples/04.ai.a.twentyQuestions` folder. Rename the file to `.env`. 
 
