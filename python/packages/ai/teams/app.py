@@ -195,8 +195,9 @@ class Application(Bot, Generic[StateT]):
         self, context: TurnContext, state: StateT, setting_name: str
     ) -> Optional[str]:
         """
-        If the user is signed in, get the access token. If not, triggers the sign in flow for the provided authentication setting name
-        and returns. In this case, the bot should end the turn until the sign in flow is completed.
+        If the user is signed in, get the access token.
+        If not, triggers the sign in flow for the provided authentication setting name and returns.
+        In this case, the bot should end the turn until the sign in flow is completed.
         """
         if self._auth is None:
             raise ApplicationError("Authentication manager is not configured.")
