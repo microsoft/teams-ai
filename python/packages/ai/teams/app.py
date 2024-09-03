@@ -191,6 +191,31 @@ class Application(Bot, Generic[StateT]):
         """
         return self._meetings
 
+    async def get_token_or_sign_in_user(
+        self, context: TurnContext, state: StateT, setting_name: str
+    ) -> Optional[str]:
+        """
+        If the user is signed in, get the access token. If not, triggers the sign in flow for the provided authentication setting name
+        and returns. In this case, the bot should end the turn until the sign in flow is completed.
+        """
+        if self._auth is None:
+            raise ApplicationError("Authentication manager is not configured.")
+
+        sign_in_response = await self._auth.sign_in(context, state, key=setting_name)
+
+        if sign_in_response.status == "complete":
+
+            token = state.temp.auth_tokens.get(setting_name)
+            if token:
+                return token
+
+        auth_success = await self._authenticate_user(context, state)
+
+        if auth_success:
+            return state.temp.auth_tokens.get(setting_name)
+
+        return None
+
     def activity(
         self, type: ActivityType
     ) -> Callable[[RouteHandler[StateT]], RouteHandler[StateT]]:
