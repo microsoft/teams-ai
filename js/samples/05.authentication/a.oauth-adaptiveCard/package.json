@@ -20,10 +20,10 @@
     },
     "dependencies": {
         "@microsoft/microsoft-graph-client": "^3.0.7",
-        "@microsoft/teams-ai": "~1.3.1",
+        "@microsoft/teams-ai": "~1.4.0",
         "botbuilder": "^4.23.0",
         "dotenv": "^16.4.5",
-        "openai": "4.28.4",
+        "openai": "4.41.1",
         "isomorphic-fetch": "^3.0.0",
         "replace": "~1.2.0",
         "restify": "~11.1.0"
