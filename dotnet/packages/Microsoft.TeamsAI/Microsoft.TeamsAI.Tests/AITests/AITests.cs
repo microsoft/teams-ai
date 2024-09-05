@@ -1,5 +1,5 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Action;
 using Microsoft.Teams.AI.AI.Moderator;

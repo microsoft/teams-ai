@@ -1,7 +1,6 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Connector.Authentication;
-using Microsoft.Bot.Schema;
-using Microsoft.Rest;
+﻿using Microsoft.Copilot.Authentication;
+using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
 using Newtonsoft.Json.Linq;
@@ -14,6 +13,7 @@ namespace Microsoft.Teams.AI.Application
     /// <typeparam name="TState"></typeparam>
     public class TeamsAttachmentDownloader<TState> : IInputFileDownloader<TState> where TState : TurnState, new()
     {
+        private IGetCopilotAccessToken _tokenAccess;
         private TeamsAttachmentDownloaderOptions _options;
         private HttpClient _httpClient;
 
@@ -22,17 +22,14 @@ namespace Microsoft.Teams.AI.Application
         /// Creates the TeamsAttachmentDownloader
         /// </summary>
         /// <param name="options">The options</param>
+        /// <param name="tokenAccess">Instance of IGetCopilotAccessToken</param>
         /// <param name="httpClient">Optional. The http client</param>
         /// <exception cref="ArgumentException"></exception>
-        public TeamsAttachmentDownloader(TeamsAttachmentDownloaderOptions options, HttpClient? httpClient = null)
+        public TeamsAttachmentDownloader(TeamsAttachmentDownloaderOptions options, IGetCopilotAccessToken tokenAccess, HttpClient? httpClient = null)
         {
             this._options = options;
             this._httpClient = httpClient ?? DefaultHttpClient.Instance;
-
-            if (this._options.Adapter.CredentialsFactory == null)
-            {
-                throw new ArgumentException("The credentials factory is not set in the adapter");
-            }
+            this._tokenAccess = tokenAccess ?? throw new ArgumentException("IGetCopilotAccessToken is required");
         }
 
         /// <inheritdoc />
@@ -45,15 +42,7 @@ namespace Microsoft.Teams.AI.Application
                 return new List<InputFile>();
             }
 
-            string accessToken = "";
-
-            bool authEnabled = !(await this._options.Adapter.CredentialsFactory!.IsAuthenticationDisabledAsync(cancellationToken));
-
-            // If authentication is enabled, get access token
-            if (authEnabled)
-            {
-                accessToken = await _GetAccessTokenAsync();
-            }
+            string accessToken = await _tokenAccess.GetAccessTokenAsync(_options.BotAppId, []);
 
             List<InputFile> files = new();
 
@@ -121,44 +110,6 @@ namespace Microsoft.Teams.AI.Application
                     ContentUrl = attachment.ContentUrl,
                 };
             }
-        }
-
-
-        private async Task<string> _GetAccessTokenAsync(CancellationToken cancellationToken = default)
-        {
-            // Normalize the ToChannelFromBotLoginUrlPrefix (and use a default value when it is undefined).
-            // If non-public (specific tenant) login URL is to be used, make sure the full url including tenant ID is provided to TeamsAdapter on setup.
-            string? toChannelFromBotLoginUrl = this._options.Adapter.Configuration?.GetSection("ToChannelFromBotLoginUrl")?.Value;
-            if (toChannelFromBotLoginUrl == null)
-            {
-                toChannelFromBotLoginUrl = string.Format(AuthenticationConstants.ToChannelFromBotLoginUrlTemplate, AuthenticationConstants.DefaultChannelAuthTenant);
-            }
-
-            string? audience = this._options.Adapter.Configuration?.GetSection("ToChannelFromBotOAuthScope")?.Value;
-
-            string ToChannelFromBotLoginUrlPrefix = "https://login.microsoftonline.com/";
-            string ToChannelFromBotLoginUrlPrefixGov = "https://login.microsoftonline.us/";
-
-            // If there is no toChannelFromBotLoginUrl set on the provided configuration, or it starts with 'https://login.microsoftonline.com/', the bot is operating in Public Azure.
-            // So we use the Public Azure audience or the specified audience.
-            if (toChannelFromBotLoginUrl.StartsWith(ToChannelFromBotLoginUrlPrefix))
-            {
-                audience ??= AuthenticationConstants.ToChannelFromBotOAuthScope;
-            }
-            else if (toChannelFromBotLoginUrl.StartsWith(ToChannelFromBotLoginUrlPrefixGov))
-            {
-                audience ??= GovernmentAuthenticationConstants.ToChannelFromBotOAuthScope;
-            }
-
-            ServiceClientCredentials appCreds = await this._options.Adapter.CredentialsFactory!.CreateCredentialsAsync(
-                this._options.BotAppId,
-                audience,
-                toChannelFromBotLoginUrl,
-                true,
-                cancellationToken
-            );
-
-            return await ((AppCredentials)appCreds).GetTokenAsync();
         }
     }
 

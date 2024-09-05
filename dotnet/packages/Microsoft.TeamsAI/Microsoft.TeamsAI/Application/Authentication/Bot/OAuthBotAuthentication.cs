@@ -1,6 +1,6 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Schema;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.BotBuilder.Dialogs;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.Application.Authentication.Bot;
 using Microsoft.Teams.AI.State;
 
@@ -30,10 +30,7 @@ namespace Microsoft.Teams.AI
             this._oauthPrompt = new OAuthPrompt("OAuthPrompt", this._oauthSettings);
 
             // Handles deduplication of token exchange event when using SSO with Bot Authentication
-            if (!IsTokenExchangeMiddlewareRegistered(app))
-            {
-                app.Adapter.Use(new FilteredTeamsSSOTokenExchangeMiddleware(storage ?? new MemoryStorage(), oauthSettings.ConnectionName));
-            }
+            app.Adapter.Use(new FilteredTeamsSSOTokenExchangeMiddleware(storage ?? new MemoryStorage(), settingName));
         }
 
         /// <summary>
@@ -118,14 +115,9 @@ namespace Microsoft.Teams.AI
             };
         }
 
-        protected virtual async Task<SignInResource> GetSignInResourceAsync(ITurnContext context, string connectionName, CancellationToken cancellationToken = default)
+        protected async virtual Task<SignInResource> GetSignInResourceAsync(ITurnContext context, string connectionName, CancellationToken cancellationToken = default)
         {
             return await UserTokenClientWrapper.GetSignInResourceAsync(context, this._oauthSettings.ConnectionName, cancellationToken);
-        }
-
-        private bool IsTokenExchangeMiddlewareRegistered(Application<TState> app)
-        {
-            return app.Adapter.MiddlewareSet.Where(middleWare => middleWare as FilteredTeamsSSOTokenExchangeMiddleware is not null).Count() > 0;
         }
     }
 }

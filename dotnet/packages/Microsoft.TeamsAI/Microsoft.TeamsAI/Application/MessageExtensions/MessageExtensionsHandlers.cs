@@ -1,6 +1,6 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
-using Microsoft.Bot.Schema.Teams;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
+using Microsoft.Copilot.Teams.Primitives;
 using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI

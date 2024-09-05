@@ -1,8 +1,9 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Builder.Integration.AspNet.Core;
-using Microsoft.Bot.Connector;
-using Microsoft.Bot.Schema;
-using Microsoft.Bot.Schema.Teams;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Hosting.AspNetCore;
+using Microsoft.Copilot.Protocols.Adapter;
+using Microsoft.Copilot.Protocols.Connector;
+using Microsoft.Copilot.Protocols.Primitives;
+using Microsoft.Copilot.Teams.Primitives;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.Application;
 using Microsoft.Teams.AI.Exceptions;
@@ -33,7 +34,7 @@ namespace Microsoft.Teams.AI
         private static readonly string CONFIG_SUBMIT_INVOKE_NAME = "config/submit";
 
         private readonly AI<TState>? _ai;
-        private readonly BotAdapter? _adapter;
+        private readonly IBotAdapter? _adapter;
         private readonly AuthenticationManager<TState>? _authentication;
 
         private readonly int _typingTimerDelay = 1000;
@@ -163,7 +164,7 @@ namespace Microsoft.Teams.AI
         /// <summary>
         /// Fluent interface for accessing the bot adapter used to configure the application.
         /// </summary>
-        public BotAdapter Adapter
+        public IBotAdapter Adapter
         {
             get
             {

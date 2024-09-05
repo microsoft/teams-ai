@@ -5,9 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using System.Reflection;
 using Xunit.Abstractions;
-using Microsoft.Bot.Schema;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.State;
-using Microsoft.Bot.Builder;
+using Microsoft.Copilot.BotBuilder;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Extensions.Logging;
 

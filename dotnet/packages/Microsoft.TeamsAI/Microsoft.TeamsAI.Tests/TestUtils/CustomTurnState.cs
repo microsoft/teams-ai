@@ -1,4 +1,4 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Microsoft.Copilot.BotBuilder;
 using Microsoft.Teams.AI.State;
 using Record = Microsoft.Teams.AI.State.Record;
 

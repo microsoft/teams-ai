@@ -1,7 +1,8 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Microsoft.Copilot.BotBuilder;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Exceptions;
-using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Copilot.BotBuilder.Dialogs;
+using Microsoft.Copilot.Protocols.Primitives;
 
 namespace Microsoft.Teams.AI
 {

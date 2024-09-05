@@ -1,6 +1,6 @@
 ﻿using Microsoft.Teams.AI.Utilities;
-using Microsoft.Bot.Schema;
-using Microsoft.Bot.Builder;
+using Microsoft.Copilot.Protocols.Primitives;
+using Microsoft.Copilot.BotBuilder;
 
 namespace Microsoft.Teams.AI
 {
@@ -115,7 +115,7 @@ namespace Microsoft.Teams.AI
             }
         }
 
-        private Task<ResourceResponse[]> StopTimerWhenSendMessageActivityHandlerAsync(ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
+        private Task<ResourceResponse[]> StopTimerWhenSendMessageActivityHandlerAsync(ITurnContext turnContext, List<IActivity> activities, Func<Task<ResourceResponse[]>> next)
         {
             if (_timer != null)
             {

@@ -1,6 +1,6 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Schema;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.BotBuilder.Dialogs;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Exceptions;
 using Newtonsoft.Json.Linq;
@@ -145,7 +145,7 @@ namespace Microsoft.Teams.AI
                 throw new AuthException("Invalid context, can not get storage key!");
             }
 
-            Activity activity = context.Activity;
+            IActivity activity = context.Activity;
             string channelId = activity.ChannelId;
             string conversationId = activity.Conversation.Id;
             if (activity.Type != ActivityTypes.Invoke || activity.Name != SignInConstants.TokenExchangeOperationName)

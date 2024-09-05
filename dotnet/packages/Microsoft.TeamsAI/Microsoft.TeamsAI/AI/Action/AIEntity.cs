@@ -1,4 +1,4 @@
-﻿using Microsoft.Bot.Schema;
+﻿using Microsoft.Copilot.Protocols.Primitives;
 using Newtonsoft.Json;
 
 namespace Microsoft.Teams.AI.AI.Action

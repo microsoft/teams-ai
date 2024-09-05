@@ -1,4 +1,4 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Microsoft.Copilot.BotBuilder;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Augmentations;
 using Microsoft.Teams.AI.AI.Models;

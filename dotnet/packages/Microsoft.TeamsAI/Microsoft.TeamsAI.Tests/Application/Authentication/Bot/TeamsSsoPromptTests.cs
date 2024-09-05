@@ -1,10 +1,10 @@
-﻿using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
+﻿using Microsoft.Copilot.BotBuilder.Dialogs;
+using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Identity.Client;
 using Moq;
-using Microsoft.Bot.Builder.Adapters;
-using Microsoft.Bot.Connector;
+using Microsoft.Copilot.BotBuilder.Adapters;
+using Microsoft.Copilot.Protocols.Connector;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
 

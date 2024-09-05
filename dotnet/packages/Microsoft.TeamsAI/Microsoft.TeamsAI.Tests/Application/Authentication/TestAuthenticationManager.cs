@@ -1,4 +1,4 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Microsoft.Copilot.BotBuilder;
 using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.Tests.Application.Authentication

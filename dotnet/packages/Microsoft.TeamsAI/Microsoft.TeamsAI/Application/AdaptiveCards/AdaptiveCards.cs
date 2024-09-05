@@ -1,5 +1,7 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Adapter;
+using Microsoft.Copilot.Protocols.Connector;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
@@ -340,8 +342,11 @@ namespace Microsoft.Teams.AI
                     throw new TeamsAIException($"Unexpected AdaptiveCards.OnSearch() triggered for activity type: {turnContext.Activity.Type}");
                 }
 
+                // Would probably be better to have a type to convert to.
+                IDictionary<string, System.Text.Json.JsonElement> queryElements = SerializationExtensions.ToJsonElements(searchInvokeValue.QueryOptions);
+
                 AdaptiveCardsSearchParams adaptiveCardsSearchParams = new(searchInvokeValue.QueryText, searchInvokeValue.Dataset ?? string.Empty);
-                Query<AdaptiveCardsSearchParams> query = new(searchInvokeValue.QueryOptions.Top, searchInvokeValue.QueryOptions.Skip, adaptiveCardsSearchParams);
+                Query<AdaptiveCardsSearchParams> query = new(int.Parse(queryElements["top"].ToString()), int.Parse(queryElements["skip"].ToString()), adaptiveCardsSearchParams);
                 IList<AdaptiveCardsSearchResult> results = await handler(turnContext, turnState, query, cancellationToken);
 
                 // Check to see if an invoke response has already been added

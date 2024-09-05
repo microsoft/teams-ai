@@ -1,6 +1,7 @@
 ﻿using Azure.AI.OpenAI;
 using Azure.Core;
-using Microsoft.Bot.Builder;
+using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Teams.AI.AI.Models;

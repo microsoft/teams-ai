@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using Microsoft.Bot.Builder;
+using Microsoft.Copilot.BotBuilder;
 using Microsoft.Teams.AI.AI.Moderator;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.AI.Planners;

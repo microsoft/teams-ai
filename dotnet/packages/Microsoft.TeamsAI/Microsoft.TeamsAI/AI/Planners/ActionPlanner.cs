@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Extensions.Logging;
 using Microsoft.Teams.AI.AI.Clients;
 using Microsoft.Teams.AI.AI.Models;

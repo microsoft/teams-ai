@@ -1,7 +1,8 @@
 ﻿using System.Text.Json;
 using Json.More;
 using Json.Schema;
-using Microsoft.Bot.Builder;
+using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.State;

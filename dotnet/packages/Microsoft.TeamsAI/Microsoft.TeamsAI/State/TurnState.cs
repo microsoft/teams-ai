@@ -1,5 +1,5 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.Utilities;
 using System.Runtime.CompilerServices;
@@ -422,7 +422,7 @@ namespace Microsoft.Teams.AI.State
         protected virtual Dictionary<string, string> OnComputeStorageKeys(ITurnContext context)
         {
             // Compute state keys
-            Activity activity = context.Activity;
+            IActivity activity = context.Activity;
             string channelId = activity.ChannelId;
             string botId = activity.Recipient.Id;
             string conversationId = activity.Conversation.Id;

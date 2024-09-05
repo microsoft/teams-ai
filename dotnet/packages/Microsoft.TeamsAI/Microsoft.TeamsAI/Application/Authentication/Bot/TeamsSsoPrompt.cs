@@ -1,6 +1,6 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Schema;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.BotBuilder.Dialogs;
+using Microsoft.Copilot.Protocols.Primitives;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using Microsoft.Identity.Client;
@@ -146,7 +146,7 @@ namespace Microsoft.Teams.AI
             SignInResource signInResource = GetSignInResource();
 
             // Ensure prompt initialized
-            IMessageActivity prompt = Activity.CreateMessageActivity();
+            IActivity prompt = Activity.CreateMessageActivity();
             prompt.Attachments = new List<Attachment>();
             prompt.Attachments.Add(new Attachment
             {
@@ -200,7 +200,7 @@ namespace Microsoft.Teams.AI
             await turnContext.SendActivityAsync(
                 new Activity
                 {
-                    Type = ActivityTypesEx.InvokeResponse,
+                    Type = ActivityTypes.InvokeResponse,
                     Value = new InvokeResponse
                     {
                         Status = (int)statusCode,

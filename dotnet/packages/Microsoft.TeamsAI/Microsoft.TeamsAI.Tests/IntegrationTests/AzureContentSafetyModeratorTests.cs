@@ -4,9 +4,9 @@ using Microsoft.Teams.AI.AI;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using System.Reflection;
-using Microsoft.Bot.Schema;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.State;
-using Microsoft.Bot.Builder;
+using Microsoft.Copilot.BotBuilder;
 
 namespace Microsoft.Teams.AI.Tests.IntegrationTests
 {

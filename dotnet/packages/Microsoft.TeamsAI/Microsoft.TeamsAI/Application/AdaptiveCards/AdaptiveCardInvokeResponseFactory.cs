@@ -1,5 +1,5 @@
 ﻿using AdaptiveCards;
-using Microsoft.Bot.Schema;
+using Microsoft.Copilot.Protocols.Primitives;
 
 namespace Microsoft.Teams.AI
 {

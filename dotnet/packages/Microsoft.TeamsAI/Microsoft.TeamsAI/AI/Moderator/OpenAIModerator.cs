@@ -2,8 +2,9 @@
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Teams.AI.State;
-using Microsoft.Bot.Builder;
+using Microsoft.Copilot.BotBuilder;
 using Microsoft.Teams.AI.AI.OpenAI;
+using Microsoft.Copilot.Protocols.Primitives;
 
 namespace Microsoft.Teams.AI.AI.Moderator
 {
