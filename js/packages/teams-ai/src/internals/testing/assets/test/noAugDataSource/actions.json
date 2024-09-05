@@ -1,0 +1,16 @@
+[
+    {
+        "name": "SendCard",
+        "description": "Sends an adaptive card to the user",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "card": {
+                    "type": "object",
+                    "description": "The adaptive card to send"
+                }
+            },
+            "required": ["card"]
+        }
+    }
+]

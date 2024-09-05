@@ -127,7 +127,7 @@ class TemplateSection(PromptSectionBase):
         length = len(tokenizer.encode(text))
 
         # Return output
-        messages = [Message(self.role, text)] if length > 0 else []
+        messages = [Message(role=self.role, content=text)] if length > 0 else []
         return self._return_messages(messages, length, tokenizer, max_tokens)
 
     # pylint: enable=too-many-arguments

@@ -84,7 +84,7 @@ jobs:
           parallel: true
           files: ${{ env.SOLUTION_DIR }}TestResults/coverage/lcov.info
       - name: Upload Tests
-        uses: actions/upload-artifact@89ef406dd8d7e03cfd12d9e0a4a378f454709029 # v4.3.5
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: testresults-dotnet-${{ env.dotnet-version }}
           path: ${{ env.SOLUTION_DIR }}TestResults
@@ -104,7 +104,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: Setup Python ${{ env.python-version }}
-        uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
+        uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5.2.0
         with:
           python-version: ${{ env.python-version }}
       - name: Install Dependencies

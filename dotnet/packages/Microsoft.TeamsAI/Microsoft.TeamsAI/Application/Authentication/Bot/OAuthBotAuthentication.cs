@@ -30,7 +30,10 @@ namespace Microsoft.Teams.AI
             this._oauthPrompt = new OAuthPrompt("OAuthPrompt", this._oauthSettings);
 
             // Handles deduplication of token exchange event when using SSO with Bot Authentication
-            app.Adapter.Use(new FilteredTeamsSSOTokenExchangeMiddleware(storage ?? new MemoryStorage(), settingName));
+            if (!IsTokenExchangeMiddlewareRegistered(app))
+            {
+                app.Adapter.Use(new FilteredTeamsSSOTokenExchangeMiddleware(storage ?? new MemoryStorage(), oauthSettings.ConnectionName));
+            }
         }
 
         /// <summary>
@@ -115,9 +118,14 @@ namespace Microsoft.Teams.AI
             };
         }
 
-        protected async virtual Task<SignInResource> GetSignInResourceAsync(ITurnContext context, string connectionName, CancellationToken cancellationToken = default)
+        protected virtual async Task<SignInResource> GetSignInResourceAsync(ITurnContext context, string connectionName, CancellationToken cancellationToken = default)
         {
             return await UserTokenClientWrapper.GetSignInResourceAsync(context, this._oauthSettings.ConnectionName, cancellationToken);
+        }
+
+        private bool IsTokenExchangeMiddlewareRegistered(Application<TState> app)
+        {
+            return app.Adapter.MiddlewareSet.Where(middleWare => middleWare as FilteredTeamsSSOTokenExchangeMiddleware is not null).Count() > 0;
         }
     }
 }

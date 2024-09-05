@@ -1,6 +1,6 @@
 # Microsoft Teams Conversational Bot with AI: Teams Chef
 
-This is a conversational bot for Microsoft Teams that thinks it's a Chef to help you cook apps using the Teams AI Library. The bot uses the `gpt-3.5-turbo` model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
+This is a conversational streaming bot for Microsoft Teams that thinks it's a Chef to help you cook apps using the Teams AI Library. The bot uses the `gpt-4o` model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
@@ -11,6 +11,7 @@ This is a conversational bot for Microsoft Teams that thinks it's a Chef to help
     -   [Setting up the sample](#setting-up-the-sample)
     -   [Testing the sample](#testing-the-sample)
         -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+        -   [Using Teams App test tool](#using-teams-app-test-tool)
 
 <!-- /code_chunk_output -->
 
@@ -19,6 +20,8 @@ This is a conversational bot for Microsoft Teams that thinks it's a Chef to help
 This sample illustrates how to use [Retrieval Augmented Generation (RAG)](https://en.wikipedia.org/wiki/Prompt_engineering#Retrieval-augmented_generation) to easily inject contextual relevant information into the prompt sent to the model. This results in better and more accurate replies from the bot.
 
 The sample uses a local Vector Database, called [Vectra](https://github.com/Stevenic/vectra), and [Semantic Search](https://en.wikipedia.org/wiki/Semantic_search) to find the most relevant information to include in the prompt for the users input. The index can be found in `./index/teams-ai` and includes all of the projects Getting Started docs and the source code for the Teams AI Library. This means you can ask the Teams Chef Bot anything about the library and it can answer it. You can even ask it to write sample code for you!
+
+In addition, the sample illustrates our streaming feature. This is enabled via using our `DefaultAugmentation` class, and by setting `stream: true` in the OpenAIModel declaration. The informative message can be set in the `ActionPlanner` declaration via the `startStreamingMessage` config. Custom logic is available through the `StreamingResponse` class.
 
 ![Teams Chef Bot](./assets/TeamsChef003.png?raw=1)
 
@@ -96,3 +99,29 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 1. In the browser that launches, select the **Add** button to install the app to Teams.
 
 > If you do not have permission to upload custom apps (sideloading), Teams Toolkit will recommend creating and using a Microsoft 365 Developer Program account - a free program to get your own dev environment sandbox that includes Teams.
+
+### Using Teams App test tool
+
+If you are using Azure OpenAI then follow these steps:
+
+- Comment the `SECRET_OPENAI_KEY` variable in the `./env/.env.testtool` file.
+- Add your Azure OpenAI key and endpoint values to the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables
+- Open the `teamsapp.testtool.yml` file and modify the last step to use Azure OpenAI variables instead:
+
+```yml
+- uses: file/createOrUpdateEnvironmentFile
+  with:
+    target: ./.localConfigs.testTool
+    envs:
+      TEAMSFX_NOTIFICATION_STORE_FILENAME: ${{TEAMSFX_NOTIFICATION_STORE_FILENAME}}
+      # OPENAI_KEY: ${{SECRET_OPENAI_KEY}}
+      AZURE_OPENAI_KEY: ${{SECRET_AZURE_OPENAI_KEY}}
+      AZURE_OPENAI_ENDPOINT: ${{SECRET_AZURE_OPENAI_ENDPOINT}}
+```
+1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
+1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
+1. Copy this sample into a new folder outside of teams-ai
+1. Select File > Open Folder in VS Code and choose this sample's directory
+1. From the left pane, select **Run and Debug**(Ctrl+Shift+D) and select **Debug in Test Tool** in dropdown list.
+1. Select Debug > Start Debugging or F5 to run the app.
+1. The browser will pop up to open Teams App Test Tool.

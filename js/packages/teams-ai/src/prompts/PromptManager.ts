@@ -10,12 +10,13 @@ import { TurnContext } from 'botbuilder';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-import { MonologueAugmentation, SequenceAugmentation } from '../augmentations';
+import { MonologueAugmentation, SequenceAugmentation, ToolsAugmentation } from '../augmentations';
 import { DataSource } from '../dataSources';
 import { Memory } from '../MemoryFork';
 import { Tokenizer } from '../tokenizers';
 import { CompletionConfig } from '../types';
 
+import { ActionOutputMessage } from './ActionOutputMessage';
 import { ConversationHistory } from './ConversationHistory';
 import { PromptTemplate } from './PromptTemplate';
 import { DataSourceSection } from './DataSourceSection';
@@ -340,6 +341,11 @@ export class PromptManager implements PromptFunctions {
             } else if (template.config.completion.include_input) {
                 sections.push(new UserMessage('{{$temp.input}}', this.options.max_input_tokens));
             }
+            if (template.config.augmentation && template.config.augmentation.augmentation_type === 'tools') {
+                const includeHistory: boolean = template.config.completion.include_history;
+                const historyVariable = includeHistory ? `conversation.${name}_history` : 'temp.${name}_history';
+                sections.push(new ActionOutputMessage(historyVariable));
+            }
 
             // Create prompt
             template.prompt = new Prompt(sections);
@@ -388,10 +394,7 @@ export class PromptManager implements PromptFunctions {
                 max_input_tokens: 2048,
                 presence_penalty: 0.0,
                 temperature: 0.0,
-                top_p: 0.0,
-                include_tools: false,
-                tool_choice: 'auto',
-                parallel_tool_calls: true
+                top_p: 0.0
             } as CompletionConfig,
             template.config.completion
         );
@@ -442,6 +445,8 @@ export class PromptManager implements PromptFunctions {
                 case 'sequence':
                     template.augmentation = new SequenceAugmentation(template.actions ?? []);
                     break;
+                case 'tools':
+                    template.augmentation = new ToolsAugmentation();
             }
 
             // Append the augmentations prompt section

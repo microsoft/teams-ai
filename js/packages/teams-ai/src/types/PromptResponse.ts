@@ -10,13 +10,7 @@ import { Message } from '../prompts';
  * `too_long` - The rendered prompt exceeded the `max_input_tokens` limit.
  */
 
-export type PromptResponseStatus =
-    | 'success'
-    | 'error'
-    | 'rate_limited'
-    | 'invalid_response'
-    | 'too_long'
-    | 'tools_error';
+export type PromptResponseStatus = 'success' | 'error' | 'rate_limited' | 'invalid_response' | 'too_long';
 
 /**
  * Response returned by a `PromptCompletionClient`.
@@ -30,9 +24,9 @@ export interface PromptResponse<TContent = unknown> {
     status: PromptResponseStatus;
 
     /**
-     * User input message sent to the model. `undefined` if no input was sent.
+     * User input message sent to the model. `undefined` if no input was sent. If multiple action calls were made, this will be an array of messages.
      */
-    input?: Message<any>;
+    input?: Message<any> | Message<any>[];
 
     /**
      * Message returned.

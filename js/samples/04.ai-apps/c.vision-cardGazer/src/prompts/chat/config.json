@@ -17,6 +17,6 @@
         "stop_sequences": []
     },
     "augmentation": {
-        "augmentation_type": "sequence"
+        "augmentation_type": "tools"
     }
-  }
+}

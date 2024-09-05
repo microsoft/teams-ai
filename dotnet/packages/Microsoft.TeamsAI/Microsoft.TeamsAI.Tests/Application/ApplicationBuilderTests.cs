@@ -55,7 +55,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Moderator = new TestModerator()
             };
             AuthenticationOptions<TurnState> authOptions = new();
-            authOptions.AddAuthentication("graph", new OAuthSettings());
+            authOptions.AddAuthentication("graph", new OAuthSettings() { ConnectionName = "graph-connection" });
 
             // Act
             var app = new ApplicationBuilder<TurnState>()

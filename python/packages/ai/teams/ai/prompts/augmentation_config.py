@@ -16,14 +16,15 @@ class AugmentationConfig:
     New in schema version 1.1.
 
     Attributes:
-        augmentation_type (Literal['none','sequence', 'monologue']): Type of augmentation to use.
+        augmentation_type (Literal['none','sequence', 'monologue', 'tools']):
+            Type of augmentation to use. Can be client or server side.
 
         data_sources (Optional[Dict[str, float]]): List of named data sources
             to augment the prompt with. For each data source, the value is the max number of
             tokens to use from the data source.
     """
 
-    augmentation_type: Literal["none", "sequence", "monologue"] = "none"
+    augmentation_type: Literal["none", "sequence", "monologue", "tools"] = "none"
     data_sources: Optional[Dict[str, float]] = None
 
     @classmethod

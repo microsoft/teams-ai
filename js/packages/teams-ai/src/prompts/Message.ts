@@ -6,13 +6,15 @@
  * Licensed under the MIT License.
  */
 
+import { ActionCall } from '../types';
+
 /**
  * A message object sent to or received from an LLM.
  * @param TContent Optional. Type of the message content. Defaults to `string`
  */
 export interface Message<TContent = string> {
     /**
-     * The messages role. Typically 'system', 'user', 'assistant', 'function'.
+     * The messages role. Typically 'system', 'user', 'assistant', 'tool', 'function'.
      */
     role: string;
 
@@ -35,6 +37,16 @@ export interface Message<TContent = string> {
      * Optional. Name of the function that was called.
      */
     name?: string;
+
+    /**
+     * Optional. The action or tool to be called by the model when using 'tools' augmentation. In OpenAI, this is the tool_calls property returned from the model.
+     */
+    action_calls?: ActionCall[];
+
+    /**
+     * Optional. The id of the action called.
+     */
+    action_call_id?: string | undefined;
 }
 
 /**

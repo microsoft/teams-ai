@@ -11,3 +11,4 @@ export * from './Augmentation';
 export * from './DefaultAugmentation';
 export * from './MonologueAugmentation';
 export * from './SequenceAugmentation';
+export * from './ToolsAugmentation';
