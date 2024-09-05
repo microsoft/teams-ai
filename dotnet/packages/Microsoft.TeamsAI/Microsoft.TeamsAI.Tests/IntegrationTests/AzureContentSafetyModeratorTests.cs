@@ -7,6 +7,7 @@ using System.Reflection;
 using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.State;
 using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Adapter;
 
 namespace Microsoft.Teams.AI.Tests.IntegrationTests
 {

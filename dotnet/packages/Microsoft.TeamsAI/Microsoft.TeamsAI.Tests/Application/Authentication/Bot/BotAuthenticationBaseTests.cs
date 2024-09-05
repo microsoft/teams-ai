@@ -1,5 +1,6 @@
 ﻿using Microsoft.Copilot.BotBuilder;
 using Microsoft.Copilot.BotBuilder.Dialogs;
+using Microsoft.Copilot.Protocols.Adapter;
 using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;

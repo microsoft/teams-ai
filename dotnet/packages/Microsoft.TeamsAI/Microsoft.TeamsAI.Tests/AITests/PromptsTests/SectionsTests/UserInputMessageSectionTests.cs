@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Teams.AI.Application;
 using static System.Net.Mime.MediaTypeNames;
+using Microsoft.Copilot.Protocols.Primitives;
 
 namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
 {

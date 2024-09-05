@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Microsoft.Copilot.BotBuilder;
 using Microsoft.Teams.AI.AI.Moderator;
+using Microsoft.Copilot.Protocols.Adapter;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {

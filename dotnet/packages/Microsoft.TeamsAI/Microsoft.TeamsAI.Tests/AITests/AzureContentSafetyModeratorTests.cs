@@ -10,6 +10,7 @@ using Microsoft.Copilot.BotBuilder;
 using Azure.AI.ContentSafety;
 using Azure;
 using Microsoft.Teams.AI.State;
+using Microsoft.Copilot.Protocols.Adapter;
 
 #pragma warning disable CS8604 // Possible null reference argument.
 namespace Microsoft.Teams.AI.Tests.AITests

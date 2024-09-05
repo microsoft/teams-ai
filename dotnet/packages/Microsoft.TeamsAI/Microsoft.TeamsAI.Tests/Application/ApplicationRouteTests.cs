@@ -1,13 +1,14 @@
 ﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Adapter;
 using Microsoft.Copilot.Protocols.Connector;
 using Microsoft.Copilot.Protocols.Primitives;
-using Microsoft.Copilot.Teams.Primitives
+using Microsoft.Copilot.Teams.Primitives;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
-using Activity = Microsoft.Bot.Schema.Activity;
+using Activity = Microsoft.Copilot.Protocols.Primitives.Activity;
 
 namespace Microsoft.Teams.AI.Tests.Application
 {
@@ -1866,8 +1867,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async Task Test_OnConfigFetch()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -1885,7 +1886,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Type = ActivityTypes.Invoke,
                 Name = "config/fetch",
-                ChannelId = Channels.Outlook,
+                ChannelId = "outlook",
                 Recipient = new() { Id = "recipientId" },
                 Conversation = new() { Id = "conversationId" },
                 From = new() { Id = "fromId" },
@@ -1950,8 +1951,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async Task Test_OnConfigSubmit()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -1974,7 +1975,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Type = ActivityTypes.Invoke,
                 Name = "config/submit",
-                ChannelId = Channels.Outlook,
+                ChannelId = "outlook",
                 Value = JObject.FromObject(data),
                 Recipient = new() { Id = "recipientId" },
                 Conversation = new() { Id = "conversationId" },
@@ -2042,8 +2043,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async Task Test_OnFileConsentAccept()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -2123,8 +2124,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async Task Test_OnFileConsentDecline()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -2204,8 +2205,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async Task Test_OnO365ConnectorCardAction()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -2278,8 +2279,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async Task Test_OnHandoff()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }

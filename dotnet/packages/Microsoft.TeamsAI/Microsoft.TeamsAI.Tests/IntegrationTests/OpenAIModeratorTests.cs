@@ -10,6 +10,7 @@ using Microsoft.Teams.AI.State;
 using Microsoft.Copilot.BotBuilder;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Extensions.Logging;
+using Microsoft.Copilot.Protocols.Adapter;
 
 namespace Microsoft.Teams.AI.Tests.IntegrationTests
 {

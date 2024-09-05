@@ -1,4 +1,5 @@
 ﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Adapter;
 using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.State;
 using Moq;
@@ -17,7 +18,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
 
             // Arrange
             var state = new TurnState();
-            Activity activity = turnContext.Activity;
+            IActivity activity = turnContext.Activity;
             string channelId = activity.ChannelId;
             string botId = activity.Recipient.Id;
             string conversationId = activity.Conversation.Id;

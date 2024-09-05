@@ -34,7 +34,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             // Arrange
             var state = new TurnState();
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
-            Activity activity = turnContext.Activity;
+            IActivity activity = turnContext.Activity;
             string channelId = activity.ChannelId;
             string botId = activity.Recipient.Id;
             string conversationId = activity.Conversation.Id;
@@ -75,7 +75,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             // Arrange
             var state = new TurnState();
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
-            Activity activity = turnContext.Activity;
+            IActivity activity = turnContext.Activity;
             string channelId = activity.ChannelId;
             string botId = activity.Recipient.Id;
             string conversationId = activity.Conversation.Id;
@@ -112,7 +112,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             // Arrange
             var state = new CustomTurnState();
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
-            Activity activity = turnContext.Activity;
+            IActivity activity = turnContext.Activity;
             string channelId = activity.ChannelId;
             string botId = activity.Recipient.Id;
             string conversationId = activity.Conversation.Id;

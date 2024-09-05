@@ -8,6 +8,7 @@ using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Copilot.Protocols.Primitives;
 using Moq;
 using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Adapter;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {

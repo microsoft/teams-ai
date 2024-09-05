@@ -99,7 +99,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
                 })
                 .AssertReply(a =>
                 {
-                    Assert.Equal(ActivityTypesEx.InvokeResponse, a.Type);
+                    Assert.Equal(ActivityTypes.InvokeResponse, a.Type);
                     var response = ((Activity)a).Value as InvokeResponse;
                     Assert.NotNull(response);
                     Assert.Equal(200, response!.Status);
@@ -154,7 +154,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
                 })
                 .AssertReply(a =>
                 {
-                    Assert.Equal(ActivityTypesEx.InvokeResponse, a.Type);
+                    Assert.Equal(ActivityTypes.InvokeResponse, a.Type);
                     var response = ((Activity)a).Value as InvokeResponse;
                     Assert.NotNull(response);
                     Assert.Equal(412, response!.Status);
@@ -205,7 +205,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
                 })
                 .AssertReply(a =>
                 {
-                    Assert.Equal(ActivityTypesEx.InvokeResponse, a.Type);
+                    Assert.Equal(ActivityTypes.InvokeResponse, a.Type);
                     var response = ((Activity)a).Value as InvokeResponse;
                     Assert.NotNull(response);
                     Assert.Equal(200, response!.Status);

@@ -1,9 +1,10 @@
 ﻿
 using Microsoft.Copilot.BotBuilder;
 using Microsoft.Copilot.Protocols.Primitives;
-using Microsoft.Copilot.Teams.Primitives
+using Microsoft.Copilot.Teams.Primitives;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Copilot.Protocols.Adapter;
 
 namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
 {
@@ -85,8 +86,8 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
         {
             // arrange
             var meAuth = new MockedMessageExtensionsAuthentication();
-            Activity[]? activities = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activities = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activities = arg;
             }
@@ -108,7 +109,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
             Assert.NotNull(activities);
             var sentActivity = activities.FirstOrDefault();
             Assert.NotNull(sentActivity);
-            Assert.Equal(ActivityTypesEx.InvokeResponse, sentActivity.Type);
+            Assert.Equal(ActivityTypes.InvokeResponse, sentActivity.Type);
             Assert.Equal(412, ((InvokeResponse)sentActivity.Value).Status);
         }
 
@@ -132,8 +133,8 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
         {
             // arrange
             var meAuth = new MockedMessageExtensionsAuthentication();
-            Activity[]? activities = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activities = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activities = arg;
             }
@@ -149,7 +150,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
             Assert.NotNull(activities);
             var sentActivity = activities.FirstOrDefault();
             Assert.NotNull(sentActivity);
-            Assert.Equal(ActivityTypesEx.InvokeResponse, sentActivity.Type);
+            Assert.Equal(ActivityTypes.InvokeResponse, sentActivity.Type);
             var invokeResponse = sentActivity.Value as InvokeResponse;
             Assert.NotNull(invokeResponse);
             var meResponse = invokeResponse.Body as MessagingExtensionResponse;

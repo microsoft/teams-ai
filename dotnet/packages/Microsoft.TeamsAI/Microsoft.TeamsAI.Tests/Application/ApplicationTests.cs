@@ -1,4 +1,5 @@
 ﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Adapter;
 using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Identity.Client;
 using Microsoft.Teams.AI.AI;

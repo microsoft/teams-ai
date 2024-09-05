@@ -2,32 +2,33 @@
 // Licensed under the MIT License.
 
 using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Adapter;
 using Microsoft.Copilot.Protocols.Primitives;
 
 namespace Microsoft.Teams.AI.Tests.TestUtils
 {
     public class SimpleAdapter : TeamsAdapter
     {
-        private readonly Action<Activity[]>? _callOnSend;
-        private readonly Action<Activity>? _callOnUpdate;
+        private readonly Action<IActivity[]>? _callOnSend;
+        private readonly Action<IActivity>? _callOnUpdate;
         private readonly Action<ConversationReference>? _callOnDelete;
 
-        public SimpleAdapter() : base()
+        public SimpleAdapter() : base(null)
         {
 
         }
 
-        public SimpleAdapter(Action<Activity[]> callOnSend) : base()
+        public SimpleAdapter(Action<IActivity[]> callOnSend) : base(null)
         {
             _callOnSend = callOnSend;
         }
 
-        public SimpleAdapter(Action<Activity> callOnUpdate) : base()
+        public SimpleAdapter(Action<IActivity> callOnUpdate) : base(null)
         {
             _callOnUpdate = callOnUpdate;
         }
 
-        public SimpleAdapter(Action<ConversationReference> callOnDelete) : base()
+        public SimpleAdapter(Action<ConversationReference> callOnDelete) : base(null)
         {
             _callOnDelete = callOnDelete;
         }
@@ -39,7 +40,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return Task.CompletedTask;
         }
 
-        public override Task<ResourceResponse[]> SendActivitiesAsync(ITurnContext turnContext, Activity[] activities, CancellationToken cancellationToken)
+        public override Task<ResourceResponse[]> SendActivitiesAsync(ITurnContext turnContext, IActivity[] activities, CancellationToken cancellationToken)
         {
             Assert.NotNull(activities); // SimpleAdapter.deleteActivity: missing reference
             Assert.True(activities.Count() > 0, "SimpleAdapter.sendActivities: empty activities array.");
@@ -50,7 +51,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return Task.FromResult(responses.ToArray());
         }
 
-        public override Task<ResourceResponse> UpdateActivityAsync(ITurnContext turnContext, Activity activity, CancellationToken cancellationToken)
+        public override Task<ResourceResponse> UpdateActivityAsync(ITurnContext turnContext, IActivity activity, CancellationToken cancellationToken)
         {
             Assert.NotNull(activity); //SimpleAdapter.updateActivity: missing activity
             _callOnUpdate?.Invoke(activity);
@@ -59,7 +60,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
 #pragma warning restore CA1062 // Validate arguments of public methods
         }
 
-        public async Task ProcessRequest(Activity activity, BotCallbackHandler callback, CancellationToken cancellationToken)
+        public async Task ProcessRequest(IActivity activity, BotCallbackHandler callback, CancellationToken cancellationToken)
         {
             using (var ctx = new TurnContext(this, activity))
             {

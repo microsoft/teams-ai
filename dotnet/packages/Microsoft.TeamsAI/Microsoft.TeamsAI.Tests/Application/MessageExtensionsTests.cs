@@ -1,6 +1,7 @@
 ﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Adapter;
 using Microsoft.Copilot.Protocols.Primitives;
-using Microsoft.Copilot.Teams.Primitives
+using Microsoft.Copilot.Teams.Primitives;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
@@ -16,8 +17,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnSubmitAction_CommandId()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -75,8 +76,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnSubmitAction_CommandId_NotHit()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -163,8 +164,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnBotMessagePreviewEdit_CommandId()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -227,8 +228,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnBotMessagePreviewEdit_CommandId_NotHit()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -319,8 +320,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnBotMessagePreviewSend_CommandId()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -381,8 +382,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnBotMessagePreviewSend_CommandId_NotHit()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -471,8 +472,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnFetchTask_CommandId()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -522,8 +523,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnFetchTask_CommandId_NotHit()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -602,8 +603,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnQuery_CommandId()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -669,8 +670,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnQuery_CommandId_NotHit()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -762,8 +763,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_SelectItem()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -813,8 +814,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_SelectItem_NotHit()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -861,8 +862,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnQueryLink()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -916,8 +917,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnQueryLink_NotHit()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -955,8 +956,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnAnonymousQueryLink()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -1010,8 +1011,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnAnonymousQueryLink_NotHit()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -1049,8 +1050,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnQueryUrlSetting()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -1098,8 +1099,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnQueryUrlSetting_NotHit()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -1136,8 +1137,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnConfigureSettings()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -1187,8 +1188,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnConfigureSettings_NotHit()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -1224,8 +1225,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnCardButtonClicked()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -1268,8 +1269,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnCardButtonClicked_NotHit()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }

@@ -10,6 +10,7 @@ using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Extensions.Logging;
+using Microsoft.Copilot.Protocols.Adapter;
 
 namespace Microsoft.Teams.AI.Tests.IntegrationTests
 {

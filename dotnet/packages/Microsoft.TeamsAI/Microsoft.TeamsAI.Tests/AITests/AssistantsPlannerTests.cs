@@ -9,6 +9,7 @@ using Moq;
 using System.Reflection;
 using Microsoft.Teams.AI.AI.Planners;
 using OpenAI.Assistants;
+using Microsoft.Copilot.Protocols.Adapter;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
