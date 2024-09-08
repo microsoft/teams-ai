@@ -909,7 +909,7 @@ export class Application<TState extends TurnState = TurnState> {
             await this.continueConversationAsync(reference, async (ctx) => {
                 const teamId =
                     ctx.activity?.channelData?.team?.id ??
-                    (ctx.activity.conversation.name === undefined ? ctx.activity?.conversation?.id : undefined);
+                    (ctx.activity?.conversation?.name === undefined ? ctx.activity?.conversation?.id : undefined);
                 if (teamId) {
                     teamsChannels = await TeamsInfo.getTeamChannels(ctx, teamId);
                 }
@@ -942,7 +942,7 @@ export class Application<TState extends TurnState = TurnState> {
             await this.continueConversationAsync(reference, async (ctx) => {
                 const teamId =
                     ctx.activity?.channelData?.team?.id ??
-                    (ctx.activity.conversation.name === undefined ? ctx.activity?.conversation?.id : undefined);
+                    (ctx.activity?.conversation?.name === undefined ? ctx.activity?.conversation?.id : undefined);
                 if (teamId) {
                     teamDetails = await TeamsInfo.getTeamDetails(ctx, teamId);
                 }
