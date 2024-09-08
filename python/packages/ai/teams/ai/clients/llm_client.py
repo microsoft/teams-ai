@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from logging import Logger
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union
 
 from botbuilder.core import TurnContext
 
@@ -89,21 +89,6 @@ class LLMClient:
         """
 
         self._options = options
-
-    def add_action_output_to_history(self, memory: MemoryBase, id: str, results: str) -> None:
-        """
-        Adds the result from an `action_call` to the history.
-
-        Args:
-            memory (MemoryBase): An interface for accessing state values.
-            id (str): Id of the action that was called.
-            results (str): Results returned by the action call.
-        """
-        self._add_message_to_history(
-            memory=memory,
-            variable=self._options.history_variable,
-            message=Message(role="tool", action_call_id=id, content=results),
-        )
 
     async def complete_prompt(
         self,
@@ -207,10 +192,14 @@ class LLMClient:
             return PromptResponse(status="error", error=str(err))
 
     def _add_message_to_history(
-        self, memory: MemoryBase, variable: str, message: Message[Any]
+        self, memory: MemoryBase, variable: str, messages: Union[Message[Any], List[Message[Any]]]
     ) -> None:
+
         history: List[Message] = memory.get(variable) or []
-        history.append(message)
+        if isinstance(messages, list):
+            history.extend(messages)
+        else:
+            history.append(messages)
 
         if len(history) > self._options.max_history_messages:
             del history[0 : len(history) - self._options.max_history_messages]

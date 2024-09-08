@@ -282,12 +282,21 @@ class OpenAIModel(PromptCompletionModel):
                         )
                     )
 
-            input: Optional[Message] = None
+            input: Optional[Union[Message, List[Message]]] = None
             last_message = len(res.output) - 1
 
             # Skips the first message which is the prompt
             if last_message > 0 and res.output[last_message].role != "assistant":
                 input = res.output[last_message]
+
+                # Add remaining parallel tool calls
+                if input.role == "tool":
+                    first_message = len(res.output)
+                    for msg in reversed(res.output):
+                        if msg.action_calls:
+                            break
+                        first_message -= 1
+                    input = res.output[first_message:]
 
             return PromptResponse[str](
                 input=input,

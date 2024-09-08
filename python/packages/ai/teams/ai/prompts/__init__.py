@@ -3,6 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from .action_output_message import ActionOutputMessage
 from .assistant_message import AssistantMessage
 from .augmentation_config import AugmentationConfig
 from .completion_config import CompletionConfig
@@ -57,4 +58,5 @@ __all__ = [
     "SystemMessage",
     "UserInputMessage",
     "UserMessage",
+    "ActionOutputMessage",
 ]

@@ -11,10 +11,12 @@ import { TurnContext } from 'botbuilder';
 import EventEmitter from 'events';
 import { ClientOptions, AzureOpenAI, OpenAI } from 'openai';
 import {
-    ChatCompletionCreateParams,
+    type ChatCompletionCreateParams,
     ChatCompletionMessageParam,
     ChatCompletionChunk,
-    ChatCompletion
+    ChatCompletion,
+    ChatCompletionTool,
+    type ChatCompletionMessageToolCall
 } from 'openai/resources';
 import { Stream } from 'openai/streaming';
 
@@ -22,7 +24,7 @@ import { Colorize } from '../internals';
 import { Memory } from '../MemoryFork';
 import { Message, PromptFunctions, PromptTemplate } from '../prompts';
 import { Tokenizer } from '../tokenizers';
-import { PromptResponse } from '../types';
+import { ActionCall, PromptResponse } from '../types';
 
 import { PromptCompletionModel, PromptCompletionModelEmitter } from './PromptCompletionModel';
 
@@ -288,9 +290,9 @@ export class OpenAIModel implements PromptCompletionModel {
                 : (this.options as OpenAIModelOptions).defaultModel);
 
         // Check for legacy completion type
-        if (template.config.type == 'completion') {
+        if (template.config.completion.completion_type == 'text') {
             throw new Error(
-                `The completion type 'completion' is no longer supported. Only 'chat' based models are supported.`
+                `The completion_type 'text' is no longer supported. Only 'chat' based models are supported.`
             );
         }
 
@@ -316,6 +318,8 @@ export class OpenAIModel implements PromptCompletionModel {
             console.log(Colorize.output(result.output));
         }
 
+        // Format messages to ChatCompletionMessageParam[]
+        const updatedMessages = this.convertMessages(result.output);
         // Get input message
         // - we're doing this here because the input message can be complex and include images.
         const input = this.getInputMessage(result.output);
@@ -323,7 +327,7 @@ export class OpenAIModel implements PromptCompletionModel {
         try {
             // Call chat completion API
             let message: Message<string>;
-            const params = this.getChatCompletionParams(model, result.output, template);
+            const params = this.getChatCompletionParams(model, updatedMessages, template);
             const completion = await this._client.chat.completions.create(params);
             if (params.stream) {
                 // Log start of streaming
@@ -341,10 +345,19 @@ export class OpenAIModel implements PromptCompletionModel {
                     if (delta.content) {
                         message.content += delta.content;
                     }
-                    // TODO: handle tool calls
-                    // if (delta.tool_calls) {
-                    //     message.tool_calls = delta.tool_calls;
-                    // }
+                    // Handle tool calls
+                    if (delta.tool_calls) {
+                        message.action_calls = delta.tool_calls.map((toolCall) => {
+                            return {
+                                id: toolCall.id,
+                                function: {
+                                    name: toolCall.function!.name,
+                                    arguments: toolCall.function!.arguments
+                                },
+                                type: toolCall.type
+                            } as ActionCall;
+                        });
+                    }
 
                     // Signal chunk received
                     if (this.options.logRequests) {
@@ -354,14 +367,39 @@ export class OpenAIModel implements PromptCompletionModel {
                 }
 
                 // Log stream completion
-                console.log(Colorize.title('STREAM COMPLETED:'));
-                console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
+                if (this.options.logRequests) {
+                    console.log(Colorize.title('STREAM COMPLETED:'));
+                    console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
+                }
             } else {
+                const actionCalls: ActionCall[] = [];
+                const responseMessage = (completion as ChatCompletion).choices![0].message;
+                const isToolsAugmentation =
+                    template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
+
+                // Log tool calls to be added to message of type Message<string> as action_calls
+                if (isToolsAugmentation && responseMessage?.tool_calls) {
+                    for (const toolCall of responseMessage.tool_calls) {
+                        actionCalls.push({
+                            id: toolCall.id,
+                            function: {
+                                name: toolCall.function.name,
+                                arguments: toolCall.function.arguments
+                            },
+                            type: toolCall.type
+                        });
+                    }
+                }
                 // Log the generated response
-                message = ((completion as ChatCompletion).choices[0]?.message as Message<string>) ?? {
-                    role: 'assistant',
-                    content: ''
+                message = {
+                    role: responseMessage.role,
+                    content: responseMessage.content ?? ''
                 };
+
+                if (actionCalls.length > 0) {
+                    message.action_calls = actionCalls;
+                }
+
                 if (this.options.logRequests) {
                     console.log(Colorize.title('CHAT RESPONSE:'));
                     console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
@@ -372,10 +410,76 @@ export class OpenAIModel implements PromptCompletionModel {
             // Signal response received
             const response: PromptResponse<string> = { status: 'success', input, message };
             this._events.emit('responseReceived', context, memory, response);
+
+            // Let any pending events flush before returning
+            await new Promise((resolve) => setTimeout(resolve, 0));
             return response;
         } catch (err: unknown) {
+            console.log(err);
             return this.returnError(err, input);
         }
+    }
+
+    /**
+     * Converts the messages to ChatCompletionMessageParam[].
+     * @param {Message<string>} messages - The messages from result.output.
+     * @returns {ChatCompletionMessageParam[]} - The converted messages.
+     */
+    private convertMessages(messages: Message<string>[]): ChatCompletionMessageParam[] {
+        const params: ChatCompletionMessageParam[] = [];
+        // Iterate through the messages and check for action calls
+
+        for (const message of messages) {
+            let param: ChatCompletionMessageParam = {
+                role: 'user',
+                content: ''
+            };
+
+            if (message.role === 'user') {
+                param.content = message.content ?? '';
+            } else if (message.role === 'system') {
+                param = {
+                    role: 'system',
+                    content: message.content ?? ''
+                };
+            } else if (message.role === 'assistant') {
+                param = {
+                    role: 'assistant',
+                    content: message.content ?? ''
+                };
+                const toolCallParams: ChatCompletionMessageToolCall[] = [];
+
+                if (message.action_calls && message.action_calls.length > 0) {
+                    for (const toolCall of message.action_calls) {
+                        toolCallParams.push({
+                            id: toolCall.id,
+                            function: {
+                                name: toolCall.function.name,
+                                arguments: toolCall.function.arguments
+                            },
+                            type: toolCall.type
+                        });
+                    }
+
+                    param.tool_calls = toolCallParams;
+                }
+            } else if (message.role === 'tool') {
+                param = {
+                    role: 'tool',
+                    content: message.content ?? '',
+                    tool_call_id: message.action_call_id ?? ''
+                };
+            } else {
+                param = {
+                    role: 'function',
+                    content: message.content ?? '',
+                    name: message.name ?? ''
+                };
+            }
+            params.push(param);
+        }
+
+        return params;
     }
 
     /**
@@ -399,20 +503,52 @@ export class OpenAIModel implements PromptCompletionModel {
     /**
      * @private
      * @param {string} model - Model to use.
-     * @param {Message<string>[]} messages - Messages to send.
+     * @param {ChatCompletionMessageParam[]} messages - Messages to send.
      * @param {PromptTemplate} template Prompt template being used.
      * @returns {ChatCompletionCreateParams} Chat completion parameters.
      */
     private getChatCompletionParams(
         model: string,
-        messages: Message<string>[],
+        messages: ChatCompletionMessageParam[],
         template: PromptTemplate
     ): ChatCompletionCreateParams {
+        let completion = template.config.completion;
+
+        // Validate Tools Augmentation
+        const isToolsAugmentation =
+            template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
+
+        if (isToolsAugmentation) {
+            const chatCompletionTools = isToolsAugmentation
+                ? template.actions?.map((action) => {
+                      const chatCompletionTool: ChatCompletionTool = {
+                          type: 'function',
+                          function: {
+                              name: action.name,
+                              description: action.description ?? '',
+                              parameters: (action.parameters as Record<string, any>) ?? {}
+                          }
+                      };
+                      return chatCompletionTool;
+                  })
+                : [];
+
+            const parallelToolCalls = template.config.completion.parallel_tool_calls || undefined;
+
+            completion = {
+                ...completion,
+                tool_choice: template.config.completion.tool_choice ?? 'auto',
+                ...(chatCompletionTools && chatCompletionTools.length > 0 && { tools: chatCompletionTools }),
+                // Only include parallel_tool_calls if tools are enabled and the template has it set; otherwise, it will default to true without being added to the API call
+                ...(!!parallelToolCalls && { parallel_tool_calls: parallelToolCalls })
+            };
+        }
+
         const params: ChatCompletionCreateParams = this.copyOptionsToRequest<ChatCompletionCreateParams>(
             {
-                messages: messages as ChatCompletionMessageParam[]
+                messages: messages
             },
-            template.config.completion,
+            completion,
             [
                 'max_tokens',
                 'temperature',
@@ -432,7 +568,8 @@ export class OpenAIModel implements PromptCompletionModel {
                 'response_format',
                 'seed',
                 'tool_choice',
-                'tools'
+                'tools',
+                'parallel_tool_calls'
             ]
         );
         if (this.options.responseFormat) {
@@ -446,12 +583,32 @@ export class OpenAIModel implements PromptCompletionModel {
         }
         params.model = model;
 
+        // Remove tool params if not using tools
+        if (!Array.isArray(params.tools) || params.tools.length == 0) {
+            if (params.tool_choice) {
+                delete params.tool_choice;
+            }           
+        }
+
         return params;
     }
 
-    private getInputMessage(messages: Message<string>[]): Message<string> | undefined {
+    private getInputMessage(messages: Message<string>[]): Message<string>[] | Message<string> | undefined {
         const last = messages.length - 1;
-        if (last > 0 && messages[last].role == 'user') {
+        if (last > 0 && messages[last].role !== 'assistant') {
+            // Handling for when there are multiple action output responses (e.g. user message instantiated multiple tool calls)
+            if (messages[last].role === 'tool') {
+                const toolsInput: Message<string>[] = [];
+
+                for (let i = messages.length - 1; i >= 0; i--) {
+                    if (messages[i].action_calls) {
+                        break;
+                    }
+                    toolsInput.unshift(messages[i]);
+                }
+                return toolsInput;
+            }
+
             return messages[last];
         }
 
@@ -468,13 +625,15 @@ export class OpenAIModel implements PromptCompletionModel {
         };
     }
 
-    private returnError(err: unknown, input: Message<string> | undefined): PromptResponse<string> {
+    private returnError(err: unknown, input: Message<string>[] | Message<string> | undefined): PromptResponse<string> {
         if (err instanceof OpenAI.APIError) {
+            if (this.options.logRequests) {
+                console.log(Colorize.title('ERROR:'));
+                console.log(Colorize.output(err.message));
+                console.log(Colorize.title('HEADERS:'));
+                console.log(Colorize.output(err.headers as any));
+            }
             if (err.status == 429) {
-                if (this.options.logRequests) {
-                    console.log(Colorize.title('HEADERS:'));
-                    console.log(Colorize.output(err.headers as any));
-                }
                 return {
                     status: 'rate_limited',
                     input,

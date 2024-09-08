@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from 'botbuilder-core';
+import { Activity, TurnContext } from 'botbuilder-core';
 
 /**
  * A helper class for streaming responses to the client.
@@ -24,6 +24,11 @@ export class StreamingResponse {
     private _streamId?: string;
     private _message: string = '';
     private _ended = false;
+
+    // Queue for outgoing activities
+    private _queue: Array<() => Partial<Activity>> = [];
+    private _queueSync: Promise<void> | undefined;
+    private _chunkQueued = false;
 
     /**
      * Creates a new StreamingResponse instance.
@@ -53,30 +58,33 @@ export class StreamingResponse {
     }
 
     /**
-     * Sends an informative update to the client.
+     * Queues an informative update to be sent to the client.
      * @param {string} text Text of the update to send.
-     * @returns {Promise<void>} - A promise representing the async operation.
      */
-    public sendInformativeUpdate(text: string): Promise<void> {
+    public queueInformativeUpdate(text: string): void {
         if (this._ended) {
             throw new Error('The stream has already ended.');
         }
 
-        // Send typing activity
-        return this.sendActivity('typing', text, {
-            streamType: 'informative',
-            streamSequence: this._nextSequence++
-        });
+        // Queue a typing activity
+        this.queueActivity(() => ({
+            type: 'typing',
+            text,
+            channelData: {
+                streamType: 'informative',
+                streamSequence: this._nextSequence++
+            } as StreamingChannelData
+        }));
     }
 
     /**
-     * Sends a chunk of partial message text to the client.
+     * Queues a chunk of partial message text to be sent to the client.
      * @remarks
-     * The text is appended to the full message text which will be sent when endStream() is called.
+     * The text we be sent as quickly as possible to the client. Chunks may be combined before
+     * delivery to the client.
      * @param {string} text Partial text of the message to send.
-     * @returns {Promise<void>} - A promise representing the async operation
      */
-    public sendTextChunk(text: string): Promise<void> {
+    public queueTextChunk(text: string): void {
         if (this._ended) {
             throw new Error('The stream has already ended.');
         }
@@ -84,11 +92,8 @@ export class StreamingResponse {
         // Update full message text
         this._message += text;
 
-        // Send typing activity
-        return this.sendActivity('typing', text, {
-            streamType: 'streaming',
-            streamSequence: this._nextSequence++
-        });
+        // Queue the next chunk
+        this.queueNextChunk();
     }
 
     /**
@@ -100,43 +105,118 @@ export class StreamingResponse {
             throw new Error('The stream has already ended.');
         }
 
-        // Send final message
+        // Queue final message
         this._ended = true;
-        return this.sendActivity('message', this._message, {
-            streamType: 'final',
-            streamSequence: this._nextSequence++
+        this.queueNextChunk();
+
+        // Wait for the queue to drain
+        return this._queueSync!;
+    }
+
+    /**
+     * Waits for the outgoing activity queue to be empty.
+     * @returns {Promise<void>} - A promise representing the async operation.
+     */
+    public waitForQueue(): Promise<void> {
+        return this._queueSync || Promise.resolve();
+    }
+
+    /**
+     * Queues the next chunk of text to be sent to the client.
+     * @private 
+     */
+    private queueNextChunk(): void {
+        // Are we already waiting to send a chunk?
+        if (this._chunkQueued) {
+            return;
+        }
+
+        // Queue a chunk of text to be sent
+        this._chunkQueued = true;
+        this.queueActivity(() => {
+            this._chunkQueued = false;
+            if (this._ended) {
+                // Send final message
+                return {
+                    type: 'message',
+                    text: this._message,
+                    channelData: {
+                        streamType: 'final'
+                    } as StreamingChannelData
+                };
+            } else {
+                // Send typing activity
+                return {
+                    type: 'typing',
+                    text: this._message,
+                    channelData: {
+                        streamType: 'streaming',
+                        streamSequence: this._nextSequence++
+                    } as StreamingChannelData
+                };
+            }
         });
     }
 
     /**
-     * @param {'typing' | 'message'} type - The type of activity to send.
-     * @param {string} text - The text of the activity to send.
-     * @param {StreamingChannelData} channelData - The channel data for the activity to send.
+     * Queues an activity to be sent to the client.
+     * @param {() => Partial<Activity>} factory - A factory that creates the outgoing activity just before its sent.
+     */
+    private queueActivity(factory: () => Partial<Activity>): void {
+        this._queue.push(factory);
+
+        // If there's no sync in progress, start one
+        if (!this._queueSync) {
+            this._queueSync = this.drainQueue();
+        }
+    }
+
+    /**
+     * Sends any queued activities to the client until the queue is empty.
+     * @returns {Promise<void>} - A promise that will be resolved once the queue is empty.
+     * @private
+     */
+    private drainQueue(): Promise<void> {
+        return new Promise<void>(async (resolve) => {
+            try {
+                while (this._queue.length > 0) {
+                    // Get next activity from queue
+                    const factory = this._queue.shift()!;
+                    const activity = factory();
+
+                    // Send activity
+                    await this.sendActivity(activity);
+                }
+    
+                resolve();
+            } finally {
+                // Queue is empty, mark as idle
+                this._queueSync = undefined;
+            }
+        });
+    }
+
+    /**
+     * Sends an activity to the client and saves the stream ID returned.
+     * @param {Partial<Activity>} activity - The activity to send.
      * @returns {Promise<void>} - A promise representing the async operation.
      * @private
      */
-    private async sendActivity(
-        type: 'typing' | 'message',
-        text: string,
-        channelData: StreamingChannelData
-    ): Promise<void> {
-        // Add stream ID
+    private async sendActivity(activity: Partial<Activity>): Promise<void> {
+        // Set activity ID to the assigned stream ID
         if (this._streamId) {
-            channelData.streamId = this._streamId;
+            activity.id = this._streamId;
+            activity.channelData = Object.assign({}, activity.channelData, { streamId: this._streamId });
         }
 
         // Send activity
-        const response = await this._context.sendActivity({
-            type,
-            text,
-            channelData
-        });
+        const response = await this._context.sendActivity(activity);
 
-        // Save stream ID
+        // Save assigned stream ID
         if (!this._streamId) {
             this._streamId = response?.id;
         }
-    }
+    }        
 }
 
 /**

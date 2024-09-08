@@ -797,8 +797,8 @@ class TestApp(IsolatedAsyncioTestCase):
                     locale="en-uS",
                     service_url="https://example.org",
                     value={
-                        "action_name": "feedback",
-                        "action_value": {"reaction": "like", "feedback": "Thanks for liking this"},
+                        "actionName": "feedback",
+                        "actionValue": {"reaction": "like", "feedback": "Thanks for liking this"},
                         "reply_to_id": "5678",
                     },
                 ),

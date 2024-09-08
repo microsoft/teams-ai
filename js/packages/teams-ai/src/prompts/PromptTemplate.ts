@@ -90,7 +90,7 @@ export interface AugmentationConfig {
     /**
      * The type of augmentation to use.
      */
-    augmentation_type: 'none' | 'sequence' | 'monologue';
+    augmentation_type: 'none' | 'monologue' | 'sequence' | 'tools';
 
     /**
      * Optional. List of named data sources to augment the prompt with.

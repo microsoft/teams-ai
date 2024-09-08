@@ -65,7 +65,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 AutoSignIn = (context, cancellationToken) => Task.FromResult(false)
             };
-            authenticationOptions.AddAuthentication("graph", new OAuthSettings());
+            authenticationOptions.AddAuthentication("graph", new OAuthSettings() { ConnectionName = "graph-connection" });
             ApplicationOptions<TurnState> applicationOptions = new()
             {
                 RemoveRecipientMention = removeRecipientMention,

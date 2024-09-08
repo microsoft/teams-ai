@@ -23,8 +23,13 @@ from teams.ai.prompts import (
     PromptTemplateConfig,
     TextSection,
 )
+from teams.ai.prompts.action_output_message import ActionOutputMessage
 from teams.ai.prompts.augmentation_config import AugmentationConfig
-from teams.ai.prompts.message import ActionCall, ActionFunction
+from teams.ai.prompts.message import ActionCall, ActionFunction, Message
+from teams.ai.prompts.prompt import Prompt
+from teams.ai.prompts.sections.conversation_history_section import (
+    ConversationHistorySection,
+)
 from teams.ai.tokenizers import GPTTokenizer
 from teams.state import TurnState
 
@@ -276,6 +281,66 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
 
         self.assertTrue(mock_async_openai.called)
         self.assertEqual(res.status, "success")
+
+    @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
+    async def test_should_succeed_on_prev_tool_calls(self, mock_async_openai):
+        context = self.create_mock_context()
+        state = TurnState()
+        state.temp = {}
+        state.conversation = {}
+        state.set(
+            "conversation.default_history",
+            [
+                Message(role="user", content="Turn the lights on"),
+                Message(
+                    role="assistant",
+                    action_calls=[
+                        ActionCall(
+                            id="test_tool_1",
+                            type="function",
+                            function=ActionFunction(name="tool_one", arguments="{}"),
+                        ),
+                        ActionCall(
+                            id="test_tool_2",
+                            type="function",
+                            function=ActionFunction(name="tool_two", arguments="{}"),
+                        ),
+                    ],
+                ),
+            ],
+        )
+        state.set("temp.action_outputs", {"test_tool_1": "hello", "test_tool_2": "world"})
+        await state.load(context)
+
+        model = OpenAIModel(OpenAIModelOptions(api_key="", default_model="model"))
+        res = await model.complete_prompt(
+            context=context,
+            memory=state,
+            functions=cast(PromptFunctions, {}),
+            tokenizer=GPTTokenizer(),
+            template=PromptTemplate(
+                name="default",
+                prompt=Prompt(
+                    sections=[
+                        ConversationHistorySection("conversation.default_history"),
+                        ActionOutputMessage("conversation.default_history"),
+                    ]
+                ),
+                config=PromptTemplateConfig(
+                    schema=1.0,
+                    type="completion",
+                    description="test",
+                    completion=CompletionConfig(completion_type="chat"),
+                ),
+            ),
+        )
+
+        self.assertTrue(mock_async_openai.called)
+        self.assertEqual(res.status, "success")
+        if res.input and isinstance(res.input, list):
+            self.assertEqual(len(res.input), 2)
+            self.assertEqual(res.input[0].action_call_id, "test_tool_1")
+            self.assertEqual(res.input[1].action_call_id, "test_tool_2")
 
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
     async def test_wrong_augmentation_type(self, mock_async_openai):
