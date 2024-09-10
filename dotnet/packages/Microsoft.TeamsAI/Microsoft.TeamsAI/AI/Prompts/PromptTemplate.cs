@@ -125,6 +125,8 @@ namespace Microsoft.Teams.AI.AI.Prompts
         [Obsolete("Use `completion.model` instead.")]
         public List<string> DefaultBackends { get; set; } = new();
 
+        private static readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true };
+
         /// <summary>
         /// Creates a prompt template configuration from JSON.
         /// </summary>
@@ -132,10 +134,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <returns>Prompt template configuration.</returns>
         internal static PromptTemplateConfiguration FromJson(string json)
         {
-            PromptTemplateConfiguration? result = JsonSerializer.Deserialize<PromptTemplateConfiguration>(json, new JsonSerializerOptions()
-            {
-                WriteIndented = true
-            });
+            PromptTemplateConfiguration? result = JsonSerializer.Deserialize<PromptTemplateConfiguration>(json, _serializerOptions);
 
             if (result == null)
             {
