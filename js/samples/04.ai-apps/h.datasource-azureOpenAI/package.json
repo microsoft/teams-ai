@@ -44,7 +44,7 @@
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
         "copyfiles": "^2.4.1",
-        "debug": "^4.3.6",
+        "debug": "^4.3.7",
         "env-cmd": "^10.1.0",
         "eslint": "^8.57.0",
         "nodemon": "~3.0.1",

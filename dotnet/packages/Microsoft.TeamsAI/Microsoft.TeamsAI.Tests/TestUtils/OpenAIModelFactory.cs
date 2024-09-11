@@ -1,4 +1,5 @@
 ﻿using OpenAI.Assistants;
+using OpenAI.Files;
 using System.ClientModel;
 using System.ClientModel.Primitives;
 
@@ -69,6 +70,12 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
                                     ""file_citation"": {{
                                         ""file_id"": ""{fileId}""
                                     }}
+                                }},
+                                {{
+                                    ""type"": ""file_path"",
+                                    ""file_path"": {{
+                                        ""file_id"": ""{fileId}""
+                                    }}
                                 }}
                             ]
                         }}
@@ -80,6 +87,22 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             var threadMessage = ModelReaderWriter.Read<ThreadMessage>(BinaryData.FromString(json))!;
 
             return threadMessage.Content[0];
+        }
+
+        public static OpenAIFileInfo CreateOpenAIFileInfo(string fileId)
+        {
+            var json = @$"{{
+                ""id"": ""{fileId}"",
+                ""object"": ""file"",
+                ""bytes"": 120000,
+                ""created_at"": 16761602,
+                ""filename"": ""salesOverview.pdf"",
+                ""purpose"": ""assistants""
+            }}";
+
+            var fileInfo = ModelReaderWriter.Read<OpenAIFileInfo>(BinaryData.FromString(json))!;
+
+            return fileInfo;
         }
 
         public static ThreadRun CreateThreadRun(string threadId, string runStatus, string? runId = null, IList<RequiredAction> requiredActions = null!)

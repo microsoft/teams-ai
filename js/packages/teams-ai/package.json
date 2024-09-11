@@ -40,7 +40,7 @@
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
         "uuid": "^9.0.1",
-        "yaml": "^2.5.0"
+        "yaml": "^2.5.1"
     },
     "resolutions": {
         "follow-redirects": "^1.15.0"
@@ -54,7 +54,7 @@
         "@types/uuid": "^9.0.8",
         "botbuilder-core": "^4.22.1",
         "eslint": "^8.57.0",
-        "express": "^4.19.2",
+        "express": "^4.20.0",
         "jsonwebtoken": "^9.0.2",
         "mocha": "10.7.3",
         "nyc": "^15.1.0",
