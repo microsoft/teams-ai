@@ -40,7 +40,7 @@
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
         "uuid": "^9.0.1",
-        "yaml": "^2.5.0"
+        "yaml": "^2.5.1"
     },
     "resolutions": {
         "follow-redirects": "^1.15.0"

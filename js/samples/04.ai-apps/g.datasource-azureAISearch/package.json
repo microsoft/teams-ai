@@ -31,7 +31,7 @@
         "@microsoft/teams-ai": "~1.4.0",
         "@microsoft/teamsfx": "^2.3.2",
         "botbuilder": "^4.23.0",
-        "debug": "^4.3.6",
+        "debug": "^4.3.7",
         "dotenv": "^16.4.1",
         "openai": "4.41.1",
         "replace": "~1.2.0",
