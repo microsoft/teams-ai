@@ -102,6 +102,7 @@ This is the user's post: {{ $post }}
 **Javascript**
 
 ```typescript
+// TurnEvents values include "beforeTurn" and "afterTurn"
 app.turn("beforeTurn", (context, state) => {
   state.temp.post = "Lorem Ipsum...";
 });
