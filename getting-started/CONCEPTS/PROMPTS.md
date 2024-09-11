@@ -102,7 +102,7 @@ This is the user's post: {{ $post }}
 **Javascript**
 
 ```typescript
-app.beforeTurn((context, state) => {
+app.turn("beforeTurn", (context, state) => {
   state.temp.post = "Lorem Ipsum...";
 });
 ```
