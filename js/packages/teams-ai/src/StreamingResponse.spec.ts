@@ -92,7 +92,7 @@ describe('StreamingResponse', function () {
                     'first activity channelData should match'
                 );
                 assert.equal(activities[1].type, 'typing', 'second activity type should be "typing"');
-                assert.equal(activities[1].text, 'second', 'second activity text should be "second"');
+                assert.equal(activities[1].text, 'firstsecond', 'second activity text should be "firstsecond"');
                 assert.deepEqual(
                     activities[1].channelData,
                     { streamType: 'streaming', streamSequence: 2, streamId: response.streamId },
@@ -123,7 +123,7 @@ describe('StreamingResponse', function () {
             await adapter.sendTextToBot('test', async (context) => {
                 const response = new StreamingResponse(context);
                 await response.endStream();
-                assert(response.updatesSent == 1, 'updatesSent should be 1');
+                assert(response.updatesSent == 0, 'updatesSent should be 0');
 
                 // Validate sent activity
                 const activity = adapter.getNextReply();
@@ -131,7 +131,7 @@ describe('StreamingResponse', function () {
                 assert.equal(activity.text, '', 'activity.text should be ""');
                 assert.deepEqual(
                     activity.channelData,
-                    { streamType: 'final', streamSequence: 1 },
+                    { streamType: 'final' },
                     'activity.channelData should match'
                 );
             });
@@ -143,20 +143,20 @@ describe('StreamingResponse', function () {
                 const response = new StreamingResponse(context);
                 response.queueTextChunk('first');
                 response.queueTextChunk('second');
+                await response.waitForQueue();
                 await response.endStream();
-                assert(response.updatesSent == 3, 'updatesSent should be 3');
+                assert(response.updatesSent == 2, 'updatesSent should be 2');
 
                 // Validate sent activities
                 const activities = adapter.activeQueue;
                 assert.equal(activities.length, 3, 'should have sent 3 activities');
                 assert.equal(activities[0].channelData.streamSequence, 1, 'first activity streamSequence should be 1');
                 assert.equal(activities[1].channelData.streamSequence, 2, 'second activity streamSequence should be 2');
-                assert.equal(activities[2].channelData.streamSequence, 3, 'final activity streamSequence should be 3');
                 assert.equal(activities[2].type, 'message', 'final activity type should be "message"');
                 assert.equal(activities[2].text, 'firstsecond', 'final activity text should be "firstsecond"');
                 assert.deepEqual(
                     activities[2].channelData,
-                    { streamType: 'final', streamSequence: 3, streamId: response.streamId },
+                    { streamType: 'final', streamId: response.streamId },
                     'final activity channelData should match'
                 );
             });

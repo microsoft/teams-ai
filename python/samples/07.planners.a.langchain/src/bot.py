@@ -36,11 +36,11 @@ model: BaseChatModel
 
 if config.OPENAI_KEY:
     os.environ["OPENAI_API_KEY"] = config.OPENAI_KEY
-    model = ChatOpenAI(model="gpt-4-turbo")
+    model = ChatOpenAI(model="gpt-4o")
 elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
     os.environ["AZURE_OPENAI_API_KEY"] = config.AZURE_OPENAI_KEY
     os.environ["AZURE_OPENAI_ENDPOINT"] = config.AZURE_OPENAI_ENDPOINT
-    model = AzureChatOpenAI(model="gpt-4-turbo")
+    model = AzureChatOpenAI(model="gpt-4o")
 
 prompts = PromptManager(
     PromptManagerOptions(prompts_folder=f"{os.path.dirname(os.path.abspath(__file__))}/prompts")
@@ -55,6 +55,7 @@ app = Application[AppTurnState](
             planner=LangChainPlanner(
                 model=model,
                 prompts=prompts,
+                default_prompt="tools"
             )
         ),
     )

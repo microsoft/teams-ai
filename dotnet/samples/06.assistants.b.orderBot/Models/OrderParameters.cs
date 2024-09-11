@@ -57,7 +57,7 @@ namespace OrderBot.Models
                             },
                             ""kind"": {
                                 ""type"": ""string"",
-                                ""description"": ""examples: Mack and Jacks, Sierra Nevada Pale Ale, Miller Lite""
+                                ""description"": ""Mack and Jacks, Sierra Nevada Pale Ale, Miller Lite""
                             },
                             ""quantity"": {
                                 ""type"": ""number"",
