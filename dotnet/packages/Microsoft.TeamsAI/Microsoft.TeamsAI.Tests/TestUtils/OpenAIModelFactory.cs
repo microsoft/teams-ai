@@ -1,4 +1,5 @@
-﻿using OpenAI.Assistants;
+﻿using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using OpenAI.Assistants;
 using OpenAI.Files;
 using System.ClientModel;
 using System.ClientModel.Primitives;
