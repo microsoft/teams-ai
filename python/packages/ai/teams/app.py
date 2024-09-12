@@ -441,6 +441,12 @@ class Application(Bot, Generic[StateT]):
                 if not context.activity.value:
                     return False
                 await func(context, state, context.activity.value)
+                await context.send_activity(
+                    Activity(
+                        type=ActivityTypes.invoke_response,
+                        value=InvokeResponse(status=200, body={}),
+                    )
+                )
                 return True
 
             self._routes.append(Route[StateT](__selector__, __handler__, True))
@@ -483,6 +489,12 @@ class Application(Bot, Generic[StateT]):
                 if not context.activity.value:
                     return False
                 await func(context, state, context.activity.value)
+                await context.send_activity(
+                    Activity(
+                        type=ActivityTypes.invoke_response,
+                        value=InvokeResponse(status=200, body={}),
+                    )
+                )
                 return True
 
             self._routes.append(Route[StateT](__selector__, __handler__, True))
