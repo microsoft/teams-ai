@@ -123,7 +123,7 @@ export class StreamingResponse {
 
     /**
      * Queues the next chunk of text to be sent to the client.
-     * @private 
+     * @private
      */
     private queueNextChunk(): void {
         // Are we already waiting to send a chunk?
@@ -187,7 +187,7 @@ export class StreamingResponse {
                     // Send activity
                     await this.sendActivity(activity);
                 }
-    
+
                 resolve();
             } finally {
                 // Queue is empty, mark as idle
@@ -216,7 +216,7 @@ export class StreamingResponse {
         if (!this._streamId) {
             this._streamId = response?.id;
         }
-    }        
+    }
 }
 
 /**
