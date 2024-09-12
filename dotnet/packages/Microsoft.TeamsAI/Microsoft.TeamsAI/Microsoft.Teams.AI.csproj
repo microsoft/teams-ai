@@ -52,6 +52,11 @@
 
   <ItemGroup>
     <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Include="C:\Users\kavinsingh\source\repos\teams-ai\dotnet\packages\Microsoft.TeamsAI\Microsoft.TeamsAI\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\kavinsingh\source\repos\teams-ai\dotnet\packages\Microsoft.TeamsAI\Microsoft.TeamsAI\.editorconfig" />
   </ItemGroup>
 
 </Project>
