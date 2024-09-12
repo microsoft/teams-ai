@@ -4,7 +4,7 @@ using OpenAI.Chat;
 
 namespace Microsoft.Teams.AI.Tests.AITests.Models
 {
-    internal sealed class ChatCompletionToolCallTests
+    public sealed class ChatCompletionToolCallTests
     {
         [Fact]
         public void Test_ChatCompletionsToolCall_ToFunctionToolCall()

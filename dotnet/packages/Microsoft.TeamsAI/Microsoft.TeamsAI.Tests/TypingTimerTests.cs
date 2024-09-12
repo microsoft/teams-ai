@@ -155,7 +155,7 @@ namespace Microsoft.Teams.AI.Tests
             Assert.False(typingTimer.IsRunning());
         }
 
-        private static IEnumerable<object[]> ExceptionTestData()
+        public static IEnumerable<object[]> ExceptionTestData()
         {
             yield return new[]
             {
