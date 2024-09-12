@@ -107,3 +107,4 @@ dist
 
 .DS_Store
 **/.vs/
+/dotnet/packages/Microsoft.TeamsAI/Dabble
