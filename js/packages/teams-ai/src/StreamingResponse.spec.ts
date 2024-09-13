@@ -129,11 +129,7 @@ describe('StreamingResponse', function () {
                 const activity = adapter.getNextReply();
                 assert.equal(activity.type, 'message', 'activity.type should be "message"');
                 assert.equal(activity.text, '', 'activity.text should be ""');
-                assert.deepEqual(
-                    activity.channelData,
-                    { streamType: 'final' },
-                    'activity.channelData should match'
-                );
+                assert.deepEqual(activity.channelData, { streamType: 'final' }, 'activity.channelData should match');
             });
         });
 

@@ -109,7 +109,7 @@ export class ActionResponseValidator implements PromptResponseValidator<Validate
                     `No arguments were sent with called ${this._noun}. Call the "${function_call.name}" ${this._noun} with required arguments as a valid JSON object.`,
                     `The ${this._noun} arguments had errors. Apply these fixes and call "${function_call.name}" ${this._noun} again:`
                 );
-                const args = function_call.arguments === '{}' ? undefined : function_call.arguments ?? '{}';
+                const args = function_call.arguments === '{}' ? undefined : (function_call.arguments ?? '{}');
                 const message: Message = { role: 'assistant', content: args };
                 const result = await validator.validateResponse(
                     context,
