@@ -177,8 +177,8 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
  * `useSystemMessages` parameter is ignored when calling the o1 models.
  * - The o1 models do not currently support setting the `temperature`, `top_p`, and `presence_penalty` 
  * parameters so they will be ignored.
- * - The o1 models do not currently support the use of tools so you will need to use the "actions" augmentation
- * to call actions.
+ * - The o1 models do not currently support the use of tools so you will need to use the "monologue" 
+ * augmentation to call actions.
  */
 export class OpenAIModel implements PromptCompletionModel {
     private readonly _events: PromptCompletionModelEmitter = new EventEmitter() as PromptCompletionModelEmitter;
