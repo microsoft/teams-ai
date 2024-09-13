@@ -175,8 +175,8 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
  * increase in token usage and costs when using the o1 models.
  * - The o1 models do not currently support the sending of system messages which just means that the
  * `useSystemMessages` parameter is ignored when calling the o1 models.
- * - The o1 models do not currently support setting the `temperature` or `top_p` parameters so they will be 
- * ignored.
+ * - The o1 models do not currently support setting the `temperature`, `top_p`, and `presence_penalty` 
+ * parameters so they will be ignored.
  * - The o1 models do not currently support the use of tools so you will need to use the "actions" augmentation
  * to call actions.
  */
@@ -348,12 +348,9 @@ export class OpenAIModel implements PromptCompletionModel {
                     params.max_completion_tokens = params.max_tokens;
                     delete params.max_tokens;
                 }
-                if (params.temperature) {
-                    delete params.temperature;
-                }
-                if (params.top_p) {
-                    delete params.top_p;
-                }
+                params.temperature = 1;
+                params.top_p = 1;
+                params.presence_penalty = 0;
             }
 
             // Call chat completion API

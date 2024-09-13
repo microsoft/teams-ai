@@ -14,6 +14,6 @@
         "stop_sequences": []
     },
     "augmentation": {
-        "augmentation_type": "tools"
+        "augmentation_type": "actions"
     }
 }
