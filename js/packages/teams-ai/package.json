@@ -2,7 +2,7 @@
     "name": "@microsoft/teams-ai",
     "author": "Microsoft Corp.",
     "description": "SDK focused on building AI based applications for Microsoft Teams.",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "license": "MIT",
     "keywords": [
         "botbuilder",
@@ -26,7 +26,7 @@
     "types": "./lib/index.d.ts",
     "peerDependencies": {
         "botbuilder": "^4.23.0",
-        "openai": "^4.41.1"
+        "openai": "^4.61.0"
     },
     "dependencies": {
         "@azure/openai-assistants": "1.0.0-beta.5",

@@ -165,6 +165,18 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
 
 /**
  * A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
+ * @remarks
+ * The model has been updated to support calling OpenAI's new o1 family of models. That currently 
+ * comes with a few constraints. These constraints are mostly handled for you but are worth noting:
+ * - The o1 models introduce a new `max_completion_tokens` parameter and they've deprecated the
+ *  `max_tokens` parameter. The model will automatically convert the incoming `max_tokens` parameter
+ * to `max_completion_tokens` for you. But you should be aware that o1 has hidden token usage and costs
+ * that aren't constrained by the `max_completion_tokens` parameter. This means that you may see an
+ * increase in token usage and costs when using the o1 models.
+ * - The o1 models do not currently support the sending of system messages which just means that the
+ * `useSystemMessages` parameter is ignored when calling the o1 models.
+ * - The o1 models do not currently support setting the `temperature` or `top_p` parameters so they will be 
+ * ignored.
  */
 export class OpenAIModel implements PromptCompletionModel {
     private readonly _events: PromptCompletionModelEmitter = new EventEmitter() as PromptCompletionModelEmitter;
@@ -308,7 +320,9 @@ export class OpenAIModel implements PromptCompletionModel {
 
         // Check for use of system messages
         // - 'user' messages tend to be followed better by the model then 'system' messages.
-        if (!this.options.useSystemMessages && result.output.length > 0 && result.output[0].role == 'system') {
+        const isO1Model = model.startsWith('o1-');
+        const useSystemMessages = !isO1Model && this.options.useSystemMessages;
+        if (!useSystemMessages && result.output.length > 0 && result.output[0].role == 'system') {
             result.output[0].role = 'user';
         }
 
@@ -325,9 +339,23 @@ export class OpenAIModel implements PromptCompletionModel {
         const input = this.getInputMessage(result.output);
 
         try {
+            // Get the chat completion parameters
+            const params = this.getChatCompletionParams(model, updatedMessages, template);
+            if (isO1Model) {
+                if (params.max_tokens) {
+                    params.max_completion_tokens = params.max_tokens;
+                    delete params.max_tokens;
+                }
+                if (params.temperature) {
+                    delete params.temperature;
+                }
+                if (params.top_p) {
+                    delete params.top_p;
+                }
+            }
+            
             // Call chat completion API
             let message: Message<string>;
-            const params = this.getChatCompletionParams(model, updatedMessages, template);
             const completion = await this._client.chat.completions.create(params);
             if (params.stream) {
                 // Log start of streaming
