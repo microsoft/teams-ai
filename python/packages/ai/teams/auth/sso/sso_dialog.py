@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from typing import Callable, Generic, List, Optional, TypeVar, cast
+from typing import Generic, Optional, TypeVar, cast
 
 from botbuilder.core import TurnContext
 from botbuilder.dialogs import (
