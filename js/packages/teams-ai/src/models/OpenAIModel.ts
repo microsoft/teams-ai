@@ -614,7 +614,7 @@ export class OpenAIModel implements PromptCompletionModel {
         if (!Array.isArray(params.tools) || params.tools.length == 0) {
             if (params.tool_choice) {
                 delete params.tool_choice;
-            }           
+            }
         }
 
         return params;

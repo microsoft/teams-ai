@@ -21,7 +21,6 @@
     },
     "dependencies": {
         "@microsoft/teams-ai": "~1.4.1",
-        "@microsoft/teamsfx": "^2.3.2",
         "botbuilder": "^4.23.0",
         "dotenv": "^16.4.5",
         "openai": "4.61.0",
@@ -39,6 +38,6 @@
         "rimraf": "^5.0.10",
         "nodemon": "~3.0.1",
         "ts-node": "^10.9.2",
-        "typescript": "^5.5.4"
+        "typescript": "~5.5.4"
     }
 }
