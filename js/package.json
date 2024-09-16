@@ -38,7 +38,7 @@
         "applicationinsights": "^2.9.6",
         "chai": "^4.5.0",
         "depcheck": "^1.4.7",
-        "eslint": "^8.57.0",
+        "eslint": "^8.57.1",
         "eslint-config-prettier": "^8.10.0",
         "eslint-plugin-import": "^2.30.0",
         "eslint-plugin-jsdoc": "^46.10.1",
