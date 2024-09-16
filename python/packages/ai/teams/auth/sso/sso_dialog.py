@@ -108,9 +108,9 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
             raise ValueError("Invalid context, cannot get storage key!")
 
         activity = context.activity
-        if (
-            activity.type != ActivityTypes.invoke
-            or activity.name != SignInConstants.token_exchange_operation_name
+        if not (
+            activity.type == ActivityTypes.invoke
+            and activity.name == SignInConstants.token_exchange_operation_name
         ):
             raise ValueError(
                 "TokenExchangeState can only be used with Invokes of signin/tokenExchange."
