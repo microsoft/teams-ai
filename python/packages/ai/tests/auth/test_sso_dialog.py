@@ -76,9 +76,7 @@ class TestSsoDialog(unittest.IsolatedAsyncioTestCase):
 
         result = await self.sso_dialog._step_two(waterfall_step_context)
 
-        self.sso_dialog._should_dedup.assert_called_once_with(
-            waterfall_step_context.context, waterfall_step_context.state
-        )
+        self.sso_dialog._should_dedup.assert_called_once_with(waterfall_step_context.context)
         self.assertFalse(waterfall_step_context.context.state.temp.duplicate_token_exchange)
         self.assertEqual(result.status, DialogTurnStatus.Waiting)
 
@@ -98,8 +96,6 @@ class TestSsoDialog(unittest.IsolatedAsyncioTestCase):
 
         result = await self.sso_dialog._step_two(waterfall_step_context)
 
-        self.sso_dialog._should_dedup.assert_called_once_with(
-            waterfall_step_context.context, waterfall_step_context.state
-        )
+        self.sso_dialog._should_dedup.assert_called_once_with(waterfall_step_context.context)
         self.assertTrue(waterfall_step_context.context.state.temp.duplicate_token_exchange)
         self.assertEqual(result.status, DialogTurnStatus.Waiting)
