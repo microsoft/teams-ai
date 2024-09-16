@@ -14,7 +14,7 @@ from botbuilder.dialogs import (
     WaterfallDialog,
     WaterfallStepContext,
 )
-from botbuilder.schema import Activity, ActivityTypes
+from botbuilder.schema import Activity, ActivityTypes, SignInConstants
 from msal import ConfidentialClientApplication
 
 from ...dialogs import Dialog
@@ -60,7 +60,9 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
             if hasattr(res.result, "token"):
                 return cast(str, getattr(res.result, "token"))
 
-            return await self.sign_in(context, state)
+            if not getattr(state, "sign_in_retries", 0):
+                setattr(state, "sign_in_retries", 1)
+                return await self.sign_in(context, state)
 
         return None
 
@@ -74,5 +76,48 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
     async def _step_two(self, context: WaterfallStepContext) -> DialogTurnResult:
         token_response = context.result
 
-        # TODO: Dedup token exchange responses
+        if token_response and await self._should_dedup(context.context):
+            return DialogTurnResult(DialogTurnStatus.Waiting)
+
         return await context.end_dialog(token_response)
+
+    async def _should_dedup(self, context: TurnContext) -> bool:
+        """
+        Checks if deduplication should be performed for token exchange.
+        """
+        etag = context.activity.value.get("id")
+        store_item = {"eTag": etag}
+        key = self._get_storage_key(context)
+
+        try:
+            await self._options.storage.write({key: store_item})
+        except Exception as e:
+            if "eTag conflict" in str(e):
+                return True
+            raise e
+
+        return False
+
+    def _get_storage_key(self, context: TurnContext) -> str:
+        """
+        Gets the storage key for storing the token exchange state.
+        """
+        if not context or not context.activity or not context.activity.conversation:
+            raise ValueError("Invalid context, cannot get storage key!")
+
+        activity = context.activity
+        if not (
+            activity.type == ActivityTypes.invoke
+            and activity.name == SignInConstants.token_exchange_operation_name
+        ):
+            raise ValueError(
+                "TokenExchangeState can only be used with Invokes of signin/tokenExchange."
+            )
+
+        value_id = activity.value.get("id")
+        if not value_id:
+            raise ValueError("Invalid signin/tokenExchange. Missing activity.value.id.")
+
+        channel_id = activity.channel_id
+        conversation_id = activity.conversation.id
+        return f"{channel_id}/{conversation_id}/{value_id}"
