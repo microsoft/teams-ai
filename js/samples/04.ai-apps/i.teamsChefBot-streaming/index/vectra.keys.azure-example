@@ -1,0 +1,5 @@
+{
+    "azureApiKey": "<YOUR API KEY>",
+    "azureEndpoint": "<DEPLOYMENT ENDPOINT>",
+    "azureDeployment": "<NAME OF DEPLOYMENT>"
+}
