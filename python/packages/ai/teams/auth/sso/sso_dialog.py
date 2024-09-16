@@ -77,10 +77,8 @@ class SsoDialog(Generic[StateT], Dialog[StateT], AuthComponent[StateT]):
         token_response = context.result
 
         if token_response and await self._should_dedup(context.context):
-            context.state.temp.duplicate_token_exchange = True
             return DialogTurnResult(DialogTurnStatus.Waiting)
 
-        context.state.temp.duplicate_token_exchange = False
         return await context.end_dialog(token_response)
 
     async def _should_dedup(self, context: TurnContext) -> bool:
