@@ -28,11 +28,11 @@
     },
     "dependencies": {
         "@azure/search-documents": "12.1.0",
-        "@microsoft/teams-ai": "~1.4.0",
+        "@microsoft/teams-ai": "~1.4.1",
         "botbuilder": "^4.23.0",
         "debug": "^4.3.7",
         "dotenv": "^16.4.1",
-        "openai": "4.41.1",
+        "openai": "4.61.0",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
         "vectra": "^0.9.0"
