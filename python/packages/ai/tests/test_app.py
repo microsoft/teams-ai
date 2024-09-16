@@ -26,6 +26,20 @@ class TestApp(IsolatedAsyncioTestCase):
         yield
 
     @pytest.mark.asyncio
+    async def test_get_token_or_sign_in_user_token_exists(self):
+        context = mock.MagicMock(spec=TurnContext)
+        state = mock.MagicMock()
+        state.temp.auth_tokens = {"test_setting": "test_token"}
+
+        self.app._auth = mock.MagicMock()
+        self.app._auth.sign_in = mock.AsyncMock(return_value=mock.Mock(status="complete"))
+
+        result = await self.app.get_token_or_sign_in_user(context, state, "test_setting")
+
+        self.app._auth.sign_in.assert_called_once_with(context, state, key="test_setting")
+        self.assertEqual(result, "test_token")
+
+    @pytest.mark.asyncio
     async def test_activity(self):
         on_event = mock.AsyncMock()
         self.app.activity("event")(on_event)
