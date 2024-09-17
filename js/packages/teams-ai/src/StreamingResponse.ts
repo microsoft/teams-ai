@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { Activity, TurnContext } from 'botbuilder-core';
+import { Activity, Attachment, TurnContext } from 'botbuilder-core';
 
 /**
  * A helper class for streaming responses to the client.
@@ -23,6 +23,7 @@ export class StreamingResponse {
     private _nextSequence: number = 1;
     private _streamId?: string;
     private _message: string = '';
+    private _attachments?: Attachment[];
     private _ended = false;
 
     // Queue for outgoing activities
@@ -98,15 +99,17 @@ export class StreamingResponse {
 
     /**
      * Ends the stream by sending the final message to the client.
+     * @param {attachments} attachments List of attachments to attach to the final chunk.
      * @returns {Promise<void>} - A promise representing the async operation
      */
-    public endStream(): Promise<void> {
+    public endStream(attachments?: Attachment[]): Promise<void> {
         if (this._ended) {
             throw new Error('The stream has already ended.');
         }
 
         // Queue final message
         this._ended = true;
+        this._attachments = attachments;
         this.queueNextChunk();
 
         // Wait for the queue to drain
@@ -140,6 +143,7 @@ export class StreamingResponse {
                 return {
                     type: 'message',
                     text: this._message,
+                    attachments: this._attachments,
                     channelData: {
                         streamType: 'final'
                     } as StreamingChannelData
