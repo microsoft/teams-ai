@@ -170,7 +170,7 @@ app.messageExtensions.submitAction<SubmitData>(
                     } as MessagingExtensionResult;
                 }
                 case 'post': {
-                    const attachments = [createPostCard(data.post!)] || undefined;
+                    const attachments = [createPostCard(data.post!)];
                     // Drop the card into compose window
                     return {
                         type: 'result',

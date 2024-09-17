@@ -1,6 +1,6 @@
 # Microsoft Teams Vision Enabled Bot : Card Gazer
 
-This is a conversational bot for Microsoft Teams with AI Vision support that is able to generate Adaptive Cards from uploaded images using `gpt-4-vision-preview`.
+This is a conversational bot for Microsoft Teams with AI Vision support that is able to generate Adaptive Cards from uploaded images using a model that supports vision, for example `gpt-4o`.
 
 _Table of contents_
 
@@ -19,6 +19,8 @@ _Table of contents_
 ## Interacting with the bot
 
 You can interact with this bot by sending it a message with an image or a doodle. Be sure to add a message like "Turn this image into an Adaptive Card". As an example, you can use the image included in the `./assets` folder. Large resolution images will not work due to the limitations of the AI model.
+
+By default, only copy-pasting your image into the Teams chat will work. Drag-and-drop or using the paperclip icon to upload an attachment will not work at this time.
 
 ## Setting up the sample
 

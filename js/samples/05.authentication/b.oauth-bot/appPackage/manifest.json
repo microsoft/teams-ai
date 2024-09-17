@@ -6,7 +6,7 @@
     "packageName": "com.package.name",
     "name": {
         "short": "BotSSO${{APP_NAME_SUFFIX}}",
-        "full": "Echo Bot"
+        "full": "OAuth bot${{APP_NAME_SUFFIX}}"
     },
     "developer": {
         "name": "Microsoft",
@@ -44,11 +44,7 @@
             "supportsFiles": false
         }
     ],
-    "validDomains": [
-        "${{BOT_DOMAIN}}",
-        "*.ngrok.io",
-        "*.botframework.com"
-    ],
+    "validDomains": ["${{BOT_DOMAIN}}", "*.ngrok.io", "*.botframework.com"],
     "webApplicationInfo": {
         "id": "${{BOT_ID}}",
         "resource": "api://botid-${{BOT_ID}}"

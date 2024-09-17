@@ -52,7 +52,7 @@ provision:
       # Relative path to this file. Environment variables in manifest will
       # be replaced before apply to Microsoft Entra app
       manifestPath: ./aad.manifest.json
-      outputFilePath : ./build/aad.manifest.${{TEAMSFX_ENV}}.json
+      outputFilePath: ./build/aad.manifest.${{TEAMSFX_ENV}}.json
 
   - uses: arm/deploy # Deploy given ARM templates parallelly.
     env:
@@ -152,3 +152,4 @@ publish:
   - uses: teamsApp/update
     with:
       appPackagePath: ./appPackage/build/appPackage.${{TEAMSFX_ENV}}.zip
+projectId: 5fc23282-f245-485e-8f21-4c4481e1c446
