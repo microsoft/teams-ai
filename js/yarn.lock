@@ -1971,11 +1971,6 @@ balanced-match@^1.0.0:
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.2.tgz#e83e3a7e3f300b34cb9d87f615fa0cbf357690ee"
   integrity sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==
 
-base-64@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/base-64/-/base-64-0.1.0.tgz#780a99c84e7d600260361511c4877613bf24f6bb"
-  integrity sha512-Y5gU45svrR5tI2Vt/X9GPd3L0HNIKzGu202EjxrXMpuc2V2CiKgemAbUUsqYmZJvPtCXoUKjNZwBJzsNScUbXA==
-
 base64-js@^1.3.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
@@ -3364,14 +3359,6 @@ diffie-hellman@^5.0.0:
     bn.js "^4.1.0"
     miller-rabin "^4.0.0"
     randombytes "^2.0.0"
-
-digest-fetch@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/digest-fetch/-/digest-fetch-1.3.0.tgz#898e69264d00012a23cf26e8a3e40320143fc661"
-  integrity sha512-CGJuv6iKNM7QyZlM2T3sPAdZWd/p9zQiRNS9G+9COUCwzWFTs0Xp8NF5iePx7wtvhDykReiRRrSeNb4oMmB8lA==
-  dependencies:
-    base-64 "^0.1.0"
-    md5 "^2.3.0"
 
 dir-glob@^3.0.1:
   version "3.0.1"
@@ -4875,12 +4862,12 @@ gpt-3-encoder@1.1.4:
   resolved "https://registry.yarnpkg.com/gpt-3-encoder/-/gpt-3-encoder-1.1.4.tgz#d6cdaacf5824857e133b6065247c757fc7e4fa72"
   integrity sha512-fSQRePV+HUAhCn7+7HL7lNIXNm6eaFWFbNLOOGtmSJ0qJycyQvj60OvRlH7mee8xAMjBDNRdMXlMwjAbMTDjkg==
 
-gpt-tokenizer@^2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/gpt-tokenizer/-/gpt-tokenizer-2.2.1.tgz#195edebcc60b20c76f25075ffc87cb6b74cbdf3f"
-  integrity sha512-JYvLWTpPtFGz7eS7uixHslv3L96zka0n18MlQeH5YVl5F6mNhssxzSBTeqwNfW8A0AQIMYEaOfbSr+MaoCUvpg==
+gpt-tokenizer@^2.2.3:
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/gpt-tokenizer/-/gpt-tokenizer-2.2.3.tgz#97ce5505f151eb2eff2f6c2a37b0fe6d9f09df36"
+  integrity sha512-EOHvuE+J/sDw36QSWYX3d9fypAPMDvevi/W2XW0Bh+n76Iq3yHuNMHXXe5VmSQfcxIC9CVqyZgPOSxgjgAyQtQ==
   dependencies:
-    rfc4648 "^1.5.2"
+    rfc4648 "^1.5.3"
 
 graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6:
   version "4.2.11"
@@ -7005,21 +6992,6 @@ open@^8.0.0:
     is-docker "^2.1.1"
     is-wsl "^2.2.0"
 
-openai@4.28.4:
-  version "4.28.4"
-  resolved "https://registry.yarnpkg.com/openai/-/openai-4.28.4.tgz#d4bf1f53a89ef151bf066ef284489e12e7dd1657"
-  integrity sha512-RNIwx4MT/F0zyizGcwS+bXKLzJ8QE9IOyigDG/ttnwB220d58bYjYFp0qjvGwEFBO6+pvFVIDABZPGDl46RFsg==
-  dependencies:
-    "@types/node" "^18.11.18"
-    "@types/node-fetch" "^2.6.4"
-    abort-controller "^3.0.0"
-    agentkeepalive "^4.2.1"
-    digest-fetch "^1.3.0"
-    form-data-encoder "1.7.2"
-    formdata-node "^4.3.2"
-    node-fetch "^2.6.7"
-    web-streams-polyfill "^3.2.1"
-
 openai@4.41.1:
   version "4.41.1"
   resolved "https://registry.yarnpkg.com/openai/-/openai-4.41.1.tgz#61d22d3f9338841be9f1ab3242418193e4df620f"
@@ -7938,7 +7910,7 @@ reusify@^1.0.4:
   resolved "https://registry.yarnpkg.com/reusify/-/reusify-1.0.4.tgz#90da382b1e126efc02146e90845a88db12925d76"
   integrity sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==
 
-rfc4648@^1.5.2:
+rfc4648@^1.5.3:
   version "1.5.3"
   resolved "https://registry.yarnpkg.com/rfc4648/-/rfc4648-1.5.3.tgz#e62b81736c10361ca614efe618a566e93d0b41c0"
   integrity sha512-MjOWxM065+WswwnmNONOT+bD1nXzY9Km6u3kzvnx8F8/HXGZdz3T6e6vZJ8Q/RIMUSp/nxqjH3GwvJDy8ijeQQ==

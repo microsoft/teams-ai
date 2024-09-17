@@ -36,7 +36,7 @@
         "botframework-connector": "^4.23.0",
         "botframework-schema": "^4.23.0",
         "botframework-streaming": "^4.23.0",
-        "gpt-tokenizer": "^2.2.1",
+        "gpt-tokenizer": "^2.2.3",
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
         "uuid": "^9.0.1",
