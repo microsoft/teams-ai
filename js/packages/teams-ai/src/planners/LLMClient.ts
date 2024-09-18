@@ -338,7 +338,7 @@ export class LLMClient<TContent = any> {
 
             // End the stream if streaming
             // - We're not listening for the response received event because we can't await the completion of events.
-            if (streamer && !this._endStreamHandler) {
+            if (streamer) {
                 await streamer.endStream();
             }
 
