@@ -27,10 +27,10 @@
     "dependencies": {
         "@azure/identity": "^4.4.1",
         "@azure/search-documents": "12.1.0",
-        "@microsoft/teams-ai": "~1.4.0",
+        "@microsoft/teams-ai": "~1.4.1",
         "botbuilder": "^4.23.0",
         "dotenv": "^16.4.1",
-        "openai": "4.41.1",
+        "openai": "4.61.0",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
         "vectra": "^0.9.0"
@@ -45,7 +45,7 @@
         "copyfiles": "^2.4.1",
         "debug": "^4.3.7",
         "env-cmd": "^10.1.0",
-        "eslint": "^8.57.0",
+        "eslint": "^8.57.1",
         "nodemon": "~3.0.1",
         "prettier": "^3.3.3",
         "rimraf": "^5.0.10",

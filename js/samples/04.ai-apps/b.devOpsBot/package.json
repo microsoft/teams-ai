@@ -20,11 +20,11 @@
     },
     "dependencies": {
         "botbuilder": "^4.23.0",
-        "@microsoft/teams-ai": "~1.4.0",
+        "@microsoft/teams-ai": "~1.4.1",
         "dotenv": "^16.4.5",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
-        "openai": "4.28.4"
+        "openai": "4.61.0"
     },
     "devDependencies": {
         "@types/jsonwebtoken": "^9.0.6",
@@ -32,7 +32,7 @@
         "@types/restify": "^8.5.12",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
-        "eslint": "^8.57.0",
+        "eslint": "^8.57.1",
         "nodemon": "~3.0.1",
         "prettier": "^3.3.3",
         "rimraf": "^5.0.10",
