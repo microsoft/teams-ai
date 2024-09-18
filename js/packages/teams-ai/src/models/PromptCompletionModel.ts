@@ -14,6 +14,7 @@ import { Tokenizer } from '../tokenizers';
 import { PromptResponse } from '../types';
 import { Memory } from '../MemoryFork';
 import StrictEventEmitter from '../external/strict-event-emitter-types';
+import { StreamingResponse } from '../StreamingResponse';
 
 /**
  * Events emitted by a PromptCompletionModel.
@@ -51,7 +52,7 @@ export interface PromptCompletionModelEvents {
      * @param memory An interface for accessing state values.
      * @param response Final response returned by the model.
      */
-    responseReceived: (context: TurnContext, memory: Memory, response: PromptResponse<string>) => void;
+    responseReceived: (context: TurnContext, memory: Memory, response: PromptResponse<string>, streamer: StreamingResponse) => void;
 }
 
 /**
@@ -81,7 +82,8 @@ export type PromptCompletionModelChunkReceivedEvent = (
 export type PromptCompletionModelResponseReceivedEvent = (
     context: TurnContext,
     memory: Memory,
-    response: PromptResponse<string>
+    response: PromptResponse<string>,
+    streamer: StreamingResponse,
 ) => void;
 
 /**

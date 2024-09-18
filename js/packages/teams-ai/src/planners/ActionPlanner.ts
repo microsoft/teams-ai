@@ -11,7 +11,7 @@ import { TurnContext } from 'botbuilder';
 import { AI } from '../AI';
 import { DefaultAugmentation } from '../augmentations';
 import { Memory } from '../MemoryFork';
-import { PromptCompletionModel } from '../models';
+import { PromptCompletionModel, PromptCompletionModelResponseReceivedEvent } from '../models';
 import { PromptTemplate, PromptManager } from '../prompts';
 import { Tokenizer } from '../tokenizers';
 import { TurnState } from '../TurnState';
@@ -85,6 +85,11 @@ export interface ActionPlannerOptions<TState extends TurnState = TurnState> {
      * Optional message to send a client at the start of a streaming response.
      */
     startStreamingMessage?: string;
+
+    /**
+     * Optional handler to run when a stream is about to conclude.
+     */
+    endStreamHandler?: PromptCompletionModelResponseReceivedEvent
 }
 
 /**

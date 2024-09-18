@@ -13,7 +13,8 @@ import { Memory, MemoryFork } from '../MemoryFork';
 import {
     PromptCompletionModel,
     PromptCompletionModelBeforeCompletionEvent,
-    PromptCompletionModelChunkReceivedEvent
+    PromptCompletionModelChunkReceivedEvent,
+    PromptCompletionModelResponseReceivedEvent
 } from '../models';
 import { ConversationHistory, Message, Prompt, PromptFunctions, PromptTemplate } from '../prompts';
 import { StreamingResponse } from '../StreamingResponse';
@@ -91,6 +92,11 @@ export interface LLMClientOptions<TContent = any> {
      * Optional message to send a client at the start of a streaming response.
      */
     startStreamingMessage?: string;
+
+    /**
+     * Optional handler to run when a stream is about to conclude.
+     */
+    endStreamHandler?: PromptCompletionModelResponseReceivedEvent
 }
 
 /**
@@ -193,6 +199,7 @@ export interface ConfiguredLLMClientOptions<TContent = any> {
  */
 export class LLMClient<TContent = any> {
     private readonly _startStreamingMessage: string | undefined;
+    private readonly _endStreamHandler: PromptCompletionModelResponseReceivedEvent | undefined;
 
     /**
      * Configured options for this LLMClient instance.
@@ -226,6 +233,7 @@ export class LLMClient<TContent = any> {
         }
 
         this._startStreamingMessage = options.startStreamingMessage;
+        this._endStreamHandler = options.endStreamHandler;
     }
 
     /**
@@ -290,6 +298,7 @@ export class LLMClient<TContent = any> {
 
                 // Create streamer and send initial message
                 streamer = new StreamingResponse(context);
+                memory.setValue("temp.streamer", streamer)
                 if (this._startStreamingMessage) {
                     streamer.queueInformativeUpdate(this._startStreamingMessage);
                 }
@@ -313,6 +322,10 @@ export class LLMClient<TContent = any> {
         if (this.options.model.events) {
             this.options.model.events.on('beforeCompletion', beforeCompletion);
             this.options.model.events.on('chunkReceived', chunkReceived);
+
+            if (this._endStreamHandler) {
+                this.options.model.events.on("responseReceived", this._endStreamHandler)
+            }
         }
 
         try {
@@ -325,7 +338,7 @@ export class LLMClient<TContent = any> {
 
             // End the stream if streaming
             // - We're not listening for the response received event because we can't await the completion of events.
-            if (streamer) {
+            if (streamer && !this._endStreamHandler) {
                 await streamer.endStream();
             }
 
@@ -335,6 +348,10 @@ export class LLMClient<TContent = any> {
             if (this.options.model.events) {
                 this.options.model.events.off('beforeCompletion', beforeCompletion);
                 this.options.model.events.off('chunkReceived', chunkReceived);
+
+                if (this._endStreamHandler) {
+                    this.options.model.events.off("responseReceived", this._endStreamHandler)
+                }
             }
         }
     }

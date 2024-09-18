@@ -27,6 +27,7 @@ import { Tokenizer } from '../tokenizers';
 import { ActionCall, PromptResponse } from '../types';
 
 import { PromptCompletionModel, PromptCompletionModelEmitter } from './PromptCompletionModel';
+import { StreamingResponse } from '../StreamingResponse';
 
 /**
  * Base model options common to both OpenAI and Azure OpenAI services.
@@ -436,7 +437,8 @@ export class OpenAIModel implements PromptCompletionModel {
 
             // Signal response received
             const response: PromptResponse<string> = { status: 'success', input, message };
-            this._events.emit('responseReceived', context, memory, response);
+            const streamer: StreamingResponse = memory.getValue("temp.streamer");
+            this._events.emit('responseReceived', context, memory, response, streamer);
 
             // Let any pending events flush before returning
             await new Promise((resolve) => setTimeout(resolve, 0));
