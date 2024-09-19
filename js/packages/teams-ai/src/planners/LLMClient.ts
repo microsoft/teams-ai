@@ -96,7 +96,7 @@ export interface LLMClientOptions<TContent = any> {
     /**
      * Optional handler to run when a stream is about to conclude.
      */
-    endStreamHandler?: PromptCompletionModelResponseReceivedEvent
+    endStreamHandler?: PromptCompletionModelResponseReceivedEvent;
 }
 
 /**
@@ -298,7 +298,7 @@ export class LLMClient<TContent = any> {
 
                 // Create streamer and send initial message
                 streamer = new StreamingResponse(context);
-                memory.setValue("temp.streamer", streamer)
+                memory.setValue('temp.streamer', streamer);
                 if (this._startStreamingMessage) {
                     streamer.queueInformativeUpdate(this._startStreamingMessage);
                 }
@@ -324,7 +324,7 @@ export class LLMClient<TContent = any> {
             this.options.model.events.on('chunkReceived', chunkReceived);
 
             if (this._endStreamHandler) {
-                this.options.model.events.on("responseReceived", this._endStreamHandler)
+                this.options.model.events.on('responseReceived', this._endStreamHandler);
             }
         }
 
@@ -350,7 +350,7 @@ export class LLMClient<TContent = any> {
                 this.options.model.events.off('chunkReceived', chunkReceived);
 
                 if (this._endStreamHandler) {
-                    this.options.model.events.off("responseReceived", this._endStreamHandler)
+                    this.options.model.events.off('responseReceived', this._endStreamHandler);
                 }
             }
         }

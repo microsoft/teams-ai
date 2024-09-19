@@ -52,7 +52,12 @@ export interface PromptCompletionModelEvents {
      * @param memory An interface for accessing state values.
      * @param response Final response returned by the model.
      */
-    responseReceived: (context: TurnContext, memory: Memory, response: PromptResponse<string>, streamer: StreamingResponse) => void;
+    responseReceived: (
+        context: TurnContext,
+        memory: Memory,
+        response: PromptResponse<string>,
+        streamer: StreamingResponse
+    ) => void;
 }
 
 /**
@@ -83,7 +88,7 @@ export type PromptCompletionModelResponseReceivedEvent = (
     context: TurnContext,
     memory: Memory,
     response: PromptResponse<string>,
-    streamer: StreamingResponse,
+    streamer: StreamingResponse
 ) => void;
 
 /**

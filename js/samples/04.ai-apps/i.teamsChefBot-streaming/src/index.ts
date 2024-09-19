@@ -106,23 +106,26 @@ const prompts = new PromptManager({
     promptsFolder: path.join(__dirname, '../src/prompts')
 });
 
-const endStreamHandler: PromptCompletionModelResponseReceivedEvent = async (ctx, memory, response, streamer) => {
+const endStreamHandler: PromptCompletionModelResponseReceivedEvent = (ctx, memory, response, streamer) => {
     // Ignore events for other contexts
     if (!streamer) {
         return;
     }
 
     const card = CardFactory.adaptiveCard({
+        $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+        version: '1.6',
         type: 'AdaptiveCard',
                         body: [
                             {
                                 type: 'TextBlock',
+                                wrap: true,
                                 text: streamer.getMessage(),
                             }
                         ],
     })
 
-    streamer.addAttachments([card]);
+    streamer.setAttachments([card]);
 };
 
 const planner = new ActionPlanner({

@@ -170,15 +170,16 @@ describe('StreamingResponse', function () {
                         text: 'This is an example of an attachment..',
                         wrap: true,
                         type: 'TextBlock'
-                    }]
+                    }
+                ]
             };
             await adapter.sendTextToBot('test', async (context) => {
                 const response = new StreamingResponse(context);
                 response.queueTextChunk('first');
                 response.queueTextChunk('second');
                 await response.waitForQueue();
-                await response.addAttachments([CardFactory.adaptiveCard(adaptiveCard)]);
-                await response.endStream()
+                await response.setAttachments([CardFactory.adaptiveCard(adaptiveCard)]);
+                await response.endStream();
                 assert(response.updatesSent == 2, 'updatesSent should be 2');
 
                 // Validate sent activities

@@ -89,7 +89,7 @@ export interface ActionPlannerOptions<TState extends TurnState = TurnState> {
     /**
      * Optional handler to run when a stream is about to conclude.
      */
-    endStreamHandler?: PromptCompletionModelResponseReceivedEvent
+    endStreamHandler?: PromptCompletionModelResponseReceivedEvent;
 }
 
 /**
@@ -265,7 +265,7 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
             max_repair_attempts: this._options.max_repair_attempts,
             logRepairs: this._options.logRepairs,
             startStreamingMessage: this._options.startStreamingMessage,
-            endStreamHandler: this._options.endStreamHandler,
+            endStreamHandler: this._options.endStreamHandler
         });
 
         // Complete prompt

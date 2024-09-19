@@ -115,10 +115,10 @@ export class StreamingResponse {
     }
 
     /**
-     * Adds attachments to the final chunk.
-     * @param attachments List of attachments to attach.
+     * Sets the attachments to attach to the final chunk.
+     * @param attachments List of attachments.
      */
-    public addAttachments(attachments?: Attachment[]): void {
+    public setAttachments(attachments: Attachment[]): void {
         this._attachments = attachments;
     }
 
