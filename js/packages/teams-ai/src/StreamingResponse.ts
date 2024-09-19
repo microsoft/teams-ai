@@ -123,6 +123,14 @@ export class StreamingResponse {
     }
 
     /**
+     * Returns the most recently streamed message.
+     * @returns The streamed message.
+     */
+    public getMessage(): string {
+        return this._message;
+    }
+
+    /**
      * Waits for the outgoing activity queue to be empty.
      * @returns {Promise<void>} - A promise representing the async operation.
      */
