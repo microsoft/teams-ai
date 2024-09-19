@@ -117,7 +117,7 @@ const endStreamHandler: PromptCompletionModelResponseReceivedEvent = async (ctx,
                         body: [
                             {
                                 type: 'TextBlock',
-                                text: "current streamId" + streamer.streamId
+                                text: streamer.getMessage(),
                             }
                         ],
     })
