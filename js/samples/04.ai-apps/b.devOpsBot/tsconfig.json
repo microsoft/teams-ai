@@ -2,8 +2,8 @@
     "compilerOptions": {
         "declaration": true,
         "forceConsistentCasingInFileNames": true,
-        "target": "es2017",
-        "module": "commonjs",
+        "target": "ESNext",
+        "module": "ESNext",
         "outDir": "./lib",
         "rootDir": "./src",
         "sourceMap": true,

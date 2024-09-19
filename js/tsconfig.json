@@ -8,13 +8,13 @@
         "esModuleInterop": true,
         "experimentalDecorators": true,
         "forceConsistentCasingInFileNames": true,
-        "module": "CommonJS",
+        "module": "ESNext",
         "moduleResolution": "node",
         "noImplicitAny": true,
         "noUnusedLocals": true,
         "resolveJsonModule": true,
         "sourceMap": true,
         "strict": true,
-        "target": "ESNEXT"
+        "target": "ESNext"
     }
 }
