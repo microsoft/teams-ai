@@ -8,7 +8,7 @@ import * as restify from 'restify';
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
-import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
+import { CardFactory, ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
 
 import {
     AI,
@@ -17,7 +17,9 @@ import {
     OpenAIModel,
     PromptManager,
     TurnState,
-    TeamsAdapter
+    TeamsAdapter,
+    PromptCompletionModelResponseReceivedEvent,
+    StreamingResponse
 } from '@microsoft/teams-ai';
 
 import { addResponseFormatter } from './responseFormatter';
@@ -104,11 +106,31 @@ const prompts = new PromptManager({
     promptsFolder: path.join(__dirname, '../src/prompts')
 });
 
+const endStreamHandler: PromptCompletionModelResponseReceivedEvent = async (ctx, memory, response, streamer) => {
+    // Ignore events for other contexts
+    if (!streamer) {
+        return;
+    }
+
+    const card = CardFactory.adaptiveCard({
+        type: 'AdaptiveCard',
+                        body: [
+                            {
+                                type: 'TextBlock',
+                                text: "current streamId" + streamer.streamId
+                            }
+                        ],
+    })
+
+    streamer.addAttachments([card]);
+};
+
 const planner = new ActionPlanner({
     model,
     prompts,
     defaultPrompt: 'default',
-    startStreamingMessage: 'Loading stream results...'
+    startStreamingMessage: 'Loading stream results...',
+    endStreamHandler: endStreamHandler
 });
 
 // Define storage and application

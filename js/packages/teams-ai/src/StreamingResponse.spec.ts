@@ -177,7 +177,8 @@ describe('StreamingResponse', function () {
                 response.queueTextChunk('first');
                 response.queueTextChunk('second');
                 await response.waitForQueue();
-                await response.endStream([CardFactory.adaptiveCard(adaptiveCard)]);
+                await response.addAttachments([CardFactory.adaptiveCard(adaptiveCard)]);
+                await response.endStream()
                 assert(response.updatesSent == 2, 'updatesSent should be 2');
 
                 // Validate sent activities

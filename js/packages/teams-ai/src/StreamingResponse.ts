@@ -99,21 +99,27 @@ export class StreamingResponse {
 
     /**
      * Ends the stream by sending the final message to the client.
-     * @param {attachments} attachments List of attachments to attach to the final chunk.
      * @returns {Promise<void>} - A promise representing the async operation
      */
-    public endStream(attachments?: Attachment[]): Promise<void> {
+    public endStream(): Promise<void> {
         if (this._ended) {
             throw new Error('The stream has already ended.');
         }
 
         // Queue final message
         this._ended = true;
-        this._attachments = attachments;
         this.queueNextChunk();
 
         // Wait for the queue to drain
         return this._queueSync!;
+    }
+
+    /**
+     * Adds attachments to the final chunk.
+     * @param attachments List of attachments to attach.
+     */
+    public addAttachments(attachments?: Attachment[]): void {
+        this._attachments = attachments;
     }
 
     /**

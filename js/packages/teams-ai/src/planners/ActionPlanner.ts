@@ -264,7 +264,8 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
             max_history_messages: this.prompts.options.max_history_messages,
             max_repair_attempts: this._options.max_repair_attempts,
             logRepairs: this._options.logRepairs,
-            startStreamingMessage: this._options.startStreamingMessage
+            startStreamingMessage: this._options.startStreamingMessage,
+            endStreamHandler: this._options.endStreamHandler,
         });
 
         // Complete prompt
