@@ -11,7 +11,7 @@ import pytest
 from botbuilder.core import TurnContext
 from botbuilder.schema import Activity, ChannelAccount, ConversationAccount
 
-from teams import Application
+from teams import Application, ApplicationError
 from teams.feedback_loop_data import FeedbackLoopActionValue, FeedbackLoopData
 from teams.message_reaction_types import MessageReactionTypes
 from tests.utils import SimpleAdapter
@@ -24,6 +24,67 @@ class TestApp(IsolatedAsyncioTestCase):
     def before_each(self):
         self.app = Application()
         yield
+
+    @pytest.mark.asyncio
+    async def test_get_token_or_sign_in_user_token_exists(self):
+        context = mock.MagicMock(spec=TurnContext)
+        state = mock.MagicMock()
+        state.temp.auth_tokens = {"test_setting": "test_token"}
+
+        self.app._auth = mock.MagicMock()
+        self.app._auth.sign_in = mock.AsyncMock(return_value=mock.Mock(status="complete"))
+
+        result = await self.app.get_token_or_sign_in_user(context, state, "test_setting")
+
+        self.app._auth.sign_in.assert_called_once_with(context, state, key="test_setting")
+        self.assertEqual(result, "test_token")
+
+    @pytest.mark.asyncio
+    async def test_get_token_or_sign_in_user_no_token_sign_in_flow(self):
+        context = mock.MagicMock(spec=TurnContext)
+        state = mock.MagicMock()
+        state.temp.auth_tokens = {}
+
+        self.app._auth = mock.MagicMock()
+        self.app._auth.sign_in = mock.AsyncMock(return_value=mock.Mock(status="pending"))
+        self.app._authenticate_user = mock.AsyncMock(return_value=False)
+
+        result = await self.app.get_token_or_sign_in_user(context, state, "test_setting")
+
+        self.app._auth.sign_in.assert_called_once_with(context, state, key="test_setting")
+        self.app._authenticate_user.assert_called_once_with(context, state)
+        self.assertIsNone(result)
+
+    @pytest.mark.asyncio
+    async def test_get_token_or_sign_in_user_successful_authentication(self):
+        context = mock.MagicMock(spec=TurnContext)
+        state = mock.MagicMock()
+        state.temp.auth_tokens = {}
+
+        self.app._auth = mock.MagicMock()
+        self.app._auth.sign_in = mock.AsyncMock(return_value=mock.Mock(status="pending"))
+        self.app._authenticate_user = mock.AsyncMock(return_value=True)
+        state.temp.auth_tokens = {"test_setting": "new_token"}
+
+        result = await self.app.get_token_or_sign_in_user(context, state, "test_setting")
+
+        self.app._auth.sign_in.assert_called_once_with(context, state, key="test_setting")
+        self.app._authenticate_user.assert_called_once_with(context, state)
+        self.assertEqual(result, "new_token")
+
+    @pytest.mark.asyncio
+    async def test_get_token_or_sign_in_user_no_auth_manager(self):
+        context = mock.MagicMock(spec=TurnContext)
+        state = mock.MagicMock()
+
+        self.app._auth = None
+
+        with self.assertRaises(ApplicationError) as context_manager:
+            await self.app.get_token_or_sign_in_user(context, state, "test_setting")
+
+        self.assertEqual(
+            str(context_manager.exception), "Authentication manager is not configured."
+        )
 
     @pytest.mark.asyncio
     async def test_activity(self):
