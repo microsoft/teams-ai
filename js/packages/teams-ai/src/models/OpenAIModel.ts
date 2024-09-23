@@ -27,6 +27,7 @@ import { Tokenizer } from '../tokenizers';
 import { ActionCall, PromptResponse } from '../types';
 
 import { PromptCompletionModel, PromptCompletionModelEmitter } from './PromptCompletionModel';
+import { StreamingResponse } from '../StreamingResponse';
 
 /**
  * Base model options common to both OpenAI and Azure OpenAI services.
@@ -166,7 +167,7 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
 /**
  * A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
  * @remarks
- * The model has been updated to support calling OpenAI's new o1 family of models. That currently 
+ * The model has been updated to support calling OpenAI's new o1 family of models. That currently
  * comes with a few constraints. These constraints are mostly handled for you but are worth noting:
  * - The o1 models introduce a new `max_completion_tokens` parameter and they've deprecated the
  *  `max_tokens` parameter. The model will automatically convert the incoming `max_tokens` parameter
@@ -175,9 +176,9 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
  * increase in token usage and costs when using the o1 models.
  * - The o1 models do not currently support the sending of system messages which just means that the
  * `useSystemMessages` parameter is ignored when calling the o1 models.
- * - The o1 models do not currently support setting the `temperature`, `top_p`, and `presence_penalty` 
+ * - The o1 models do not currently support setting the `temperature`, `top_p`, and `presence_penalty`
  * parameters so they will be ignored.
- * - The o1 models do not currently support the use of tools so you will need to use the "monologue" 
+ * - The o1 models do not currently support the use of tools so you will need to use the "monologue"
  * augmentation to call actions.
  */
 export class OpenAIModel implements PromptCompletionModel {
@@ -436,7 +437,8 @@ export class OpenAIModel implements PromptCompletionModel {
 
             // Signal response received
             const response: PromptResponse<string> = { status: 'success', input, message };
-            this._events.emit('responseReceived', context, memory, response);
+            const streamer: StreamingResponse = memory.getValue('temp.streamer');
+            this._events.emit('responseReceived', context, memory, response, streamer);
 
             // Let any pending events flush before returning
             await new Promise((resolve) => setTimeout(resolve, 0));

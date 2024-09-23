@@ -13,6 +13,7 @@ import { Tokenizer } from '../tokenizers';
 import { TurnContext } from 'botbuilder';
 import { Memory } from '../MemoryFork';
 import EventEmitter from 'events';
+import { StreamingResponse } from '../StreamingResponse';
 
 /**
  * A `PromptCompletionModel` used for testing.
@@ -90,7 +91,8 @@ export class TestModel implements PromptCompletionModel {
         return new TestModel(async (model, context, memory, functions, tokenizer, template) => {
             model.events.emit('beforeCompletion', context, memory, functions, tokenizer, template, false);
             await new Promise((resolve) => setTimeout(resolve, delay));
-            model.events.emit('responseReceived', context, memory, response);
+            const streamer = new StreamingResponse(context);
+            model.events.emit('responseReceived', context, memory, response, streamer);
             return response;
         });
     }
@@ -127,7 +129,8 @@ export class TestModel implements PromptCompletionModel {
             // Finalize the response.
             await new Promise((resolve) => setTimeout(resolve, delay));
             const response: PromptResponse<string> = { status: 'success', message: { role: 'assistant', content } };
-            model.events.emit('responseReceived', context, memory, response);
+            const streamer = new StreamingResponse(context);
+            model.events.emit('responseReceived', context, memory, response, streamer);
             return response;
         });
     }

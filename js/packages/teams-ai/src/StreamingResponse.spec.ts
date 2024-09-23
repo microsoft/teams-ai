@@ -1,5 +1,6 @@
 import assert from 'assert';
 import { TestAdapter } from 'botbuilder';
+import { CardFactory } from 'botbuilder-core';
 import { StreamingResponse } from './StreamingResponse';
 
 describe('StreamingResponse', function () {
@@ -155,6 +156,49 @@ describe('StreamingResponse', function () {
                     { streamType: 'final', streamId: response.streamId },
                     'final activity channelData should match'
                 );
+            });
+        });
+
+        it('should send a final message with text and attachments', async () => {
+            const adapter = new TestAdapter();
+            const adaptiveCard = {
+                $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+                version: '1.6',
+                type: 'AdaptiveCard',
+                body: [
+                    {
+                        text: 'This is an example of an attachment..',
+                        wrap: true,
+                        type: 'TextBlock'
+                    }
+                ]
+            };
+            await adapter.sendTextToBot('test', async (context) => {
+                const response = new StreamingResponse(context);
+                response.queueTextChunk('first');
+                response.queueTextChunk('second');
+                await response.waitForQueue();
+                await response.setAttachments([CardFactory.adaptiveCard(adaptiveCard)]);
+                await response.endStream();
+                assert(response.updatesSent == 2, 'updatesSent should be 2');
+
+                // Validate sent activities
+                const activities = adapter.activeQueue;
+                assert.equal(activities.length, 3, 'should have sent 3 activities');
+                assert.equal(activities[0].channelData.streamSequence, 1, 'first activity streamSequence should be 1');
+                assert.equal(activities[1].channelData.streamSequence, 2, 'second activity streamSequence should be 2');
+                assert.equal(activities[2].type, 'message', 'final activity type should be "message"');
+                assert.equal(activities[2].text, 'firstsecond', 'final activity text should be "firstsecond"');
+                assert.deepEqual(
+                    activities[2].channelData,
+                    { streamType: 'final', streamId: response.streamId },
+                    'final activity channelData should match'
+                );
+                assert.notEqual(activities[2].attachments, null);
+                if (activities[2].attachments) {
+                    assert.equal(activities[2].attachments.length, 1, 'should have 1 attachment');
+                    assert.deepEqual(activities[2].attachments[0].content, adaptiveCard, 'adaptive card should match');
+                }
             });
         });
     });
