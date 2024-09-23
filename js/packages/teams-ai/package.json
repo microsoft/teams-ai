@@ -52,7 +52,7 @@
         "@types/mocha": "^10.0.7",
         "@types/node": "^20.16.1",
         "@types/uuid": "^9.0.8",
-        "botbuilder-core": "^4.22.1",
+        "botbuilder-core": "^4.23.1",
         "eslint": "^8.57.1",
         "express": "^4.20.0",
         "jsonwebtoken": "^9.0.2",
@@ -61,7 +61,7 @@
         "rimraf": "5.0.10",
         "shx": "^0.3.4",
         "ts-mocha": "10.0.0",
-        "typescript": "~5.5.4"
+        "typescript": "~5.6.2"
     },
     "scripts": {
         "build": "tsc -b",
