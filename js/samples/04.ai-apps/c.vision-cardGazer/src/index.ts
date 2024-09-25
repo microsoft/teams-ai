@@ -87,11 +87,11 @@ if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
 const model = new OpenAIModel({
     // OpenAI Support
     apiKey: process.env.OPENAI_KEY!,
-    defaultModel: 'gpt-4-vision-preview',
+    defaultModel: 'gpt-4o-mini',
 
     // Azure OpenAI Support
     azureApiKey: process.env.AZURE_OPENAI_KEY!,
-    azureDefaultDeployment: 'gpt-4-vision-preview',
+    azureDefaultDeployment: 'gpt-4o-mini',
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
     azureApiVersion: '2023-03-15-preview',
 
@@ -132,16 +132,29 @@ interface SendCardParams {
     card: any;
 }
 
-app.ai.action<SendCardParams>('SendCard', async (context, state, params) => {
+app.ai.action<SendCardParams>('SendAdaptiveCard', async (context, state, params) => {
     const attachment = CardFactory.adaptiveCard(params.card);
     await context.sendActivity(MessageFactory.attachment(attachment));
     return 'card sent';
 });
 
-app.ai.action<SendCardParams>('ShowCardJSON', async (context, state, params) => {
-    const json = JSON.stringify(params.card, null, 2);
-    await context.sendActivity(`<pre>${json}</pre>`);
-    return 'card displayed';
+app.ai.action<SendCardParams>('DisplayJSON', async (context, state, params) => {
+    const adaptiveCardJson = {
+        type: 'AdaptiveCard',
+        version: '1.6',
+        body: [
+            {
+                type: 'CodeBlock',
+                language: 'Json',
+                codeSnippet: JSON.stringify(params.card, null, 2)
+            }
+        ]
+    };
+
+    // Create the attachment
+    const attachment = CardFactory.adaptiveCard(adaptiveCardJson);
+    await context.sendActivity(MessageFactory.attachment(attachment));
+    return `json sent`;
 });
 
 // Listen for incoming server requests.
