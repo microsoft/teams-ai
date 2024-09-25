@@ -5,6 +5,7 @@ namespace Microsoft.Teams.AI.AI.Models
     /// <summary>
     /// Represents a function tool call in a chat message.
     /// </summary>
+    [Obsolete]
     public class ChatCompletionsFunctionToolCall : ChatCompletionsToolCall
     {
         /// <summary>

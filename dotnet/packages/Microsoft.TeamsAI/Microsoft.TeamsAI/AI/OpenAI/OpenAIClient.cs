@@ -27,6 +27,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
         private readonly HttpClient _httpClient;
         private readonly ILogger _logger;
         private readonly OpenAIClientOptions _options;
+        // TODO: Remove since it's not being used.
         private static readonly JsonSerializerOptions _serializerOptions = new()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,

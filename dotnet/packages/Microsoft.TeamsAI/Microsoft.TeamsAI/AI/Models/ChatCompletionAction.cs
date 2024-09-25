@@ -1,4 +1,6 @@
 ﻿using Json.Schema;
+using OpenAI.Chat;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Microsoft.Teams.AI.AI.Models
@@ -8,6 +10,8 @@ namespace Microsoft.Teams.AI.AI.Models
     /// </summary>
     public class ChatCompletionAction
     {
+        private static JsonSerializerOptions _serializerOptions = new();
+
         /// <summary>
         /// Name of the action to be called.
         ///
@@ -72,6 +76,20 @@ namespace Microsoft.Teams.AI.AI.Models
             this.Name = name;
             this.Description = description;
             this.Parameters = parameters;
+        }
+
+        /// <summary>
+        /// Maps to an instance of <see cref="ChatTool"/>.
+        /// </summary>
+        internal ChatTool ToChatTool()
+        {
+            // Empty json object string
+            string parameters = "{}";
+            if (Parameters != null)
+            {
+                parameters = JsonSerializer.Serialize(this.Parameters, _serializerOptions);
+            }
+            return ChatTool.CreateFunctionTool(this.Name, this.Description, BinaryData.FromString(parameters));
         }
     }
 }

@@ -160,14 +160,14 @@ namespace Microsoft.Teams.AI.AI.Clients
                     return response;
                 }
 
-                // Get input message
+                // Get input message/s
                 string inputVariable = Options.InputVariable;
-                ChatMessage? inputMsg = response.Input;
-                if (inputMsg == null)
+                IList<ChatMessage>? inputMsgs = response.Input;
+                if (inputMsgs == null)
                 {
                     object? content = memory.GetValue(inputVariable);
-                    inputMsg = new ChatMessage(ChatRole.User);
-                    inputMsg.Content = content;
+                    inputMsgs = new List<ChatMessage>() { new ChatMessage(ChatRole.User) };
+                    inputMsgs[0].Content = content;
                 }
 
                 Validation validation = await this.Options.Validator.ValidateResponseAsync(
@@ -186,11 +186,11 @@ namespace Microsoft.Teams.AI.AI.Clients
                         response.Message.Content = validation.Value.ToString();
                     }
 
-                    this.AddInputToHistory(memory, this.Options.HistoryVariable, inputMsg);
+                    this.AddMessagesToHistory(memory, this.Options.HistoryVariable, inputMsgs);
 
                     if (response.Message != null)
                     {
-                        this.AddOutputToHistory(memory, this.Options.HistoryVariable, response.Message);
+                        this.AddMessageToHistory(memory, this.Options.HistoryVariable, response.Message);
                     }
 
                     return response;
@@ -226,11 +226,11 @@ namespace Microsoft.Teams.AI.AI.Clients
 
                 if (repairResponse.Status == PromptResponseStatus.Success)
                 {
-                    this.AddInputToHistory(memory, this.Options.HistoryVariable, inputMsg);
+                    this.AddMessagesToHistory(memory, this.Options.HistoryVariable, inputMsgs);
 
                     if (repairResponse.Message != null)
                     {
-                        this.AddOutputToHistory(memory, this.Options.HistoryVariable, repairResponse.Message);
+                        this.AddMessageToHistory(memory, this.Options.HistoryVariable, repairResponse.Message);
                     }
                 }
 
@@ -246,44 +246,6 @@ namespace Microsoft.Teams.AI.AI.Clients
             }
         }
 
-        private void AddInputToHistory(IMemory memory, string variable, ChatMessage input)
-        {
-            if (variable == null)
-            {
-                return;
-            }
-
-            List<ChatMessage> history = (List<ChatMessage>?)memory.GetValue(variable) ?? new() { };
-
-            history.Insert(0, input);
-
-            if (history.Count > this.Options.MaxHistoryMessages)
-            {
-                history.RemoveAt(history.Count - 1);
-            }
-
-            memory.SetValue(variable, history);
-        }
-
-        private void AddOutputToHistory(IMemory memory, string variable, ChatMessage message)
-        {
-            if (variable == string.Empty)
-            {
-                return;
-            }
-
-            List<ChatMessage> history = (List<ChatMessage>?)memory.GetValue(variable) ?? new() { };
-
-            history.Insert(0, message);
-
-            if (history.Count > this.Options.MaxHistoryMessages)
-            {
-                history.RemoveAt(history.Count - 1);
-            }
-
-            memory.SetValue(variable, history);
-        }
-
         private async Task<PromptResponse> RepairResponseAsync(
             ITurnContext context,
             MemoryFork fork,
@@ -296,11 +258,11 @@ namespace Microsoft.Teams.AI.AI.Clients
         {
             string feedback = validation.Feedback ?? "The response was invalid. Try another strategy.";
 
-            this.AddInputToHistory(fork, $"{this.Options.HistoryVariable}-repair", new(ChatRole.User) { Content = feedback });
+            this.AddMessageToHistory(fork, $"{this.Options.HistoryVariable}-repair", new(ChatRole.User) { Content = feedback });
 
             if (response.Message != null)
             {
-                this.AddOutputToHistory(fork, $"{this.Options.HistoryVariable}-repair", response.Message);
+                this.AddMessageToHistory(fork, $"{this.Options.HistoryVariable}-repair", response.Message);
             }
 
             PromptTemplate repairTemplate = new(this.Options.Template);
@@ -360,6 +322,39 @@ namespace Microsoft.Teams.AI.AI.Clients
             }
 
             return await this.RepairResponseAsync(context, fork, functions, repairResponse, repairValidation, remainingAttempts, cancellationToken);
+        }
+
+        private void AddMessagesToHistory(IMemory memory, string variable, IEnumerable<ChatMessage> messages)
+        {
+            if (variable == string.Empty || variable == null)
+            {
+                return;
+            }
+
+            List<ChatMessage> history = (List<ChatMessage>?)memory.GetValue(variable) ?? new();
+
+            history.AddRange(messages);
+
+            if (history.Count > this.Options.MaxHistoryMessages)
+            {
+                int overflow = history.Count - this.Options.MaxHistoryMessages;
+                history.RemoveRange(0, overflow);
+            }
+
+            // Remove completed partial action outputs
+            while (history.Count > 0 && history[0].Role == ChatRole.Tool)
+            {
+                history.RemoveAt(0);
+            }
+
+
+            memory.SetValue(variable, history);
+        }
+
+
+        private void AddMessageToHistory(IMemory memory, string variable, ChatMessage message)
+        {
+            AddMessagesToHistory(memory, variable, new List<ChatMessage>() { message });
         }
     }
 }

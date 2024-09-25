@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Google.Protobuf;
+using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Augmentations;
 using Microsoft.Teams.AI.AI.DataSources;
 using Microsoft.Teams.AI.AI.Models;
@@ -121,7 +122,15 @@ namespace Microsoft.Teams.AI.AI.Prompts
 
             if (template == null)
             {
-                template = this.AppendAugmentations(this._LoadPromptTemplateFromFile(name));
+                template = this._LoadPromptTemplateFromFile(name);
+                template = this.AppendAugmentations(template);
+
+                // Group sections together under one "system" message
+                template.Prompt.Sections = new List<PromptSection>() { 
+                    // The "1" place holder is to make this a fixed section is it is rendered in the correct order.
+                    // TODO: When implementing the new layout engine class refactor this.
+                    new GroupSection(ChatRole.System, template.Prompt.Sections, 1) 
+                };
 
                 if (template.Configuration.Completion.IncludeHistory)
                 {
@@ -129,6 +138,13 @@ namespace Microsoft.Teams.AI.AI.Prompts
                         $"conversation.{name}_history",
                         this.Options.MaxConversationHistoryTokens
                     ));
+                }
+
+                if (template.Configuration.Augmentation != null && template.Configuration.Augmentation.Type == AugmentationType.Tools)
+                {
+                    bool includeHistory = template.Configuration.Completion.IncludeHistory;
+                    string historyVariable = includeHistory ? $"conversation.{name}_history" : $"temp.{name}_history";
+                    template.Prompt.AddSection(new ActionOutputMessageSection(historyVariable));
                 }
 
                 if (template.Configuration.Completion.IncludeImages)
@@ -173,6 +189,9 @@ namespace Microsoft.Teams.AI.AI.Prompts
                     break;
                 case AugmentationType.Sequence:
                     template.Augmentation = new SequenceAugmentation(template.Actions);
+                    break;
+                case AugmentationType.Tools:
+                    template.Augmentation = new ToolsAugmentation();
                     break;
             }
 

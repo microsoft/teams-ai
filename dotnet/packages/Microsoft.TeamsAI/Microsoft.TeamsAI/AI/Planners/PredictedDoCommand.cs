@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using Json.Schema;
 using Microsoft.Teams.AI.Utilities.JsonConverters;
 
@@ -28,6 +29,14 @@ namespace Microsoft.Teams.AI.AI.Planners
         public Dictionary<string, object?>? Parameters { get; set; }
 
         /// <summary>
+        /// The id mapped to the named action that the AI system should perform.
+        /// </summary>
+        [JsonPropertyName("action_id")]
+        public string? ActionId { get; set; }
+
+        private static readonly JsonSerializerOptions _serializerOptions = _CreateJsonSerializerOptions();
+
+        /// <summary>
         /// Creates a new instance of the <see cref="PredictedDoCommand"/> class.
         /// </summary>
         /// <param name="action">The action name.</param>
@@ -36,6 +45,17 @@ namespace Microsoft.Teams.AI.AI.Planners
         {
             Action = action;
             Parameters = parameters;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="PredictedDoCommand"/> class where parameters is a valid JSON string.
+        /// </summary>
+        /// <param name="action">The action name.</param>
+        /// <param name="parameters">Any parameters that the AI system should use to perform the action as a JSON string.</param>
+        public PredictedDoCommand(string action, string parameters)
+        {
+            Action = action;
+            Parameters = JsonSerializer.Deserialize<Dictionary<string, object>>(parameters, _serializerOptions)!;
         }
 
         /// <summary>
@@ -77,6 +97,13 @@ namespace Microsoft.Teams.AI.AI.Planners
                 )
                 .Required(new string[] { "type", "action" })
                 .Build();
+        }
+
+        private static JsonSerializerOptions _CreateJsonSerializerOptions()
+        {
+            JsonSerializerOptions options = new();
+            options.Converters.Add(new DictionaryJsonConverter());
+            return options;
         }
     }
 }
