@@ -10,8 +10,8 @@ import { TurnContext } from 'botbuilder';
 import { Schema } from 'jsonschema';
 import { stringify } from 'yaml';
 
-import { Memory } from '../MemoryFork';
 import { ChatCompletionAction } from '../models';
+import { Memory } from '../MemoryFork';
 import { Message, PromptFunctions, RenderedPromptSection, PromptSectionBase } from '../prompts';
 import { Tokenizer } from '../tokenizers';
 
