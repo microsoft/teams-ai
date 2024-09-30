@@ -1,6 +1,6 @@
 # Microsoft Teams Conversational Bot with AI: Teams Chef
 
-This is a conversational bot for Microsoft Teams that thinks it's a Chef to help you cook apps using the Teams AI Library. The bot uses the `gpt-4o` model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
+This is a conversational streaming bot for Microsoft Teams that thinks it's a Chef to help you cook apps using the Teams AI Library. The bot uses the `gpt-4o` model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
@@ -20,6 +20,42 @@ This is a conversational bot for Microsoft Teams that thinks it's a Chef to help
 This sample illustrates how to use [Retrieval Augmented Generation (RAG)](https://en.wikipedia.org/wiki/Prompt_engineering#Retrieval-augmented_generation) to easily inject contextual relevant information into the prompt sent to the model. This results in better and more accurate replies from the bot.
 
 The sample uses a local Vector Database, called [Vectra](https://github.com/Stevenic/vectra), and [Semantic Search](https://en.wikipedia.org/wiki/Semantic_search) to find the most relevant information to include in the prompt for the users input. The index can be found in `./index/teams-ai` and includes all of the projects Getting Started docs and the source code for the Teams AI Library. This means you can ask the Teams Chef Bot anything about the library and it can answer it. You can even ask it to write sample code for you!
+
+## Streaming
+In addition, the sample illustrates our streaming feature. 
+
+The following configurations are needed:
+- Use the `DefaultAugmentation` class
+- Set `stream: true` in the `OpenAIModel` declaration
+
+Optional additions:
+- Set the informative message in the `ActionPlanner` declaration via the `startStreamingMessage` config. 
+
+- Set attachments in the final chunk via the  `endStreamHandler` in the `ActionPlanner` declaration. 
+  - Useful methods include 
+    - `streamer.setAttachments([...attachments])`
+    - `streamer.getMessage()`
+
+
+```js
+const model = new OpenAIModel({
+    // ...Setup OpenAI or AzureOpenAI
+    stream: true,                                         // Set stream toggle
+});
+
+const endStreamHandler: PromptCompletionModelResponseReceivedEvent = (ctx, memory, response, streamer) => {
+    // ... Setup attachments
+    streamer.setAttachments([...cards]);                      // Set attachments
+};
+
+const planner = new ActionPlanner({
+    model,
+    prompts,
+    defaultPrompt: 'default',
+    startStreamingMessage: 'Loading stream results...', // Set informative message
+    endStreamHandler: endStreamHandler                  // Set final chunk handler
+});
+```
 
 ![Teams Chef Bot](./assets/TeamsChef003.png?raw=1)
 

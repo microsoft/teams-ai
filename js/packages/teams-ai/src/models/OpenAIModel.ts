@@ -27,6 +27,7 @@ import { Tokenizer } from '../tokenizers';
 import { ActionCall, PromptResponse } from '../types';
 
 import { PromptCompletionModel, PromptCompletionModelEmitter } from './PromptCompletionModel';
+import { StreamingResponse } from '../StreamingResponse';
 
 /**
  * Base model options common to both OpenAI and Azure OpenAI services.
@@ -165,6 +166,20 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
 
 /**
  * A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
+ * @remarks
+ * The model has been updated to support calling OpenAI's new o1 family of models. That currently
+ * comes with a few constraints. These constraints are mostly handled for you but are worth noting:
+ * - The o1 models introduce a new `max_completion_tokens` parameter and they've deprecated the
+ *  `max_tokens` parameter. The model will automatically convert the incoming `max_tokens` parameter
+ * to `max_completion_tokens` for you. But you should be aware that o1 has hidden token usage and costs
+ * that aren't constrained by the `max_completion_tokens` parameter. This means that you may see an
+ * increase in token usage and costs when using the o1 models.
+ * - The o1 models do not currently support the sending of system messages which just means that the
+ * `useSystemMessages` parameter is ignored when calling the o1 models.
+ * - The o1 models do not currently support setting the `temperature`, `top_p`, and `presence_penalty`
+ * parameters so they will be ignored.
+ * - The o1 models do not currently support the use of tools so you will need to use the "monologue"
+ * augmentation to call actions.
  */
 export class OpenAIModel implements PromptCompletionModel {
     private readonly _events: PromptCompletionModelEmitter = new EventEmitter() as PromptCompletionModelEmitter;
@@ -308,7 +323,9 @@ export class OpenAIModel implements PromptCompletionModel {
 
         // Check for use of system messages
         // - 'user' messages tend to be followed better by the model then 'system' messages.
-        if (!this.options.useSystemMessages && result.output.length > 0 && result.output[0].role == 'system') {
+        const isO1Model = model.startsWith('o1-');
+        const useSystemMessages = !isO1Model && this.options.useSystemMessages;
+        if (!useSystemMessages && result.output.length > 0 && result.output[0].role == 'system') {
             result.output[0].role = 'user';
         }
 
@@ -325,9 +342,20 @@ export class OpenAIModel implements PromptCompletionModel {
         const input = this.getInputMessage(result.output);
 
         try {
+            // Get the chat completion parameters
+            const params = this.getChatCompletionParams(model, updatedMessages, template);
+            if (isO1Model) {
+                if (params.max_tokens) {
+                    params.max_completion_tokens = params.max_tokens;
+                    delete params.max_tokens;
+                }
+                params.temperature = 1;
+                params.top_p = 1;
+                params.presence_penalty = 0;
+            }
+
             // Call chat completion API
             let message: Message<string>;
-            const params = this.getChatCompletionParams(model, updatedMessages, template);
             const completion = await this._client.chat.completions.create(params);
             if (params.stream) {
                 // Log start of streaming
@@ -409,7 +437,8 @@ export class OpenAIModel implements PromptCompletionModel {
 
             // Signal response received
             const response: PromptResponse<string> = { status: 'success', input, message };
-            this._events.emit('responseReceived', context, memory, response);
+            const streamer: StreamingResponse = memory.getValue('temp.streamer');
+            this._events.emit('responseReceived', context, memory, response, streamer);
 
             // Let any pending events flush before returning
             await new Promise((resolve) => setTimeout(resolve, 0));
@@ -587,7 +616,7 @@ export class OpenAIModel implements PromptCompletionModel {
         if (!Array.isArray(params.tools) || params.tools.length == 0) {
             if (params.tool_choice) {
                 delete params.tool_choice;
-            }           
+            }
         }
 
         return params;

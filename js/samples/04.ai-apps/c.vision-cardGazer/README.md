@@ -18,7 +18,7 @@ _Table of contents_
 
 ## Interacting with the bot
 
-You can interact with this bot by sending it a message with an image or a doodle. Be sure to add a message like "Turn this image into an Adaptive Card". As an example, you can use the image included in the `./assets` folder. Large resolution images will not work due to the limitations of the AI model.
+You can interact with this bot by sending it a message with an image or a doodle. Be sure to add a message like "Turn this image into an Adaptive Card". As an example, you can use the image included in the `./assets` folder. Large resolution images will not work due to the limitations of the AI model. Since the TeamsAttachmentDownloader is only using low resolution images, your image will be converted to 512px by 512px and budgeted at 85 tokens.
 
 ## Setting up the sample
 
