@@ -64,7 +64,7 @@ class Appearance(Model):
         name (str): The name of the document
         text (str): Optional; ignored in Teams
         url (str): The url of the document
-        abstract (str): Content of the citation. Should be clipped if longer than ~500 characters
+        abstract (str): Content of the citation. Must be clipped if longer than 480 characters
         encodingFormat (str): The encoding format of the citation
         image (str): Used for icon; for not it is ignored
         keywords (list[str]): The optional keywords to the citation
