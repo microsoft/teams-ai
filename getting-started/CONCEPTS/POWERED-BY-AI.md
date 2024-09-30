@@ -74,6 +74,7 @@ Feedback loop, when enabled, will add thumbs up and thumbs down buttons to the b
 To enable this feature, set the `enable_feedback_loop` property to `true` in the `AIOptions` object when creating the `AI` object.
 
 ### JS
+
 ```typescript
 export const app = new Application<ApplicationTurnState>({
     ai: {
@@ -83,6 +84,7 @@ export const app = new Application<ApplicationTurnState>({
 ```
 
 ### C#
+
 ```csharp
 AIOptions<TurnState> options = new(planner);
 options.EnableFeedbackLoop = true; // setting `EnableFeedbackLoop`
@@ -93,10 +95,11 @@ Application<TurnState> app = new ApplicationBuilder<TurnState>()
 ```
 
 ### Python
+
 ```python
 app = Application[AppTurnState](
     ApplicationOptions(
-        ...,
+        # ...other options e.g. planner
         ai=AIOptions(
            enable_feedback_loop=True
         ),
@@ -122,6 +125,7 @@ If the user presses either of the feedback buttons, they will be prompted to pro
 Use the `app.feedbackLoop` method to register a feedback loop handler. This method will be called when the user provides feedback on the AI system's response. It is up to the developer to store and process the feedback.
 
 ### JS
+
 ```typescript
 app.feedbackLoop(async (context, state, feedbackLoopData) => {
   // custom logic here...
@@ -129,6 +133,7 @@ app.feedbackLoop(async (context, state, feedbackLoopData) => {
 ```
 
 ### C#
+
 ```csharp
 app.OnFeedbackLoop(async (turnContext, turnState, feedbackLoopData, cancellationToken) =>
 {
@@ -137,6 +142,7 @@ app.OnFeedbackLoop(async (turnContext, turnState, feedbackLoopData, cancellation
 ```
 
 ### Python
+
 ```python
 @app.feedback_loop
 async def feedback_loop(
@@ -191,6 +197,7 @@ app.ai.action<PredictedSayCommand>(AI.SayCommandActionName, async (context, stat
 ```
 
 ### C#
+
 ```csharp
 // AIActions.cs
 public class AIActions
@@ -208,6 +215,7 @@ app.AI.ImportActions(new AIActions());
 ```
 
 ### Python
+
 ```python
 @app.ai.action(ActionTypes.SAY_COMMAND)
 async def on_say(

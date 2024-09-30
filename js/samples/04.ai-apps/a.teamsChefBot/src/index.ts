@@ -86,7 +86,6 @@ const model = new OpenAIModel({
     // OpenAI Support
     apiKey: process.env.OPENAI_KEY!,
     defaultModel: 'gpt-4o',
-    stream: true,
     project: process.env.OPENAI_PROJECT_KEY!,
     clientOptions: { apiKey: process.env.OPENAI_KEY! },
 
@@ -108,7 +107,6 @@ const planner = new ActionPlanner({
     model,
     prompts,
     defaultPrompt: 'default',
-    startStreamingMessage: 'Loading stream results...'
 });
 
 // Define storage and application

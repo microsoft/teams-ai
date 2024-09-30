@@ -20,8 +20,8 @@
         "test:nyc:report": "npx rimraf coverage && yarn test:mocha && nyc report"
     },
     "dependencies": {
-        "botbuilder": "^4.23.0",
-        "openai": "4.41.1"
+        "botbuilder": "^4.23.1",
+        "openai": "4.61.0"
     },
     "devDependencies": {
         "@azure/logger": "^1.1.4",
@@ -29,17 +29,16 @@
         "@microsoft/api-extractor": "^7.47.7",
         "@standardlabs/is-private": "^1.0.1",
         "@types/jsonwebtoken": "9.0.4",
-        "@types/lodash": "^4.17.7",
+        "@types/lodash": "^4.17.9",
         "@types/mocha": "^10.0.7",
         "@types/node": "^20.16.1",
         "@types/sinon": "^10.0.19",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
         "applicationinsights": "^2.9.6",
-        "browserify": "^17.0.0",
         "chai": "^4.5.0",
         "depcheck": "^1.4.7",
-        "eslint": "^8.57.0",
+        "eslint": "^8.57.1",
         "eslint-config-prettier": "^8.10.0",
         "eslint-plugin-import": "^2.30.0",
         "eslint-plugin-jsdoc": "^46.10.1",
@@ -64,7 +63,7 @@
         "sponge": "^0.1.0",
         "tinyify": "^4.0.0",
         "ts-node": "^10.9.2",
-        "typescript": "^5.5.4",
+        "typescript": "5.5.4",
         "wsrun": "^5.2.4"
     }
 }
