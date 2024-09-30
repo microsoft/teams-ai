@@ -203,9 +203,13 @@ namespace Microsoft.Teams.AI.AI.Models
                 TopP = (float)completion.TopP,
                 PresencePenalty = (float)completion.PresencePenalty,
                 FrequencyPenalty = (float)completion.FrequencyPenalty,
-                ToolChoice = completion.GetOpenAIChatToolChoice(),
-                ParallelToolCallsEnabled = completion.ParallelToolCalls
             };
+
+            if (isToolsAugmentation)
+            {
+                chatCompletionOptions.ToolChoice = completion.GetOpenAIChatToolChoice();
+                chatCompletionOptions.ParallelToolCallsEnabled = completion.ParallelToolCalls;
+            }
 
             foreach (ChatTool tool in tools)
             {
