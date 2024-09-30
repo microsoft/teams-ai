@@ -305,13 +305,13 @@ namespace Microsoft.Teams.AI.AI.Models
         /// The ID of the action call.
         /// </summary>
         [JsonPropertyName("id")]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         /// <summary>
         /// The function that the model called.
         /// </summary>
         [JsonPropertyName("function")]
-        public ActionFunction Function { get; set; }
+        public ActionFunction? Function { get; set; }
 
 
         /// <summary>
@@ -330,6 +330,14 @@ namespace Microsoft.Teams.AI.AI.Models
             Id = id;
             Function = function;
         }
+
+        /// <summary>
+        /// Creates an instance of <see cref="ActionCall"/>.
+        /// 
+        /// Used to create the object when deserializing.
+        /// </summary>
+        [JsonConstructor]
+        internal ActionCall() {}
 
         /// <summary>
         /// Creates an instance of <see cref="ActionCall"/> from <see cref="ChatToolCall"/>
@@ -399,8 +407,6 @@ namespace Microsoft.Teams.AI.AI.Models
             this.Name = name;
             this.Arguments = arguments;
         }
-
-        //IDictionary<string, object> ParseArgumentsJson
     }
 
     /// <summary>

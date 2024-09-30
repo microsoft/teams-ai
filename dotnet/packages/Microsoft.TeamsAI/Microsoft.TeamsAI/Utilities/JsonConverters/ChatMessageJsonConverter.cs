@@ -4,6 +4,8 @@ using System.Text.Json.Serialization;
 
 namespace Microsoft.Teams.AI.Utilities.JsonConverters
 {
+    // Currently only supports serialization and deserialization of string `content` properties.
+    // TODO: Support deserializing message content as well.
     internal class ChatMessageJsonConverter : JsonConverter<ChatMessage>
     {
         private static JsonSerializerOptions serializerOptions = new();
@@ -53,7 +55,7 @@ namespace Microsoft.Teams.AI.Utilities.JsonConverters
                             break;
                         case "content":
                             string content = reader.GetString() ?? "";
-                            chatMessage.Content = JsonSerializer.Deserialize<string>(content, serializerOptions);
+                            chatMessage.Content = content;
                             break;
                         case "name":
                             chatMessage.Name = reader.GetString();
