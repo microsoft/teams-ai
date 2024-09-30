@@ -75,7 +75,7 @@ export interface ClientCitation {
         url?: string;
 
         /**
-         * Content of the citation. Should be clipped if longer than ~500 characters.
+         * Content of the citation. Must be clipped if longer than 480 characters.
          */
         abstract: string;
 
@@ -179,7 +179,7 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
                     appearance: {
                         '@type': 'DigitalDocument',
                         name: citation.title || `Document #${i + 1}`,
-                        abstract: Utilities.snippet(citation.content, 500)
+                        abstract: Utilities.snippet(citation.content, 480)
                     }
                 };
 
