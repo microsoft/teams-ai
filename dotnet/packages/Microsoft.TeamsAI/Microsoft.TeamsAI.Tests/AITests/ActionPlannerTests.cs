@@ -15,7 +15,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
     public class ActionPlannerTests
     {
         [Fact]
-        public async void Test_CompletePromptAsync_HasPrompt()
+        public async Task Test_CompletePromptAsync_HasPrompt()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
@@ -50,7 +50,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_CompletePromptAsync_DoesNotHavePrompt()
+        public async Task Test_CompletePromptAsync_DoesNotHavePrompt()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
@@ -85,7 +85,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_ContinueTaskAsync_PromptResponseStatusError()
+        public async Task Test_ContinueTaskAsync_PromptResponseStatusError()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
@@ -127,7 +127,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_ContinueTaskAsync_PromptResponseStatusError_ErrorNull()
+        public async Task Test_ContinueTaskAsync_PromptResponseStatusError_ErrorNull()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
@@ -168,7 +168,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_ContinueTaskAsync_PlanNull()
+        public async Task Test_ContinueTaskAsync_PlanNull()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
@@ -224,7 +224,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_ContinueTaskAsync()
+        public async Task Test_ContinueTaskAsync()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
@@ -280,7 +280,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_BeginTaskAsync_PromptResponseStatusError()
+        public async Task Test_BeginTaskAsync_PromptResponseStatusError()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
@@ -322,7 +322,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_BeginTaskAsync_PromptResponseStatusError_ErrorNull()
+        public async Task Test_BeginTaskAsync_PromptResponseStatusError_ErrorNull()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
@@ -363,7 +363,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_BeginTaskAsync_PlanNull()
+        public async Task Test_BeginTaskAsync_PlanNull()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
@@ -419,7 +419,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_BeginTaskAsync()
+        public async Task Test_BeginTaskAsync()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();

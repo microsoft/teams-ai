@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
     public class ConversationHistorySectionTests
     {
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldRender()
+        public async Task Test_RenderAsTextAsync_ShouldRender()
         {
             // Arrange
             ConversationHistorySection section = new("history");
@@ -36,7 +36,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         }
 
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldRenderEmpty()
+        public async Task Test_RenderAsTextAsync_ShouldRenderEmpty()
         {
             // Arrange
             ConversationHistorySection section = new("history");
@@ -55,7 +55,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
 
 
         [Fact]
-        public async void Test_RenderAsMessagesAsync_ShoulderRender()
+        public async Task Test_RenderAsMessagesAsync_ShoulderRender()
         {
             // Arrange
             ConversationHistorySection section = new("history");

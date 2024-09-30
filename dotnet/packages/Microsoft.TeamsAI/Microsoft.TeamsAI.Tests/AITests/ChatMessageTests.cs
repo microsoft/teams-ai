@@ -67,7 +67,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             var context = message.Context;
             Assert.NotNull(context);
-            Assert.Equal(1, context.Citations.Count);
+            Assert.Single(context.Citations);
             Assert.Equal("test-title", context.Citations[0].Title);
             Assert.Equal("test-url", context.Citations[0].Url);
             Assert.Equal("test-content", context.Citations[0].Content);

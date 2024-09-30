@@ -8,7 +8,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
     public class AuthenticationManagerTests
     {
         [Fact]
-        public async void Test_SignIn_DefaultSetting()
+        public async Task Test_SignIn_DefaultSetting()
         {
             // arrange
             var graphToken = "graph token";
@@ -33,7 +33,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
         }
 
         [Fact]
-        public async void Test_SignIn_SpecificSetting()
+        public async Task Test_SignIn_SpecificSetting()
         {
             // arrange
             var sharepointToken = "graph token";
@@ -58,7 +58,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
         }
 
         [Fact]
-        public async void Test_SignIn_Pending()
+        public async Task Test_SignIn_Pending()
         {
             var app = new TestApplication(new TestApplicationOptions());
             var options = new AuthenticationOptions<TurnState>();
@@ -79,7 +79,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
         }
 
         [Fact]
-        public async void Test_SignOut_DefaultHandler()
+        public async Task Test_SignOut_DefaultHandler()
         {
             // arrange
             var app = new TestApplication(new TestApplicationOptions());
@@ -107,7 +107,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
         }
 
         [Fact]
-        public async void Test_SignOut_SpecificHandler()
+        public async Task Test_SignOut_SpecificHandler()
         {
             // arrange
             var app = new TestApplication(new TestApplicationOptions());

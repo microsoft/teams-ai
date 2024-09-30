@@ -185,6 +185,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
+        [Obsolete]
         public void Test_ChatCompletionsToolCall_ToFunctionToolCall()
         {
             // Arrange
@@ -201,6 +202,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
+        [Obsolete]
         public void Test_ChatCompletionsToolCall_InvalidToolType()
         {
             // Arrange
@@ -213,6 +215,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             Assert.Equal("Invalid tool type: invalidToolType", ex.Message);
         }
 
+        [Obsolete]
         private sealed class InvalidToolCall : ChatCompletionsToolCall
         {
             public InvalidToolCall() : base("invalidToolType", "test-id")

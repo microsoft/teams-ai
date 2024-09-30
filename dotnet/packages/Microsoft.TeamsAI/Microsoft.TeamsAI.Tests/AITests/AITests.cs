@@ -40,7 +40,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_RegisterAction_OverrideDefaultAction()
+        public async Task Test_RegisterAction_OverrideDefaultAction()
         {
             // Arrange
             var planner = new TestPlanner();
@@ -68,7 +68,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_RunAsync()
+        public async Task Test_RunAsync()
         {
             // Arrange
             var planner = new TurnStatePlanner<TurnState>();
@@ -88,12 +88,12 @@ namespace Microsoft.Teams.AI.Tests.AITests
                     From = new() { Id = "fromId" },
                     ChannelId = "channelId"
                 });
-            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
+            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
             var actions = new TestActions();
             ai.ImportActions(actions);
 
             // Act
-            var result = await ai.RunAsync(turnContextMock, turnState.Result);
+            var result = await ai.RunAsync(turnContextMock, turnState);
 
             // Assert
             Assert.True(result);
@@ -104,7 +104,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_RunAsync_ExceedStepLimit()
+        public async Task Test_RunAsync_ExceedStepLimit()
         {
             var planner = new TurnStatePlanner<TurnState>();
             var moderator = new TurnStateModerator<TurnState>();
@@ -123,14 +123,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
                     From = new() { Id = "fromId" },
                     ChannelId = "channelId"
                 });
-            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
+            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
             var actions = new TestActions();
             ai.ImportActions(actions);
             var actionHandler = new TurnStateActionHandler();
             ai.RegisterAction(AIConstants.TooManyStepsActionName, actionHandler);
 
             // Act
-            var result = await ai.RunAsync(turnContextMock, turnState.Result, stepCount: 30);
+            var result = await ai.RunAsync(turnContextMock, turnState, stepCount: 30);
 
             // Assert
             Assert.False(result);
@@ -141,7 +141,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_RunAsync_ExceedTimeLimit()
+        public async Task Test_RunAsync_ExceedTimeLimit()
         {
             // Arrange
             var planner = new TurnStatePlanner<TurnState>();
@@ -162,13 +162,13 @@ namespace Microsoft.Teams.AI.Tests.AITests
                     From = new() { Id = "fromId" },
                     ChannelId = "channelId"
                 });
-            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
+            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
             var actions = new TestActions();
             ai.ImportActions(actions);
             ai.RegisterAction(AIConstants.TooManyStepsActionName, new TurnStateActionHandler());
 
             // Act
-            var result = await ai.RunAsync(turnContextMock, turnState.Result);
+            var result = await ai.RunAsync(turnContextMock, turnState);
 
             // Assert
             Assert.False(result);

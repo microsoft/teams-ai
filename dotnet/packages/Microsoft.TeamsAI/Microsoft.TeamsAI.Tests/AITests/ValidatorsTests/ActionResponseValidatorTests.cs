@@ -12,7 +12,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
     public class ActionResponseValidatorTests
     {
         [Fact]
-        public async void Test_FunctionWithParams_ShouldSucceed()
+        public async Task Test_FunctionWithParams_ShouldSucceed()
         {
             Mock<ITurnContext> context = new();
             MemoryFork memory = new();
@@ -48,7 +48,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
         }
 
         [Fact]
-        public async void Test_FunctionWithMissingParams_ShouldFail()
+        public async Task Test_FunctionWithMissingParams_ShouldFail()
         {
             Mock<ITurnContext> context = new();
             MemoryFork memory = new();
@@ -84,7 +84,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
         }
 
         [Fact]
-        public async void Test_FunctionWithInvalidParams_ShouldFail()
+        public async Task Test_FunctionWithInvalidParams_ShouldFail()
         {
             Mock<ITurnContext> context = new();
             MemoryFork memory = new();
@@ -120,7 +120,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
         }
 
         [Fact]
-        public async void Test_MissingAction_ShouldFail()
+        public async Task Test_MissingAction_ShouldFail()
         {
             Mock<ITurnContext> context = new();
             MemoryFork memory = new();
@@ -156,7 +156,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
         }
 
         [Fact]
-        public async void Test_TextMessageRequired_ShouldFail()
+        public async Task Test_TextMessageRequired_ShouldFail()
         {
             Mock<ITurnContext> context = new();
             MemoryFork memory = new();

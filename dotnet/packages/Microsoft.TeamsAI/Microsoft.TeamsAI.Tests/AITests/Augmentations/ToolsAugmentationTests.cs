@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
     public class ToolsAugmentationTests
     {
         [Fact]
-        public async void Test_CreatePlanFromResponse_NoActionCalls_CreateSayCommand()
+        public async Task Test_CreatePlanFromResponse_NoActionCalls_CreateSayCommand()
         {
             // Arrange
             ToolsAugmentation augmentation = new ToolsAugmentation();
@@ -33,7 +33,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
         }
 
         [Fact]
-        public async void Test_CreatePlanFromResponse_OneActionCall()
+        public async Task Test_CreatePlanFromResponse_OneActionCall()
         {
             // Arrange
             ToolsAugmentation augmentation = new ToolsAugmentation();
@@ -62,7 +62,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
         }
 
         [Fact]
-        public async void Test_CreatePlanFromTesponse_MultipleActionCalls()
+        public async Task Test_CreatePlanFromTesponse_MultipleActionCalls()
         {
             // Arrange
             ToolsAugmentation augmentation = new ToolsAugmentation();

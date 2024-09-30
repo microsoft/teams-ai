@@ -16,7 +16,7 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             HttpClient client = adapter.HttpClientFactory.CreateClient();
             Assert.NotNull(client);
-            Assert.True(client.DefaultRequestHeaders.UserAgent.Contains(productInfo));
+            Assert.Contains(productInfo, client.DefaultRequestHeaders.UserAgent);
         }
 
         [Fact]
@@ -30,7 +30,7 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             HttpClient client = adapter.HttpClientFactory.CreateClient();
             Assert.NotNull(client);
-            Assert.True(client.DefaultRequestHeaders.UserAgent.Contains(productInfo));
+            Assert.Contains(productInfo, client.DefaultRequestHeaders.UserAgent);
             Assert.True(client.DefaultRequestHeaders.UserAgent.Count == 1);
         }
     }

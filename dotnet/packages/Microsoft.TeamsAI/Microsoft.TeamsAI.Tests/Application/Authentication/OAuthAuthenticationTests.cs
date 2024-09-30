@@ -8,7 +8,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
     public class OAuthAuthenticationTests
     {
         [Fact]
-        public async void Test_IsUserSignedIn_ReturnsTokenString()
+        public async Task Test_IsUserSignedIn_ReturnsTokenString()
         {
             // Arrange
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
@@ -35,7 +35,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
         }
 
         [Fact]
-        public async void Test_IsUserSignedIn_ReturnsNull()
+        public async Task Test_IsUserSignedIn_ReturnsNull()
         {
             // Arrange
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();

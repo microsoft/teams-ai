@@ -25,7 +25,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_OpenAI_CreateEmbeddings_ReturnEmbeddings()
+        public async Task Test_OpenAI_CreateEmbeddings_ReturnEmbeddings()
         {
             // Arrange
             var apiKey = "randomApiKey";
@@ -59,11 +59,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             Assert.NotNull(result);
             Assert.NotNull(result.Output);
-            Assert.Equal(result.Status, EmbeddingsResponseStatus.Success);
+            Assert.Equal(EmbeddingsResponseStatus.Success, result.Status);
         }
 
         [Fact]
-        public async void Test_AzureOpenAI_CreateEmbeddings_ReturnEmbeddings()
+        public async Task Test_AzureOpenAI_CreateEmbeddings_ReturnEmbeddings()
         {
             // Arrange
             var apiKey = "randomApiKey";
@@ -98,13 +98,13 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             Assert.NotNull(result);
             Assert.NotNull(result.Output);
-            Assert.Equal(result.Status, EmbeddingsResponseStatus.Success);
+            Assert.Equal(EmbeddingsResponseStatus.Success, result.Status);
         }
 
         [Theory]
         [InlineData(429, "too many requests", EmbeddingsResponseStatus.RateLimited)]
         [InlineData(502, "service error", EmbeddingsResponseStatus.Failure)]
-        public async void Test_CreateEmbeddings_ThrowClientResultException(int statusCode, string errorMsg, EmbeddingsResponseStatus responseStatus)
+        public async Task Test_CreateEmbeddings_ThrowClientResultException(int statusCode, string errorMsg, EmbeddingsResponseStatus responseStatus)
         {
             // Arrange
             var apiKey = "randomApiKey";
@@ -133,7 +133,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
         [Fact]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "<Pending>")]
-        public async void Test_CreateEmbeddings_ThrowException()
+        public async Task Test_CreateEmbeddings_ThrowException()
         {
             // Arrange
             var apiKey = "randomApiKey";

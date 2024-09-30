@@ -30,7 +30,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
 
 
         [Fact]
-        public async void Test_RunDialog_BeginNew()
+        public async Task Test_RunDialog_BeginNew()
         {
             // arrange
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
@@ -49,7 +49,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_RunDialog_ContinueExisting()
+        public async Task Test_RunDialog_ContinueExisting()
         {
             // arrange
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
@@ -71,7 +71,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
 
 
         [Fact]
-        public async void Test_ContinueDialog()
+        public async Task Test_ContinueDialog()
         {
             // arrange
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
@@ -92,7 +92,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_TokenExchangeRouteSelector_NameMatched()
+        public async Task Test_TokenExchangeRouteSelector_NameMatched()
         {
             // arrange
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
@@ -110,7 +110,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_TokenExchangeRouteSelector_NameNotMatch()
+        public async Task Test_TokenExchangeRouteSelector_NameNotMatch()
         {
             // arrange
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
@@ -128,7 +128,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_Dedupe()
+        public async Task Test_Dedupe()
         {
             // arrange
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());

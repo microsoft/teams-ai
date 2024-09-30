@@ -65,7 +65,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
-        public async void Test_CompletePromptAsync_AzureOpenAI_Chat_PromptTooLong()
+        public async Task Test_CompletePromptAsync_AzureOpenAI_Chat_PromptTooLong()
         {
             // Arrange
             var turnContextMock = new Mock<ITurnContext>();
@@ -93,7 +93,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
-        public async void Test_CompletePromptAsync_AzureOpenAI_Chat_RateLimited()
+        public async Task Test_CompletePromptAsync_AzureOpenAI_Chat_RateLimited()
         {
             // Arrange
             var turnContextMock = new Mock<ITurnContext>();
@@ -126,7 +126,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
-        public async void Test_CompletePromptAsync_AzureOpenAI_Chat_RequestFailed()
+        public async Task Test_CompletePromptAsync_AzureOpenAI_Chat_RequestFailed()
         {
             // Arrange
             var turnContextMock = new Mock<ITurnContext>();
@@ -155,11 +155,11 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             // Assert
             Assert.Equal(PromptResponseStatus.Error, result.Status);
             Assert.NotNull(result.Error);
-            Assert.True(result.Error.Message.StartsWith("The chat completion API returned an error status of InternalServerError: Service request failed.\r\nStatus: 500 (exception)"));
+            Assert.StartsWith("The chat completion API returned an error status of InternalServerError: Service request failed.\r\nStatus: 500 (exception)", result.Error.Message);
         }
 
         [Fact]
-        public async void Test_CompletePromptAsync_AzureOpenAI_Chat()
+        public async Task Test_CompletePromptAsync_AzureOpenAI_Chat()
         {
             // Arrange
             var turnContextMock = new Mock<ITurnContext>();
@@ -209,7 +209,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
-        public async void Test_CompletePromptAsync_AzureOpenAI_Chat_WithTools()
+        public async Task Test_CompletePromptAsync_AzureOpenAI_Chat_WithTools()
         {
             // Arrange
             var turnContextMock = new Mock<ITurnContext>();

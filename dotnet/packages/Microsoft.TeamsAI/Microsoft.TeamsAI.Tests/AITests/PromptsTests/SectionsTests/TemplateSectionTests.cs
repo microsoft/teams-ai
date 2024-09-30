@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
     public class TemplateSectionTests
     {
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldRenderWithFunction()
+        public async Task Test_RenderAsTextAsync_ShouldRenderWithFunction()
         {
             TemplateSection section = new("this is a test message: {{getMessage}}", ChatRole.User);
             Mock<ITurnContext> context = new();
@@ -31,7 +31,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         }
 
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldRenderWithFunction_WithWhiteSpace()
+        public async Task Test_RenderAsTextAsync_ShouldRenderWithFunction_WithWhiteSpace()
         {
             TemplateSection section = new("this is a test message: {{ getMessage }}", ChatRole.User);
             Mock<ITurnContext> context = new();
@@ -51,7 +51,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         }
 
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldRenderWithFunctionArgs()
+        public async Task Test_RenderAsTextAsync_ShouldRenderWithFunctionArgs()
         {
             TemplateSection section = new("this is a test message: {{getMessage 'my param'}}", ChatRole.User);
             Mock<ITurnContext> context = new();
@@ -71,7 +71,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         }
 
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldRenderWithVariable()
+        public async Task Test_RenderAsTextAsync_ShouldRenderWithVariable()
         {
             TemplateSection section = new("this is a test message: {{$message}}", ChatRole.User);
             Mock<ITurnContext> context = new();
@@ -88,7 +88,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         }
 
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldRenderWithVariable_WithWhitespace()
+        public async Task Test_RenderAsTextAsync_ShouldRenderWithVariable_WithWhitespace()
         {
             TemplateSection section = new("this is a test message: {{ $message }}", ChatRole.User);
             Mock<ITurnContext> context = new();
