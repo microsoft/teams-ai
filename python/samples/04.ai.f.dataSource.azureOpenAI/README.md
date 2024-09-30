@@ -7,7 +7,7 @@ You can chat with your data in Azure AI Search, Azure Blob Storage, URL/web addr
 
 <!-- code_chunk_output -->
 
-- [Azure OpenAI On Your Data](#azure-openai-on-your-data)
+- [Azure OpenAI On Your Data](#azure-openai-on-your-data-oyd)
   - [Summary](#summary)
     - [Example Interaction](#example-interaction)
   - [Setting up the sample](#setting-up-the-sample)
