@@ -189,11 +189,13 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
     {
         private readonly List<T> _items;
         private readonly PipelineResponse _pipelineResponse;
+        private bool _movedOnToNext;
 
         public TestAsyncEnumerator(List<T> items, PipelineResponse response)
         {
             _items = items;
             _pipelineResponse = response;
+            _movedOnToNext = false;
         }
 
         public PageResult<T> Current => PageResult<T>.Create(_items, ContinuationToken.FromBytes(BinaryData.FromString("")), null, _pipelineResponse);
@@ -205,7 +207,16 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
 
         public ValueTask<bool> MoveNextAsync()
         {
-            return new ValueTask<bool>(false);
+            if (!_movedOnToNext)
+            {
+                return new ValueTask<bool>(true);
+            }
+            else
+            {
+                _movedOnToNext = true;
+                return new ValueTask<bool>(false);
+            }
+
         }
     }
 }

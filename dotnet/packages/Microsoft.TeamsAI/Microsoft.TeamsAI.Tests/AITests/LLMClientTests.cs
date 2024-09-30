@@ -398,7 +398,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(response.Message);
             Assert.Equal(ChatRole.Assistant, response.Message.Role);
             Assert.Equal("welcome", response.Message.Content);
-            Assert.Equal(1, memory.Values.Count);
+            Assert.Empty(memory.Values);
         }
 
         [Fact]
@@ -444,7 +444,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(response.Message);
             Assert.Equal(ChatRole.Assistant, response.Message.Role);
             Assert.Equal("welcome", response.Message.Content);
-            Assert.Equal(1, memory.Values.Count);
+            Assert.Single(memory.Values);
             Assert.Equal("hello", memory.Values[options.InputVariable]);
         }
 

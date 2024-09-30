@@ -160,16 +160,16 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public void Test_AssistantRole_ToOpenAISdkChatMessage_ToolCall()
+        public void Test_AssistantRole_ToOpenAISdkChatMessage_ActionCall()
         {
             // Arrange
             var chatMessage = new ChatMessage(ChatRole.Assistant)
             {
                 Content = "test-content",
                 Name = "test-name",
-                ToolCalls = new List<ChatCompletionsToolCall>()
+                ActionCalls = new List<ActionCall>()
                 {
-                    new ChatCompletionsFunctionToolCall("test-id", "test-tool-name", "test-tool-arg1")
+                    new ActionCall("test-id", new ActionFunction("test-tool-name", "test-tool-arg1"))
                 }
             };
 
@@ -183,7 +183,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // TODO: Uncomment when participant name issue is resolved.
             //Assert.Equal("test-name", assistantMessage.ParticipantName);
 
-            Assert.Equal(1, assistantMessage.ToolCalls.Count);
+            Assert.Single(assistantMessage.ToolCalls);
             ChatToolCall toolCall = assistantMessage.ToolCalls[0];
             Assert.NotNull(toolCall);
             Assert.Equal("test-id", toolCall.Id);
@@ -239,7 +239,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 Content = "test-content",
                 Name = "tool-name",
-                ToolCallId = "tool-call-id"
+                ActionCallId = "action-call-id"
             };
 
             // Act
@@ -249,7 +249,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var toolMessage = result as ToolChatMessage;
             Assert.NotNull(toolMessage);
             Assert.Equal("test-content", toolMessage.Content[0].Text);
-            Assert.Equal("tool-call-id", toolMessage.ToolCallId);
+            Assert.Equal("action-call-id", toolMessage.ToolCallId);
         }
     }
 }

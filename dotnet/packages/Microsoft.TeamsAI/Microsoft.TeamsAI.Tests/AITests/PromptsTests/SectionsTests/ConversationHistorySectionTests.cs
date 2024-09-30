@@ -74,9 +74,9 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
 
             // Assert
             RenderedPromptSection<List<ChatMessage>> rendered = await section.RenderAsMessagesAsync(context.Object, memory, manager, tokenizer, 50);
-            Assert.Equal("you are a unit test bot", rendered.Output[2].GetContent<string>());
+            Assert.Equal("you are a unit test bot", rendered.Output[0].GetContent<string>());
             Assert.Equal("hi", rendered.Output[1].GetContent<string>());
-            Assert.Equal("hi, how may I assist you?", rendered.Output[0].GetContent<string>());
+            Assert.Equal("hi, how may I assist you?", rendered.Output[2].GetContent<string>());
             Assert.Equal(15, rendered.Length);
         }
     }

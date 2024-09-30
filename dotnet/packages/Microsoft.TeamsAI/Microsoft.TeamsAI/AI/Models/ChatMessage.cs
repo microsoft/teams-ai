@@ -173,7 +173,7 @@ namespace Microsoft.Teams.AI.AI.Models
             }
             // else if context is null, then it must be a tool message.
 
-            string textContent = textContentBuilder.ToString();
+            string textContent = textContentBuilder.ToString().Trim();
 
             // Different roles map to different classes
             if (role == ChatRole.User)
@@ -329,13 +329,6 @@ namespace Microsoft.Teams.AI.AI.Models
         {
             Id = id;
             Function = function;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ActionCall"/> class.
-        /// </summary>
-        public ActionCall()
-        {
         }
 
         /// <summary>

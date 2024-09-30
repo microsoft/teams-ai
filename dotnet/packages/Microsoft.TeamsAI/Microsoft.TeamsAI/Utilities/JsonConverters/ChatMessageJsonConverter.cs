@@ -15,7 +15,19 @@ namespace Microsoft.Teams.AI.Utilities.JsonConverters
         {
             if (reader.TokenType != JsonTokenType.StartObject)
             {
-                throw new JsonException();
+                // Non-json string is being deserialized.
+                // Read the string into the ChatMessage "content" property.
+                string? response = JsonSerializer.Deserialize<string>(ref reader);
+
+                if (response == null)
+                {
+                    throw new JsonException();
+                }
+
+                return new ChatMessage(ChatRole.Assistant)
+                {
+                    Content = response
+                };
             }
 
             var chatMessage = new ChatMessage(ChatRole.Assistant);
