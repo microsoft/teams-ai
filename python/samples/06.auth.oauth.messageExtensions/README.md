@@ -34,7 +34,7 @@ Note that this bot will only work in tenants where the following graph scopes ar
 
 2. Duplicate the `sample.env`. Rename the file to .env and fill in the variables with your keys.
 
-The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below. To read about other options, see [Other ways to run the sample](https://github.com/microsoft/teams-ai/tree/main/getting-started/OTHER).
+The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below. To read about other options, skip to [Other ways to run the sample](#other-ways-to-run-the-sample).
 
 ## Testing the sample
 

@@ -118,7 +118,7 @@ Above steps use Azure OpenAI as AI service, optionally, you can also use OpenAI 
 
 **For Local Debug (F5) with Teams Toolkit for Visual Studio**
 
-1. Set your [OpenAI API Key](https://openai.com/api/) to *appsettings.Development.json*.
+1. Set your [OpenAI API Key](https://platform.openai.com/settings/profile?tab=api-keys) to *appsettings.Development.json*.
 
     ```json
       "OpenAI": {
@@ -130,7 +130,7 @@ Above steps use Azure OpenAI as AI service, optionally, you can also use OpenAI 
 
 To configure the Azure resources to have OpenAI environment variables:
 
-1. In `./env/.env.dev.user` file, paste your [OpenAI API Key](https://openai.com/api/) to the environment variable `SECRET_OPENAI_KEY=`.
+1. In `./env/.env.dev.user` file, paste your [OpenAI API Key](https://platform.openai.com/settings/profile?tab=api-keys) to the environment variable `SECRET_OPENAI_KEY=`.
 
 ## Further reading
 
