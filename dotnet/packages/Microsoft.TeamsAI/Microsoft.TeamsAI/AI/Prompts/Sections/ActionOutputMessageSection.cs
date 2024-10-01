@@ -31,7 +31,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             List<ChatMessage> history = memory.GetValue(_HistoryVariable) as List<ChatMessage> ?? new();
             List<ChatMessage> messages = new();
 
-            if (history.Count > 1)
+            if (history.Count >= 1)
             {
                 Dictionary<string, string> actionOutputs = memory.GetValue(_OutputVariable) as Dictionary<string, string> ?? new();
                 List<ActionCall> actionCalls = history.Last().ActionCalls ?? new();
