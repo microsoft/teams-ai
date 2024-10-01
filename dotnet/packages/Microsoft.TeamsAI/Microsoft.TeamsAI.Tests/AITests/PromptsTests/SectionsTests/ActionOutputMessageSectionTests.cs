@@ -75,7 +75,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         }
 
         [Fact]
-        public async Task Test_RenderAsMessages_WithInvalidActionCalls_AddsToolMessage_WithEmptyOutput()
+        public async Task Test_RenderAsMessages_WithInvalidActionCalls_AddsToolMessage_WithEmptyStringOutputContent()
         {
             // Arrange
             var historyVariable = "temp.history";
@@ -96,7 +96,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
             var sections = await section.RenderAsMessagesAsync(turnContext, turnState, null!, null!, 0);
 
             // Assert
-            Assert.Empty(sections.Output);
+            Assert.Single(sections.Output);
+            Assert.Equal("", sections.Output[0].Content);
         }
     }
 }
