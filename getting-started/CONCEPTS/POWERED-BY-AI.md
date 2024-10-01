@@ -144,7 +144,7 @@ app.OnFeedbackLoop(async (turnContext, turnState, feedbackLoopData, cancellation
 ### Python
 
 ```python
-@app.feedback_loop
+@app.feedback_loop()
 async def feedback_loop(
     context: TurnContext, state: TurnState, feedback_data: FeedbackLoopData
 ):
