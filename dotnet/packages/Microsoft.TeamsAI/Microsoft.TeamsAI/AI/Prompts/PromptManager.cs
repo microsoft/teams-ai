@@ -1,5 +1,4 @@
-﻿using Google.Protobuf;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Augmentations;
 using Microsoft.Teams.AI.AI.DataSources;
 using Microsoft.Teams.AI.AI.Models;
@@ -127,7 +126,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
 
                 // Group sections together under one "system" message
                 template.Prompt.Sections = new List<PromptSection>() { 
-                    // The "1" place holder is to make this a fixed section is it is rendered in the correct order.
+                    // The "1" place holder is to make this a fixed section so it is rendered in the correct order.
                     // TODO: When implementing the new layout engine class refactor this.
                     new GroupSection(ChatRole.System, template.Prompt.Sections, 1) 
                 };

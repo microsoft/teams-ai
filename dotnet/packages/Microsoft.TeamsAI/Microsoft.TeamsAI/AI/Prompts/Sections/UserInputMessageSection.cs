@@ -71,7 +71,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             {
                 // Check for budget to add image.
                 // TODO: This accounts for low detail images but not high detail images.
-                // Additional work is needed to accoutn for high detail images.
+                // Additional work is needed to account for high detail images.
                 if (budget < 85)
                 {
                     break;

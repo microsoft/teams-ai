@@ -359,7 +359,7 @@ namespace Microsoft.Teams.AI.AI.Models
         {
             if (this.Type == ActionCallType.Function)
             {
-                return ChatToolCall.CreateFunctionToolCall(Id, Function.Name, Function.Arguments);
+                return ChatToolCall.CreateFunctionToolCall(Id, Function!.Name, Function.Arguments);
             }
 
             throw new TeamsAIException($"Invalid tool type: {this.Type}");

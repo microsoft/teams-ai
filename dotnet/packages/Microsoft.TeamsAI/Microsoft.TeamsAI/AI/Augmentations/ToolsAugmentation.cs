@@ -32,7 +32,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
 
                 foreach (ActionCall actionCall in actionCalls)
                 {
-                    PredictedDoCommand command = new(actionCall.Function.Name, actionCall.Function.Arguments)
+                    PredictedDoCommand command = new(actionCall.Function!.Name, actionCall.Function.Arguments)
                     {
                         ActionId = actionCall.Id,
                     };

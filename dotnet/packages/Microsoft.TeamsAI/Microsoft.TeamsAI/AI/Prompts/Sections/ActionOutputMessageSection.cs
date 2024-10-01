@@ -34,13 +34,12 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             if (history.Count > 1)
             {
                 Dictionary<string, string> actionOutputs = memory.GetValue(_OutputVariable) as Dictionary<string, string> ?? new();
-                // TODO: Set to "First" 
                 List<ActionCall> actionCalls = history.Last().ActionCalls ?? new();
 
                 foreach (ActionCall actionCall in actionCalls)
                 {
                     string output = "";
-                    if (actionOutputs.TryGetValue(actionCall.Id, out string actionOutput))
+                    if (actionOutputs.TryGetValue(actionCall.Id!, out string actionOutput))
                     {
                         output = actionOutput;
                     }

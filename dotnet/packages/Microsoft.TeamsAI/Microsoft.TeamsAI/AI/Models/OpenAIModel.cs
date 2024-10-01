@@ -183,16 +183,6 @@ namespace Microsoft.Teams.AI.AI.Models
                 _logger.LogTrace(JsonSerializer.Serialize(prompt.Output, _serializerOptions));
             }
 
-            // TODO: REMOVE
-            //// Get input message
-            //// - we're doing this here because the input message can be complex and include images.
-            //ChatMessage? input = null;
-            //int last = prompt.Output.Count - 1;
-            //if (last >= 0 && prompt.Output[last].Role == "user")
-            //{
-            //    input = prompt.Output[last];
-            //}
-
             // Render prompt template
             IEnumerable<OAIChat.ChatMessage> chatMessages = prompt.Output.Select(chatMessage => chatMessage.ToOpenAIChatMessage());
 

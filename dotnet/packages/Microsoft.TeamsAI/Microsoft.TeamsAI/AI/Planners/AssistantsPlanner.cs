@@ -196,7 +196,6 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
                     return;
                 }
 
-                // TODO: Confirm pointer is on the first object.
                 ThreadRun? run = runs.GetAllValuesAsync().GetAsyncEnumerator().Current;
                 if (run == null || _IsRunCompleted(run))
                 {
