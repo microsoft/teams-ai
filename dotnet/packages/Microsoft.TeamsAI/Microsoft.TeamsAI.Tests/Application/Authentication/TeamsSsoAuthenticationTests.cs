@@ -1,11 +1,12 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Identity.Client;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using Newtonsoft.Json.Linq;
+using Microsoft.Copilot.Protocols.Adapter;
 
 namespace Microsoft.Teams.AI.Tests.Application.Authentication
 {

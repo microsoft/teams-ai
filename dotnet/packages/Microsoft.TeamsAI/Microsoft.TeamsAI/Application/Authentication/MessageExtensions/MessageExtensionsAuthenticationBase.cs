@@ -1,6 +1,7 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
-using Microsoft.Bot.Schema.Teams;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
+using Microsoft.Copilot.Teams;
+using Microsoft.Copilot.Teams.Primitives;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Teams.AI
@@ -45,7 +46,7 @@ namespace Microsoft.Teams.AI
                     // Token exchange failed, asks user to sign in and consent.
                     Activity activity = new()
                     {
-                        Type = ActivityTypesEx.InvokeResponse,
+                        Type = ActivityTypes.InvokeResponse,
                         Value = new InvokeResponse
                         {
                             Status = 412

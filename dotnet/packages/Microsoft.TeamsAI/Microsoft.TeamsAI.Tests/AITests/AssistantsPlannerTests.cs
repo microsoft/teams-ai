@@ -1,5 +1,5 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Planners.Experimental;
 using Microsoft.Teams.AI.Exceptions;
@@ -9,6 +9,7 @@ using Moq;
 using System.Reflection;
 using Microsoft.Teams.AI.AI.Planners;
 using OpenAI.Assistants;
+using Microsoft.Copilot.Protocols.Adapter;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {

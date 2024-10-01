@@ -1,10 +1,11 @@
 ﻿using Microsoft.Teams.AI.AI.Models;
-using Microsoft.Bot.Builder;
+using Microsoft.Copilot.BotBuilder;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Moq;
 using Microsoft.Teams.AI.State;
+using Microsoft.Copilot.Protocols.Primitives;
 
 namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
 {

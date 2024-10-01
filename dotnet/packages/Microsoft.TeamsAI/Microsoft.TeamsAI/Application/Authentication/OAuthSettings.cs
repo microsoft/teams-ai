@@ -1,4 +1,4 @@
-﻿using Microsoft.Bot.Builder.Dialogs;
+﻿using Microsoft.Copilot.BotBuilder.Dialogs;
 
 namespace Microsoft.Teams.AI
 {

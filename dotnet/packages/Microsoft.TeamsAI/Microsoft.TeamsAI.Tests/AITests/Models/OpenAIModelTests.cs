@@ -1,4 +1,4 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Microsoft.Copilot.BotBuilder;
 using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
@@ -15,6 +15,7 @@ using System.Reflection;
 using ChatMessage = Microsoft.Teams.AI.AI.Models.ChatMessage;
 using ChatRole = Microsoft.Teams.AI.AI.Models.ChatRole;
 using Azure.Identity;
+using Microsoft.Copilot.Protocols.Primitives;
 
 namespace Microsoft.Teams.AI.Tests.AITests.Models
 {

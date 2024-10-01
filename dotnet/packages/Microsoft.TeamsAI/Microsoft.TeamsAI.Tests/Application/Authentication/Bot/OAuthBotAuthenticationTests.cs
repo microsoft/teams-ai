@@ -1,5 +1,5 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Newtonsoft.Json.Linq;
@@ -122,7 +122,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
 
             // Act
             var result = await botAuth.VerifyStateRouteSelector(turnContext, default);
@@ -143,7 +143,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
 
             // Act
             var result = await botAuth.VerifyStateRouteSelector(turnContext, default);
@@ -164,7 +164,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
 
             // Act
             var result = await botAuth.VerifyStateRouteSelector(turnContext, default);
@@ -185,7 +185,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", "NOT SETTING_NAME");
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
 
             // Act
             var result = await botAuth.VerifyStateRouteSelector(turnContext, default);
@@ -206,7 +206,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
 
             // Act
             var result = await botAuth.TokenExchangeRouteSelector(turnContext, default);
@@ -227,7 +227,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
 
             // Act
             var result = await botAuth.TokenExchangeRouteSelector(turnContext, default);
@@ -248,7 +248,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
 
             // Act
             var result = await botAuth.TokenExchangeRouteSelector(turnContext, default);
@@ -269,7 +269,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", "NOT SETTING_NAME");
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
 
             // Act
             var result = await botAuth.TokenExchangeRouteSelector(turnContext, default);

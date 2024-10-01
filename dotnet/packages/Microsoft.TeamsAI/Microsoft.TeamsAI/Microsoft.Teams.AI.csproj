@@ -40,18 +40,56 @@
     <PackageReference Include="Azure.AI.OpenAI" Version="2.0.0-beta.2" />
     <PackageReference Include="JsonSchema.Net" Version="5.5.1" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Bot.Builder" Version="4.22.7" />
-    <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.22.7" />
-    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.7" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.61.3" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.62.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Microsoft.ML.Tokenizers" Version="0.22.0-preview.24271.1" />
     <PackageReference Include="OpenAI" Version="2.0.0-beta.7" />
     <PackageReference Include="System.Text.Json" Version="8.0.4" />
+
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
+    <PackageReference Include="Microsoft.IdentityModel.LoggingExtensions" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <PackageReference Include="Azure.Core" Version="1.42.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.0"/>
+
   </ItemGroup>
 
   <ItemGroup>
     <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.Copilot.BotBuilder">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplBotBuilder\netstandard2.0\Microsoft.Copilot.BotBuilder.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.BotBuilder.Dialogs">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplBotBuilderDialogs\netstandard2.0\Microsoft.Copilot.BotBuilder.Dialogs.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.Authentication">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplAuth\netstandard2.0\Microsoft.Copilot.Authentication.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.Authentication.Msal">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplAuth.Msal\netstandard2.0\Microsoft.Copilot.Authentication.Msal.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.Hosting.AspNetCore">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplHostingAspNet\netstandard2.0\Microsoft.Copilot.Hosting.AspNetCore.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.Protocols.Adapter">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplAdapter\netstandard2.0\Microsoft.Copilot.Protocols.Adapter.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.Protocols.Primitives">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplProtoPrimitives\netstandard2.0\Microsoft.Copilot.Protocols.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.Protocols.Connector">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplConnector\netstandard2.0\Microsoft.Copilot.Protocols.Connector.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.Teams">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplTeams\netstandard2.0\Microsoft.Copilot.Teams.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

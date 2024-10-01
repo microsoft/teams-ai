@@ -14,7 +14,6 @@
     <PackageReference Include="Azure.AI.OpenAI" Version="2.0.0-beta.2" />
     <PackageReference Include="Azure.Identity" Version="1.12.0" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Bot.Builder" Version="4.22.7" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageReference Include="Moq" Version="4.18.4" />
     <PackageReference Include="OpenAI" Version="2.0.0-beta.7" />
@@ -32,6 +31,36 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.TeamsAI\Microsoft.Teams.AI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.Copilot.BotBuilder">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplBotBuilder\netstandard2.0\Microsoft.Copilot.BotBuilder.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.BotBuilder.Dialogs">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplBotBuilderDialogs\netstandard2.0\Microsoft.Copilot.BotBuilder.Dialogs.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.Authentication">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplAuth\netstandard2.0\Microsoft.Copilot.Authentication.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.Authentication.Msal">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplAuth.Msal\netstandard2.0\Microsoft.Copilot.Authentication.Msal.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.Hosting.AspNetCore">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplHostingAspNet\netstandard2.0\Microsoft.Copilot.Hosting.AspNetCore.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.Protocols.Adapter">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplAdapter\netstandard2.0\Microsoft.Copilot.Protocols.Adapter.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.Protocols.Primitives">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplProtoPrimitives\netstandard2.0\Microsoft.Copilot.Protocols.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.Protocols.Connector">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplConnector\netstandard2.0\Microsoft.Copilot.Protocols.Connector.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Copilot.Teams">
+      <HintPath>D:\mcs-sdk\Microsoft.Copilot.Sdk\bin\Debug\CplTeams\netstandard2.0\Microsoft.Copilot.Teams.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

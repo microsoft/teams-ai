@@ -4,7 +4,7 @@ using Microsoft.Teams.AI.AI.Moderator;
 using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.Exceptions;
-using Microsoft.Bot.Schema;
+using Microsoft.Copilot.Protocols.Primitives;
 using Moq;
 using System.Reflection;
 using Microsoft.Teams.AI.Tests.TestUtils;

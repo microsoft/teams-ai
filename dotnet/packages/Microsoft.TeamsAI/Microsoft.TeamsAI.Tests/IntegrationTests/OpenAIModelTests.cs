@@ -1,15 +1,16 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Microsoft.Copilot.BotBuilder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using System.Reflection;
 using Xunit.Abstractions;
-using Microsoft.Bot.Schema;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Extensions.Logging;
+using Microsoft.Copilot.Protocols.Adapter;
 
 namespace Microsoft.Teams.AI.Tests.IntegrationTests
 {

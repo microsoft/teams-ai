@@ -1,6 +1,7 @@
 ﻿using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.State;
-using Microsoft.Bot.Builder;
+using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
 
 namespace Microsoft.Teams.AI.AI.Moderator
 {

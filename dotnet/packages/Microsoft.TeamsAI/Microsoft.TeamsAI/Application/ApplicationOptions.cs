@@ -1,8 +1,10 @@
 ﻿using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.State;
 using Microsoft.Extensions.Logging;
-using Microsoft.Bot.Builder;
+using Microsoft.Copilot.BotBuilder;
 using Microsoft.Teams.AI.Application;
+using Microsoft.Copilot.Protocols.Adapter;
+using Microsoft.Copilot.Protocols.Primitives;
 
 namespace Microsoft.Teams.AI
 {
@@ -17,7 +19,7 @@ namespace Microsoft.Teams.AI
         /// Optional. Teams Bot adapter being used.
         /// </summary>
         /// <remarks>
-        /// If using the <see cref="ApplicationOptions{TState}.LongRunningMessages"/> option, calling the <see cref="CloudAdapterBase.ContinueConversationAsync(string, Bot.Schema.Activity, BotCallbackHandler, CancellationToken)"/> method, or configuring user authentication, this property is required.
+        /// If using the <see cref="ApplicationOptions{TState}.LongRunningMessages"/> option, calling the <see cref="CloudAdapterBase.ContinueConversationAsync(string, IActivity, BotCallbackHandler, CancellationToken)"/> method, or configuring user authentication, this property is required.
         /// </remarks>
         public TeamsAdapter? Adapter { get; set; }
 
@@ -25,7 +27,7 @@ namespace Microsoft.Teams.AI
         /// Optional. Application ID of the bot.
         /// </summary>
         /// <remarks>
-        /// If using the <see cref="ApplicationOptions{TState}.LongRunningMessages"/> option, calling the <see cref="CloudAdapterBase.ContinueConversationAsync(string, Bot.Schema.Activity, BotCallbackHandler, CancellationToken)"/> method, or configuring user authentication, this property is required.
+        /// If using the <see cref="ApplicationOptions{TState}.LongRunningMessages"/> option, calling the <see cref="CloudAdapterBase.ContinueConversationAsync(string, IActivity, BotCallbackHandler, CancellationToken)"/> method, or configuring user authentication, this property is required.
         /// </remarks>
         public string? BotAppId { get; set; }
 

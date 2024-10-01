@@ -1,5 +1,5 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Identity.Client;
 using Microsoft.Teams.AI.Exceptions;
 using Newtonsoft.Json.Linq;

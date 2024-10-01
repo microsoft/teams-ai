@@ -5,9 +5,10 @@ using Microsoft.Teams.AI.AI.Moderator;
 using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
-using Microsoft.Bot.Schema;
+using Microsoft.Copilot.Protocols.Primitives;
 using Moq;
-using Microsoft.Bot.Builder;
+using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Adapter;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {

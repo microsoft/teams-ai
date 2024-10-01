@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Adapter;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 

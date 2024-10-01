@@ -1,5 +1,6 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Adapter;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Identity.Client;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.Exceptions;
@@ -65,7 +66,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 AutoSignIn = (context, cancellationToken) => Task.FromResult(false)
             };
-            authenticationOptions.AddAuthentication("graph", new OAuthSettings() { ConnectionName = "graph-connection" });
+            authenticationOptions.AddAuthentication("graph", new OAuthSettings());
             ApplicationOptions<TurnState> applicationOptions = new()
             {
                 RemoveRecipientMention = removeRecipientMention,

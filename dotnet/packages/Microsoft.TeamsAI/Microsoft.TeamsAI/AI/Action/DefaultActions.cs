@@ -2,12 +2,12 @@
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
-using Microsoft.Bot.Connector;
+using Microsoft.Copilot.Protocols.Connector;
 using Microsoft.Extensions.Logging;
-using Microsoft.Bot.Builder;
+using Microsoft.Copilot.BotBuilder;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Teams.AI.AI.Models;
-using Microsoft.Bot.Schema;
+using Microsoft.Copilot.Protocols.Primitives;
 
 namespace Microsoft.Teams.AI.AI.Action
 {

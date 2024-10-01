@@ -1,5 +1,5 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
@@ -55,7 +55,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Moderator = new TestModerator()
             };
             AuthenticationOptions<TurnState> authOptions = new();
-            authOptions.AddAuthentication("graph", new OAuthSettings() { ConnectionName = "graph-connection" });
+            authOptions.AddAuthentication("graph", new OAuthSettings());
 
             // Act
             var app = new ApplicationBuilder<TurnState>()

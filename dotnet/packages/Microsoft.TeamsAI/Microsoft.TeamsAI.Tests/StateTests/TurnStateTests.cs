@@ -1,8 +1,8 @@
 ﻿using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
-using Microsoft.Bot.Schema;
+using Microsoft.Copilot.Protocols.Primitives;
 using Moq;
-using Microsoft.Bot.Builder;
+using Microsoft.Copilot.BotBuilder;
 using Record = Microsoft.Teams.AI.State.Record;
 using System.Reflection;
 
@@ -34,7 +34,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             // Arrange
             var state = new TurnState();
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
-            Activity activity = turnContext.Activity;
+            IActivity activity = turnContext.Activity;
             string channelId = activity.ChannelId;
             string botId = activity.Recipient.Id;
             string conversationId = activity.Conversation.Id;
@@ -75,7 +75,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             // Arrange
             var state = new TurnState();
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
-            Activity activity = turnContext.Activity;
+            IActivity activity = turnContext.Activity;
             string channelId = activity.ChannelId;
             string botId = activity.Recipient.Id;
             string conversationId = activity.Conversation.Id;
@@ -112,7 +112,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             // Arrange
             var state = new CustomTurnState();
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
-            Activity activity = turnContext.Activity;
+            IActivity activity = turnContext.Activity;
             string channelId = activity.ChannelId;
             string botId = activity.Recipient.Id;
             string conversationId = activity.Conversation.Id;

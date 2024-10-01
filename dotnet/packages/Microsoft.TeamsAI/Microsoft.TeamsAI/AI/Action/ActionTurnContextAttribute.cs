@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Primitives;
 
 namespace Microsoft.Teams.AI.AI.Action
 {

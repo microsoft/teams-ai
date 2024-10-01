@@ -1,4 +1,4 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Microsoft.Copilot.BotBuilder;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Teams.AI.AI.Prompts;
@@ -18,6 +18,7 @@ using System.ClientModel;
 using ServiceVersion = Azure.AI.OpenAI.AzureOpenAIClientOptions.ServiceVersion;
 using Azure.AI.OpenAI.Chat;
 using OpenAI.Chat;
+using Microsoft.Copilot.Protocols.Primitives;
 
 namespace Microsoft.Teams.AI.AI.Models
 {

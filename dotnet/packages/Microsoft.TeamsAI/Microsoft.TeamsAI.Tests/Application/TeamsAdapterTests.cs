@@ -11,17 +11,25 @@ namespace Microsoft.Teams.AI.Tests.Application
         {
             string version = Assembly.GetAssembly(typeof(TeamsAdapter))?.GetName().Version?.ToString() ?? "";
             ProductInfoHeaderValue productInfo = new("teamsai-dotnet", version);
+
+            Assert.False(true);
+
+            /*
             TeamsAdapter adapter = new();
             Assert.NotNull(adapter.HttpClientFactory);
 
             HttpClient client = adapter.HttpClientFactory.CreateClient();
             Assert.NotNull(client);
             Assert.True(client.DefaultRequestHeaders.UserAgent.Contains(productInfo));
+            */
         }
 
         [Fact]
         public void Test_TeamsAdapter_NoDuplicateDefaultHeaders()
         {
+            Assert.False(true);
+
+            /*
             string version = Assembly.GetAssembly(typeof(TeamsAdapter))?.GetName().Version?.ToString() ?? "";
             ProductInfoHeaderValue productInfo = new("teamsai-dotnet", version);
             ConfigurationBuilder config = new();
@@ -32,6 +40,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.NotNull(client);
             Assert.True(client.DefaultRequestHeaders.UserAgent.Contains(productInfo));
             Assert.True(client.DefaultRequestHeaders.UserAgent.Count == 1);
+            */
         }
     }
 }

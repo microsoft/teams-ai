@@ -1,7 +1,8 @@
 ﻿using Microsoft.Teams.AI.AI.Models;
-using Microsoft.Bot.Builder;
+using Microsoft.Copilot.BotBuilder;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.State;
+using Microsoft.Copilot.Protocols.Primitives;
 
 namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {

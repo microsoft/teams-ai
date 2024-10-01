@@ -1,5 +1,6 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
+﻿using Microsoft.Copilot.BotBuilder;
+using Microsoft.Copilot.Protocols.Adapter;
+using Microsoft.Copilot.Protocols.Primitives;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
@@ -15,8 +16,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnActionExecute_Verb()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -74,8 +75,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnActionExecute_Verb_NotHit()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -289,8 +290,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnSearch_Dataset()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
@@ -361,8 +362,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async void Test_OnSearch_Dataset_NotHit()
         {
             // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
+            IActivity[]? activitiesToSend = null;
+            void CaptureSend(IActivity[] arg)
             {
                 activitiesToSend = arg;
             }
