@@ -171,7 +171,7 @@ namespace Microsoft.Teams.AI.AI.Models
                     }
                 }
             }
-            // else if context is null, then it must be a tool message.
+            // else if content is null, then it must be a tool message.
 
             string textContent = textContentBuilder.ToString().Trim();
 
