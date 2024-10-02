@@ -8,6 +8,7 @@ using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI;
 using TeamsChefBot;
 using Microsoft.KernelMemory;
+using Microsoft.Teams.AI.AI.DataSources;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -93,6 +94,11 @@ else
     throw new Exception("please configure settings for either OpenAI or Azure");
 }
 
+builder.Services.AddSingleton<IDataSource>((sp) =>
+{
+    return new KernelMemoryDataSource("teams-ai", sp.GetService<IKernelMemory>()!);
+});
+
 // Create the bot as transient. In this case the ASP Controller is expecting an IBot.
 builder.Services.AddTransient<IBot>(sp =>
 {
@@ -105,8 +111,7 @@ builder.Services.AddTransient<IBot>(sp =>
         PromptFolder = "./Prompts"
     });
 
-    KernelMemoryDataSource dataSource = new("teams-ai", sp.GetService<IKernelMemory>()!);
-    prompts.AddDataSource("teams-ai", dataSource);
+    prompts.AddDataSource("teams-ai", sp.GetService<IDataSource>()!);
 
     // Create ActionPlanner
     ActionPlanner<TurnState> planner = new(
