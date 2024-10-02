@@ -15,6 +15,7 @@ using System.Reflection;
 using ChatMessage = Microsoft.Teams.AI.AI.Models.ChatMessage;
 using ChatRole = Microsoft.Teams.AI.AI.Models.ChatRole;
 using Azure.Identity;
+using Microsoft.Teams.AI.AI.Augmentations;
 
 namespace Microsoft.Teams.AI.Tests.AITests.Models
 {
@@ -64,7 +65,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
-        public async void Test_CompletePromptAsync_AzureOpenAI_Chat_PromptTooLong()
+        public async Task Test_CompletePromptAsync_AzureOpenAI_Chat_PromptTooLong()
         {
             // Arrange
             var turnContextMock = new Mock<ITurnContext>();
@@ -92,7 +93,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
-        public async void Test_CompletePromptAsync_AzureOpenAI_Chat_RateLimited()
+        public async Task Test_CompletePromptAsync_AzureOpenAI_Chat_RateLimited()
         {
             // Arrange
             var turnContextMock = new Mock<ITurnContext>();
@@ -125,7 +126,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
-        public async void Test_CompletePromptAsync_AzureOpenAI_Chat_RequestFailed()
+        public async Task Test_CompletePromptAsync_AzureOpenAI_Chat_RequestFailed()
         {
             // Arrange
             var turnContextMock = new Mock<ITurnContext>();
@@ -154,11 +155,11 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             // Assert
             Assert.Equal(PromptResponseStatus.Error, result.Status);
             Assert.NotNull(result.Error);
-            Assert.True(result.Error.Message.StartsWith("The chat completion API returned an error status of InternalServerError: Service request failed.\r\nStatus: 500 (exception)"));
+            Assert.StartsWith("The chat completion API returned an error status of InternalServerError: Service request failed.\r\nStatus: 500 (exception)", result.Error.Message);
         }
 
         [Fact]
-        public async void Test_CompletePromptAsync_AzureOpenAI_Chat()
+        public async Task Test_CompletePromptAsync_AzureOpenAI_Chat()
         {
             // Arrange
             var turnContextMock = new Mock<ITurnContext>();
@@ -207,5 +208,79 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             Assert.Equal("test-choice", result.Message.Content);
         }
 
+        [Fact]
+        public async Task Test_CompletePromptAsync_AzureOpenAI_Chat_WithTools()
+        {
+            // Arrange
+            var turnContextMock = new Mock<ITurnContext>();
+            var turnStateMock = new Mock<TurnState>();
+            var renderedPrompt = new RenderedPromptSection<List<ChatMessage>>(new List<ChatMessage>(), length: 256, tooLong: false);
+            var promptMock = new Mock<Prompt>(new List<PromptSection>(), -1, true, "\n\n");
+            promptMock.Setup((prompt) => prompt.RenderAsMessagesAsync(
+                            It.IsAny<ITurnContext>(), It.IsAny<IMemory>(), It.IsAny<IPromptFunctions<List<string>>>(),
+                            It.IsAny<ITokenizer>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(renderedPrompt);
+            var promptTemplate = new PromptTemplate("test-prompt", promptMock.Object)
+            {
+                Actions = new List<ChatCompletionAction>() { new ChatCompletionAction() { Name = "testAction" } },
+                Augmentation = new ToolsAugmentation(),
+                Configuration = new PromptTemplateConfiguration() 
+                { 
+                    Augmentation = new AugmentationConfiguration() {
+                        Type = AugmentationType.Tools
+                    } 
+                }
+            };
+            var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/")
+            {
+                CompletionType = CompletionConfiguration.CompletionType.Chat,
+                LogRequests = true,
+            };
+            var clientMock = new Mock<OpenAIClient>();
+            var chatCompletion = ModelReaderWriter.Read<ChatCompletion>(BinaryData.FromString(@$"{{
+                ""choices"": [
+                    {{
+                        ""finish_reason"": ""stop"",
+                        ""message"": {{
+                            ""role"": ""assistant"",
+                            ""content"": null,
+                            ""tool_calls"": [
+                              {{
+                                ""id"": ""call_abc123"",
+                                ""type"": ""function"",
+                                ""function"": {{
+                                  ""name"": ""testAction"",
+                                  ""arguments"": ""{{}}""
+                                }}
+                              }}
+                            ]
+                        }}
+                    }}
+                ]
+            }}"));
+            var response = new TestResponse(200, string.Empty);
+            clientMock.Setup((client) =>
+                client
+                .GetChatClient(It.IsAny<string>())
+                .CompleteChatAsync(It.IsAny<IEnumerable<OAIChatMessage>>(), It.IsAny<ChatCompletionOptions>(), It.IsAny<CancellationToken>())
+            ).ReturnsAsync(ClientResult.FromValue(chatCompletion!, response));
+
+            var openAIModel = new OpenAIModel(options, loggerFactory: new TestLoggerFactory());
+            openAIModel.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAIModel, clientMock.Object);
+
+            // Act
+            var result = await openAIModel.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, new PromptManager(), new GPTTokenizer(), promptTemplate);
+
+            // Assert
+            Assert.Equal(PromptResponseStatus.Success, result.Status);
+            Assert.NotNull(result.Message);
+            
+            Assert.NotNull(result.Message.ActionCalls);
+            Assert.Single(result.Message.ActionCalls);
+            Assert.Equal("testAction", result.Message.ActionCalls[0].Function.Name);
+            
+            Assert.Null(result.Error);
+            Assert.Equal(ChatRole.Assistant, result.Message.Role);
+            Assert.Null(result.Message.Content);
+        }
     }
 }

@@ -161,23 +161,62 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
         }
     }
 
-    internal sealed class TestAsyncPageableCollection<T> : AsyncPageableCollection<T> where T : class
+    internal sealed class TestAsyncPageCollection<T> : AsyncPageCollection<T> where T : class
     {
         public List<T> Items;
-
         internal PipelineResponse _pipelineResponse;
+        private IAsyncEnumerator<PageResult<T>> _enumerator;
 
-        public TestAsyncPageableCollection(List<T> items, PipelineResponse response)
+        public TestAsyncPageCollection(List<T> items, PipelineResponse response)
         {
             Items = items;
             _pipelineResponse = response;
+            _enumerator = new TestAsyncEnumerator<T>(items, response);
         }
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public override async IAsyncEnumerable<ResultPage<T>> AsPages(string? continuationToken = null, int? pageSizeHint = null)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        protected override IAsyncEnumerator<PageResult<T>> GetAsyncEnumeratorCore(CancellationToken cancellationToken = default)
         {
-            yield return ResultPage<T>.Create(Items, null, _pipelineResponse);
+            return _enumerator;
+        }
+
+        protected override Task<PageResult<T>> GetCurrentPageAsyncCore()
+        {
+            return Task.FromResult(_enumerator.Current);
+        }
+    }
+
+    internal sealed class TestAsyncEnumerator<T> : IAsyncEnumerator<PageResult<T>> where T : class
+    {
+        private readonly List<T> _items;
+        private readonly PipelineResponse _pipelineResponse;
+        private bool _movedOnToNext;
+
+        public TestAsyncEnumerator(List<T> items, PipelineResponse response)
+        {
+            _items = items;
+            _pipelineResponse = response;
+            _movedOnToNext = false;
+        }
+
+        public PageResult<T> Current => PageResult<T>.Create(_items, ContinuationToken.FromBytes(BinaryData.FromString("")), null, _pipelineResponse);
+
+        public ValueTask DisposeAsync()
+        {
+            return new ValueTask();
+        }
+
+        public ValueTask<bool> MoveNextAsync()
+        {
+            if (!_movedOnToNext)
+            {
+                return new ValueTask<bool>(true);
+            }
+            else
+            {
+                _movedOnToNext = true;
+                return new ValueTask<bool>(false);
+            }
+
         }
     }
 }

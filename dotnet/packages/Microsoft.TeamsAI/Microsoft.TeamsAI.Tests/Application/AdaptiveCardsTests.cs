@@ -12,7 +12,7 @@ namespace Microsoft.Teams.AI.Tests.Application
     public class AdaptiveCardsTests
     {
         [Fact]
-        public async void Test_OnActionExecute_Verb()
+        public async Task Test_OnActionExecute_Verb()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -65,13 +65,13 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
 
         [Fact]
-        public async void Test_OnActionExecute_Verb_NotHit()
+        public async Task Test_OnActionExecute_Verb_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -125,7 +125,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnActionExecute_RouteSelector_ActivityNotMatched()
+        public async Task Test_OnActionExecute_RouteSelector_ActivityNotMatched()
         {
             var adapter = new SimpleAdapter();
             var turnContext = new TurnContext(adapter, new Activity()
@@ -163,7 +163,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnActionSubmit_Verb()
+        public async Task Test_OnActionSubmit_Verb()
         {
             // Arrange
             var adapter = new SimpleAdapter();
@@ -206,7 +206,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnActionSubmit_Verb_NotHit()
+        public async Task Test_OnActionSubmit_Verb_NotHit()
         {
             // Arrange
             var adapter = new SimpleAdapter();
@@ -248,7 +248,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnActionSubmit_RouteSelector_ActivityNotMatched()
+        public async Task Test_OnActionSubmit_RouteSelector_ActivityNotMatched()
         {
             // Arrange
             var adapter = new SimpleAdapter();
@@ -286,7 +286,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnSearch_Dataset()
+        public async Task Test_OnSearch_Dataset()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -352,13 +352,13 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
 
         [Fact]
-        public async void Test_OnSearch_Dataset_NotHit()
+        public async Task Test_OnSearch_Dataset_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -414,7 +414,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnSearch_RouteSelector_ActivityNotMatched()
+        public async Task Test_OnSearch_RouteSelector_ActivityNotMatched()
         {
             // Arrange
             var adapter = new SimpleAdapter();

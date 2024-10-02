@@ -62,7 +62,7 @@
           "type": "string",
           "description": "The name of the list to remove the item from"
         },
-        "items": {
+        "item": {
           "type": "string",
           "description": "The item to remove from the list"
         }

@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
     public class TurnStateTests
     {
         [Fact]
-        public async void Test_LoadState_NoStorageProvided_ShouldCreateDefaultTurnState()
+        public async Task Test_LoadState_NoStorageProvided_ShouldCreateDefaultTurnState()
         {
             // Arrange
             var state = new TurnState();
@@ -29,7 +29,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_LoadState_MockStorageProvided_ShouldPopulateTurnState()
+        public async Task Test_LoadState_MockStorageProvided_ShouldPopulateTurnState()
         {
             // Arrange
             var state = new TurnState();
@@ -70,7 +70,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_LoadState_MemoryStorageProvided_ShouldPopulateTurnState()
+        public async Task Test_LoadState_MemoryStorageProvided_ShouldPopulateTurnState()
         {
             // Arrange
             var state = new TurnState();
@@ -107,7 +107,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_LoadState_CustomTurnState_MemoryStorageProvided_ShouldPopulateTurnState()
+        public async Task Test_LoadState_CustomTurnState_MemoryStorageProvided_ShouldPopulateTurnState()
         {
             // Arrange
             var state = new CustomTurnState();
@@ -144,7 +144,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_LoadState_CustomTurnState_EmptyMemoryStorageProvided_ShouldPopulateTurnState()
+        public async Task Test_LoadState_CustomTurnState_EmptyMemoryStorageProvided_ShouldPopulateTurnState()
         {
             // Arrange
             var state = new CustomTurnState();
@@ -162,7 +162,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_SaveState_Existing_Loading_Operation()
+        public async Task Test_SaveState_Existing_Loading_Operation()
         {
             // Arrange
             var state = new TurnState();
@@ -192,12 +192,12 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             }
 
             // Assert
-            Assert.Equal(true, waitedForTaskToComplete);
+            Assert.True(waitedForTaskToComplete);
             Assert.True(task.IsCompleted);
         }
 
         [Fact]
-        public async void Test_SaveState_IsLoaded()
+        public async Task Test_SaveState_IsLoaded()
         {
             // Arrange
             var state = new TurnState();
@@ -205,11 +205,11 @@ namespace Microsoft.Teams.AI.Tests.StateTests
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await state.SaveStateAsync(turnContext, null));
-            Assert.True(exception.Message.Contains("TurnState hasn't been loaded."));
+            Assert.Contains("TurnState hasn't been loaded.", exception.Message);
         }
 
         [Fact]
-        public async void Test_SaveState_Does_Not_Save_TempScope()
+        public async Task Test_SaveState_Does_Not_Save_TempScope()
         {
             // Arrange
             var state = new TurnState();
@@ -227,7 +227,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_SaveState_Conversation_State()
+        public async Task Test_SaveState_Conversation_State()
         {
             // Arrange
             var state = new CustomTurnState();
@@ -251,7 +251,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_SaveState_User_State()
+        public async Task Test_SaveState_User_State()
         {
             // Arrange
             var state = new CustomTurnState();
@@ -275,7 +275,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_SaveState_Entry_Deleted()
+        public async Task Test_SaveState_Entry_Deleted()
         {
             // Arrange
             var state = new CustomTurnState();
@@ -297,7 +297,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
 
 
         [Fact]
-        public async void Test_SetValue()
+        public async Task Test_SetValue()
         {
             // Arrange
             var state = new TurnState();
@@ -316,7 +316,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_SetValue_InvalidScope()
+        public async Task Test_SetValue_InvalidScope()
         {
             // Arrange
             var state = new TurnState();
@@ -329,7 +329,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_SetValue_InvalidPath()
+        public async Task Test_SetValue_InvalidPath()
         {
             // Arrange
             var state = new TurnState();
@@ -342,7 +342,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_GetValue()
+        public async Task Test_GetValue()
         {
             // Arrange
             var state = new TurnState();
@@ -361,7 +361,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_HasValue_Returns_True()
+        public async Task Test_HasValue_Returns_True()
         {
             // Arrange
             var state = new TurnState();
@@ -377,7 +377,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_HasValue_Returns_False()
+        public async Task Test_HasValue_Returns_False()
         {
             // Arrange
             var state = new TurnState();
@@ -393,7 +393,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_DeleteValue()
+        public async Task Test_DeleteValue()
         {
             // Arrange
             var state = new TurnState();
@@ -409,7 +409,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_DeleteTempState()
+        public async Task Test_DeleteTempState()
         {
             // Arrange
             var state = new TurnState();
@@ -437,7 +437,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_DeleteUserState()
+        public async Task Test_DeleteUserState()
         {
             // Arrange
             var state = new TurnState();
@@ -465,7 +465,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_DeleteConversationState()
+        public async Task Test_DeleteConversationState()
         {
             // Arrange
             var state = new TurnState();
@@ -506,7 +506,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_GetScope_After_Loading_State()
+        public async Task Test_GetScope_After_Loading_State()
         {
             // Arrange
             var state = new TurnState();
@@ -557,7 +557,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_Conversation()
+        public async Task Test_Conversation()
         {
             // Arrange
             var state = new TurnState();
@@ -572,7 +572,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_Temp()
+        public async Task Test_Temp()
         {
             // Arrange
             var state = new TurnState();
@@ -587,7 +587,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_User()
+        public async Task Test_User()
         {
             // Arrange
             var state = new TurnState();
@@ -638,7 +638,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_Set_Conversation()
+        public async Task Test_Set_Conversation()
         {
             // Arrange
             var state = new TurnState();
@@ -653,7 +653,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_Set_Temp()
+        public async Task Test_Set_Temp()
         {
             // Arrange
             var state = new TurnState();
@@ -668,7 +668,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_Set_User()
+        public async Task Test_Set_User()
         {
             // Arrange
             var state = new TurnState();

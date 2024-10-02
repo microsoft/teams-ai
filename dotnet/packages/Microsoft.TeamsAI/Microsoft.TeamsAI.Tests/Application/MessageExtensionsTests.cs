@@ -13,7 +13,7 @@ namespace Microsoft.Teams.AI.Tests.Application
     public class MessageExtensionsTests
     {
         [Fact]
-        public async void Test_OnSubmitAction_CommandId()
+        public async Task Test_OnSubmitAction_CommandId()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -66,13 +66,13 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
 
         [Fact]
-        public async void Test_OnSubmitAction_CommandId_NotHit()
+        public async Task Test_OnSubmitAction_CommandId_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -123,7 +123,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnSubmitAction_RouteSelector_ActivityNotMatched()
+        public async Task Test_OnSubmitAction_RouteSelector_ActivityNotMatched()
         {
             var adapter = new SimpleAdapter();
             var turnContext = new TurnContext(adapter, new Activity()
@@ -160,7 +160,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnBotMessagePreviewEdit_CommandId()
+        public async Task Test_OnBotMessagePreviewEdit_CommandId()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -218,13 +218,13 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
 
         [Fact]
-        public async void Test_OnBotMessagePreviewEdit_CommandId_NotHit()
+        public async Task Test_OnBotMessagePreviewEdit_CommandId_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -279,7 +279,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnBotMessagePreviewEdit_RouteSelector_ActivityNotMatched()
+        public async Task Test_OnBotMessagePreviewEdit_RouteSelector_ActivityNotMatched()
         {
             var adapter = new SimpleAdapter();
             var turnContext = new TurnContext(adapter, new Activity()
@@ -316,7 +316,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnBotMessagePreviewSend_CommandId()
+        public async Task Test_OnBotMessagePreviewSend_CommandId()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -372,13 +372,13 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
 
         [Fact]
-        public async void Test_OnBotMessagePreviewSend_CommandId_NotHit()
+        public async Task Test_OnBotMessagePreviewSend_CommandId_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -432,7 +432,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnBotMessagePreviewSend_RouteSelector_ActivityNotMatched()
+        public async Task Test_OnBotMessagePreviewSend_RouteSelector_ActivityNotMatched()
         {
             var adapter = new SimpleAdapter();
             var turnContext = new TurnContext(adapter, new Activity()
@@ -468,7 +468,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnFetchTask_CommandId()
+        public async Task Test_OnFetchTask_CommandId()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -513,13 +513,13 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
 
         [Fact]
-        public async void Test_OnFetchTask_CommandId_NotHit()
+        public async Task Test_OnFetchTask_CommandId_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -562,7 +562,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnFetchTask_RouteSelector_ActivityNotMatched()
+        public async Task Test_OnFetchTask_RouteSelector_ActivityNotMatched()
         {
             var adapter = new SimpleAdapter();
             var turnContext = new TurnContext(adapter, new Activity()
@@ -599,7 +599,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnQuery_CommandId()
+        public async Task Test_OnQuery_CommandId()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -647,7 +647,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             QueryHandlerAsync<TurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
-                Assert.Equal(1, query.Parameters.Count);
+                Assert.Single(query.Parameters);
                 Assert.Equal("test-value", query.Parameters["test-name"]);
                 Assert.Equal(10, query.Count);
                 Assert.Equal(0, query.Skip);
@@ -660,13 +660,13 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
 
         [Fact]
-        public async void Test_OnQuery_CommandId_NotHit()
+        public async Task Test_OnQuery_CommandId_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -706,7 +706,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             QueryHandlerAsync<TurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
-                Assert.Equal(1, query.Parameters.Count);
+                Assert.Single(query.Parameters);
                 Assert.Equal("test-value", query.Parameters["test-name"]);
                 Assert.Equal(10, query.Count);
                 Assert.Equal(0, query.Skip);
@@ -722,7 +722,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnQuery_RouteSelector_NotMatched()
+        public async Task Test_OnQuery_RouteSelector_NotMatched()
         {
             var adapter = new SimpleAdapter();
             var turnContext = new TurnContext(adapter, new Activity()
@@ -759,7 +759,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_SelectItem()
+        public async Task Test_SelectItem()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -804,13 +804,13 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
 
         [Fact]
-        public async void Test_SelectItem_NotHit()
+        public async Task Test_SelectItem_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -858,7 +858,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnQueryLink()
+        public async Task Test_OnQueryLink()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -907,13 +907,13 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
 
         [Fact]
-        public async void Test_OnQueryLink_NotHit()
+        public async Task Test_OnQueryLink_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -952,7 +952,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnAnonymousQueryLink()
+        public async Task Test_OnAnonymousQueryLink()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -1001,13 +1001,13 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
 
         [Fact]
-        public async void Test_OnAnonymousQueryLink_NotHit()
+        public async Task Test_OnAnonymousQueryLink_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -1046,7 +1046,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnQueryUrlSetting()
+        public async Task Test_OnQueryUrlSetting()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -1089,13 +1089,13 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
 
         [Fact]
-        public async void Test_OnQueryUrlSetting_NotHit()
+        public async Task Test_OnQueryUrlSetting_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -1133,7 +1133,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnConfigureSettings()
+        public async Task Test_OnConfigureSettings()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -1178,13 +1178,13 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
 
         [Fact]
-        public async void Test_OnConfigureSettings_NotHit()
+        public async Task Test_OnConfigureSettings_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -1221,7 +1221,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnCardButtonClicked()
+        public async Task Test_OnCardButtonClicked()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -1259,13 +1259,13 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
 
         [Fact]
-        public async void Test_OnCardButtonClicked_NotHit()
+        public async Task Test_OnCardButtonClicked_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
