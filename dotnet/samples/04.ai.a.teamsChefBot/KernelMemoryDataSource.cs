@@ -24,12 +24,7 @@ namespace TeamsChefBot
 
             this._kernelMemory = memoryInstance;
             this.Name = name;
-
-            if (memoryInstance.GetDocumentStatusAsync("doc-1").Result?.Completed != true)
-            {
-                // Ingest documents on construction
-                this._ingestTask = this.IngestAsync();
-            }
+            this._ingestTask = this.IngestAsync();
         }
 
         public string Name { get; }
