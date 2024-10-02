@@ -543,7 +543,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 Handler handler = new(async (TestPromptCompletionStreamingModel model, ITurnContext turnContext, IMemory memory, IPromptFunctions<List<string>> promptFunctions, ITokenizer tokenizer, PromptTemplate promptTemplate, CancellationToken cancellationToken) =>
                 {
-                    BeforeCompletionEventArgs args = new(turnContext, memory, promptFunctions, tokenizer, promptTemplate, true);
+                    BeforeCompletionEventArgs args = new(turnContext, memory, promptFunctions, tokenizer, promptTemplate, cancellationToken, true);
 
                     model.Events = new();
 

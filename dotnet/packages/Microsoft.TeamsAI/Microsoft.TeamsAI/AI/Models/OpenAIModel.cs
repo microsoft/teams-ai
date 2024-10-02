@@ -150,7 +150,7 @@ namespace Microsoft.Teams.AI.AI.Models
             if (Events != null)
             {
                 // Signal start of completion
-                BeforeCompletionEventArgs beforeCompletionEventArgs = new(turnContext, memory, promptFunctions, tokenizer, promptTemplate, this._options.Stream ?? false);
+                BeforeCompletionEventArgs beforeCompletionEventArgs = new(turnContext, memory, promptFunctions, tokenizer, promptTemplate, cancellationToken, this._options.Stream ?? false);
                 Events.OnBeforeCompletion(beforeCompletionEventArgs);
             }
 
