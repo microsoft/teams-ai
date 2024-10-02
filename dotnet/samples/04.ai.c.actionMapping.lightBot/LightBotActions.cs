@@ -30,13 +30,11 @@ namespace LightBot
             // Expecting "time" to be a number of milliseconds to pause.
             if (args.TryGetValue("time", out object? time))
             {
-                if (time != null && time is string timeString)
+                if (time != null && time is long timeLong)
                 {
-                    if (int.TryParse(timeString, out int timeInt))
-                    {
-                        await turnContext.SendActivityAsync(MessageFactory.Text($"[pausing for {timeInt / 1000} seconds]"));
-                        await Task.Delay(timeInt);
-                    }
+                    int timeInt = (int)timeLong;
+                    await turnContext.SendActivityAsync(MessageFactory.Text($"[pausing for {timeInt / 1000} seconds]"));
+                    await Task.Delay(timeInt);
                 }
             }
 

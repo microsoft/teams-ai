@@ -47,11 +47,11 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
                 })
                 .AssertReply(activity =>
                 {
-                    Assert.Equal(1, ((Activity)activity).Attachments.Count);
+                    Assert.Single(((Activity)activity).Attachments);
                     Assert.Equal(OAuthCard.ContentType, ((Activity)activity).Attachments[0].ContentType);
                     OAuthCard? card = ((Activity)activity).Attachments[0].Content as OAuthCard;
                     Assert.NotNull(card);
-                    Assert.Equal(1, card.Buttons.Count);
+                    Assert.Single(card.Buttons);
                     Assert.Equal(ActionTypes.Signin, card!.Buttons[0].Type);
                     Assert.Equal($"{AuthStartPage}?scope={UserReadScope}&clientId={ClientId}&tenantId={TenantId}", card!.Buttons[0].Value);
                 })
@@ -78,11 +78,11 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
                 })
                 .AssertReply(activity =>
                 {
-                    Assert.Equal(1, ((Activity)activity).Attachments.Count);
+                    Assert.Single(((Activity)activity).Attachments);
                     Assert.Equal(OAuthCard.ContentType, ((Activity)activity).Attachments[0].ContentType);
                     OAuthCard? card = ((Activity)activity).Attachments[0].Content as OAuthCard;
                     Assert.NotNull(card);
-                    Assert.Equal(1, card.Buttons.Count);
+                    Assert.Single(card.Buttons);
                     Assert.Equal(ActionTypes.Signin, card!.Buttons[0].Type);
                     Assert.Equal($"{AuthStartPage}?scope={UserReadScope}&clientId={ClientId}&tenantId={TenantId}", card!.Buttons[0].Value);
                 })
@@ -133,11 +133,11 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
                 })
                 .AssertReply(activity =>
                 {
-                    Assert.Equal(1, ((Activity)activity).Attachments.Count);
+                    Assert.Single(((Activity)activity).Attachments);
                     Assert.Equal(OAuthCard.ContentType, ((Activity)activity).Attachments[0].ContentType);
                     OAuthCard? card = ((Activity)activity).Attachments[0].Content as OAuthCard;
                     Assert.NotNull(card);
-                    Assert.Equal(1, card.Buttons.Count);
+                    Assert.Single(card.Buttons);
                     Assert.Equal(ActionTypes.Signin, card!.Buttons[0].Type);
                     Assert.Equal($"{AuthStartPage}?scope={UserReadScope}&clientId={ClientId}&tenantId={TenantId}", card!.Buttons[0].Value);
                 })
@@ -179,11 +179,11 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
                 })
                 .AssertReply(activity =>
                 {
-                    Assert.Equal(1, ((Activity)activity).Attachments.Count);
+                    Assert.Single(((Activity)activity).Attachments);
                     Assert.Equal(OAuthCard.ContentType, ((Activity)activity).Attachments[0].ContentType);
                     OAuthCard? card = ((Activity)activity).Attachments[0].Content as OAuthCard;
                     Assert.NotNull(card);
-                    Assert.Equal(1, card.Buttons.Count);
+                    Assert.Single(card.Buttons);
                     Assert.Equal(ActionTypes.Signin, card!.Buttons[0].Type);
                     Assert.Equal($"{AuthStartPage}?scope={UserReadScope}&clientId={ClientId}&tenantId={TenantId}", card!.Buttons[0].Value);
                 })
@@ -195,11 +195,11 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
                 })
                 .AssertReply(activity =>
                 {
-                    Assert.Equal(1, ((Activity)activity).Attachments.Count);
+                    Assert.Single(((Activity)activity).Attachments);
                     Assert.Equal(OAuthCard.ContentType, ((Activity)activity).Attachments[0].ContentType);
                     OAuthCard? card = ((Activity)activity).Attachments[0].Content as OAuthCard;
                     Assert.NotNull(card);
-                    Assert.Equal(1, card.Buttons.Count);
+                    Assert.Single(card.Buttons);
                     Assert.Equal(ActionTypes.Signin, card!.Buttons[0].Type);
                     Assert.Equal($"{AuthStartPage}?scope={UserReadScope}&clientId={ClientId}&tenantId={TenantId}", card!.Buttons[0].Value);
                 })

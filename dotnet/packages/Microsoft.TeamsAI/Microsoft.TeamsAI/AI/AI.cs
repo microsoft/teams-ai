@@ -209,10 +209,6 @@ namespace Microsoft.Teams.AI.AI
 
             // Initialize start time
             startTime = startTime ?? DateTime.UtcNow;
-
-            // Populate {{$temp.input}}
-            _SetTempStateValues(turnState, turnContext);
-
             Plan? plan = null;
 
             // Review input on first loop
@@ -262,8 +258,10 @@ namespace Microsoft.Teams.AI.AI
                 }
 
                 string output;
-                if (command is PredictedDoCommand doCommand)
+                PredictedDoCommand? doCommand = null;
+                if (command is PredictedDoCommand)
                 {
+                    doCommand = (PredictedDoCommand)command;
                     if (_actions.ContainsAction(doCommand.Action))
                     {
                         DoCommandActionData<TState> data = new()
@@ -276,10 +274,15 @@ namespace Microsoft.Teams.AI.AI
                         output = await this._actions[AIConstants.DoCommandActionName]
                             .Handler
                             .PerformActionAsync(turnContext, turnState, data, doCommand.Action, cancellationToken);
-                        shouldLoop = output.Length > 0;
 
-                        if (turnState.Temp != null)
+                        if (doCommand.ActionId != null)
                         {
+                            shouldLoop = true;
+                            turnState.Temp.ActionOutputs[doCommand.ActionId] = output;
+                        }
+                        else
+                        {
+                            shouldLoop = output.Length > 0;
                             turnState.Temp.ActionOutputs[doCommand.Action] = output;
                         }
                     }
@@ -311,8 +314,16 @@ namespace Microsoft.Teams.AI.AI
                 }
 
                 // Copy the actions output to the input
-                turnState.Temp!.Input = output;
                 turnState.Temp.InputFiles = new();
+
+                if (doCommand != null && doCommand.ActionId != null)
+                {
+                    turnState.DeleteValue("temp.input");
+                }
+                else
+                {
+                    turnState.Temp!.Input = output;
+                }
             }
 
             // Check for looping

@@ -140,7 +140,7 @@ Above steps use Azure OpenAI as AI service, optionally, you can also use OpenAI 
 
 **For debugging (F5)**
 
-1. Set your [OpenAI API Key](https://openai.com/api/) to _appsettings.Development.json_.
+1. Set your [OpenAI API Key](https://platform.openai.com/settings/profile?tab=api-keys) to _appsettings.Development.json_.
 
    ```json
      "OpenAI": {
@@ -152,7 +152,7 @@ Above steps use Azure OpenAI as AI service, optionally, you can also use OpenAI 
 
 To configure the Azure resources to have OpenAI environment variables:
 
-1. In `./env/.env.dev.user` file, paste your [OpenAI API Key](https://openai.com/api/) to the environment variable `SECRET_OPENAI_KEY=`.
+1. In `./env/.env.dev.user` file, paste your [OpenAI API Key](https://platform.openai.com/settings/profile?tab=api-keys) to the environment variable `SECRET_OPENAI_KEY=`.
 
 ## Further reading
 

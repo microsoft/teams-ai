@@ -31,8 +31,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             Assert.Equal(content, assistantMessage.MessageContent);
             Assert.Equal("message", assistantMessage.Content);
-            Assert.Equal(1, assistantMessage.AttachedFiles!.Count);
-            Assert.Equal("fileId", assistantMessage.AttachedFiles[0].FileInfo.Id);
+            Assert.Single(assistantMessage.AttachedFiles!);
+            Assert.Equal("fileId", assistantMessage.AttachedFiles![0].FileInfo.Id);
 
             ChatMessage chatMessage = assistantMessage;
             Assert.NotNull(chatMessage);

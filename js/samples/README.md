@@ -48,7 +48,7 @@ You can also use the Teams Toolkit CLI to run this sample.
     BOT_DOMAIN={ngrok-url}.ngrok.io
     ```
 
-1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging GPT
+1. Update the `.env` file and provide your [OpenAI Key](https://platform.openai.com/settings/profile?tab=api-keys) key for leveraging GPT
 
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
@@ -134,7 +134,7 @@ You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sampl
 
 To configure the Azure resources to have an environment variable for the OpenAI Key:
 
-1. Add a `./env/.env.staging.user` file with a new variable, `SECRET_OPENAI_KEY=` and paste your [OpenAI Key](https://openai.com/api/).
+1. Add a `./env/.env.staging.user` file with a new variable, `SECRET_OPENAI_KEY=` and paste your [OpenAI Key](https://platform.openai.com/settings/profile?tab=api-keys).
 
 The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
 

@@ -10,7 +10,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
     public class DefaultResponseValidatorTests
     {
         [Fact]
-        public async void Test_ShouldSucceed()
+        public async Task Test_ShouldSucceed()
         {
             Mock<ITurnContext> context = new();
             MemoryFork memory = new();

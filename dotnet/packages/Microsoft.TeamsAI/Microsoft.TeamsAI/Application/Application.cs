@@ -879,7 +879,6 @@ namespace Microsoft.Teams.AI
             await _StartLongRunningCall(turnContext, _OnTurnAsync, cancellationToken);
         }
 
-        // TODO: Make TypingTimer thread-safe and work for each turn
         /// <summary>
         /// Manually start a timer to periodically send "typing" activities.
         /// </summary>

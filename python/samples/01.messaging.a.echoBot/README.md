@@ -28,7 +28,7 @@ You can interact with the bot by messaging it and it will echo that back to you.
 
 1. Follow below instructions to run the sample
 
-The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below. To read about other options, skip to [Other ways to run the sample](#other-ways-to-run-the-sample).
+The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below. To read about other options, skip to [Other ways to run the sample](https://github.com/microsoft/teams-ai/tree/main/getting-started/OTHER).
 
 ## Testing the sample
 

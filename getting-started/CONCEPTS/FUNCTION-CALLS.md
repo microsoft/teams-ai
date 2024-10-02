@@ -46,6 +46,21 @@ To use function calling with the Chat Completions API:
 
     ```
 
+    ### C#
+    
+    ```cs
+    ActionPlannerOptions<TurnState> options = new ActionPlannerOptions<TurnState>() 
+    { 
+        Model = model,
+        Prompts = prompts,
+        async (context, state, planner) =>
+        {
+            return await Task.FromResult(prompts.GetPrompt("Tools"));
+        } 
+    }
+    ActionPlanner<TurnState> planner = new ActionPlanner(options)
+    ```
+
 2. Specify "tools" in your `config.json`. 
 
     ```diff
@@ -101,7 +116,24 @@ To use function calling with the Chat Completions API:
     ensure_list_exists(state, context.data["list"])
     # Continues exectuion of next command in the plan.
     return ""
-    ```` 
+    ```
+
+    ### C#
+
+    ```cs
+    [Action("CreateList")]
+    public string CreateList([ActionTurnState] ListState turnState, [ActionParameters] Dictionary<string, object> parameters)
+    {
+        ArgumentNullException.ThrowIfNull(turnState);
+        ArgumentNullException.ThrowIfNull(parameters);
+
+        string listName = GetParameterString(parameters, "list");
+
+        EnsureListExists(turnState, listName);
+
+        return "list created. think about your next action";
+    }
+    ```
 
 
 If the model requests to invoke any function(s), these are internally mapped to `DO` commands within a `Plan`, which are then invoked in our AI class' `run` function. These outputs are then returned to the model.

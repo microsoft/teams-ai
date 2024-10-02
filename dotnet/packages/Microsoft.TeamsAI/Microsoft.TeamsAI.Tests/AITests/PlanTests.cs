@@ -30,7 +30,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Arrange
             Plan plan = new();
             plan.Commands.Add(new PredictedSayCommand("Hello"));
-            plan.Commands.Add(new PredictedDoCommand("DoSomething", new() { { "prop", "value" } }));
+            plan.Commands.Add(new PredictedDoCommand("DoSomething", new Dictionary<string, object?>() { { "prop", "value" } }));
 
             // Note: This is not a formatting error. It is formatted this way to match the expected string.
             string expectedPlanJson = @"{

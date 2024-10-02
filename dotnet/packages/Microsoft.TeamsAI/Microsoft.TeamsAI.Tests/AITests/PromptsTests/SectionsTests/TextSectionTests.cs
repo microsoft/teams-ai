@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
     public class TextSectionTests
     {
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldRender()
+        public async Task Test_RenderAsTextAsync_ShouldRender()
         {
             TextSection section = new("this is a test section", ChatRole.User);
             Mock<ITurnContext> context = new();
@@ -25,7 +25,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         }
 
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldTruncate()
+        public async Task Test_RenderAsTextAsync_ShouldTruncate()
         {
             TextSection section = new("this is a test section", ChatRole.User);
             Mock<ITurnContext> context = new();

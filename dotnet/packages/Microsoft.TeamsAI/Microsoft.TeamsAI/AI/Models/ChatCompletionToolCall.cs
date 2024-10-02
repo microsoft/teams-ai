@@ -7,6 +7,7 @@ namespace Microsoft.Teams.AI.AI.Models
     /// <summary>
     /// Abstract class representing a tool call in OpenAI's Chat Completion API.
     /// </summary>
+    [Obsolete]
     public abstract class ChatCompletionsToolCall
     {
         /// <summary>

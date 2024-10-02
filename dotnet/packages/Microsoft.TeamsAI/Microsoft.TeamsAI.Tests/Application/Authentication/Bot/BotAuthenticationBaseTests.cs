@@ -89,7 +89,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_Authenticate_Pending()
+        public async Task Test_Authenticate_Pending()
         {
             // arrange
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
@@ -103,14 +103,14 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             // assert
             var stateKey = "__fromId:test:Bot:AuthState__";
             var authState = state.Conversation[stateKey] as Dictionary<string, string>;
-            Assert.Equal(null, token);
+            Assert.Null(token);
             Assert.NotNull(authState);
             Assert.True(authState.ContainsKey("message"));
             Assert.Equal("test text", authState["message"]);
         }
 
         [Fact]
-        public async void Test_Authenticate_Complete()
+        public async Task Test_Authenticate_Complete()
         {
             // arrange
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
@@ -126,7 +126,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_Authenticate_CompleteWithoutToken()
+        public async Task Test_Authenticate_CompleteWithoutToken()
         {
             // arrange
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
@@ -138,11 +138,11 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             var token = await botAuth.AuthenticateAsync(context, state);
 
             // assert
-            Assert.Equal(null, token);
+            Assert.Null(token);
         }
 
         [Fact]
-        public async void Test_HandleSignInActivity_Complete()
+        public async Task Test_HandleSignInActivity_Complete()
         {
             // arrange
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
@@ -172,7 +172,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_HandleSignInActivity_CompleteWithoutToken()
+        public async Task Test_HandleSignInActivity_CompleteWithoutToken()
         {
             // arrange
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
@@ -192,7 +192,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_HandleSignInActivity_ThrowException()
+        public async Task Test_HandleSignInActivity_ThrowException()
         {
             // arrange
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
@@ -221,7 +221,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
 
             // assert
             Assert.NotNull(context.Activity.Value);
-            Assert.Equal(((JObject)context.Activity.Value).GetValue("settingName")!.ToString(), "settingNameValue");
+            Assert.Equal("settingNameValue", ((JObject)context.Activity.Value).GetValue("settingName")!.ToString());
         }
 
 
@@ -239,8 +239,8 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             Assert.NotNull(context.Activity.Value);
 
             var v = (JObject)context.Activity.Value;
-            Assert.Equal(v.GetValue("settingName")!.ToString(), "settingNameValue");
-            Assert.Equal(v.GetValue("testKey")!.ToString(), "testValue");
+            Assert.Equal("settingNameValue", v.GetValue("settingName")!.ToString());
+            Assert.Equal("testValue", v.GetValue("testKey")!.ToString());
 
         }
 
@@ -283,7 +283,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
 
             // assert
             Assert.NotNull(s);
-            Assert.Equal(s, "settingNameValue");
+            Assert.Equal("settingNameValue", s);
         }
 
         private static TurnContext MockTurnContext(string type = ActivityTypes.Message)

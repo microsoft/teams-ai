@@ -33,6 +33,12 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             string inputText = memory.GetValue(this.inputVariable) as string ?? string.Empty;
             List<InputFile> inputFiles = memory.GetValue(this.filesVariable) as List<InputFile> ?? new();
 
+            // If no user input then return an empty section.
+            if (inputText == string.Empty && inputFiles.Count == 0)
+            {
+                return Task.FromResult(new RenderedPromptSection<List<ChatMessage>>(new()));
+            }
+
             // Create message
             List<MessageContentParts> messageContents = new();
             ChatMessage message = new(ChatRole.User)
@@ -65,7 +71,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             {
                 // Check for budget to add image.
                 // TODO: This accounts for low detail images but not high detail images.
-                // Additional work is needed to accoutn for high detail images.
+                // Additional work is needed to account for high detail images.
                 if (budget < 85)
                 {
                     break;

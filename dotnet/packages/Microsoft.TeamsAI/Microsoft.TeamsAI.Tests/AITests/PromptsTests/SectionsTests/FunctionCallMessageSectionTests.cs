@@ -10,7 +10,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
     public class FunctionCallMessageSectionTests
     {
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldRender()
+        public async Task Test_RenderAsTextAsync_ShouldRender()
         {
             FunctionCallMessageSection section = new(new("MyFunction", ""));
             Mock<ITurnContext> context = new();

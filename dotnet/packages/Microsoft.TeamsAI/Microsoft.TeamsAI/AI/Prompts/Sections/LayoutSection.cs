@@ -5,6 +5,7 @@ using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
+    // TODO: Rewrite to be in parity with JS & Python SDK.
     /// <summary>
     /// Base layout section that renders a set of `auto`, `fixed` or `proportional` length sections.
     /// </summary>

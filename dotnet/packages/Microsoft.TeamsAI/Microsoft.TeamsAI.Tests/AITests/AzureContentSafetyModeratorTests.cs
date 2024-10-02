@@ -17,7 +17,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
     public class AzureContentSafetyModeratorTests
     {
         [Fact]
-        public async void Test_ReviewPrompt_ThrowsException()
+        public async Task Test_ReviewPrompt_ThrowsException()
         {
             // Arrange
             var apiKey = "randomApiKey";
@@ -66,7 +66,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         [InlineData(ModerationType.Input)]
         [InlineData(ModerationType.Output)]
         [InlineData(ModerationType.Both)]
-        public async void Test_ReviewPrompt_Flagged(ModerationType moderate)
+        public async Task Test_ReviewPrompt_Flagged(ModerationType moderate)
         {
             // Arrange
             var apiKey = "randomApiKey";
@@ -79,7 +79,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 Text = "input",
             };
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
-            var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var turnStateMock = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var promptTemplate = new PromptTemplate(
                 "prompt",
                 new(new() { })
@@ -121,7 +121,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             };
 
             // Act
-            var result = await moderator.ReviewInputAsync(turnContext, turnStateMock.Result);
+            var result = await moderator.ReviewInputAsync(turnContext, turnStateMock);
 
             // Assert
             if (moderate == ModerationType.Input || moderate == ModerationType.Both)
@@ -143,20 +143,19 @@ namespace Microsoft.Teams.AI.Tests.AITests
         [InlineData(ModerationType.Input)]
         [InlineData(ModerationType.Output)]
         [InlineData(ModerationType.Both)]
-        public async void Test_ReviewPrompt_NotFlagged(ModerationType moderate)
+        public async Task Test_ReviewPrompt_NotFlagged(ModerationType moderate)
         {
             // Arrange
             var apiKey = "randomApiKey";
             var endpoint = "https://test.cognitiveservices.azure.com";
 
             var botAdapterMock = new Mock<BotAdapter>();
-            // TODO: when TurnState is implemented, get the user input
             var activity = new Activity()
             {
                 Text = "input",
             };
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
-            var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var turnStateMock = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var promptTemplate = new PromptTemplate(
                 "prompt",
                 new(new() { })
@@ -183,14 +182,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewInputAsync(turnContext, turnStateMock.Result);
+            var result = await moderator.ReviewInputAsync(turnContext, turnStateMock);
 
             // Assert
             Assert.Null(result);
         }
 
         [Fact]
-        public async void Test_ReviewPlan_ThrowsException()
+        public async Task Test_ReviewPlan_ThrowsException()
         {
             // Arrange
             var apiKey = "randomApiKey";
@@ -223,14 +222,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
         [InlineData(ModerationType.Input)]
         [InlineData(ModerationType.Output)]
         [InlineData(ModerationType.Both)]
-        public async void Test_ReviewPlan_Flagged(ModerationType moderate)
+        public async Task Test_ReviewPlan_Flagged(ModerationType moderate)
         {
             // Arrange
             var apiKey = "randomApiKey";
             var endpoint = "https://test.cognitiveservices.azure.com";
 
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
-            var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var turnStateMock = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var plan = new Plan(new List<IPredictedCommand>()
             {
                 new PredictedDoCommand("action"),
@@ -262,7 +261,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             };
 
             // Act
-            var result = await moderator.ReviewOutputAsync(turnContext, turnStateMock.Result, plan);
+            var result = await moderator.ReviewOutputAsync(turnContext, turnStateMock, plan);
 
             // Assert
             if (moderate == ModerationType.Output || moderate == ModerationType.Both)
@@ -284,14 +283,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
         [InlineData(ModerationType.Input)]
         [InlineData(ModerationType.Output)]
         [InlineData(ModerationType.Both)]
-        public async void Test_ReviewPlan_NotFlagged(ModerationType moderate)
+        public async Task Test_ReviewPlan_NotFlagged(ModerationType moderate)
         {
             // Arrange
             var apiKey = "randomApiKey";
             var endpoint = "https://test.cognitiveservices.azure.com";
 
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
-            var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var turnStateMock = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var plan = new Plan(new List<IPredictedCommand>()
             {
                 new PredictedDoCommand("action"),
@@ -308,7 +307,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewOutputAsync(turnContext, turnStateMock.Result, plan);
+            var result = await moderator.ReviewOutputAsync(turnContext, turnStateMock, plan);
 
             // Assert
             Assert.StrictEqual(plan, result);

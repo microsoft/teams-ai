@@ -101,9 +101,9 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             {
                 Content = "test-content",
                 Name = "test-name",
-                ToolCalls = new List<ChatCompletionsToolCall>()
+                ActionCalls = new List<ActionCall>()
                 {
-                    new ChatCompletionsFunctionToolCall("test-id", "test-tool-name", "test-tool-arg1")
+                    new ActionCall("test-id", new ActionFunction("test-tool-name", "test-tool-arg1"))
                 }
             };
 
@@ -114,10 +114,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             var assistantMessage = result as AssistantChatMessage;
             Assert.NotNull(assistantMessage);
             Assert.Equal("test-content", assistantMessage.Content[0].Text);
-            // TODO: Uncomment when participant name issue is resolved.
-            //Assert.Equal("test-name", assistantMessage.ParticipantName);
 
-            Assert.Equal(1, assistantMessage.ToolCalls.Count);
+            Assert.Single(assistantMessage.ToolCalls);
             ChatToolCall toolCall = assistantMessage.ToolCalls[0];
             Assert.NotNull(toolCall);
             Assert.Equal("test-id", toolCall.Id);
@@ -173,7 +171,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             {
                 Content = "test-content",
                 Name = "tool-name",
-                ToolCallId = "tool-call-id"
+                ActionCallId = "tool-call-id"
             };
 
             // Act
@@ -187,6 +185,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
+        [Obsolete]
         public void Test_ChatCompletionsToolCall_ToFunctionToolCall()
         {
             // Arrange
@@ -203,6 +202,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
+        [Obsolete]
         public void Test_ChatCompletionsToolCall_InvalidToolType()
         {
             // Arrange
@@ -215,6 +215,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             Assert.Equal("Invalid tool type: invalidToolType", ex.Message);
         }
 
+        [Obsolete]
         private sealed class InvalidToolCall : ChatCompletionsToolCall
         {
             public InvalidToolCall() : base("invalidToolType", "test-id")

@@ -21,8 +21,6 @@ This sample shows how to incorporate a basic Message Extension app into a Micros
 
 > Note: this is not a chat bot and therefore the bot does not respond if you talk to it. Once it is installed in Teams, you can interact with it by selecting it's app icon in the chat compose area.
 
-![screenshot](./assets/screenshot.PNG)
-
 ## Setting up the sample
 
 1. Clone the repository

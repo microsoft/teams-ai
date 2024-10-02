@@ -57,7 +57,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(history);
             Assert.Single(history);
             Assert.Equal(history.First().Role, ChatRole.Function);
-            Assert.Equal(history.First().Name, "function");
+            Assert.Equal("function", history.First().Name);
             Assert.Equal(history.First().Content, "results");
         }
 
@@ -83,7 +83,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(history);
             Assert.Single(history);
             Assert.Equal(history.First().Role, ChatRole.Function);
-            Assert.Equal(history.First().Name, "function-1");
+            Assert.Equal("function-1", history.First().Name);
             Assert.Equal(history.First().Content, "results-1");
         }
 
@@ -113,7 +113,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal(PromptResponseStatus.Error, response.Status);
             Assert.NotNull(response.Error);
             Assert.Equal("test", response.Error.Message);
-            Assert.Equal(0, memory.Values.Count);
+            Assert.Empty(memory.Values);
         }
 
         [Fact]
@@ -334,7 +334,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal(PromptResponseStatus.Error, response.Status);
             Assert.NotNull(response.Error);
             Assert.Equal("test", response.Error.Message);
-            Assert.Equal(1, memory.Values.Count);
+            Assert.Single(memory.Values);
             Assert.Equal("hello", memory.Values[options.InputVariable]);
         }
 
@@ -403,7 +403,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal(PromptResponseStatus.InvalidResponse, response.Status);
             Assert.NotNull(response.Error);
             Assert.Equal("Reached max model response repair attempts. Last feedback given to model: \"The response was invalid. Try another strategy.\"", response.Error.Message);
-            Assert.Equal(1, memory.Values.Count);
+            Assert.Single(memory.Values);
             Assert.Equal("hello", memory.Values[options.InputVariable]);
         }
 
@@ -441,7 +441,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(response.Message);
             Assert.Equal(ChatRole.Assistant, response.Message.Role);
             Assert.Equal("welcome", response.Message.Content);
-            Assert.Equal(1, memory.Values.Count);
+            Assert.Empty(memory.Values);
         }
 
         [Fact]
@@ -487,7 +487,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(response.Message);
             Assert.Equal(ChatRole.Assistant, response.Message.Role);
             Assert.Equal("welcome", response.Message.Content);
-            Assert.Equal(1, memory.Values.Count);
+            Assert.Single(memory.Values);
             Assert.Equal("hello", memory.Values[options.InputVariable]);
         }
 

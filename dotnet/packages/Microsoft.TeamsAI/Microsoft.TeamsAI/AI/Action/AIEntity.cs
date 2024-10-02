@@ -100,7 +100,7 @@ namespace Microsoft.Teams.AI.AI.Action
         public string? Url { get; set; }
 
         /// <summary>
-        /// Content of the citation. Should be clipped if longer than ~500 characters.
+        /// Content of the citation. Must be clipped if longer than 480 characters.
         /// </summary>
         [JsonProperty(PropertyName = "abstract")]
         public string Abstract { get; set; } = string.Empty;

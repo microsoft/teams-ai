@@ -12,7 +12,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
     public class JsonResponseValidatorTests
     {
         [Fact]
-        public async void Test_NoSchema_ShouldSucceed()
+        public async Task Test_NoSchema_ShouldSucceed()
         {
             Mock<ITurnContext> context = new();
             MemoryFork memory = new();
@@ -30,7 +30,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
         }
 
         [Fact]
-        public async void Test_WithSchema_ShouldSucceed()
+        public async Task Test_WithSchema_ShouldSucceed()
         {
             JsonSchemaBuilder schema = new JsonSchemaBuilder()
                 .Type(SchemaValueType.Object)
@@ -58,7 +58,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
         }
 
         [Fact]
-        public async void Test_WithSchema_ShouldFailRequired()
+        public async Task Test_WithSchema_ShouldFailRequired()
         {
             JsonSchemaBuilder schema = new JsonSchemaBuilder()
                 .Type(SchemaValueType.Object)
@@ -86,7 +86,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
         }
 
         [Fact]
-        public async void Test_WithSchema_ShouldFailType()
+        public async Task Test_WithSchema_ShouldFailType()
         {
             JsonSchemaBuilder schema = new JsonSchemaBuilder()
                 .Type(SchemaValueType.Object)
