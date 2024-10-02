@@ -3,5 +3,10 @@
     "editor.wordWrap": "on",
     "eslint.enable": true,
     "eslint.workingDirectories": ["./packages", "./samples"],
-    "hints.no-inline-styles": "off" // Removes warnings for coverage report files
+    "json.schemas": [
+        {
+            "url": "https://cdn.jsdelivr.net/npm/tsup/schema.json",
+            "fileMatch": ["package.json", "tsup.config.json"]
+        }
+    ]
 }

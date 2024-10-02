@@ -3,12 +3,13 @@
         "declaration": true,
         "forceConsistentCasingInFileNames": true,
         "incremental": true,
-        "module": "commonjs",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
         "outDir": "./lib",
         "rootDir": "./src",
         "sourceMap": true,
         "strict": true,
-        "target": "es2017",
+        "target": "ESNEXT",
         "tsBuildInfoFile": "./lib/.tsbuildinfo",
         "esModuleInterop": true
     }

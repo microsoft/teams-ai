@@ -13,7 +13,7 @@
         "dev:teamsfx:testtool": "env-cmd --silent -f .env npm run dev",
         "dev:teamsfx:launch-testtool": "env-cmd --silent -f env/.env.testtool teamsapptester start",
         "dev": "nodemon --watch ./src --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts",
-        "build": "tsc --build",
+        "build": "npx tsup",
         "clean": "rimraf node_modules lib",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "start": "tsc --build && node ./lib/index.js",
@@ -50,6 +50,7 @@
         "prettier": "^3.3.3",
         "rimraf": "^5.0.10",
         "ts-node": "^10.9.2",
+        "tsup": "^8.3.0",
         "typescript": "~5.5.4"
     }
 }

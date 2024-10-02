@@ -7,11 +7,11 @@
  */
 
 export * from './Action';
-export * from './Unknown';
+export * from './DoCommand';
 export * from './FlaggedInput';
 export * from './FlaggedOutput';
 export * from './HttpError';
 export * from './PlanReady';
-export * from './DoCommand';
 export * from './SayCommand';
 export * from './TooManySteps';
+export * from './Unknown';

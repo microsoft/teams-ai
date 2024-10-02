@@ -6,7 +6,7 @@
     "license": "MIT",
     "main": "./lib/index.js",
     "scripts": {
-        "build": "tsc --build",
+        "build": "npx tsup",
         "clean": "rimraf node_modules lib tsconfig.tsbuildinfo",
         "lint": "eslint **/**/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "start": "tsc --build && node ./lib/index.js",
@@ -38,6 +38,7 @@
         "rimraf": "^5.0.10",
         "ts-node": "^10.9.2",
         "tsc-watch": "^6.2.0",
+        "tsup": "^8.3.0",
         "typescript": "~5.5.4"
     }
 }

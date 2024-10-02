@@ -1,4 +1,5 @@
 {
+    "$schema": "https://json.schemastore.org/tsconfig",
     "compilerOptions": {
         "allowSyntheticDefaultImports": true,
         "composite": true,
@@ -8,13 +9,21 @@
         "esModuleInterop": true,
         "experimentalDecorators": true,
         "forceConsistentCasingInFileNames": true,
-        "module": "CommonJS",
-        "moduleResolution": "node",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
         "noImplicitAny": true,
         "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "paths": {
+            "openai/resources": ["./node_modules/openai/resources"]
+        },
+        "pretty": true,
         "resolveJsonModule": true,
         "sourceMap": true,
         "strict": true,
         "target": "ESNEXT"
-    }
+    },
+    "exclude": ["node_modules"],
+    "include": ["**/src/**/*.ts", "packages/**/*.ts", "samples/**/*.ts"],
+    "types": ["jest", "node"]
 }
