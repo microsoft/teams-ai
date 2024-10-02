@@ -74,6 +74,33 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
+        public void Test_Initialization_From_OpenAISdk_StreamingChatCompletionUpdate()
+        {
+            // Arrange
+            var chatCompletion = ModelReaderWriter.Read<StreamingChatCompletionUpdate>(BinaryData.FromString(@$"{{
+                ""choices"": [
+                    {{
+                        ""finish_reason"": null,
+                        ""delta"": {{
+                            ""role"": ""assistant"",
+                            ""content"": ""hello""
+                        }}
+                    }}
+                ]
+            }}"));
+
+            // Act
+            var message = new ChatMessage(chatCompletion!);
+
+            // Assert
+            Assert.Equal("hello", message.Content);
+            Assert.Equal(ChatRole.Assistant, message.Role);
+
+            var context = message.Context;
+            Assert.Null(context);
+        }
+
+        [Fact]
         public void Test_InvalidRole_ToOpenAISdkChatMessage()
         {
             // Arrange

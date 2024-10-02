@@ -3,6 +3,7 @@ using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.State;
+using static Microsoft.Teams.AI.AI.Models.IPromptCompletionModelEvents;
 
 namespace Microsoft.Teams.AI.AI.Planners
 {
@@ -68,6 +69,16 @@ namespace Microsoft.Teams.AI.AI.Planners
             TState state,
             ActionPlanner<TState> planner
         );
+
+        /// <summary>
+        /// Optional message to send a client at the start of a streaming response.
+        /// </summary>
+        public string? StartStreamingMessage { get; set; }
+
+        /// <summary>
+        /// Optional handler to run when a stream is about to conclude.
+        /// </summary>
+        public ResponseReceivedHandler? EndStreamHandler;
 
         /// <summary>
         /// Creates an instance of `ActionPlannerOptions`.

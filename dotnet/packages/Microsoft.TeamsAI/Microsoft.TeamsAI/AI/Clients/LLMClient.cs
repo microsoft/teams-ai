@@ -5,7 +5,9 @@ using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Validators;
+using Microsoft.Teams.AI.Application;
 using Microsoft.Teams.AI.State;
+using static Microsoft.Teams.AI.AI.Models.IPromptCompletionModelEvents;
 
 namespace Microsoft.Teams.AI.AI.Clients
 {
@@ -62,6 +64,9 @@ namespace Microsoft.Teams.AI.AI.Clients
 
         private readonly ILogger _logger;
 
+        private readonly string? _startStreamingMessage;
+        private ResponseReceivedHandler? _endStreamHandler;
+
         /// <summary>
         /// Creates a new `LLMClient` instance.
         /// </summary>
@@ -76,6 +81,9 @@ namespace Microsoft.Teams.AI.AI.Clients
             {
                 throw new ArgumentException($"`{nameof(loggerFactory)}` parameter cannot be null if `LogRepairs` option is set to true");
             }
+
+            this._startStreamingMessage = Options.StartStreamingMessage;
+            this._endStreamHandler = Options.EndStreamHandler;
         }
 
         /// <summary>
@@ -144,6 +152,64 @@ namespace Microsoft.Teams.AI.AI.Clients
             CancellationToken cancellationToken = default
         )
         {
+            // Define event handlers
+            bool isStreaming = false;
+            StreamingResponse? streamer = null;
+
+            BeforeCompletionHandler handleBeforeCompletion = new((object sender, BeforeCompletionEventArgs args) =>
+            {
+                // Ignore events for other contexts
+                if (args.TurnContext != context)
+                {
+                    return;
+                }
+
+                if (args.Streaming)
+                {
+                    isStreaming = true;
+
+                    // Create streamer and send initial message
+                    streamer = new StreamingResponse(context);
+                    memory.SetValue("temp.streamer", streamer);
+                    if (!string.IsNullOrEmpty(this._startStreamingMessage))
+                    {
+                        streamer.QueueInformativeUpdate(this._startStreamingMessage!);
+                    }
+                }
+            });
+
+            ChunkReceivedHandler handleChunkReceived = new((object sender, ChunkReceivedEventArgs args) =>
+            {
+                if (args.TurnContext != context || streamer == null)
+                {
+                    return;
+                }
+
+                // Send chunk to client
+                string text = args.Chunk.delta?.GetContent<string>() ?? "";
+                if (text.Length > 0)
+                {
+                    streamer.QueueTextChunk(text);
+                }
+            });
+
+            // Subscribe to model events
+            if (this.Options.Model is IPromptCompletionStreamingModel)
+            {
+                IPromptCompletionStreamingModel model = (IPromptCompletionStreamingModel)Options.Model;
+
+                if (model.Events != null)
+                {
+                    model.Events.BeforeCompletion += handleBeforeCompletion;
+                    model.Events.ChunkReceived += handleChunkReceived;
+
+                    if (this._endStreamHandler != null)
+                    {
+                        model.Events.ResponseReceived += this._endStreamHandler;
+                    }
+                }
+            }
+
             try
             {
                 PromptResponse response = await this.Options.Model.CompletePromptAsync(
@@ -158,6 +224,20 @@ namespace Microsoft.Teams.AI.AI.Clients
                 if (response.Status != PromptResponseStatus.Success)
                 {
                     return response;
+                }
+                else
+                {
+                    if (isStreaming)
+                    {
+                        // Delete the message from the response to avoid sending it twice.
+                        response.Message = null;
+                    }
+                }
+
+                // End the stream
+                if (streamer != null)
+                {
+                    await streamer.EndStream();
                 }
 
                 // Get input message
@@ -243,6 +323,25 @@ namespace Microsoft.Teams.AI.AI.Clients
                     Status = PromptResponseStatus.Error,
                     Error = new(ex.Message ?? string.Empty)
                 };
+            }
+            finally
+            {
+
+                // Unsubscribe to model events
+                if (this.Options.Model is IPromptCompletionStreamingModel)
+                {
+                    IPromptCompletionStreamingModel model = (IPromptCompletionStreamingModel)Options.Model;
+
+                    if (model.Events != null)
+                    {
+                        model.Events.BeforeCompletion -= handleBeforeCompletion;
+                        model.Events.ChunkReceived -= handleChunkReceived;
+                        if (this._endStreamHandler != null)
+                        {
+                            model.Events.ResponseReceived -= this._endStreamHandler;
+                        }
+                    }
+                }
             }
         }
 

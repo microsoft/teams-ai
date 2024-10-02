@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using OpenAI.Assistants;
+﻿using OpenAI.Assistants;
 using OpenAI.Files;
 using System.ClientModel;
 using System.ClientModel.Primitives;
@@ -178,6 +177,26 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             yield return ResultPage<T>.Create(Items, null, _pipelineResponse);
+        }
+    }
+
+    internal sealed class TestAsyncResultCollection<T> : AsyncResultCollection<T> where T : class
+    {
+        public List<T> Items = new();
+
+        internal PipelineResponse _pipelineResponse;
+
+        public TestAsyncResultCollection(T item, PipelineResponse response)
+        {
+            Items.Add(item);
+            _pipelineResponse = response;
+        }
+
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public override async IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        {
+            yield return FromValue(Items[0], _pipelineResponse);
         }
     }
 }
