@@ -219,7 +219,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
         }
     }
 
-    internal sealed class TestAsyncResultCollection<T> : AsyncResultCollection<T> where T : class
+    internal sealed class TestAsyncResultCollection<T> : AsyncCollectionResult<T> where T : class
     {
         public List<T> Items = new();
 

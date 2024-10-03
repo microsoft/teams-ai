@@ -169,7 +169,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             ResponseReceivedHandler handler = new((object sender, ResponseReceivedEventArgs args) =>
             {
-                Assert.Equal(args.Streamer.Message, "hi");
+                Assert.Equal("hi", args.Streamer.Message);
             });
 
             LLMClientOptions<object> options = new(promptCompletionModel, promptTemplate)

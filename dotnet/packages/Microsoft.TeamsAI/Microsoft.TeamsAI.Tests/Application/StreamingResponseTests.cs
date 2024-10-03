@@ -32,7 +32,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             streamer.QueueInformativeUpdate("starting");
             await streamer.WaitForQueue();
 
-            Assert.Equal(streamer.UpdatesSent(), 1);
+            Assert.Equal(1, streamer.UpdatesSent());
         }
 
         [Fact]
@@ -57,7 +57,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             streamer.QueueInformativeUpdate("second");
             await streamer.WaitForQueue();
 
-            Assert.Equal(streamer.UpdatesSent(), 2);
+            Assert.Equal(2, streamer.UpdatesSent());
         }
 
         [Fact]
@@ -167,7 +167,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             ));
             StreamingResponse streamer = new(turnContext);
             await streamer.EndStream();
-            Assert.Equal(streamer.UpdatesSent(), 0);
+            Assert.Equal(0, streamer.UpdatesSent());
         }
 
         [Fact]
@@ -232,7 +232,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             await streamer.WaitForQueue();
             await streamer.EndStream();
             Assert.Equal(2, streamer.UpdatesSent());
-            Assert.Equal(1, streamer.Attachments.Count);
+            Assert.Single(streamer.Attachments);
         }
     }
 }

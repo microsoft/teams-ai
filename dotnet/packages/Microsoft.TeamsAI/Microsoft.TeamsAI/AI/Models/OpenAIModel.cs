@@ -251,7 +251,7 @@ namespace Microsoft.Teams.AI.AI.Models
                     {
                         Content = ""
                     };
-                    AsyncResultCollection<StreamingChatCompletionUpdate> streamCompletion = _openAIClient.GetChatClient(_deploymentName).CompleteChatStreamingAsync(chatMessages, chatCompletionOptions, cancellationToken);
+                    AsyncCollectionResult<StreamingChatCompletionUpdate> streamCompletion = _openAIClient.GetChatClient(_deploymentName).CompleteChatStreamingAsync(chatMessages, chatCompletionOptions, cancellationToken);
 
                     await foreach (StreamingChatCompletionUpdate delta in streamCompletion)
                     {
