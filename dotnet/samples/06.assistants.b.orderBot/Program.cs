@@ -113,7 +113,7 @@ if (string.IsNullOrEmpty(assistantId))
     }
     catch (Exception e)
     {
-        throw new Exception("Failed to upload file to vector store.", e.InnerException);
+        throw new Exception("Failed to upload file to vector store.", e);
     }
     
 
@@ -133,7 +133,11 @@ if (string.IsNullOrEmpty(assistantId))
         }
     };
 
-    assistantCreationOptions.Tools.Add(new FunctionToolDefinition("place_order", "Creates or updates a food order.", new BinaryData(OrderParameters.GetSchema())));
+    assistantCreationOptions.Tools.Add(new FunctionToolDefinition() { 
+        FunctionName = "place_order", 
+        Description = "Creates or updates a food order.",
+        Parameters = new BinaryData(OrderParameters.GetSchema())
+    });
     assistantCreationOptions.Tools.Add(new FileSearchToolDefinition());
 
     string newAssistantId = "";

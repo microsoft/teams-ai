@@ -10,8 +10,8 @@ namespace CardGazer
 {
     public class CardGazerBotActions
     {
-        [Action("SendCard")]
-        public async Task<string> SendCard([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] AppState turnState, [ActionParameters] Dictionary<string, object> args)
+        [Action("SendAdaptiveCard")]
+        public async Task<string> SendAdaptiveCard([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] AppState turnState, [ActionParameters] Dictionary<string, object> args)
         {
 
             if (args.TryGetValue("card", out object? cardObject) && cardObject is JsonElement cardJson)
@@ -36,7 +36,7 @@ namespace CardGazer
             return "failed to parsed card from action arguments";
         }
 
-        [Action("ShowCardJSON")]
+        [Action("DisplayJSON")]
         public async Task<string> ShowCardJSON([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] AppState turnState, [ActionParameters] Dictionary<string, object> args)
         {
             if (args.TryGetValue("card", out object? cardObject) && cardObject is JsonElement cardJson)
