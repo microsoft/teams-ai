@@ -1,34 +1,32 @@
 [
   {
-    "name": "SendCard",
+    "name": "SendAdaptiveCard",
     "description": "Sends an adaptive card to the user",
     "parameters": {
       "type": "object",
       "properties": {
         "card": {
+          "$ref": "https://adaptivecards.io/schemas/adaptive-card.json#",
           "type": "object",
           "description": "The adaptive card to send"
         }
       },
-      "required": [
-        "card"
-      ]
+      "required": [ "card" ]
     }
   },
   {
-    "name": "ShowCardJSON",
+    "name": "DisplayJSON",
     "description": "Shows the user the JSON for an adaptive card",
     "parameters": {
       "type": "object",
       "properties": {
         "card": {
+          "$ref": "https://adaptivecards.io/schemas/adaptive-card.json#",
           "type": "object",
-          "description": "The adaptive card JSON to show"
+          "description": "The adaptive card JSON as raw text"
         }
       },
-      "required": [
-        "card"
-      ]
+      "required": [ "card" ]
     }
   }
 ]
