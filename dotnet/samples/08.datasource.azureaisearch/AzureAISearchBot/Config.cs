@@ -24,6 +24,6 @@
         public string? OpenAIApiKey { get; set; }
         public string? OpenAIEndpoint { get; set; }
         public string? AISearchApiKey { get; set; }
-        public string? AISearchEndpoint { get; set; }
+        public string? AISearchApiEndpoint { get; set; }
     }
 }
