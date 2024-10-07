@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI.AI.Models
     /// <summary>
     /// A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
     /// </summary>
-    public class OpenAIModel : IPromptCompletionModel
+    public class OpenAIModel : IPromptCompletionStreamingModel
     {
         private readonly BaseOpenAIModelOptions _options;
         private readonly ILogger _logger;
@@ -45,7 +45,7 @@ namespace Microsoft.Teams.AI.AI.Models
         /// <summary>
         /// Events emitted by the model.
         /// </summary>
-        public PromptCompletionModelEmitter? Events { get; private set; } = new();
+        public PromptCompletionModelEmitter? Events { get; set; } = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OpenAIModel"/> class.
