@@ -11,6 +11,8 @@ using Azure.Core;
 using Azure.Identity;
 using System.Runtime.CompilerServices;
 
+#pragma warning disable OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -149,3 +151,5 @@ app.UseRouting();
 app.MapControllers();
 
 app.Run();
+
+#pragma warning restore OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
