@@ -243,10 +243,10 @@ export class OpenAIModel implements PromptCompletionModel {
             this._useAzure = true;
             this._client = new AzureOpenAI(
                 Object.assign({}, this.options.clientOptions, {
-                    apiKey: this.options.azureApiKey,
+                    apiKey: this.options.azureApiKey ?? null,
                     endpoint: this.options.azureEndpoint,
                     apiVersion: this.options.azureApiVersion,
-                    adTokenProvider: this.options.azureADTokenProvider
+                    azureADTokenProvider: this.options.azureADTokenProvider
                 })
             );
         } else {
