@@ -282,7 +282,7 @@ namespace Microsoft.Teams.AI.AI.Models
                             _logger.LogTrace("CHUNK", delta);
                         }
 
-                        Events!.OnChunkReceived(args);
+                       Events!.OnChunkReceived(args);
                     }
 
                     promptResponse.Message = message;
@@ -339,22 +339,42 @@ namespace Microsoft.Teams.AI.AI.Models
             }
 
             // Returns if the unsuccessful response
-            if (promptResponse.Status != PromptResponseStatus.Success || chatCompletionsResponse == null)
+            if (promptResponse.Status != PromptResponseStatus.Success)
             {
                 return promptResponse;
             }
 
-            // Process response
-            ChatCompletion chatCompletion = chatCompletionsResponse.Value;
-            List<ActionCall> actionCalls = new();
-            IReadOnlyList<ChatToolCall> toolsCalls = chatCompletion.ToolCalls;
-            if (isToolsAugmentation && toolsCalls.Count > 0)
+            if (chatCompletionsResponse != null)
             {
-                foreach (ChatToolCall toolCall in toolsCalls)
+                // Process response
+                ChatCompletion chatCompletion = chatCompletionsResponse.Value;
+                List<ActionCall> actionCalls = new();
+                IReadOnlyList<ChatToolCall> toolsCalls = chatCompletion.ToolCalls;
+                if (isToolsAugmentation && toolsCalls.Count > 0)
                 {
-                    actionCalls.Add(new ActionCall(toolCall));
+                    foreach (ChatToolCall toolCall in toolsCalls)
+                    {
+                        actionCalls.Add(new ActionCall(toolCall));
+                    }
                 }
             }
+
+            if (this._options.Stream == true)
+            {
+                StreamingResponse? streamer = (StreamingResponse?)memory.GetValue("temp.streamer");
+
+                if (streamer == null)
+                {
+                    throw new TeamsAIException("The streaming object is empty");
+                }
+
+                ResponseReceivedEventArgs responseReceivedEventArgs = new(turnContext, memory, promptResponse, streamer);
+                Events!.OnResponseReceived(responseReceivedEventArgs);
+
+                // Let any pending events flush before returning
+                await Task.Delay(TimeSpan.FromSeconds(0));
+            }
+
 
             List<ChatMessage>? inputs = new();
             int lastMessage = prompt.Output.Count - 1;
@@ -379,23 +399,6 @@ namespace Microsoft.Teams.AI.AI.Models
                     inputs = prompt.Output.GetRange(firstMessage, prompt.Output.Count - firstMessage);
                 }
             }
-
-            if (this._options.Stream == true)
-            {
-                StreamingResponse? streamer = (StreamingResponse?)memory.GetValue("temp.streamer");
-
-                if (streamer == null)
-                {
-                    throw new TeamsAIException("The streaming object is empty");
-                }
-
-                ResponseReceivedEventArgs responseReceivedEventArgs = new(turnContext, memory, promptResponse, streamer);
-                Events!.OnResponseReceived(responseReceivedEventArgs);
-
-                // Let any pending events flush before returning
-                await Task.Delay(TimeSpan.FromSeconds(0));
-            }
-
             promptResponse.Input = inputs;
 
             return promptResponse;

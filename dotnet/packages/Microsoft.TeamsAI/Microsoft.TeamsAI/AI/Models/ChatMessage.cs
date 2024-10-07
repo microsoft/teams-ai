@@ -147,7 +147,10 @@ namespace Microsoft.Teams.AI.AI.Models
         {
             this.Role = ChatRole.Assistant;
 
-            this.Content = streamingChatCompletionUpdate.ContentUpdate[0].Text;
+            if (streamingChatCompletionUpdate.ContentUpdate.Count > 0)
+            {
+                this.Content = streamingChatCompletionUpdate.ContentUpdate[0].Text;
+            }
 
             if (streamingChatCompletionUpdate.FunctionCallUpdate != null && streamingChatCompletionUpdate.FunctionCallUpdate.FunctionName != string.Empty)
             {
@@ -157,10 +160,10 @@ namespace Microsoft.Teams.AI.AI.Models
 
             if (streamingChatCompletionUpdate.ToolCallUpdates != null && streamingChatCompletionUpdate.ToolCallUpdates.Count > 0)
             {
-                this.ToolCalls = new List<ChatCompletionsToolCall>();
+                this.ActionCalls = new List<ActionCall>();
                 foreach (StreamingChatToolCallUpdate toolCall in streamingChatCompletionUpdate.ToolCallUpdates)
                 {
-                    this.ToolCalls.Add(ChatCompletionsToolCall.FromStreamingChatToolCall(toolCall));
+                    this.ActionCalls.Add(new ActionCall(toolCall));
                 }
             }
 
@@ -392,6 +395,22 @@ namespace Microsoft.Teams.AI.AI.Models
             
             Id = toolCall.Id;
             Function = new ActionFunction(toolCall.FunctionName, toolCall.FunctionArguments);
+        }
+
+        /// <summary>
+        /// Creates an instance of <see cref="ActionCall"/> from <see cref="StreamingChatToolCallUpdate"/>
+        /// </summary>
+        /// <param name="toolCall"></param>
+        /// <exception cref="TeamsAIException">Thrown if `toolCall` has an invalid type</exception>
+        public ActionCall(StreamingChatToolCallUpdate toolCall)
+        {
+            if (toolCall.Kind != ChatToolCallKind.Function)
+            {
+                throw new TeamsAIException($"Invalid ActionCall type: {toolCall.GetType().Name}");
+            }
+
+            Id = toolCall.Id;
+            Function = new ActionFunction(toolCall.FunctionName, toolCall.FunctionArgumentsUpdate);
         }
 
         internal ChatToolCall ToChatToolCall()
