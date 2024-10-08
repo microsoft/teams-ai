@@ -201,7 +201,7 @@ namespace Microsoft.Teams.AI.Application
                     {
                         // Get next activity from queue
                         Activity activity = _queue[0]();
-                        await SendActivity(activity);
+                        await SendActivity(activity).ConfigureAwait(false);
                         _queue.RemoveAt(0);
                     }
                 }
@@ -211,7 +211,7 @@ namespace Microsoft.Teams.AI.Application
                     // Queue is empty, mark as idle
                     this._queueSync = null;
                 }
-            });
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace Microsoft.Teams.AI.Application
                 activity.ChannelData = updatedChannelData;
             }
 
-            ResourceResponse response = await this._context.SendActivityAsync(activity);
+            ResourceResponse response = await this._context.SendActivityAsync(activity).ConfigureAwait(false);
 
             // Save assigned stream ID
             if (string.IsNullOrEmpty(StreamId))
