@@ -154,7 +154,7 @@ namespace Microsoft.Teams.AI.AI.Models
             CompletionConfiguration completion = promptTemplate.Configuration.Completion;
             int maxInputTokens = completion.MaxInputTokens;
 
-            if (Events != null)
+            if (this._options.Stream == true && Events != null)
             {
                 // Signal start of completion
                 BeforeCompletionEventArgs beforeCompletionEventArgs = new(turnContext, memory, promptFunctions, tokenizer, promptTemplate, cancellationToken, this._options.Stream ?? false);
@@ -339,7 +339,7 @@ namespace Microsoft.Teams.AI.AI.Models
             }
 
             // Returns if the unsuccessful response
-            if (promptResponse.Status != PromptResponseStatus.Success)
+            if (promptResponse.Status != PromptResponseStatus.Success || (chatCompletionsResponse == null && this._options.Stream == false))
             {
                 return promptResponse;
             }
