@@ -159,16 +159,21 @@ namespace Microsoft.Teams.AI.Application
                 if (this._ended)
                 {
                     // Send final message
-                    return new Activity
+                    Activity activity = new Activity
                     {
                         Type = ActivityTypes.Message,
                         Text = Message,
-                        Attachments = Attachments != null ? Attachments : [],
                         ChannelData = new StreamingChannelData
                         {
                             StreamType = StreamType.Final,
                         }
                     };
+
+                    if (Attachments != null && Attachments.Count > 0)
+                    {
+                        activity.Attachments = Attachments;
+                    }
+                    return activity;
                 }
                 else
                 {
