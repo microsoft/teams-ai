@@ -111,14 +111,23 @@ namespace Microsoft.Teams.AI.AI.Planners
                 throw new Exception(response.Error?.Message ?? "[Action Planner]: an error has occurred");
             }
 
-            Plan? plan = await template.Augmentation.CreatePlanFromResponseAsync(context, state, response, cancellationToken);
-
-            if (plan == null)
+            // Check to see if we have a response
+            // When a streaming response is used, the response message is undefined.
+            if (response.Message != null)
             {
-                throw new Exception("[Action Planner]: failed to create plan");
-            }
+                Plan? plan = await template.Augmentation.CreatePlanFromResponseAsync(context, state, response, cancellationToken);
 
-            return plan;
+                if (plan == null)
+                {
+                    throw new Exception("[Action Planner]: failed to create plan");
+                }
+
+                return plan;
+            }
+            else
+            {
+                return new Plan();
+            }
         }
 
         /// <summary>
@@ -164,7 +173,9 @@ namespace Microsoft.Teams.AI.AI.Planners
                 Tokenizer = this.Options.Tokenizer,
                 MaxHistoryMessages = this.Prompts.Options.MaxHistoryMessages,
                 MaxRepairAttempts = this.Options.MaxRepairAttempts,
-                LogRepairs = this.Options.LogRepairs
+                LogRepairs = this.Options.LogRepairs,
+                StartStreamingMessage = this.Options.StartStreamingMessage,
+                EndStreamHandler = this.Options.EndStreamHandler,
             }, this._logger);
 
             return await client.CompletePromptAsync(context, memory, this.Prompts, cancellationToken);
