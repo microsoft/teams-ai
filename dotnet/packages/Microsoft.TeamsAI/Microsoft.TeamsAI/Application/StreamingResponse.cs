@@ -21,14 +21,14 @@ namespace Microsoft.Teams.AI.Application
         private bool _ended = false;
 
         // Queue for outgoing activities
-        private IList<Func<Activity>> _queue = [];
+        private List<Func<Activity>> _queue = new();
         private Task? _queueSync;
         private bool _chunkQueued = false;
 
         /// <summary>
         /// Fluent interface for accessing the attachments.
         /// </summary>
-        public IList<Attachment>? Attachments { get; set; } = [];
+        public List<Attachment>? Attachments { get; set; } = new();
 
         /// <summary>
         /// Gets the stream ID of the current response.
@@ -159,16 +159,21 @@ namespace Microsoft.Teams.AI.Application
                 if (this._ended)
                 {
                     // Send final message
-                    return new Activity
+                    Activity activity = new Activity
                     {
                         Type = ActivityTypes.Message,
                         Text = Message,
-                        Attachments = Attachments != null ? Attachments : [],
                         ChannelData = new StreamingChannelData
                         {
                             StreamType = StreamType.Final,
                         }
                     };
+
+                    if (Attachments != null && Attachments.Count > 0)
+                    {
+                        activity.Attachments = Attachments;
+                    }
+                    return activity;
                 }
                 else
                 {
