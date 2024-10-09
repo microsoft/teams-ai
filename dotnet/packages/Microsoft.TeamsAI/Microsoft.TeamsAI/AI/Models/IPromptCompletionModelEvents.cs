@@ -62,11 +62,6 @@ namespace Microsoft.Teams.AI.AI.Models
         public PromptTemplate PromptTemplate { get; set; }
 
         /// <summary>
-        /// The cancellation token.
-        /// </summary>
-        public CancellationToken cancellationToken { get; set; }
-
-        /// <summary>
         /// Returns 'true' if the prompt response is being streamed.
         /// </summary>
         public bool Streaming { get; set; }
@@ -79,16 +74,14 @@ namespace Microsoft.Teams.AI.AI.Models
         /// <param name="promptFunctions">Functions to use when rendering the prompt.</param>
         /// <param name="tokenizer">Tokenizer to ue when rendering the prompt.</param>
         /// <param name="promptTemplate">Prompt template being configured.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
         /// <param name="streaming">Returns true if streaming is enabled.</param>
-        public BeforeCompletionEventArgs(ITurnContext turnContext, IMemory memory, IPromptFunctions<List<string>> promptFunctions, ITokenizer tokenizer, PromptTemplate promptTemplate, CancellationToken cancellationToken, bool streaming)
+        public BeforeCompletionEventArgs(ITurnContext turnContext, IMemory memory, IPromptFunctions<List<string>> promptFunctions, ITokenizer tokenizer, PromptTemplate promptTemplate, bool streaming)
         {
             this.TurnContext = turnContext;
             this.Memory = memory;
             this.PromptFunctions = promptFunctions;
             this.Tokenizer = tokenizer;
             this.PromptTemplate = promptTemplate;
-            this.cancellationToken = cancellationToken;
             this.Streaming = streaming;
         }
     }

@@ -528,7 +528,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
         private sealed class TestPromptCompletionStreamingModel : IPromptCompletionStreamingModel
         {
-            public delegate Task<PromptResponse> Handler(TestPromptCompletionStreamingModel model, ITurnContext turnContext, IMemory memory, IPromptFunctions<List<string>> promptFunctions, ITokenizer tokenizer, PromptTemplate promptTemplate, CancellationToken cancellationToken);
+            public delegate Task<PromptResponse> Handler(TestPromptCompletionStreamingModel model, ITurnContext turnContext, IMemory memory, IPromptFunctions<List<string>> promptFunctions, ITokenizer tokenizer, PromptTemplate promptTemplate);
 
             public event Handler handler;
 
@@ -541,9 +541,9 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             public static TestPromptCompletionStreamingModel StreamTextChunks(IList<string> chunks, int delay = 0)
             {
-                Handler handler = new(async (TestPromptCompletionStreamingModel model, ITurnContext turnContext, IMemory memory, IPromptFunctions<List<string>> promptFunctions, ITokenizer tokenizer, PromptTemplate promptTemplate, CancellationToken cancellationToken) =>
+                Handler handler = new(async (TestPromptCompletionStreamingModel model, ITurnContext turnContext, IMemory memory, IPromptFunctions<List<string>> promptFunctions, ITokenizer tokenizer, PromptTemplate promptTemplate) =>
                 {
-                    BeforeCompletionEventArgs args = new(turnContext, memory, promptFunctions, tokenizer, promptTemplate, cancellationToken, true);
+                    BeforeCompletionEventArgs args = new(turnContext, memory, promptFunctions, tokenizer, promptTemplate, true);
 
                     model.Events = new();
 
@@ -621,7 +621,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             public Task<PromptResponse> CompletePromptAsync(ITurnContext turnContext, IMemory memory, IPromptFunctions<List<string>> promptFunctions, ITokenizer tokenizer, PromptTemplate promptTemplate, CancellationToken cancellationToken)
             {
-                return this.handler(this, turnContext, memory, promptFunctions, tokenizer, promptTemplate, cancellationToken);
+                return this.handler(this, turnContext, memory, promptFunctions, tokenizer, promptTemplate);
             }
         }
 
