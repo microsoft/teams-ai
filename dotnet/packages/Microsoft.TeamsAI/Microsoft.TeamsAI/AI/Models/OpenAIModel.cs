@@ -19,13 +19,14 @@ using ServiceVersion = Azure.AI.OpenAI.AzureOpenAIClientOptions.ServiceVersion;
 using Azure.AI.OpenAI.Chat;
 using OpenAI.Chat;
 using Microsoft.Recognizers.Text.NumberWithUnit.Dutch;
+using Microsoft.Teams.AI.Application;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
     /// <summary>
     /// A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
     /// </summary>
-    public class OpenAIModel : IPromptCompletionModel
+    public class OpenAIModel : IPromptCompletionStreamingModel
     {
         private readonly BaseOpenAIModelOptions _options;
         private readonly ILogger _logger;
@@ -40,6 +41,11 @@ namespace Microsoft.Teams.AI.AI.Models
         };
 
         private static readonly string _userAgent = "AlphaWave";
+
+        /// <summary>
+        /// Events emitted by the model.
+        /// </summary>
+        public PromptCompletionModelEmitter? Events { get; set; } = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OpenAIModel"/> class.
@@ -148,6 +154,13 @@ namespace Microsoft.Teams.AI.AI.Models
             CompletionConfiguration completion = promptTemplate.Configuration.Completion;
             int maxInputTokens = completion.MaxInputTokens;
 
+            if (this._options.Stream == true && Events != null)
+            {
+                // Signal start of completion
+                BeforeCompletionEventArgs beforeCompletionEventArgs = new(turnContext, memory, promptFunctions, tokenizer, promptTemplate, this._options.Stream ?? false);
+                Events.OnBeforeCompletion(beforeCompletionEventArgs);
+            }
+
             // Setup tools if enabled
             bool isToolsAugmentation = promptTemplate.Configuration.Augmentation.Type == Augmentations.AugmentationType.Tools;
             List<ChatTool> tools = new();
@@ -176,7 +189,7 @@ namespace Microsoft.Teams.AI.AI.Models
             {
                 prompt.Output[0].Role = ChatRole.User;
             }
-            
+
             if (_options.LogRequests!.Value)
             {
                 _logger.LogTrace("CHAT PROMPT:");
@@ -220,13 +233,72 @@ namespace Microsoft.Teams.AI.AI.Models
 
             string model = promptTemplate.Configuration.Completion.Model ?? _deploymentName;
 
-            PipelineResponse? rawResponse;
+            PipelineResponse? rawResponse = null;
             ClientResult<ChatCompletion>? chatCompletionsResponse = null;
             PromptResponse promptResponse = new();
             try
             {
-                chatCompletionsResponse = await _openAIClient.GetChatClient(model).CompleteChatAsync(chatMessages, chatCompletionOptions, cancellationToken);
-                rawResponse = chatCompletionsResponse.GetRawResponse();
+                if (this._options.Stream == true)
+                {
+                    if (_options.LogRequests!.Value)
+                    {
+                        // TODO: Colorize
+                        _logger.LogTrace("STREAM STARTED:");
+                    }
+
+                    // Enumerate the stream chunks
+                    ChatMessage message = new(ChatRole.Assistant)
+                    {
+                        Content = ""
+                    };
+                    AsyncCollectionResult<StreamingChatCompletionUpdate> streamCompletion = _openAIClient.GetChatClient(_deploymentName).CompleteChatStreamingAsync(chatMessages, chatCompletionOptions, cancellationToken);
+
+                    await foreach (StreamingChatCompletionUpdate delta in streamCompletion)
+                    {
+                        if (delta.Role != null)
+                        {
+                            string role = delta.Role.ToString();
+                            message.Role = new ChatRole(role);
+                        }
+
+                        if (delta.ContentUpdate.Count > 0)
+                        {
+                            message.Content += delta.ContentUpdate[0].Text;
+                        }
+
+                        // TODO: Handle tool calls
+
+                        ChatMessage currDeltaMessage = new(delta);
+                        PromptChunk chunk = new()
+                        {
+                            delta = currDeltaMessage
+                        };
+
+                        ChunkReceivedEventArgs args = new(turnContext, memory, chunk);
+
+                        // Signal chunk received
+                        if (_options.LogRequests!.Value)
+                        {
+                            _logger.LogTrace("CHUNK", delta);
+                        }
+
+                       Events!.OnChunkReceived(args);
+                    }
+
+                    promptResponse.Message = message;
+
+                    // Log stream completion
+                    if (_options.LogRequests!.Value)
+                    {
+                        _logger.LogTrace("STREAM COMPLETED");
+                    }
+                }
+                else {
+                    chatCompletionsResponse = await _openAIClient.GetChatClient(model).CompleteChatAsync(chatMessages, chatCompletionOptions, cancellationToken);
+                    rawResponse = chatCompletionsResponse.GetRawResponse();
+                    promptResponse.Message = new ChatMessage(chatCompletionsResponse.Value);
+                }
+
                 promptResponse.Status = PromptResponseStatus.Success;
             }
             catch (ClientResultException e)
@@ -249,36 +321,60 @@ namespace Microsoft.Teams.AI.AI.Models
             {
                 // TODO: Colorize
                 _logger.LogTrace("RESPONSE:");
-                _logger.LogTrace($"status {rawResponse!.Status}");
                 _logger.LogTrace($"duration {(DateTime.UtcNow - startTime).TotalMilliseconds} ms");
-                if (promptResponse.Status == PromptResponseStatus.Success)
+                if (promptResponse.Status == PromptResponseStatus.Success && chatCompletionsResponse != null)
                 {
-                    _logger.LogTrace(JsonSerializer.Serialize(chatCompletionsResponse!.Value, _serializerOptions));
+                    _logger.LogTrace(JsonSerializer.Serialize(chatCompletionsResponse.Value, _serializerOptions));
                 }
-                if (promptResponse.Status == PromptResponseStatus.RateLimited)
+
+                if (rawResponse != null)
                 {
-                    _logger.LogTrace("HEADERS:");
-                    _logger.LogTrace(JsonSerializer.Serialize(rawResponse.Headers, _serializerOptions));
+                    _logger.LogTrace($"status {rawResponse!.Status}");
+                    if (promptResponse.Status == PromptResponseStatus.RateLimited)
+                    {
+                        _logger.LogTrace("HEADERS:");
+                        _logger.LogTrace(JsonSerializer.Serialize(rawResponse.Headers, _serializerOptions));
+                    }
                 }
             }
 
             // Returns if the unsuccessful response
-            if (promptResponse.Status != PromptResponseStatus.Success || chatCompletionsResponse == null)
+            if (promptResponse.Status != PromptResponseStatus.Success || (chatCompletionsResponse == null && this._options.Stream == false))
             {
                 return promptResponse;
             }
 
-            // Process response
-            ChatCompletion chatCompletion = chatCompletionsResponse.Value;
-            List<ActionCall> actionCalls = new();
-            IReadOnlyList<ChatToolCall> toolsCalls = chatCompletion.ToolCalls;
-            if (isToolsAugmentation && toolsCalls.Count > 0)
+            if (chatCompletionsResponse != null)
             {
-                foreach(ChatToolCall toolCall in toolsCalls)
+                // Process response
+                ChatCompletion chatCompletion = chatCompletionsResponse.Value;
+                List<ActionCall> actionCalls = new();
+                IReadOnlyList<ChatToolCall> toolsCalls = chatCompletion.ToolCalls;
+                if (isToolsAugmentation && toolsCalls.Count > 0)
                 {
-                    actionCalls.Add(new ActionCall(toolCall));
+                    foreach (ChatToolCall toolCall in toolsCalls)
+                    {
+                        actionCalls.Add(new ActionCall(toolCall));
+                    }
                 }
             }
+
+            if (this._options.Stream == true)
+            {
+                StreamingResponse? streamer = (StreamingResponse?)memory.GetValue("temp.streamer");
+
+                if (streamer == null)
+                {
+                    throw new TeamsAIException("The streaming object is empty");
+                }
+
+                ResponseReceivedEventArgs responseReceivedEventArgs = new(turnContext, memory, promptResponse, streamer);
+                Events!.OnResponseReceived(responseReceivedEventArgs);
+
+                // Let any pending events flush before returning
+                await Task.Delay(TimeSpan.FromSeconds(0));
+            }
+
 
             List<ChatMessage>? inputs = new();
             int lastMessage = prompt.Output.Count - 1;
@@ -299,13 +395,11 @@ namespace Microsoft.Teams.AI.AI.Models
                             break;
                         }
                     }
-                    int firstMessage = i+1;
+                    int firstMessage = i + 1;
                     inputs = prompt.Output.GetRange(firstMessage, prompt.Output.Count - firstMessage);
                 }
             }
-
             promptResponse.Input = inputs;
-            promptResponse.Message = new ChatMessage(chatCompletionsResponse.Value);
 
             return promptResponse;
 
