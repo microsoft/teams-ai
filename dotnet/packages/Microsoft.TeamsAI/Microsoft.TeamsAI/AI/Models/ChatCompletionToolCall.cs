@@ -65,6 +65,16 @@ namespace Microsoft.Teams.AI.AI.Models
 
             throw new TeamsAIException($"Invalid ChatCompletionsToolCall type: {toolCall.GetType().Name}");
         }
+
+        internal static ChatCompletionsToolCall FromStreamingChatToolCall(StreamingChatToolCallUpdate toolCall)
+        {
+            if (toolCall.Kind == ChatToolCallKind.Function)
+            {
+                return new ChatCompletionsFunctionToolCall(toolCall.Id, toolCall.FunctionName, toolCall.FunctionArgumentsUpdate);
+            }
+
+            throw new TeamsAIException($"Invalid ChatCompletionsToolCall type: {toolCall.GetType().Name}");
+        }
     }
 
     /// <summary>

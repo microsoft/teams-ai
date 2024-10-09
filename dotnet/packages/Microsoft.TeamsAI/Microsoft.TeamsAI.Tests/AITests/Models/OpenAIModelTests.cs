@@ -16,6 +16,8 @@ using ChatMessage = Microsoft.Teams.AI.AI.Models.ChatMessage;
 using ChatRole = Microsoft.Teams.AI.AI.Models.ChatRole;
 using Azure.Identity;
 using Microsoft.Teams.AI.AI.Augmentations;
+using Microsoft.Teams.AI.Application;
+using Microsoft.Bot.Schema;
 
 namespace Microsoft.Teams.AI.Tests.AITests.Models
 {
@@ -223,11 +225,12 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             {
                 Actions = new List<ChatCompletionAction>() { new ChatCompletionAction() { Name = "testAction" } },
                 Augmentation = new ToolsAugmentation(),
-                Configuration = new PromptTemplateConfiguration() 
-                { 
-                    Augmentation = new AugmentationConfiguration() {
+                Configuration = new PromptTemplateConfiguration()
+                {
+                    Augmentation = new AugmentationConfiguration()
+                    {
                         Type = AugmentationType.Tools
-                    } 
+                    }
                 }
             };
             var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/")
@@ -273,14 +276,78 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             // Assert
             Assert.Equal(PromptResponseStatus.Success, result.Status);
             Assert.NotNull(result.Message);
-            
+
             Assert.NotNull(result.Message.ActionCalls);
             Assert.Single(result.Message.ActionCalls);
             Assert.Equal("testAction", result.Message.ActionCalls[0].Function.Name);
-            
+
             Assert.Null(result.Error);
             Assert.Equal(ChatRole.Assistant, result.Message.Role);
             Assert.Null(result.Message.Content);
         }
+
+        [Fact]
+        public async Task Test_CompletePromptAsync_AzureOpenAI_Streaming()
+        {
+            // Arrange
+            ITurnContext turnContext = new TurnContext(new NotImplementedAdapter(), new Activity(
+                text: "hello",
+                channelId: "channelId",
+                recipient: new() { Id = "recipientId" },
+                conversation: new() { Id = "conversationId" },
+                from: new() { Id = "fromId" }
+            ));
+            var streamer = new StreamingResponse(turnContext);
+            var state = new TurnState();
+            await state.LoadStateAsync(null, turnContext);
+            state.SetValue("temp.streamer", streamer);
+            var renderedPrompt = new RenderedPromptSection<List<ChatMessage>>(new List<ChatMessage>(), length: 256, tooLong: false);
+            var promptMock = new Mock<Prompt>(new List<PromptSection>(), -1, true, "\n\n");
+            promptMock.Setup((prompt) => prompt.RenderAsMessagesAsync(
+                            It.IsAny<ITurnContext>(), It.IsAny<IMemory>(), It.IsAny<IPromptFunctions<List<string>>>(),
+                            It.IsAny<ITokenizer>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(renderedPrompt);
+            var promptTemplate = new PromptTemplate("test-prompt", promptMock.Object);
+            var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/")
+            {
+                CompletionType = CompletionConfiguration.CompletionType.Chat,
+                LogRequests = true,
+                Stream = true,
+            };
+            var clientMock = new Mock<OpenAIClient>();
+            var update = ModelReaderWriter.Read<StreamingChatCompletionUpdate>(BinaryData.FromString(@$"{{
+                ""choices"": [
+                    {{
+                        ""finish_reason"": null,
+                        ""delta"": {{
+                            ""role"": ""assistant"",
+                            ""content"": ""chunk one""
+                        }}
+                    }}
+                ]
+            }}"));
+
+            TestAsyncResultCollection<StreamingChatCompletionUpdate> updates = new(update!, Mock.Of<PipelineResponse>());
+
+            var response = new TestResponse(200, string.Empty);
+            clientMock.Setup((client) =>
+                client
+                .GetChatClient(It.IsAny<string>())
+                .CompleteChatStreamingAsync(It.IsAny<IEnumerable<OAIChatMessage>>(), It.IsAny<ChatCompletionOptions>(), It.IsAny<CancellationToken>())
+            ).Returns(ClientResult.FromValue(updates, response));
+
+            var openAIModel = new OpenAIModel(options, loggerFactory: new TestLoggerFactory());
+            openAIModel.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAIModel, clientMock.Object);
+
+            // Act
+            var result = await openAIModel.CompletePromptAsync(turnContext, state, new PromptManager(), new GPTTokenizer(), promptTemplate);
+
+            // Assert
+            Assert.Equal(PromptResponseStatus.Success, result.Status);
+            Assert.NotNull(result.Message);
+            Assert.Null(result.Error);
+            Assert.Equal(ChatRole.Assistant, result.Message.Role);
+            Assert.Equal("chunk one", result.Message.Content);
+        }
+
     }
 }
