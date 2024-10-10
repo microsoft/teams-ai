@@ -129,8 +129,8 @@ namespace Microsoft.Teams.AI.AI.Embeddings
             try
             {
                 DateTime startTime = DateTime.Now;
-                ClientResult<EmbeddingCollection> response = await embeddingsClient.GenerateEmbeddingsAsync(inputs);
-                List<ReadOnlyMemory<float>> embeddingItems = response.Value.OrderBy(item => item.Index).Select(item => item.Vector).ToList();
+                ClientResult<OpenAIEmbeddingCollection> response = await embeddingsClient.GenerateEmbeddingsAsync(inputs);
+                List<ReadOnlyMemory<float>> embeddingItems = response.Value.OrderBy(item => item.Index).Select(item => item.ToFloats()).ToList();
 
                 if (_options.LogRequests!.Value)
                 {
@@ -170,9 +170,9 @@ namespace Microsoft.Teams.AI.AI.Embeddings
         {
             return apiVersion switch
             {
-                "2024-04-01-preview" => ServiceVersion.V2024_04_01_Preview,
-                "2024-05-01-preview" => ServiceVersion.V2024_05_01_Preview,
                 "2024-06-01" => ServiceVersion.V2024_06_01,
+                "2024-08-01-preview" => ServiceVersion.V2024_08_01_Preview,
+                "2024-10-01-preview" => ServiceVersion.V2024_10_01_Preview,
                 _ => null,
             };
         }

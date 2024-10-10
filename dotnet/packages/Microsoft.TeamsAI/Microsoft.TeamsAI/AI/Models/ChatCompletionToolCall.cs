@@ -44,7 +44,7 @@ namespace Microsoft.Teams.AI.AI.Models
             if (this.Type == ToolType.Function)
             {
                 ChatCompletionsFunctionToolCall functionToolCall = (ChatCompletionsFunctionToolCall)this;
-                return ChatToolCall.CreateFunctionToolCall(functionToolCall.Id, functionToolCall.Name, functionToolCall.Arguments);
+                return ChatToolCall.CreateFunctionToolCall(functionToolCall.Id, functionToolCall.Name, BinaryData.FromString(functionToolCall.Arguments));
             }
 
             throw new TeamsAIException($"Invalid tool type: {this.Type}");
@@ -60,7 +60,7 @@ namespace Microsoft.Teams.AI.AI.Models
         {
             if (toolCall.Kind == ChatToolCallKind.Function)
             {
-                return new ChatCompletionsFunctionToolCall(toolCall.Id, toolCall.FunctionName, toolCall.FunctionArguments);
+                return new ChatCompletionsFunctionToolCall(toolCall.Id, toolCall.FunctionName, toolCall.FunctionArguments.ToString());
             }
 
             throw new TeamsAIException($"Invalid ChatCompletionsToolCall type: {toolCall.GetType().Name}");

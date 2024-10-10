@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         public void Test_ChatCompletionsToolCall_ToFunctionToolCall()
         {
             // Arrange
-            var functionToolCall = ChatToolCall.CreateFunctionToolCall("test-id", "test-name", "test-arg1");
+            var functionToolCall = ChatToolCall.CreateFunctionToolCall("test-id", "test-name", BinaryData.FromString("test-arg1"));
 
             // Act
             var azureSdkFunctionToolCall = ChatCompletionsToolCall.FromChatToolCall(functionToolCall);

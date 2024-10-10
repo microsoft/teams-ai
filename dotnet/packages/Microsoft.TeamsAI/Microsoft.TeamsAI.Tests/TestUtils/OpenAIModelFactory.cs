@@ -1,8 +1,7 @@
-﻿using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using OpenAI.Assistants;
-using OpenAI.Files;
+﻿using OpenAI.Assistants;
 using System.ClientModel;
 using System.ClientModel.Primitives;
+using OAI = OpenAI;
 
 namespace Microsoft.Teams.AI.Tests.TestUtils
 {
@@ -90,7 +89,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return threadMessage.Content[0];
         }
 
-        public static OpenAIFileInfo CreateOpenAIFileInfo(string fileId)
+        public static OAI.Files.OpenAIFile CreateOpenAIFileInfo(string fileId)
         {
             var json = @$"{{
                 ""id"": ""{fileId}"",
@@ -101,7 +100,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
                 ""purpose"": ""assistants""
             }}";
 
-            var fileInfo = ModelReaderWriter.Read<OpenAIFileInfo>(BinaryData.FromString(json))!;
+            var fileInfo = ModelReaderWriter.Read<OAI.Files.OpenAIFile>(BinaryData.FromString(json))!;
 
             return fileInfo;
         }
@@ -161,62 +160,33 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
         }
     }
 
-    internal sealed class TestAsyncPageCollection<T> : AsyncPageCollection<T> where T : class
+    internal sealed class TestAsyncCollectionResult<T> : AsyncCollectionResult<T> where T : class
     {
         public List<T> Items;
         internal PipelineResponse _pipelineResponse;
-        private IAsyncEnumerator<PageResult<T>> _enumerator;
 
-        public TestAsyncPageCollection(List<T> items, PipelineResponse response)
+        public TestAsyncCollectionResult(List<T> items, PipelineResponse response)
         {
             Items = items;
             _pipelineResponse = response;
-            _enumerator = new TestAsyncEnumerator<T>(items, response);
         }
 
-        protected override IAsyncEnumerator<PageResult<T>> GetAsyncEnumeratorCore(CancellationToken cancellationToken = default)
+        public override ContinuationToken? GetContinuationToken(ClientResult page)
         {
-            return _enumerator;
+            return ContinuationToken.FromBytes(BinaryData.FromString(""));
         }
 
-        protected override Task<PageResult<T>> GetCurrentPageAsyncCore()
+        public async override IAsyncEnumerable<ClientResult> GetRawPagesAsync()
         {
-            return Task.FromResult(_enumerator.Current);
-        }
-    }
-
-    internal sealed class TestAsyncEnumerator<T> : IAsyncEnumerator<PageResult<T>> where T : class
-    {
-        private readonly List<T> _items;
-        private readonly PipelineResponse _pipelineResponse;
-        private bool _movedOnToNext;
-
-        public TestAsyncEnumerator(List<T> items, PipelineResponse response)
-        {
-            _items = items;
-            _pipelineResponse = response;
-            _movedOnToNext = false;
+            yield return await Task.FromResult(ClientResult.FromValue(Items, _pipelineResponse));
         }
 
-        public PageResult<T> Current => PageResult<T>.Create(_items, ContinuationToken.FromBytes(BinaryData.FromString("")), null, _pipelineResponse);
-
-        public ValueTask DisposeAsync()
+        protected async override IAsyncEnumerable<T> GetValuesFromPageAsync(ClientResult page)
         {
-            return new ValueTask();
-        }
-
-        public ValueTask<bool> MoveNextAsync()
-        {
-            if (!_movedOnToNext)
-            {
-                return new ValueTask<bool>(true);
+            foreach (T item in Items) 
+            { 
+                yield return await Task.FromResult(item); 
             }
-            else
-            {
-                _movedOnToNext = true;
-                return new ValueTask<bool>(false);
-            }
-
         }
     }
 }

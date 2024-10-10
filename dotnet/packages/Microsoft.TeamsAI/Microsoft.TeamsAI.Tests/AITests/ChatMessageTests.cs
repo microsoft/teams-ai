@@ -48,7 +48,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
                                 ""citations"": [
                                     {{
                                         ""title"": ""test-title"",
-                                        ""url"": ""test-url"",
+                                        ""url"": ""https://www.test-uri.com/"",
                                         ""content"": ""test-content""
                                     }}
                                 ]
@@ -69,7 +69,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(context);
             Assert.Single(context.Citations);
             Assert.Equal("test-title", context.Citations[0].Title);
-            Assert.Equal("test-url", context.Citations[0].Url);
+            Assert.Equal("https://www.test-uri.com/", context.Citations[0].Url);
             Assert.Equal("test-content", context.Citations[0].Content);
         }
 
@@ -152,10 +152,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             var assistantMessage = result as AssistantChatMessage;
             Assert.NotNull(assistantMessage);
-            Assert.Equal("test-content", assistantMessage.Content[0].Text);
+            Assert.Empty(assistantMessage.Content);
             // TODO: Uncomment when participant name issue is resolved.
             //Assert.Equal("test-name", assistantMessage.ParticipantName);
-            Assert.Equal("test-arg1", assistantMessage.FunctionCall.FunctionArguments);
+            Assert.Equal("test-arg1", assistantMessage.FunctionCall.FunctionArguments.ToString());
             Assert.Equal("test-name", assistantMessage.FunctionCall.FunctionName);
         }
 
@@ -179,7 +179,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             var assistantMessage = result as AssistantChatMessage;
             Assert.NotNull(assistantMessage);
-            Assert.Equal("test-content", assistantMessage.Content[0].Text);
+            Assert.Empty(assistantMessage.Content);
             // TODO: Uncomment when participant name issue is resolved.
             //Assert.Equal("test-name", assistantMessage.ParticipantName);
 
@@ -188,7 +188,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(toolCall);
             Assert.Equal("test-id", toolCall.Id);
             Assert.Equal("test-tool-name", toolCall.FunctionName);
-            Assert.Equal("test-tool-arg1", toolCall.FunctionArguments);
+            Assert.Equal("test-tool-arg1", toolCall.FunctionArguments.ToString());
         }
 
         [Fact]

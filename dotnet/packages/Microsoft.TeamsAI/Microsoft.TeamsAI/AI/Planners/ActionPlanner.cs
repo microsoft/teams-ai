@@ -108,7 +108,7 @@ namespace Microsoft.Teams.AI.AI.Planners
 
             if (response.Status != PromptResponseStatus.Success)
             {
-                throw new Exception(response.Error?.Message ?? "[Action Planner]: an error has occurred");
+                throw new Exception(response.Error?.Message ?? "[Action Planner]: an error has occurred", response.Error);
             }
 
             Plan? plan = await template.Augmentation.CreatePlanFromResponseAsync(context, state, response, cancellationToken);

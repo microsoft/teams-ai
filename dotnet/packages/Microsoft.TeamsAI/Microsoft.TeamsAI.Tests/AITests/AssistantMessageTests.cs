@@ -15,7 +15,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         {
             // Arrange
             MessageContent content = OpenAIModelFactory.CreateMessageContent("message", "fileId");
-            Mock<FileClient> fileClientMock = new Mock<FileClient>();
+            Mock<OpenAIFileClient> fileClientMock = new Mock<OpenAIFileClient>();
             fileClientMock.Setup(fileClient => fileClient.DownloadFileAsync("fileId", It.IsAny<CancellationToken>())).Returns(() =>
             {
                 return Task.FromResult(ClientResult.FromValue(BinaryData.FromString("test"), new Mock<PipelineResponse>().Object));

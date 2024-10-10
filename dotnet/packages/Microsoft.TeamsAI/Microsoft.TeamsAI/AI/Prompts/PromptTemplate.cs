@@ -314,9 +314,9 @@ namespace Microsoft.Teams.AI.AI.Prompts
         {
             return ToolChoice switch
             {
-                ChatToolChoice.Auto => OAI.Chat.ChatToolChoice.Auto,
-                ChatToolChoice.Required => OAI.Chat.ChatToolChoice.Required,
-                ChatToolChoice.None => OAI.Chat.ChatToolChoice.None,
+                ChatToolChoice.Auto => OAI.Chat.ChatToolChoice.CreateAutoChoice(),
+                ChatToolChoice.Required => OAI.Chat.ChatToolChoice.CreateRequiredChoice(),
+                ChatToolChoice.None => OAI.Chat.ChatToolChoice.CreateNoneChoice(),
                 _ => throw new InvalidOperationException($"Unknown ChatToolChoice: {ToolChoice}"),
             };
         }

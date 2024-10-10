@@ -18,13 +18,32 @@ using System.ClientModel;
 using ServiceVersion = Azure.AI.OpenAI.AzureOpenAIClientOptions.ServiceVersion;
 using Azure.AI.OpenAI.Chat;
 using OpenAI.Chat;
-using Microsoft.Recognizers.Text.NumberWithUnit.Dutch;
 
+#pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 namespace Microsoft.Teams.AI.AI.Models
 {
     /// <summary>
-    /// A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
+    /// A `IPromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
     /// </summary>
+    /// <remarks>
+    /// The model has been updated to support calling OpenAI's new o1 family of models. That currently 
+    /// comes with a few constraints. These constraints are mostly handled for you but are worth noting:
+    ///     
+    /// * The o1 models introduce a new `max_completion_tokens` parameter and they've deprecated the
+    ///   `max_tokens` parameter. The model will automatically convert the incoming `max_tokens` parameter
+    ///   to `max_completion_tokens` for you. But you should be aware that o1 has hidden token usage and costs
+    ///   that aren't constrained by the `max_completion_tokens` parameter. This means that you may see an
+    ///   increase in token usage and costs when using the o1 models. 
+    ///   
+    /// * The o1 models do not currently support the sending of system messages which just means that the 
+    /// `useSystemMessages` parameter is ignored when calling the o1 models.
+    /// 
+    /// * The o1 models do not currently support setting the `temperature`, `top_p`, and `presence_penalty` 
+    ///   parameters so they will be ignored.
+    /// 
+    /// * The o1 models do not currently support the use of tools so you will need to use the "monologue" 
+    ///   augmentation to call actions.
+    /// </remarks>
     public class OpenAIModel : IPromptCompletionModel
     {
         private readonly BaseOpenAIModelOptions _options;
@@ -147,19 +166,8 @@ namespace Microsoft.Teams.AI.AI.Models
             DateTime startTime = DateTime.UtcNow;
             CompletionConfiguration completion = promptTemplate.Configuration.Completion;
             int maxInputTokens = completion.MaxInputTokens;
-
-            // Setup tools if enabled
-            bool isToolsAugmentation = promptTemplate.Configuration.Augmentation.Type == Augmentations.AugmentationType.Tools;
-            List<ChatTool> tools = new();
-
-            // If tools is enabled, reformat actions to schema
-            if (isToolsAugmentation && promptTemplate.Actions.Count > 0)
-            {
-                foreach (ChatCompletionAction action in promptTemplate.Actions)
-                {
-                    tools.Add(action.ToChatTool());
-                }
-            }
+            string model = promptTemplate.Configuration.Completion.Model ?? _deploymentName;
+            bool isO1Model = model.StartsWith("o1-");
 
             // Render prompt
             RenderedPromptSection<List<ChatMessage>> prompt = await promptTemplate.Prompt.RenderAsMessagesAsync(turnContext, memory, promptFunctions, tokenizer, maxInputTokens, cancellationToken);
@@ -172,7 +180,8 @@ namespace Microsoft.Teams.AI.AI.Models
                 };
             }
 
-            if (!_options.UseSystemMessages!.Value && prompt.Output.Count > 0 && prompt.Output[0].Role == ChatRole.System)
+            bool useSystemMessages = !isO1Model && _options.UseSystemMessages.GetValueOrDefault(false);
+            if (!useSystemMessages && prompt.Output.Count > 0 && prompt.Output[0].Role == ChatRole.System)
             {
                 prompt.Output[0].Role = ChatRole.User;
             }
@@ -183,42 +192,41 @@ namespace Microsoft.Teams.AI.AI.Models
                 _logger.LogTrace(JsonSerializer.Serialize(prompt.Output, _serializerOptions));
             }
 
-            // Render prompt template
+            // Map to OpenAI ChatMessage
             IEnumerable<OAIChat.ChatMessage> chatMessages = prompt.Output.Select(chatMessage => chatMessage.ToOpenAIChatMessage());
 
             ChatCompletionOptions chatCompletionOptions = new()
             {
-                MaxTokens = completion.MaxTokens,
+                MaxOutputTokenCount = completion.MaxTokens,
                 Temperature = (float)completion.Temperature,
                 TopP = (float)completion.TopP,
                 PresencePenalty = (float)completion.PresencePenalty,
                 FrequencyPenalty = (float)completion.FrequencyPenalty,
             };
 
+            // Set tools configurations
+            bool isToolsAugmentation = promptTemplate.Configuration.Augmentation.Type == Augmentations.AugmentationType.Tools;
             if (isToolsAugmentation)
             {
                 chatCompletionOptions.ToolChoice = completion.GetOpenAIChatToolChoice();
-                chatCompletionOptions.ParallelToolCallsEnabled = completion.ParallelToolCalls;
+                chatCompletionOptions.AllowParallelToolCalls = completion.ParallelToolCalls;
+
+                if (promptTemplate.Actions.Count > 0)
+                {
+                    foreach (ChatCompletionAction action in promptTemplate.Actions)
+                    {
+                        chatCompletionOptions.Tools.Add(action.ToChatTool());
+                    }
+                }
             }
 
-            foreach (ChatTool tool in tools)
-            {
-                chatCompletionOptions.Tools.Add(tool);
-            }
-
-
-            if (chatCompletionOptions == null)
-            {
-                throw new TeamsAIException("Failed to create chat completions options");
-            }
-
+            // Add Azure chat extension configurations
             IDictionary<string, JsonElement>? additionalData = promptTemplate.Configuration.Completion.AdditionalData;
             if (_useAzure)
             {
                 AddAzureChatExtensionConfigurations(chatCompletionOptions, additionalData);
             }
 
-            string model = promptTemplate.Configuration.Completion.Model ?? _deploymentName;
 
             PipelineResponse? rawResponse;
             ClientResult<ChatCompletion>? chatCompletionsResponse = null;
@@ -247,7 +255,6 @@ namespace Microsoft.Teams.AI.AI.Models
 
             if (_options.LogRequests!.Value)
             {
-                // TODO: Colorize
                 _logger.LogTrace("RESPONSE:");
                 _logger.LogTrace($"status {rawResponse!.Status}");
                 _logger.LogTrace($"duration {(DateTime.UtcNow - startTime).TotalMilliseconds} ms");
@@ -315,9 +322,9 @@ namespace Microsoft.Teams.AI.AI.Models
         {
             return apiVersion switch
             {
-                "2024-04-01-preview" => ServiceVersion.V2024_04_01_Preview,
-                "2024-05-01-preview" => ServiceVersion.V2024_05_01_Preview,
                 "2024-06-01" => ServiceVersion.V2024_06_01,
+                "2024-08-01-preview" => ServiceVersion.V2024_08_01_Preview,
+                "2024-10-01-preview" => ServiceVersion.V2024_10_01_Preview,
                 _ => null,
             };
         }
@@ -336,12 +343,10 @@ namespace Microsoft.Teams.AI.AI.Models
                 {
                     try
                     {
-                        AzureChatDataSource? dataSource = ModelReaderWriter.Read<AzureChatDataSource>(BinaryData.FromObjectAsJson(item));
+                        ChatDataSource? dataSource = ModelReaderWriter.Read<ChatDataSource>(BinaryData.FromObjectAsJson(item));
                         if (dataSource != null)
                         {
-#pragma warning disable AOAI001
                             options.AddDataSource(dataSource);
-#pragma warning restore AOAI001
                         }
                     }
                     catch (Exception ex)
@@ -353,3 +358,4 @@ namespace Microsoft.Teams.AI.AI.Models
         }
     }
 }
+#pragma warning restore AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

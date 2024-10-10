@@ -38,7 +38,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/");
             var versions = new List<string>
             {
-                "2024-04-01-preview", "2024-05-01-preview", "2024-06-01"
+                "2024-06-01", "2024-08-01-preview", "2024-10-01-preview"
             };
 
             // Act
@@ -276,7 +276,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             
             Assert.NotNull(result.Message.ActionCalls);
             Assert.Single(result.Message.ActionCalls);
-            Assert.Equal("testAction", result.Message.ActionCalls[0].Function.Name);
+            Assert.Equal("testAction", result.Message.ActionCalls[0].Function!.Name);
             
             Assert.Null(result.Error);
             Assert.Equal(ChatRole.Assistant, result.Message.Role);
