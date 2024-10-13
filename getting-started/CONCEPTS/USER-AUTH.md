@@ -14,6 +14,7 @@
 - [Planner](./PLANNER.md)
 - [Powered by AI](./POWERED-BY-AI.md)
 - [Prompts](./PROMPTS.md)
+- [Streaming](./STREAMING.md)
 - [Turns](./TURNS.md)
 - [**User Authentication**](./USER-AUTH.md)
 

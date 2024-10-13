@@ -13,6 +13,7 @@ Here you will find short guides on features available in the library.
 | [Data Sources](DATA-SOURCES.md)         | Describes the usage of data sources in the library.   |
 | [User Authentication](USER-AUTH.md)     | Describes user authentication features out of the box |
 | [Powered by AI](./POWERED-BY-AI.md)     | Describes the Bot UX features available in this SDK.  |
+| [Streaming](./STREAMING.md)             | Describes the Bot Streaming feature.                  |
 
 ## The AI System Concepts
 

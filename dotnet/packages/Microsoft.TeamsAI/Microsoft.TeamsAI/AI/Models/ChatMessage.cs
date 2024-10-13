@@ -1,4 +1,5 @@
-﻿using Azure.AI.OpenAI;
+﻿using System.Diagnostics;
+using Azure.AI.OpenAI;
 using Azure.AI.OpenAI.Chat;
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.Exceptions;
@@ -127,6 +128,47 @@ namespace Microsoft.Teams.AI.AI.Models
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             ChatMessageContext? azureContext = chatCompletion.GetMessageContext();
+#pragma warning restore AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            if (azureContext != null)
+            {
+                MessageContext? context = new(azureContext);
+                if (context != null)
+                {
+                    this.Context = context;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of ChatMessage using OpenAI.Chat.StreamingChatCompletionUpdate.
+        /// </summary>
+        /// <param name="streamingChatCompletionUpdate">The streaming chat completion update.</param>
+        internal ChatMessage(StreamingChatCompletionUpdate streamingChatCompletionUpdate)
+        {
+            this.Role = ChatRole.Assistant;
+
+            if (streamingChatCompletionUpdate.ContentUpdate.Count > 0)
+            {
+                this.Content = streamingChatCompletionUpdate.ContentUpdate[0].Text;
+            }
+
+            if (streamingChatCompletionUpdate.FunctionCallUpdate != null && streamingChatCompletionUpdate.FunctionCallUpdate.FunctionName != string.Empty)
+            {
+                this.Name = streamingChatCompletionUpdate.FunctionCallUpdate.FunctionName;
+                this.FunctionCall = new FunctionCall(streamingChatCompletionUpdate.FunctionCallUpdate.FunctionName, streamingChatCompletionUpdate.FunctionCallUpdate.FunctionArgumentsUpdate);
+            }
+
+            if (streamingChatCompletionUpdate.ToolCallUpdates != null && streamingChatCompletionUpdate.ToolCallUpdates.Count > 0)
+            {
+                this.ActionCalls = new List<ActionCall>();
+                foreach (StreamingChatToolCallUpdate toolCall in streamingChatCompletionUpdate.ToolCallUpdates)
+                {
+                    this.ActionCalls.Add(new ActionCall(toolCall));
+                }
+            }
+
+#pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            AzureChatMessageContext? azureContext = streamingChatCompletionUpdate.GetAzureMessageContext();
 #pragma warning restore AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             if (azureContext != null)
             {
@@ -353,6 +395,22 @@ namespace Microsoft.Teams.AI.AI.Models
             
             Id = toolCall.Id;
             Function = new ActionFunction(toolCall.FunctionName, toolCall.FunctionArguments.ToString());
+        }
+
+        /// <summary>
+        /// Creates an instance of <see cref="ActionCall"/> from <see cref="StreamingChatToolCallUpdate"/>
+        /// </summary>
+        /// <param name="toolCall"></param>
+        /// <exception cref="TeamsAIException">Thrown if `toolCall` has an invalid type</exception>
+        public ActionCall(StreamingChatToolCallUpdate toolCall)
+        {
+            if (toolCall.Kind != ChatToolCallKind.Function)
+            {
+                throw new TeamsAIException($"Invalid ActionCall type: {toolCall.GetType().Name}");
+            }
+
+            Id = toolCall.Id;
+            Function = new ActionFunction(toolCall.FunctionName, toolCall.FunctionArgumentsUpdate);
         }
 
         internal ChatToolCall ToChatToolCall()
