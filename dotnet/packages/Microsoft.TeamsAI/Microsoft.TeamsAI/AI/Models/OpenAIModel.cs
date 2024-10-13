@@ -218,6 +218,13 @@ namespace Microsoft.Teams.AI.AI.Models
                 FrequencyPenalty = (float)completion.FrequencyPenalty,
             };
 
+            if (isO1Model)
+            {
+                chatCompletionOptions.Temperature = 1;
+                chatCompletionOptions.TopP = 1;
+                chatCompletionOptions.PresencePenalty = 0;
+            }
+
             // Set tools configurations
             bool isToolsAugmentation = promptTemplate.Configuration.Augmentation.Type == Augmentations.AugmentationType.Tools;
             if (isToolsAugmentation)

@@ -10,7 +10,6 @@ using OrderBot.Models;
 using OpenAI.Assistants;
 using Azure.Core;
 using Azure.Identity;
-using System.Runtime.CompilerServices;
 using Microsoft.Teams.AI.Application;
 using OpenAI.Files;
 using OpenAI.VectorStores;
@@ -86,14 +85,14 @@ if (string.IsNullOrEmpty(assistantId))
 
         // Create Vector Store
         var storeClient = client.GetVectorStoreClient();
-        store = storeClient.CreateVectorStore(new VectorStoreCreationOptions());
+        var storeCreationOperation = storeClient.CreateVectorStore(true);
 
         // Upload file.
-        var fileClient = client.GetFileClient();
+        var fileClient = client.GetOpenAIFileClient();
         var uploadedFile = fileClient.UploadFile("./assets/menu.pdf", FileUploadPurpose.Assistants);
 
         // Attach file to vector store
-        var fileAssociation = storeClient.AddFileToVectorStore(store, uploadedFile);
+        var fileAssociation = storeClient.AddFileToVectorStore(store.Id, uploadedFile.Value.Id, true);
 
         // Poll vector store until file is uploaded
         var maxPollCount = 5;
@@ -113,10 +112,11 @@ if (string.IsNullOrEmpty(assistantId))
     }
     catch (Exception e)
     {
-        throw new Exception("Failed to upload file to vector store.", e);
+        throw new Exception("Failed to upload file to vector store.", e.InnerException);
     }
-    
 
+    var fileSearchTool = new FileSearchToolResources();
+    fileSearchTool.VectorStoreIds.Add(store.Id);
     AssistantCreationOptions assistantCreationOptions = new()
     {
         Name = "Order Bot",
@@ -129,7 +129,7 @@ if (string.IsNullOrEmpty(assistantId))
         }),
         ToolResources = new ToolResources()
         {
-            FileSearch = new FileSearchToolResources() { VectorStoreIds = new List<string>() { store.Id } }
+            FileSearch = fileSearchTool
         }
     };
 
