@@ -70,7 +70,7 @@ namespace Microsoft.Teams.AI.AI.Models
         {
             if (toolCall.Kind == ChatToolCallKind.Function)
             {
-                return new ChatCompletionsFunctionToolCall(toolCall.Id, toolCall.FunctionName, toolCall.FunctionArgumentsUpdate);
+                return new ChatCompletionsFunctionToolCall(toolCall.ToolCallId, toolCall.FunctionName, toolCall.FunctionArgumentsUpdate.ToString());
             }
 
             throw new TeamsAIException($"Invalid ChatCompletionsToolCall type: {toolCall.GetType().Name}");

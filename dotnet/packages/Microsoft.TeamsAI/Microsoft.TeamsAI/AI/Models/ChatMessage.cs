@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using Azure.AI.OpenAI;
-using Azure.AI.OpenAI.Chat;
+﻿using Azure.AI.OpenAI.Chat;
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.Utilities;
@@ -155,7 +153,7 @@ namespace Microsoft.Teams.AI.AI.Models
             if (streamingChatCompletionUpdate.FunctionCallUpdate != null && streamingChatCompletionUpdate.FunctionCallUpdate.FunctionName != string.Empty)
             {
                 this.Name = streamingChatCompletionUpdate.FunctionCallUpdate.FunctionName;
-                this.FunctionCall = new FunctionCall(streamingChatCompletionUpdate.FunctionCallUpdate.FunctionName, streamingChatCompletionUpdate.FunctionCallUpdate.FunctionArgumentsUpdate);
+                this.FunctionCall = new FunctionCall(streamingChatCompletionUpdate.FunctionCallUpdate.FunctionName, streamingChatCompletionUpdate.FunctionCallUpdate.FunctionArgumentsUpdate.ToString());
             }
 
             if (streamingChatCompletionUpdate.ToolCallUpdates != null && streamingChatCompletionUpdate.ToolCallUpdates.Count > 0)
@@ -168,7 +166,7 @@ namespace Microsoft.Teams.AI.AI.Models
             }
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-            AzureChatMessageContext? azureContext = streamingChatCompletionUpdate.GetAzureMessageContext();
+            ChatMessageContext? azureContext = streamingChatCompletionUpdate.GetMessageContext();
 #pragma warning restore AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             if (azureContext != null)
             {
@@ -409,8 +407,8 @@ namespace Microsoft.Teams.AI.AI.Models
                 throw new TeamsAIException($"Invalid ActionCall type: {toolCall.GetType().Name}");
             }
 
-            Id = toolCall.Id;
-            Function = new ActionFunction(toolCall.FunctionName, toolCall.FunctionArgumentsUpdate);
+            Id = toolCall.ToolCallId;
+            Function = new ActionFunction(toolCall.FunctionName, toolCall.FunctionArgumentsUpdate.ToString());
         }
 
         internal ChatToolCall ToChatToolCall()

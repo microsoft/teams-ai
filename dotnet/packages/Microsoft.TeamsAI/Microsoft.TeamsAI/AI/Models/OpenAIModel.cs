@@ -18,7 +18,6 @@ using System.ClientModel;
 using ServiceVersion = Azure.AI.OpenAI.AzureOpenAIClientOptions.ServiceVersion;
 using Azure.AI.OpenAI.Chat;
 using OpenAI.Chat;
-using Microsoft.Recognizers.Text.NumberWithUnit.Dutch;
 using Microsoft.Teams.AI.Application;
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
@@ -181,19 +180,6 @@ namespace Microsoft.Teams.AI.AI.Models
                 Events.OnBeforeCompletion(beforeCompletionEventArgs);
             }
 
-            // Setup tools if enabled
-            bool isToolsAugmentation = promptTemplate.Configuration.Augmentation.Type == Augmentations.AugmentationType.Tools;
-            List<ChatTool> tools = new();
-
-            // If tools is enabled, reformat actions to schema
-            if (isToolsAugmentation && promptTemplate.Actions.Count > 0)
-            {
-                foreach (ChatCompletionAction action in promptTemplate.Actions)
-                {
-                    tools.Add(action.ToChatTool());
-                }
-            }
-
             // Render prompt
             RenderedPromptSection<List<ChatMessage>> prompt = await promptTemplate.Prompt.RenderAsMessagesAsync(turnContext, memory, promptFunctions, tokenizer, maxInputTokens, cancellationToken);
             if (prompt.TooLong)
@@ -205,6 +191,9 @@ namespace Microsoft.Teams.AI.AI.Models
                 };
             }
 
+            // Get the model to use.
+            string model = promptTemplate.Configuration.Completion.Model ?? _deploymentName;
+            bool isO1Model = model.StartsWith("o1-");
             bool useSystemMessages = !isO1Model && _options.UseSystemMessages.GetValueOrDefault(false);
             if (!useSystemMessages && prompt.Output.Count > 0 && prompt.Output[0].Role == ChatRole.System)
             {
