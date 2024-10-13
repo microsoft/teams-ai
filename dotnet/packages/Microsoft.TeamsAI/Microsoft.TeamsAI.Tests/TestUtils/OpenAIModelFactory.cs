@@ -171,6 +171,12 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             _pipelineResponse = response;
         }
 
+        public TestAsyncCollectionResult(T item, PipelineResponse response)
+        {
+            Items = new() { item };
+            _pipelineResponse = response;
+        }
+
         public override ContinuationToken? GetContinuationToken(ClientResult page)
         {
             return ContinuationToken.FromBytes(BinaryData.FromString(""));
@@ -188,26 +194,6 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
                 yield return await Task.FromResult(item); 
             }
 
-        }
-    }
-
-    internal sealed class TestAsyncResultCollection<T> : AsyncCollectionResult<T> where T : class
-    {
-        public List<T> Items = new();
-
-        internal PipelineResponse _pipelineResponse;
-
-        public TestAsyncResultCollection(T item, PipelineResponse response)
-        {
-            Items.Add(item);
-            _pipelineResponse = response;
-        }
-
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public override async IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-        {
-            yield return FromValue(Items[0], _pipelineResponse);
         }
     }
 }

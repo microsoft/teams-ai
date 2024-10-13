@@ -326,7 +326,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
                 ]
             }}"));
 
-            TestAsyncResultCollection<StreamingChatCompletionUpdate> updates = new(update!, Mock.Of<PipelineResponse>());
+            TestAsyncCollectionResult<StreamingChatCompletionUpdate> updates = new(update!, Mock.Of<PipelineResponse>());
 
             var response = new TestResponse(200, string.Empty);
             clientMock.Setup((client) =>
