@@ -20,7 +20,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         {
             get
             {
-                return this.Sections.Where(s => s.Tokens > -1).OrderBy(s => s.Required).ToList();
+                return this.Sections.Where(s => s.Tokens > -1).OrderBy(s => !s.Required).ToList();
             }
         }
 
@@ -28,7 +28,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         {
             get
             {
-                return this.Sections.Where(s => s.Tokens == -1).OrderBy(s => s.Required).ToList();
+                return this.Sections.Where(s => s.Tokens == -1).OrderBy(s => !s.Required).ToList();
             }
         }
 
