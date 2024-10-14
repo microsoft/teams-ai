@@ -111,7 +111,7 @@ describe('OAuthBotAuthentication', () => {
     });
 
     describe('authenticate()', () => {
-        it('should save incomming message if not signed in yet', async () => {
+        it('should save incoming message if not signed in yet', async () => {
             const botAuth = new OAuthBotAuthentication(app, settings, settingName);
 
             const runDialogStub = sinon.stub(botAuth, 'runDialog');

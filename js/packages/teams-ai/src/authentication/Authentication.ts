@@ -102,7 +102,7 @@ export class Authentication<TState extends TurnState> {
         }
 
         throw new AuthError(
-            'Incomming activity is not a valid activity to initiate authentication flow.',
+            'Incoming activity is not a valid activity to initiate authentication flow.',
             'invalidActivity'
         );
     }

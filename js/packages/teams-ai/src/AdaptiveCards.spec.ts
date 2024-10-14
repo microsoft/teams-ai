@@ -79,7 +79,7 @@ describe('AdaptiveCards', () => {
                     assert((await selector(context)) == true);
                 });
 
-                it('incomming activity is invalid', async () => {
+                it('incoming activity is invalid', async () => {
                     const activity = {
                         type: 'NotInvoke'
                     };
@@ -133,7 +133,7 @@ describe('AdaptiveCards', () => {
                 assert(typeof handler === 'function');
             });
 
-            it('should throw error if incomming activity is not valid', async () => {
+            it('should throw error if incoming activity is not valid', async () => {
                 adaptiveCards.actionExecute(testVerb, testHandler);
 
                 const activity = {
@@ -566,7 +566,7 @@ describe('AdaptiveCards', () => {
                     adaptiveCards.actionSubmit(verbRegex, testHandler);
                 });
 
-                it('incomming activity is valid action submit type and should match regex', async () => {
+                it('incoming activity is valid action submit type and should match regex', async () => {
                     // a valid action submit type is a message activity with a value property.
                     const activity = {
                         type: 'message',
@@ -581,7 +581,7 @@ describe('AdaptiveCards', () => {
                     assert((await selector(context)) == true);
                 });
 
-                it('incomming activity is valid action submit type and should not match regex ', async () => {
+                it('incoming activity is valid action submit type and should not match regex ', async () => {
                     // a valid action submit type is a message activity with a value property.
                     const activity = {
                         type: 'message',
@@ -596,7 +596,7 @@ describe('AdaptiveCards', () => {
                     assert((await selector(context)) == false);
                 });
 
-                it('incomming activity is invalid', async () => {
+                it('incoming activity is invalid', async () => {
                     const activity = {
                         type: 'notActionSubmit'
                     };
@@ -663,7 +663,7 @@ describe('AdaptiveCards', () => {
                 assert(typeof handler === 'function');
             });
 
-            it('should throw error if incomming activity is not valid', async () => {
+            it('should throw error if incoming activity is not valid', async () => {
                 adaptiveCards.actionSubmit(testVerb, testHandler);
 
                 const activity = {
@@ -738,7 +738,7 @@ describe('AdaptiveCards', () => {
                     adaptiveCards.search(datasetRegex, testHandler);
                 });
 
-                it('incomming activity is valid application/search type and should match regex', async () => {
+                it('incoming activity is valid application/search type and should match regex', async () => {
                     const activity = {
                         type: 'invoke',
                         name: 'application/search',
@@ -752,7 +752,7 @@ describe('AdaptiveCards', () => {
                     assert((await selector(context)) == true);
                 });
 
-                it('incomming activity is valid application/search type and should not match regex ', async () => {
+                it('incoming activity is valid application/search type and should not match regex ', async () => {
                     const activity = {
                         type: 'invoke',
                         name: 'application/search',
@@ -766,7 +766,7 @@ describe('AdaptiveCards', () => {
                     assert((await selector(context)) == false);
                 });
 
-                it('incomming activity is invalid', async () => {
+                it('incoming activity is invalid', async () => {
                     const activity = {
                         type: 'NotInvoke'
                     };
@@ -829,7 +829,7 @@ describe('AdaptiveCards', () => {
                 assert(typeof handler === 'function');
             });
 
-            it('should throw error if incomming activity is not valid', async () => {
+            it('should throw error if incoming activity is not valid', async () => {
                 adaptiveCards.search(testDataset, testHandler);
 
                 const activity = {
