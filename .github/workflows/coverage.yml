@@ -71,7 +71,7 @@ jobs:
       - name: Test
         run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.Teams.AI.Tests.csproj --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration Release
       - name: Coverage
-        uses: danielpalme/ReportGenerator-GitHub-Action@b7115d212c0f7814a0cb17fb43ec36983c707ccb # 5.3.10
+        uses: danielpalme/ReportGenerator-GitHub-Action@62f9e70ab348d56eee76d446b4db903a85ab0ea8 # 5.3.11
         with:
           reports: ${{ env.SOLUTION_DIR }}TestResults/*/coverage.cobertura.xml
           targetdir: ${{ env.SOLUTION_DIR }}TestResults/coverage
@@ -84,7 +84,7 @@ jobs:
           parallel: true
           files: ${{ env.SOLUTION_DIR }}TestResults/coverage/lcov.info
       - name: Upload Tests
-        uses: actions/upload-artifact@604373da6381bf24206979c74d06a550515601b9 # v4.4.1
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         with:
           name: testresults-dotnet-${{ env.dotnet-version }}
           path: ${{ env.SOLUTION_DIR }}TestResults
