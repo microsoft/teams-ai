@@ -4781,10 +4781,10 @@ gpt-3-encoder@1.1.4:
   resolved "https://registry.yarnpkg.com/gpt-3-encoder/-/gpt-3-encoder-1.1.4.tgz#d6cdaacf5824857e133b6065247c757fc7e4fa72"
   integrity sha512-fSQRePV+HUAhCn7+7HL7lNIXNm6eaFWFbNLOOGtmSJ0qJycyQvj60OvRlH7mee8xAMjBDNRdMXlMwjAbMTDjkg==
 
-gpt-tokenizer@^2.4.1:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/gpt-tokenizer/-/gpt-tokenizer-2.4.1.tgz#77769429d0f85c8d16d9a3c842b4c808d10051d2"
-  integrity sha512-toR/iMboG04xErwQGdtf4KuW4dPsiRqIh8qQ5i+Us8PW0iThUf+FqY0rNUMA8hRauf3kJttR7uVae7MNgx4OXA==
+gpt-tokenizer@^2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/gpt-tokenizer/-/gpt-tokenizer-2.5.0.tgz#610486e543098be0c0e161196c577c620d4bdb53"
+  integrity sha512-O/hZmEqmDNjhj2LsO5Ly8Y8927vyI5J1FLbutkFkRo/S1AredRU/Mt2RFy3O71B3Bm6REz0a+3ezBVeYQaCS8Q==
 
 graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0:
   version "4.2.11"
@@ -9451,10 +9451,10 @@ yaml@^1.10.0:
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.10.2.tgz#2301c5ffbf12b467de8da2333a459e29e7920e4b"
   integrity sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==
 
-yaml@^2.5.1:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.5.1.tgz#c9772aacf62cb7494a95b0c4f1fb065b563db130"
-  integrity sha512-bLQOjaX/ADgQ20isPJRvF0iRUHIxVhYvr53Of7wGcWlO2jvtUlH5m87DsmulFVxRpNLOnI4tB6p/oh8D7kpn9Q==
+yaml@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.6.0.tgz#14059ad9d0b1680d0f04d3a60fe00f3a857303c3"
+  integrity sha512-a6ae//JvKDEra2kdi1qzCyrJW/WZCgFi8ydDV+eXExl95t+5R+ijnqHJbz9tmMh8FUjx3iv2fCQ4dclAQlO2UQ==
 
 yargs-parser@^13.1.2:
   version "13.1.2"
