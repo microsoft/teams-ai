@@ -45,7 +45,7 @@ namespace Microsoft.Teams.AI.AI.Models
     /// * The o1 models do not currently support the use of tools so you will need to use the "monologue" 
     ///   augmentation to call actions.
     /// </remarks>
-    public class OpenAIModel : IPromptCompletionModel
+    public class OpenAIModel : IPromptCompletionStreamingModel
     {
         private readonly BaseOpenAIModelOptions _options;
         private readonly ILogger _logger;
