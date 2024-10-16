@@ -7,7 +7,7 @@
  */
 
 import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
-import { EmbeddingsModel, EmbeddingsResponse } from './EmbeddingsModel';
+import { EmbeddingsModel, EmbeddingsResponse } from '../types/EmbeddingsModel';
 import { CreateEmbeddingRequest, CreateEmbeddingResponse, OpenAICreateEmbeddingRequest, Colorize } from '../internals';
 
 /**

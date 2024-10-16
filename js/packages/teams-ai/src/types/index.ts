@@ -10,6 +10,7 @@ export * from './ActionCall';
 export * from './AIEntity';
 export * from './ClientCitation';
 export * from './CompletionConfig';
+export * from './EmbeddingsModel';
 export * from './InnerMonologue';
 export * from './InnerMonologueSchema';
 export * from './PlanSchema';
