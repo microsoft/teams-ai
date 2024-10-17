@@ -6,7 +6,9 @@ import { EventEmitter } from 'stream';
 describe('OpenAIModel', () => {
     const GPT35_MODEL = 'gpt-3.5-turbo';
     const goodEndpoint = 'https://test-endpoint.com';
-    const azureADTokenProvider = async () => { return "test" };
+    const azureADTokenProvider = async () => {
+        return 'test';
+    };
     it('should construct with OpenAI parameters', () => {
         const model = new OpenAIModel({
             apiKey: 'test-api-key',

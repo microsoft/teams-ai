@@ -8,10 +8,12 @@
 
 import { TurnContext } from 'botbuilder';
 
+import { TooManyStepsParameters } from './types';
+
 import * as actions from './actions';
 import { DefaultModerator } from './moderators';
 import { Moderator } from './moderators/Moderator';
-import { PredictedDoCommand, Planner, Plan } from './planners';
+import { Plan, Planner, PredictedDoCommand } from './planners';
 import { TurnState } from './TurnState';
 
 /**
@@ -393,7 +395,7 @@ export class AI<TState extends TurnState = TurnState> {
                 // Check for timeout
                 if (Date.now() - start_time! > max_time || ++step_count! > max_steps) {
                     completed = false;
-                    const parameters: actions.TooManyStepsParameters = {
+                    const parameters: TooManyStepsParameters = {
                         max_steps,
                         max_time,
                         start_time: start_time!,

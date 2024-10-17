@@ -116,14 +116,14 @@ const endStreamHandler: PromptCompletionModelResponseReceivedEvent = (ctx, memor
         $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
         version: '1.6',
         type: 'AdaptiveCard',
-                        body: [
-                            {
-                                type: 'TextBlock',
-                                wrap: true,
-                                text: streamer.getMessage(),
-                            }
-                        ],
-    })
+        body: [
+            {
+                type: 'TextBlock',
+                wrap: true,
+                text: streamer.getMessage()
+            }
+        ]
+    });
 
     streamer.setAttachments([card]);
 };

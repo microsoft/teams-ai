@@ -106,7 +106,7 @@ const prompts = new PromptManager({
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'default',
+    defaultPrompt: 'default'
 });
 
 // Define storage and application

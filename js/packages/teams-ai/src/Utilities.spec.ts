@@ -1,6 +1,6 @@
 import { strict as assert } from 'assert';
 
-import { ClientCitation } from './actions';
+import { ClientCitation } from './types';
 import { GPTTokenizer } from './tokenizers';
 import { Utilities } from './Utilities';
 
