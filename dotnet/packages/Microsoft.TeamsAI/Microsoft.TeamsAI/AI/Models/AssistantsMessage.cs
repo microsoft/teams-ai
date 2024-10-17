@@ -2,6 +2,7 @@
 using Microsoft.Bot.Schema;
 using OpenAI.Assistants;
 using OpenAI.Files;
+using OAI = OpenAI;
 
 
 namespace Microsoft.Teams.AI.AI.Models
@@ -26,7 +27,7 @@ namespace Microsoft.Teams.AI.AI.Models
         /// </summary>
         /// <param name="content">The Assistants API thread message.</param>
         /// <param name="fileClient">The OpenAI File client.</param>
-        public AssistantsMessage(MessageContent content, FileClient? fileClient = null) : base(ChatRole.Assistant)
+        public AssistantsMessage(MessageContent content, OpenAIFileClient? fileClient = null) : base(ChatRole.Assistant)
         {
             this.MessageContent = content;
 
@@ -39,7 +40,7 @@ namespace Microsoft.Teams.AI.AI.Models
             MessageContext context = new();
 
             List<Task<ClientResult<BinaryData>>> fileContentDownloadTasks = new();
-            List<Task<ClientResult<OpenAIFileInfo>>> fileInfoDownloadTasks = new();
+            List<Task<ClientResult<OAI.Files.OpenAIFile>>> fileInfoDownloadTasks = new();
 
             for (int i = 0; i < content.TextAnnotations.Count; i++)
             {
@@ -73,7 +74,7 @@ namespace Microsoft.Teams.AI.AI.Models
                 // Create attachments out of these downloaded files
                 // Wait for tasks to complete
                 ClientResult<BinaryData>[] downloadedFileContent = fileContentDownloadTasks.Select((task) => task.Result).ToArray();
-                ClientResult<OpenAIFileInfo>[] downloadedFileInfo = fileInfoDownloadTasks.Select((task) => task.Result).ToArray();
+                ClientResult<OAI.Files.OpenAIFile>[] downloadedFileInfo = fileInfoDownloadTasks.Select((task) => task.Result).ToArray();
 
                 for (int i = 0; i < downloadedFileContent.Length; i++)
                 {
@@ -128,7 +129,7 @@ namespace Microsoft.Teams.AI.AI.Models
         /// <summary>
         /// Represents an OpenAI File information
         /// </summary>
-        public OpenAIFileInfo FileInfo;
+        public OAI.Files.OpenAIFile FileInfo;
 
         /// <summary>
         /// Represents the contents of an OpenAI File
@@ -173,7 +174,7 @@ namespace Microsoft.Teams.AI.AI.Models
         /// </summary>
         /// <param name="fileInfo">The OpenAI File</param>
         /// <param name="fileContent">The OpenAI File contents</param>
-        public OpenAIFile(OpenAIFileInfo fileInfo, BinaryData fileContent)
+        public OpenAIFile(OAI.Files.OpenAIFile fileInfo, BinaryData fileContent)
         {
             FileInfo = fileInfo;
             FileContent = fileContent;

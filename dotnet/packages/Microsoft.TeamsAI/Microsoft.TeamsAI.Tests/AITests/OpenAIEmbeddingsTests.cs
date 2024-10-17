@@ -37,7 +37,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             IList<string> inputs = new List<string> { "test" };
             var clientMock = new Mock<OpenAIClient>(new ApiKeyCredential(apiKey), It.IsAny<OpenAIClientOptions>());
             var response = new TestResponse(200, string.Empty);
-            var embeddingCollection = ModelReaderWriter.Read<EmbeddingCollection>(BinaryData.FromString(@"{
+            var embeddingCollection = ModelReaderWriter.Read<OpenAIEmbeddingCollection>(BinaryData.FromString(@"{
                 ""data"": [
                     {
                         ""object"": ""embedding"",
@@ -76,7 +76,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             IList<string> inputs = new List<string> { "test" };
             var clientMock = new Mock<OpenAIClient>(new ApiKeyCredential(apiKey), It.IsAny<OpenAIClientOptions>());
             var response = new TestResponse(200, string.Empty);
-            var embeddingCollection = ModelReaderWriter.Read<EmbeddingCollection>(BinaryData.FromString(@"{
+            var embeddingCollection = ModelReaderWriter.Read<OpenAIEmbeddingCollection>(BinaryData.FromString(@"{
                 ""data"": [
                     {
                         ""object"": ""embedding"",

@@ -368,7 +368,7 @@ namespace Microsoft.Teams.AI.AI.Clients
             repairTemplate.Prompt = new(new()
             {
                 this.Options.Template.Prompt,
-                new ConversationHistorySection($"{this.Options.HistoryVariable}-repair")
+                new ConversationHistorySection($"{this.Options.HistoryVariable}-repair", -1)
             });
 
             if (this.Options.LogRepairs)
