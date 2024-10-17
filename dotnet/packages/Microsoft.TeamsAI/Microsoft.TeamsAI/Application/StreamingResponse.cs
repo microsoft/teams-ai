@@ -121,7 +121,7 @@ namespace Microsoft.Teams.AI.Application
             QueueNextChunk();
 
             // Wait for the queue to drain
-            return this._queueSync!;
+            return WaitForQueue()!;
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace Microsoft.Teams.AI.Application
             this._queue.Add(factory);
 
             // If there's no sync in progress, start one
-            if (this._queueSync == null)
+            if (this._queueSync == null || this._queueSync.IsCompleted)
             {
                 this._queueSync = DrainQueue();
             }
@@ -198,25 +198,20 @@ namespace Microsoft.Teams.AI.Application
         /// </summary>
         private async Task DrainQueue()
         {
-            await Task.Run(async () =>
+            try
             {
-                try
+                while (this._queue.Count > 0)
                 {
-                    while (this._queue.Count > 0)
-                    {
-                        // Get next activity from queue
-                        Activity activity = _queue[0]();
-                        await SendActivity(activity).ConfigureAwait(false);
-                        _queue.RemoveAt(0);
-                    }
+                    // Get next activity from queue
+                    Activity activity = _queue[0]();
+                    await SendActivity(activity).ConfigureAwait(false);
+                    _queue.RemoveAt(0);
                 }
-
-                finally
-                {
-                    // Queue is empty, mark as idle
-                    this._queueSync = null;
-                }
-            }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw new TeamsAIException($"Error occured when sending activity while streaming: {ex.Message}", ex);
+            }
         }
 
         /// <summary>

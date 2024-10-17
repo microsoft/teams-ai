@@ -5,6 +5,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.Application;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.Tests.TestUtils;
+using Moq;
 
 namespace Microsoft.Teams.AI.Tests.Application
 {
@@ -233,6 +234,28 @@ namespace Microsoft.Teams.AI.Tests.Application
             await streamer.EndStream();
             Assert.Equal(2, streamer.UpdatesSent());
             Assert.Single(streamer.Attachments);
+        }
+
+        [Fact]
+        public async Task Test_SendActivityThrowsException_AssertThrows()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            var turnContextMock = new Mock<ITurnContext>();
+            turnContextMock.Setup((tc) => tc.SendActivityAsync(It.IsAny<Activity>(), It.IsAny<CancellationToken>())).ThrowsAsync(new Exception("Forbidden operation"));
+            
+            // Act
+            StreamingResponse streamer = new(turnContextMock.Object);
+            Exception ex = await Assert.ThrowsAsync<TeamsAIException>(() => streamer.EndStream());
+
+
+            // Assert
+            Assert.Equal("Error occured when sending activity while streaming: Forbidden operation", ex.Message);
         }
     }
 }
