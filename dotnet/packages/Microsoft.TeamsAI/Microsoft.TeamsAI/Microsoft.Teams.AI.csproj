@@ -47,7 +47,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Microsoft.ML.Tokenizers" Version="0.22.0-preview.24271.1" />
     <PackageReference Include="OpenAI" Version="2.0.0-beta.11" />
-    <PackageReference Include="System.Text.Json" Version="8.0.4" /> 
+    <PackageReference Include="System.Text.Json" Version="8.0.5" /> 
   </ItemGroup>
 
   <ItemGroup>
