@@ -6,7 +6,8 @@
  * Licensed under the MIT License.
  */
 
-import { Activity, Attachment, TurnContext } from 'botbuilder-core';
+import { Activity, Attachment, TurnContext, Entity } from 'botbuilder-core';
+import { AIEntity } from './types';
 
 /**
  * A helper class for streaming responses to the client.
@@ -79,7 +80,7 @@ export class StreamingResponse {
     }
 
     /**
-     * Queues a chunk of partial message text to be sent to the client.
+     * Queues a chunk of partial message text to be sent to the client
      * @remarks
      * The text we be sent as quickly as possible to the client. Chunks may be combined before
      * delivery to the client.
@@ -111,7 +112,7 @@ export class StreamingResponse {
         this.queueNextChunk();
 
         // Wait for the queue to drain
-        return this._queueSync!;
+        return this.waitForQueue();
     }
 
     /**
@@ -185,7 +186,10 @@ export class StreamingResponse {
 
         // If there's no sync in progress, start one
         if (!this._queueSync) {
-            this._queueSync = this.drainQueue();
+            this._queueSync = this.drainQueue().catch((err) => {
+                console.error(`Error occured when sending activity while streaming: "${err}".`);
+                throw err;
+            });
         }
     }
 
@@ -195,7 +199,7 @@ export class StreamingResponse {
      * @private
      */
     private drainQueue(): Promise<void> {
-        return new Promise<void>(async (resolve) => {
+        return new Promise<void>(async (resolve, reject) => {
             try {
                 while (this._queue.length > 0) {
                     // Get next activity from queue
@@ -207,6 +211,8 @@ export class StreamingResponse {
                 }
 
                 resolve();
+            } catch (err) {
+                reject(err);
             } finally {
                 // Queue is empty, mark as idle
                 this._queueSync = undefined;
@@ -227,8 +233,25 @@ export class StreamingResponse {
             activity.channelData = Object.assign({}, activity.channelData, { streamId: this._streamId });
         }
 
+        activity.entities = [
+            {
+                type: 'streaminfo',
+                properties: {
+                    ...activity.channelData
+                }
+            } as Entity,
+            {
+                type: 'https://schema.org/Message',
+                '@type': 'Message',
+                '@context': 'https://schema.org',
+                '@id': '',
+                additionalType: ['AIGeneratedContent']
+            } as AIEntity
+        ];
+
         // Send activity
         const response = await this._context.sendActivity(activity);
+        await new Promise((resolve) => setTimeout(resolve, 1.5));
 
         // Save assigned stream ID
         if (!this._streamId) {
