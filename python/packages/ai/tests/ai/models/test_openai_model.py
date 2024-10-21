@@ -30,6 +30,7 @@ from teams.ai.prompts.prompt import Prompt
 from teams.ai.prompts.sections.conversation_history_section import (
     ConversationHistorySection,
 )
+from teams.ai.prompts.sections.template_section import TemplateSection
 from teams.ai.tokenizers import GPTTokenizer
 from teams.state import TurnState
 
@@ -99,11 +100,17 @@ class MockAsyncCompletions:
     should_error = False
     has_tool_call = False
     has_tool_calls = False
+    is_o1_model = False
+    messages = []
 
-    def __init__(self, should_error=False, has_tool_call=False, has_tool_calls=False) -> None:
+    def __init__(
+        self, should_error=False, has_tool_call=False, has_tool_calls=False, is_o1_model=False
+    ) -> None:
         self.should_error = should_error
         self.has_tool_call = has_tool_call
         self.has_tool_calls = has_tool_calls
+        self.is_o1_model = is_o1_model
+        self.messages = []
 
     async def create(self, **kwargs) -> chat.ChatCompletion:
         if self.should_error:
@@ -118,6 +125,9 @@ class MockAsyncCompletions:
 
         if self.has_tool_calls:
             return await self.handle_tool_calls(**kwargs)
+
+        if self.is_o1_model:
+            self.messages = kwargs["messages"]
 
         return chat.ChatCompletion(
             id="",
@@ -281,6 +291,35 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
 
         self.assertTrue(mock_async_openai.called)
         self.assertEqual(res.status, "success")
+
+    @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
+    async def test_o1_model_should_use_user_message_over_system_message(self, mock_async_openai):
+        mock_async_openai.return_value.chat.completions.is_o1_model = True
+        context = self.create_mock_context()
+        state = TurnState()
+        state.temp = {}
+        state.conversation = {}
+        model = OpenAIModel(OpenAIModelOptions(api_key="", default_model="o1-"))
+        res = await model.complete_prompt(
+            context=context,
+            memory=state,
+            functions=cast(PromptFunctions, {}),
+            tokenizer=GPTTokenizer(),
+            template=PromptTemplate(
+                name="default",
+                prompt=Prompt(sections=[TemplateSection("prompt text", "system")]),
+                config=PromptTemplateConfig(
+                    schema=1.0,
+                    type="completion",
+                    description="test",
+                    completion=CompletionConfig(completion_type="chat"),
+                ),
+            ),
+        )
+
+        self.assertTrue(mock_async_openai.called)
+        self.assertEqual(res.status, "success")
+        self.assertEqual(mock_async_openai.return_value.chat.completions.messages[0]["role"], "user")
 
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
     async def test_should_succeed_on_prev_tool_calls(self, mock_async_openai):
