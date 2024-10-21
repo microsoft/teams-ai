@@ -107,6 +107,7 @@ An action handler is a callback function that is called when an action is trigge
 
 - If the result is a non-empty string, that string is included as the output of the action to the plan. The last output can be accessed in the next triggered action via the state object: `state.temp.lastOutput`.
 - If the action handler returns `AI.StopCommandName`, the `run` method will terminate execution.
+  > **Note:** `AI.StopCommandName` does not work with `tools` augmentation!
 - If the result is an empty string and there is a list of predicted commands, the next command in the plan is executed.
 - In sequence augmentation, the returned string is appended to the prompt at runtime (see Sequence [Augmentations](./AUGMENTATIONS.md)). This is then used to generate the plan object using defined actions.
 - In monologue augmentation, the returned string is used as inner monologue to perform chain-of-thought reasoning by appending instructions to the prompt during runtime (see Monologue [Augmentation](./AUGMENTATIONS.md)). This is for predicing the next action to execute.
