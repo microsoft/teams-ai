@@ -10,6 +10,8 @@ from enum import Enum
 
 class ActionTypes(str, Enum):
     STOP = "STOP"
+    "This command is incompatible and should not be used with `tools` augmentation"
+
     UNKNOWN_ACTION = "___UnknownAction___"
     FLAGGED_INPUT = "___FlaggedInput___"
     FLAGGED_OUTPUT = "___FlaggedOutput___"

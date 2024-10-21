@@ -120,6 +120,8 @@ export class AI<TState extends TurnState = TurnState> {
     /**
      * A text string that can be returned from an action to stop the AI system from continuing
      * to execute the current plan.
+     * @remarks
+     * This command is incompatible and should not be used with `tools` augmentation 
      */
     public static readonly StopCommandName = actions.StopCommandName;
 
