@@ -73,7 +73,7 @@ class MockAsyncModerationsWithResults:
                             "sexual/minors": ["text"],
                             "violence": ["text"],
                             "violence/graphic": ["text"],
-                        }
+                        },
                     ),
                     categories=cast(
                         openai.types.moderation.Categories,

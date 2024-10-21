@@ -84,20 +84,20 @@ class OpenAIModel(PromptCompletionModel):
     The model has been updated to support calling OpenAI's new o1 family of models. That currently
     comes with a few constraints. These constraints are mostly handled for you but are worth noting:
 
-    - The o1 models introduce a new `max_completion_tokens` parameter and they've deprecated the
-    `max_tokens` parameter. The model will automatically convert the incoming `max_tokens` parameter
-    to `max_completion_tokens` for you. But you should be aware that o1 has hidden token usage and costs
-    that aren't constrained by the `max_completion_tokens` parameter. This means that you may see an
-    increase in token usage and costs when using the o1 models.
+    - The o1 models introduce a new `max_completion_tokens` parameter and they've deprecated
+    the `max_tokens` parameter. The model will automatically convert the incoming `max_tokens
+    ` parameter to `max_completion_tokens` for you. But you should be aware that o1 has hidden
+    token usage and costs that aren't constrained by the `max_completion_tokens` parameter. 
+    This means that you may see an increase in token usage and costs when using the o1 models.
 
-    - The o1 models do not currently support the sending of system message so the model will map them to user message
-    in this case.
+    - The o1 models do not currently support the sending of system message so the model will 
+    map them to user message in this case.
 
-    - The o1 models do not currently support setting the `temperature`, `top_p`, and `presence_penalty`
-    parameters so they will be ignored.
+    - The o1 models do not currently support setting the `temperature`, `top_p`, and 
+    `presence_penalty` parameters so they will be ignored.
 
-    - The o1 models do not currently support the use of tools so you will need to use the "monologue"
-    augmentation to call actions.
+    - The o1 models do not currently support the use of tools so you will need to use the 
+    "monologue" augmentation to call actions.
     """
 
     _options: Union[OpenAIModelOptions, AzureOpenAIModelOptions]
@@ -294,8 +294,7 @@ class OpenAIModel(PromptCompletionModel):
 
             # Handle tools flow
             action_calls = []
-            response_message = completion.choices[0].message
-            tool_calls = response_message.tool_calls
+            tool_calls = completion.choices[0].message.tool_calls
 
             if is_tools_aug and tool_calls:
                 for curr_tool_call in tool_calls:

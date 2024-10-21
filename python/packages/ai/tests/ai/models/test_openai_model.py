@@ -319,7 +319,9 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
 
         self.assertTrue(mock_async_openai.called)
         self.assertEqual(res.status, "success")
-        self.assertEqual(mock_async_openai.return_value.chat.completions.messages[0]["role"], "user")
+        self.assertEqual(
+            mock_async_openai.return_value.chat.completions.messages[0]["role"], "user"
+        )
 
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
     async def test_should_succeed_on_prev_tool_calls(self, mock_async_openai):
