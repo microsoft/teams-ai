@@ -57,6 +57,24 @@ class MockAsyncModerationsWithResults:
             model=model,
             results=[
                 openai.types.Moderation(
+                    category_applied_input_types=cast(
+                        openai.types.moderation.CategoryAppliedInputTypes,
+                        {
+                            "harassment": ["text"],
+                            "harassment/threatening": ["text"],
+                            "hate": ["text"],
+                            "hate/threatening": ["text"],
+                            "illicit": ["text"],
+                            "illicit/violent": ["text"],
+                            "self-harm": ["text"],
+                            "self-harm/instructions": ["text"],
+                            "self-harm/intent": ["text"],
+                            "sexual": ["text"],
+                            "sexual/minors": ["text"],
+                            "violence": ["text"],
+                            "violence/graphic": ["text"],
+                        }
+                    ),
                     categories=cast(
                         openai.types.moderation.Categories,
                         {
@@ -64,6 +82,8 @@ class MockAsyncModerationsWithResults:
                             "harassment/threatening": False,
                             "hate": False,
                             "hate/threatening": False,
+                            "illicit": False,
+                            "illicit/violent": False,
                             "self-harm": False,
                             "self-harm/instructions": False,
                             "self-harm/intent": False,
@@ -80,6 +100,8 @@ class MockAsyncModerationsWithResults:
                             "harassment/threatening": 0,
                             "hate": 0,
                             "hate/threatening": 0,
+                            "illicit": 0,
+                            "illicit/violent": 0,
                             "self-harm": 0,
                             "self-harm/instructions": 0,
                             "self-harm/intent": 0,
