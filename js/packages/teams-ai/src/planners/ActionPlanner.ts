@@ -90,6 +90,11 @@ export interface ActionPlannerOptions<TState extends TurnState = TurnState> {
      * Optional handler to run when a stream is about to conclude.
      */
     endStreamHandler?: PromptCompletionModelResponseReceivedEvent;
+
+    /**
+     * If true, the feedback loop will be enabled for streaming responses.
+     */
+    enableFeedbackLoop?: boolean;
 }
 
 /**
@@ -187,6 +192,8 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
         // Identify the augmentation to use
         const augmentation = template.augmentation ?? new DefaultAugmentation();
 
+        this._options.enableFeedbackLoop = ai.enableFeedbackLoop;
+
         // Complete prompt
         const result = await this.completePrompt(context, state, template, augmentation);
         if (result.status != 'success') {
@@ -265,7 +272,8 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
             max_repair_attempts: this._options.max_repair_attempts,
             logRepairs: this._options.logRepairs,
             startStreamingMessage: this._options.startStreamingMessage,
-            endStreamHandler: this._options.endStreamHandler
+            endStreamHandler: this._options.endStreamHandler,
+            enableFeedbackLoop: this._options.enableFeedbackLoop ?? false
         });
 
         // Complete prompt

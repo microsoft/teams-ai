@@ -245,6 +245,13 @@ export class AI<TState extends TurnState = TurnState> {
     }
 
     /**
+     * @returns {boolean} Returns the feedback loop flag.
+     */
+    public get enableFeedbackLoop(): boolean {
+        return this._options.enable_feedback_loop;
+    }
+
+    /**
      * Registers a handler for a named action.
      * @remarks
      * The AI systems planner returns plans that are made up of a series of commands or actions
