@@ -400,8 +400,19 @@ export class OpenAIModel implements PromptCompletionModel {
                     console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
                 }
             } else {
-                const actionCalls: ActionCall[] = [];
                 const responseMessage = (completion as ChatCompletion).choices![0].message;
+                message = {
+                    role: responseMessage.role,
+                    content: responseMessage.content ?? '',
+                };
+                
+                // Preserve message context if there is any
+                const messageWithContext = responseMessage as Message<string>;
+                
+                if (messageWithContext.context) {
+                    message.context = messageWithContext.context;
+                }
+                const actionCalls: ActionCall[] = [];
                 const isToolsAugmentation =
                     template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
 
@@ -418,16 +429,11 @@ export class OpenAIModel implements PromptCompletionModel {
                         });
                     }
                 }
-                // Log the generated response
-                message = {
-                    role: responseMessage.role,
-                    content: responseMessage.content ?? ''
-                };
-
                 if (actionCalls.length > 0) {
                     message.action_calls = actionCalls;
                 }
-
+                
+                // Log the generated response
                 if (this.options.logRequests) {
                     console.log(Colorize.title('CHAT RESPONSE:'));
                     console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
