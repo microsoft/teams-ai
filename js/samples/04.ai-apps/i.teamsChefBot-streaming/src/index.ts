@@ -94,7 +94,7 @@ const model = new OpenAIModel({
 
     // Azure OpenAI Support
     // azureApiKey: process.env.AZURE_OPENAI_KEY!,
-    // azureDefaultDeployment: 'gpt-3.5-turbo',
+    // azureDefaultDeployment: 'gpt-4o',
     // azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
     // azureApiVersion: '2023-03-15-preview',
 
@@ -141,8 +141,9 @@ const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
-        planner
-    }
+        planner,
+        enable_feedback_loop: true,
+    },
 });
 
 // Register your data source with planner
@@ -172,6 +173,10 @@ app.ai.action(AI.FlaggedOutputActionName, async (context: TurnContext, state: Ap
     await context.sendActivity(`I'm not allowed to talk about such things.`);
     return AI.StopCommandName;
 });
+
+app.feedbackLoop(async (context, state, feedbackLoopData) => {
+    console.log("Feedback loop triggered");
+  });
 
 // Listen for incoming server requests.
 server.post('/api/messages', async (req, res) => {
