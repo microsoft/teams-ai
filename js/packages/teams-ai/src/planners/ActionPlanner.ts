@@ -121,6 +121,7 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
     private readonly _options: ActionPlannerOptions<TState>;
     private readonly _promptFactory: ActionPlannerPromptFactory<TState>;
     private readonly _defaultPrompt?: string;
+    private _enableFeedbackLoop: boolean | undefined;
 
     /**
      * Creates a new `ActionPlanner` instance.
@@ -192,7 +193,9 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
         // Identify the augmentation to use
         const augmentation = template.augmentation ?? new DefaultAugmentation();
 
-        this._options.enableFeedbackLoop = ai.enableFeedbackLoop;
+        if (ai.enableFeedbackLoop != null) {
+            this._enableFeedbackLoop = ai.enableFeedbackLoop;
+        }
 
         // Complete prompt
         const result = await this.completePrompt(context, state, template, augmentation);
@@ -273,7 +276,7 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
             logRepairs: this._options.logRepairs,
             startStreamingMessage: this._options.startStreamingMessage,
             endStreamHandler: this._options.endStreamHandler,
-            enableFeedbackLoop: this._options.enableFeedbackLoop
+            enableFeedbackLoop: this._enableFeedbackLoop
         });
 
         // Complete prompt
