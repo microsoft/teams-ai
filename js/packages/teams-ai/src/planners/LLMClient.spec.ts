@@ -114,7 +114,8 @@ describe('LLMClient', function () {
                 const client = new LLMClient({
                     model: streamingModel,
                     template,
-                    startStreamingMessage: 'start'
+                    startStreamingMessage: 'start',
+                    enableFeedbackLoop: true
                 });
                 const response = await client.completePrompt(context, state, functions);
                 assert.equal(adapter.activeQueue.length, 4, 'adapter should have 4 messages in the queue');
