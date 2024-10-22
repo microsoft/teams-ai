@@ -1,3 +1,5 @@
+/// <reference types="mocha" />
+
 import { strict as assert } from 'assert';
 import sinon from 'sinon';
 import { OpenAIModel } from './OpenAIModel';
