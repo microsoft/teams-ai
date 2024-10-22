@@ -105,7 +105,7 @@ namespace Microsoft.Teams.AI.AI.Action
                 int i = 0;
                 foreach (Citation citation in command.Response.Context.Citations)
                 {
-                    string abs = CitationUtils.Snippet(citation.Content, 480);
+                    string abs = CitationUtils.Snippet(citation.Content, 477);
                     if (isTeamsChannel)
                     {
                         content.Replace("\n", "<br>");

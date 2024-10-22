@@ -2122,7 +2122,7 @@ botbuilder@^4.23.1:
     uuid "^10.0.0"
     zod "^3.23.8"
 
-botframework-connector@4.23.1, botframework-connector@^4.23.0:
+botframework-connector@4.23.1, botframework-connector@^4.23.1:
   version "4.23.1"
   resolved "https://registry.yarnpkg.com/botframework-connector/-/botframework-connector-4.23.1.tgz#060cce789cb57deedc657d136b00f318b8a2ef17"
   integrity sha512-UqOdVndOGNN1dgtLEKDD1rObPPI32tPwyrtU8WDuVukaPSL7KYp6z1SjudZ9ywDcrt5z+Rkbz2kGzaSidCVZWA==
@@ -2148,7 +2148,7 @@ botframework-connector@4.23.1, botframework-connector@^4.23.0:
     stream-http "^3.2.0"
     zod "^3.23.8"
 
-botframework-schema@4.23.1, botframework-schema@^4.23.0:
+botframework-schema@4.23.1, botframework-schema@^4.23.1:
   version "4.23.1"
   resolved "https://registry.yarnpkg.com/botframework-schema/-/botframework-schema-4.23.1.tgz#e58118194085a3fcf67adbd92b38b43981794f7c"
   integrity sha512-J/cjL9IFewO3Q2yuV+QGtWyzVFPgKCp/3adY5/+0MrBQasJS5IIGm45W4CV/uYuoAstOIpYJ9nQPzvNWbDN16g==
@@ -2157,7 +2157,7 @@ botframework-schema@4.23.1, botframework-schema@^4.23.0:
     uuid "^10.0.0"
     zod "^3.23.8"
 
-botframework-streaming@4.23.1, botframework-streaming@^4.23.0:
+botframework-streaming@4.23.1, botframework-streaming@^4.23.1:
   version "4.23.1"
   resolved "https://registry.yarnpkg.com/botframework-streaming/-/botframework-streaming-4.23.1.tgz#271db2b5f75ea929fc17832f3b4003eb3179d415"
   integrity sha512-/BjIu2BR8y/HOdJ+Wdr1nZUvW2W53G8whH65msvM95kmjEyqskeEWP62xDpZLA1OM3sLD9APNix69BX1awcbdw==

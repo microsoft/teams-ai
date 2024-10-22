@@ -375,16 +375,18 @@ export class OpenAIModel implements PromptCompletionModel {
                     }
                     // Handle tool calls
                     if (delta.tool_calls) {
-                        message.action_calls = delta.tool_calls.map((toolCall) => {
-                            return {
-                                id: toolCall.id,
-                                function: {
-                                    name: toolCall.function!.name,
-                                    arguments: toolCall.function!.arguments
-                                },
-                                type: toolCall.type
-                            } as ActionCall;
-                        });
+                        message.action_calls = delta.tool_calls.map(
+                            (toolCall: OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall) => {
+                                return {
+                                    id: toolCall.id,
+                                    function: {
+                                        name: toolCall.function!.name,
+                                        arguments: toolCall.function!.arguments
+                                    },
+                                    type: toolCall.type
+                                } as ActionCall;
+                            }
+                        );
                     }
 
                     // Signal chunk received
@@ -403,12 +405,12 @@ export class OpenAIModel implements PromptCompletionModel {
                 const responseMessage = (completion as ChatCompletion).choices![0].message;
                 message = {
                     role: responseMessage.role,
-                    content: responseMessage.content ?? '',
+                    content: responseMessage.content ?? ''
                 };
-                
+
                 // Preserve message context if there is any
                 const messageWithContext = responseMessage as Message<string>;
-                
+
                 if (messageWithContext.context) {
                     message.context = messageWithContext.context;
                 }
@@ -432,7 +434,7 @@ export class OpenAIModel implements PromptCompletionModel {
                 if (actionCalls.length > 0) {
                     message.action_calls = actionCalls;
                 }
-                
+
                 // Log the generated response
                 if (this.options.logRequests) {
                     console.log(Colorize.title('CHAT RESPONSE:'));
