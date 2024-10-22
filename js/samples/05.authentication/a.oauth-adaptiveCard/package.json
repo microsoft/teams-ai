@@ -23,7 +23,7 @@
         "@microsoft/teams-ai": "~1.5.2",
         "botbuilder": "^4.23.1",
         "dotenv": "^16.4.5",
-        "openai": "4.61.0",
+        "openai": "4.68.2",
         "isomorphic-fetch": "^3.0.0",
         "replace": "~1.2.0",
         "restify": "~11.1.0"

@@ -41,7 +41,7 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
                     appearance: {
                         '@type': 'DigitalDocument',
                         name: citation.title || `Document #${i + 1}`,
-                        abstract: Utilities.snippet(citation.content, 480)
+                        abstract: Utilities.snippet(citation.content, 477)
                     }
                 };
 

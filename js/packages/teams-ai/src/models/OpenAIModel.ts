@@ -375,16 +375,18 @@ export class OpenAIModel implements PromptCompletionModel {
                     }
                     // Handle tool calls
                     if (delta.tool_calls) {
-                        message.action_calls = delta.tool_calls.map((toolCall) => {
-                            return {
-                                id: toolCall.id,
-                                function: {
-                                    name: toolCall.function!.name,
-                                    arguments: toolCall.function!.arguments
-                                },
-                                type: toolCall.type
-                            } as ActionCall;
-                        });
+                        message.action_calls = delta.tool_calls.map(
+                            (toolCall: OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall) => {
+                                return {
+                                    id: toolCall.id,
+                                    function: {
+                                        name: toolCall.function!.name,
+                                        arguments: toolCall.function!.arguments
+                                    },
+                                    type: toolCall.type
+                                } as ActionCall;
+                            }
+                        );
                     }
 
                     // Signal chunk received
@@ -400,8 +402,19 @@ export class OpenAIModel implements PromptCompletionModel {
                     console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
                 }
             } else {
-                const actionCalls: ActionCall[] = [];
                 const responseMessage = (completion as ChatCompletion).choices![0].message;
+                message = {
+                    role: responseMessage.role,
+                    content: responseMessage.content ?? ''
+                };
+
+                // Preserve message context if there is any
+                const messageWithContext = responseMessage as Message<string>;
+
+                if (messageWithContext.context) {
+                    message.context = messageWithContext.context;
+                }
+                const actionCalls: ActionCall[] = [];
                 const isToolsAugmentation =
                     template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
 
@@ -418,16 +431,11 @@ export class OpenAIModel implements PromptCompletionModel {
                         });
                     }
                 }
-                // Log the generated response
-                message = {
-                    role: responseMessage.role,
-                    content: responseMessage.content ?? ''
-                };
-
                 if (actionCalls.length > 0) {
                     message.action_calls = actionCalls;
                 }
 
+                // Log the generated response
                 if (this.options.logRequests) {
                     console.log(Colorize.title('CHAT RESPONSE:'));
                     console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
