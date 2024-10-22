@@ -136,7 +136,7 @@ export class AzureContentSafetyModerator<TState extends TurnState = TurnState> e
         return new AzureOpenAIClient({
             apiKey: options.apiKey,
             endpoint: options.endpoint!,
-            apiVersion: options.apiVersion ?? '2023-04-30-preview',
+            apiVersion: options.apiVersion ?? '2023-10-01',
             headerKey: 'Ocp-Apim-Subscription-Key'
         });
     }
