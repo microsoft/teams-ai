@@ -74,7 +74,7 @@ You can configure streaming with your bot by following these steps:
 
 #### Optional additions:
 - Set the informative message in the `ActionPlanner` declaration via the `StartStreamingMessage` config.
-- As previously, set the feedback loop toggle in the `AIOptions` object in the `ai` declaration and specify a handler.  
+- As previously, set the feedback loop toggle in the `AIOptions` object in the `app` declaration and specify a handler.  
 - Set attachments in the final chunk via the  `EndStreamHandler` in the `ActionPlanner` declaration. 
 
 #### C#
