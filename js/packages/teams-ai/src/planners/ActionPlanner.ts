@@ -273,7 +273,7 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
             logRepairs: this._options.logRepairs,
             startStreamingMessage: this._options.startStreamingMessage,
             endStreamHandler: this._options.endStreamHandler,
-            enableFeedbackLoop: this._options.enableFeedbackLoop ?? false
+            enableFeedbackLoop: this._options.enableFeedbackLoop
         });
 
         // Complete prompt
