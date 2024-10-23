@@ -97,7 +97,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             };
 
             var clientMock = new Mock<ContentSafetyClient>(new Uri(endpoint), new AzureKeyCredential(apiKey));
-            AnalyzeTextResult analyzeTextResult = ContentSafetyModelFactory.AnalyzeTextResult(hateResult: ContentSafetyModelFactory.TextAnalyzeSeverityResult(TextCategory.Hate, 2));
+            var analyses = new List<TextCategoriesAnalysis>() { ContentSafetyModelFactory.TextCategoriesAnalysis(TextCategory.Hate, 2) };
+            AnalyzeTextResult analyzeTextResult = ContentSafetyModelFactory.AnalyzeTextResult(null, analyses);
             Response? response = null;
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(analyzeTextResult, response));
 
@@ -173,7 +174,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             };
 
             var clientMock = new Mock<ContentSafetyClient>(new Uri(endpoint), new AzureKeyCredential(apiKey));
-            AnalyzeTextResult analyzeTextResult = ContentSafetyModelFactory.AnalyzeTextResult(hateResult: ContentSafetyModelFactory.TextAnalyzeSeverityResult(TextCategory.Hate, 0));
+            var analyses = new List<TextCategoriesAnalysis>() { ContentSafetyModelFactory.TextCategoriesAnalysis(TextCategory.Hate, 0) };
+            AnalyzeTextResult analyzeTextResult = ContentSafetyModelFactory.AnalyzeTextResult(null, analyses); 
             Response? response = null;
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(analyzeTextResult, response));
 
@@ -237,7 +239,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             });
 
             var clientMock = new Mock<ContentSafetyClient>(new Uri(endpoint), new AzureKeyCredential(apiKey));
-            AnalyzeTextResult analyzeTextResult = ContentSafetyModelFactory.AnalyzeTextResult(hateResult: ContentSafetyModelFactory.TextAnalyzeSeverityResult(TextCategory.Hate, 2));
+            var analyses = new List<TextCategoriesAnalysis>() { ContentSafetyModelFactory.TextCategoriesAnalysis(TextCategory.Hate, 2) };
+            AnalyzeTextResult analyzeTextResult = ContentSafetyModelFactory.AnalyzeTextResult(null, analyses);
             Response? response = null;
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(analyzeTextResult, response));
 
@@ -298,7 +301,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             });
 
             var clientMock = new Mock<ContentSafetyClient>(new Uri(endpoint), new AzureKeyCredential(apiKey));
-            AnalyzeTextResult analyzeTextResult = ContentSafetyModelFactory.AnalyzeTextResult(hateResult: ContentSafetyModelFactory.TextAnalyzeSeverityResult(TextCategory.Hate, 0));
+            var analyses = new List<TextCategoriesAnalysis>() { ContentSafetyModelFactory.TextCategoriesAnalysis(TextCategory.Hate, 0) };
+            AnalyzeTextResult analyzeTextResult = ContentSafetyModelFactory.AnalyzeTextResult(null, analyses);
             Response? response = null;
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(analyzeTextResult, response));
 

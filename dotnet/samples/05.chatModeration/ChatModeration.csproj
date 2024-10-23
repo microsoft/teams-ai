@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<ProjectCapability Include="TeamsFx" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Bot.Builder" Version="4.22.9" />
+    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.9" />
+    <PackageReference Include="Microsoft.Bot.Connector" Version="4.22.9" />
+    <PackageReference Include="Microsoft.KernelMemory.AI.OpenAI" Version="0.73.240906.1" />
+    <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.73.240906.1" />
+    <PackageReference Include="Microsoft.Teams.AI" Version="1.7.*" />
+  </ItemGroup>
+
+  <!-- Exclude Teams Toolkit files from build output, but can still be viewed from Solution Explorer -->
+  <ItemGroup>
+    <Content Remove="appPackage/**/*" />
+    <None Include="appPackage/**/*" />
+    <None Include="env/**/*" />
+    <Content Remove="infra/**/*" />
+    <None Include="infra/**/*" />
+  </ItemGroup>
+
+  <!-- Exclude local settings from publish -->
+  <ItemGroup>
+    <Content Remove="appsettings.Development.json" />
+    <Content Include="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>None</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Teams.AI">
+      <HintPath>..\..\packages\Microsoft.TeamsAI\Microsoft.TeamsAI\obj\Debug\netstandard2.0\Microsoft.Teams.AI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="assets\" />
+  </ItemGroup>
+</Project>
