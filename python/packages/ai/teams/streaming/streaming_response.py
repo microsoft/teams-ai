@@ -208,6 +208,7 @@ class StreamingResponse:
 
         # Send activity
         response = await self._context.send_activity(activity)
+        await asyncio.sleep(1.5)
 
         # Save assigned stream ID
         if not self._stream_id:

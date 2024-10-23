@@ -333,8 +333,8 @@ class OpenAIModel(PromptCompletionModel):
 
                     # TODO: Handle tool calls
 
-                    if self._options.logger is not None:
-                        self._options.logger.debug("CHUNK", delta)
+                    # if self._options.logger is not None:
+                    #     self._options.logger.debug("CHUNK", delta)
 
                     curr_delta_message = PromptChunk(
                         delta=Message[str](role=str(delta.role), content=delta.content)

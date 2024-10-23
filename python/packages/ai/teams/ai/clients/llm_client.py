@@ -144,9 +144,11 @@ class LLMClient:
 
             # Check for a streaming response
             if streaming:
+                nonlocal is_streaming
                 is_streaming = True
 
             # Create streamer and send initial message
+            nonlocal streamer
             streamer = StreamingResponse(context)
             memory.set("temp.streamer", streamer)
             if self.options.start_streaming_message:
@@ -157,6 +159,7 @@ class LLMClient:
             memory: MemoryBase,
             chunk: PromptChunk,
         ) -> None:
+            nonlocal streamer
             if (context != ctx) or streamer is None:
                 return
 
