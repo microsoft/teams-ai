@@ -38,6 +38,8 @@ namespace Microsoft.Teams.AI.AI.Planners
 
         private readonly ILoggerFactory? _logger;
 
+        private bool _enableFeedbackLoop;
+
         /// <summary>
         /// Creates a new `ActionPlanner` instance.
         /// </summary>
@@ -111,6 +113,8 @@ namespace Microsoft.Teams.AI.AI.Planners
                 throw new Exception(response.Error?.Message ?? "[Action Planner]: an error has occurred", response.Error);
             }
 
+            this._enableFeedbackLoop = ai.Options.EnableFeedbackLoop;
+
             // Check to see if we have a response
             // When a streaming response is used, the response message is undefined.
             if (response.Message != null)
@@ -176,6 +180,7 @@ namespace Microsoft.Teams.AI.AI.Planners
                 LogRepairs = this.Options.LogRepairs,
                 StartStreamingMessage = this.Options.StartStreamingMessage,
                 EndStreamHandler = this.Options.EndStreamHandler,
+                EnableFeedbackLoop = this._enableFeedbackLoop,
             }, this._logger);
 
             return await client.CompletePromptAsync(context, memory, this.Prompts, cancellationToken);

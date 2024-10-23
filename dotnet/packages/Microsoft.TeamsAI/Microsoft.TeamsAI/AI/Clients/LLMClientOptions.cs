@@ -74,6 +74,11 @@ namespace Microsoft.Teams.AI.AI.Clients
         public ResponseReceivedHandler? EndStreamHandler;
 
         /// <summary>
+        /// Optional, controls the feedback loop for streaming responses.
+        /// </summary>
+        public bool? EnableFeedbackLoop { get; set; }
+
+        /// <summary>
         /// Creates an instance of `LLMClientOptions`
         /// </summary>
         /// <param name="model">AI model to use for completing prompts.</param>
