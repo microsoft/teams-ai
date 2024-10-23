@@ -164,11 +164,17 @@ builder.Services.AddTransient<IBot>(sp =>
     );
 
     Application<TurnState> app = new ApplicationBuilder<TurnState>()
-        .WithAIOptions(new(planner))
+        .WithAIOptions(new(planner) { EnableFeedbackLoop = true })
         .WithStorage(sp.GetService<IStorage>()!)
         .Build();
 
     app.AI.ImportActions(new ActionHandlers());
+
+    app.OnFeedbackLoop((turnContext, turnState, feedbackLoopData, _) =>
+    {
+        Console.WriteLine("Feedback loop triggered");
+        return Task.CompletedTask;
+    });
 
     return app;
 });

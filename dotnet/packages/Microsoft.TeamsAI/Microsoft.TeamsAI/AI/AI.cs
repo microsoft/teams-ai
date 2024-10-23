@@ -36,6 +36,7 @@ namespace Microsoft.Teams.AI.AI
                 MaxSteps = options.MaxSteps ?? 25,
                 MaxTime = options.MaxTime ?? TimeSpan.FromMilliseconds(300000),
                 AllowLooping = options.AllowLooping ?? true,
+                EnableFeedbackLoop = options.EnableFeedbackLoop,
             };
             _actions = new ActionCollection<TState>();
 

@@ -106,14 +106,15 @@ namespace Microsoft.Teams.AI.AI.Planners
         public async Task<Plan> ContinueTaskAsync(ITurnContext context, TState state, AI<TState> ai, CancellationToken cancellationToken = default)
         {
             PromptTemplate template = await this.Options.DefaultPrompt(context, state, this);
+
+            this._enableFeedbackLoop = ai.Options.EnableFeedbackLoop;
+
             PromptResponse response = await this.CompletePromptAsync(context, state, template, template.Augmentation, cancellationToken);
 
             if (response.Status != PromptResponseStatus.Success)
             {
                 throw new Exception(response.Error?.Message ?? "[Action Planner]: an error has occurred", response.Error);
             }
-
-            this._enableFeedbackLoop = ai.Options.EnableFeedbackLoop;
 
             // Check to see if we have a response
             // When a streaming response is used, the response message is undefined.
