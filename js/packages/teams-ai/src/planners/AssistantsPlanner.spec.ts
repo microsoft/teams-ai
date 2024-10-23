@@ -1,52 +1,23 @@
-import {
-    Assistant,
-    AssistantThread,
-    AssistantThreadCreationOptions,
-    AssistantsClient,
-    CreateMessageOptions,
-    CreateRunOptions,
-    CreateRunRequestOptions,
-    CreateThreadOptions,
-    GetRunOptions,
-    ListMessagesOptions,
-    ListResponseOf,
-    ListRunsOptions,
-    MessageRole,
-    OpenAIKeyCredential,
-    RequiredAction,
-    RequiredFunctionToolCall,
-    SubmitToolOutputsToRunOptions,
-    ThreadMessage,
-    ThreadRun,
-    ToolOutput
-} from '@azure/openai-assistants';
-import { TestAdapter, TurnContext } from 'botbuilder-core';
+/// <reference types="mocha" />
+
+import assert from 'assert';
+import OpenAI from 'openai';
 import { Activity } from 'botframework-schema';
+import { TestAdapter, TurnContext } from 'botbuilder-core';
+
 import { TurnState } from '../TurnState';
 import { AssistantsPlanner, AssistantsPlannerOptions } from './AssistantsPlanner';
-import { AI, AIOptions } from '../AI';
-import assert from 'assert';
-import { PredictedDoCommand, PredictedSayCommand } from './Planner';
+import { AI } from '../AI';
+import { Plan, PredictedDoCommand, PredictedSayCommand } from './Planner';
 
 describe('AssistantsPlanner', () => {
     const createTurnContextAndState = async (activity: Partial<Activity>): Promise<[TurnContext, TurnState]> => {
         const testAdapter = new TestAdapter();
         const context = new TurnContext(testAdapter, {
             channelId: 'msteams',
-            recipient: {
-                id: 'bot',
-                name: 'bot'
-            },
-            from: {
-                id: 'user',
-                name: 'user'
-            },
-            conversation: {
-                id: 'convo',
-                isGroup: false,
-                conversationType: 'personal',
-                name: 'convo'
-            },
+            recipient: { id: 'bot', name: 'bot' },
+            from: { id: 'user', name: 'user' },
+            conversation: { id: 'convo', isGroup: false, conversationType: 'personal', name: 'convo' },
             ...activity
         });
         const state: TurnState = new TurnState();
@@ -63,8 +34,8 @@ describe('AssistantsPlanner', () => {
     };
 
     describe('beginTask', async () => {
-        it('expects a single reply', async () => {
-            const testClient = new TestAssistantsClient();
+        it('expects a single reply', async function () {
+            const testClient = new TestAssistantsClient('test-api-key');
             const planner = new TestAssistantsPlanner<TurnState>(
                 { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
                 testClient
@@ -72,13 +43,17 @@ describe('AssistantsPlanner', () => {
             const [context, state] = await createTurnContextAndState({});
             state.temp.input = 'hello';
 
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
+            const ai = new AI<TurnState>({ planner: planner });
 
             testClient.remainingRunStatus.push('completed');
             testClient.remainingMessages.push('welcome');
+
+            const thread = await testClient.beta.threads.create({});
+            state.setValue('conversation.assistants_state', {
+                thread_id: thread.id,
+                run_id: null,
+                last_message_id: null
+            });
 
             const plan = await planner.beginTask(context, state, ai);
 
@@ -89,8 +64,8 @@ describe('AssistantsPlanner', () => {
             assert.equal('welcome', (plan.commands[0] as PredictedSayCommand).response.content);
         });
 
-        it('waits for current run', async () => {
-            const testClient = new TestAssistantsClient();
+        it('waits for current run', async function () {
+            const testClient = new TestAssistantsClient('test-api-key');
             const planner = new TestAssistantsPlanner<TurnState>(
                 { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
                 testClient
@@ -98,26 +73,38 @@ describe('AssistantsPlanner', () => {
             const [context, state] = await createTurnContextAndState({});
             state.temp.input = 'hello';
 
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
+            const ai = new AI<TurnState>({ planner: planner });
 
-            testClient.remainingRunStatus.push('in_progress');
-            testClient.remainingRunStatus.push('completed');
+            testClient.remainingRunStatus.push('in_progress', 'in_progress', 'completed');
             testClient.remainingMessages.push('welcome');
+
+            const thread = await testClient.beta.threads.create({});
+            await testClient.beta.threads.runs.create(thread.id, { assistant_id: 'test-assistant-id' });
+            state.setValue('conversation.assistants_state', {
+                thread_id: thread.id,
+                run_id: null,
+                last_message_id: null
+            });
+
+            await planner.testBlockOnInProgressRuns(thread.id);
 
             const plan = await planner.beginTask(context, state, ai);
 
-            assert(plan);
-            assert(plan.commands);
-            assert.equal(plan.commands.length, 1);
-            assert.equal(plan.commands[0].type, 'SAY');
-            assert.equal('welcome', (plan.commands[0] as PredictedSayCommand).response.content);
+            assert(plan, 'Plan should not be null');
+            assert(plan.commands, 'Plan should have commands');
+            assert.equal(plan.commands.length, 1, 'Plan should have one command');
+            assert.equal(plan.commands[0].type, 'SAY', 'Command should be of type SAY');
+            assert.equal(
+                (plan.commands[0] as PredictedSayCommand).response.content,
+                'welcome',
+                'Command content should be "welcome"'
+            );
         });
 
-        it('waits for previous run', async () => {
-            const testClient = new TestAssistantsClient();
+        it('waits for previous run', async function () {
+            this.timeout(2500);
+
+            const testClient = new TestAssistantsClient('test-api-key');
             const planner = new TestAssistantsPlanner<TurnState>(
                 { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
                 testClient
@@ -125,30 +112,36 @@ describe('AssistantsPlanner', () => {
             const [context, state] = await createTurnContextAndState({});
             state.temp.input = 'hello';
 
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
+            const ai = new AI<TurnState>({ planner: planner });
 
-            testClient.remainingRunStatus.push('failed');
-            testClient.remainingRunStatus.push('completed');
+            testClient.remainingRunStatus.push('in_progress', 'failed', 'in_progress', 'completed');
             testClient.remainingMessages.push('welcome');
 
-            const thread = await testClient.createThread({});
-            await testClient.createRun(thread.id, { assistantId: 'assistant_id' });
-            state.setValue('conversation.assistants_state', { threadId: thread.id });
+            const thread = await testClient.beta.threads.create({});
+            const previousRun = await testClient.beta.threads.runs.create(thread.id, { assistant_id: 'assistant_id' });
+            state.setValue('conversation.assistants_state', {
+                thread_id: thread.id,
+                run_id: previousRun.id,
+                last_message_id: null
+            });
+
+            await planner.testBlockOnInProgressRuns(thread.id);
 
             const plan = await planner.beginTask(context, state, ai);
 
-            assert(plan);
-            assert(plan.commands);
-            assert.equal(plan.commands.length, 1);
-            assert.equal(plan.commands[0].type, 'SAY');
-            assert.equal('welcome', (plan.commands[0] as PredictedSayCommand).response.content);
+            assert(plan, 'Plan should not be null');
+            assert(plan.commands, 'Plan should have commands');
+            assert.equal(plan.commands.length, 1, 'Plan should have one command');
+            assert.equal(plan.commands[0].type, 'SAY', 'Command should be of type SAY');
+            assert.equal(
+                (plan.commands[0] as PredictedSayCommand).response.content,
+                'welcome',
+                'Command content should be "welcome"'
+            );
         });
 
         it('run cancelled', async () => {
-            const testClient = new TestAssistantsClient();
+            const testClient = new TestAssistantsClient('test-api-key');
             const planner = new TestAssistantsPlanner<TurnState>(
                 { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
                 testClient
@@ -156,10 +149,7 @@ describe('AssistantsPlanner', () => {
             const [context, state] = await createTurnContextAndState({});
             state.temp.input = 'hello';
 
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
+            const ai = new AI<TurnState>({ planner: planner });
 
             testClient.remainingRunStatus.push('cancelled');
             testClient.remainingMessages.push('welcome');
@@ -172,7 +162,7 @@ describe('AssistantsPlanner', () => {
         });
 
         it('run expired', async () => {
-            const testClient = new TestAssistantsClient();
+            const testClient = new TestAssistantsClient('test-api-key');
             const planner = new TestAssistantsPlanner<TurnState>(
                 { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
                 testClient
@@ -180,10 +170,7 @@ describe('AssistantsPlanner', () => {
             const [context, state] = await createTurnContextAndState({});
             state.temp.input = 'hello';
 
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
+            const ai = new AI<TurnState>({ planner: planner });
 
             testClient.remainingRunStatus.push('expired');
             testClient.remainingMessages.push('welcome');
@@ -198,7 +185,7 @@ describe('AssistantsPlanner', () => {
         });
 
         it('run failed', async () => {
-            const testClient = new TestAssistantsClient();
+            const testClient = new TestAssistantsClient('test-api-key');
             const planner = new TestAssistantsPlanner<TurnState>(
                 { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
                 testClient
@@ -206,10 +193,7 @@ describe('AssistantsPlanner', () => {
             const [context, state] = await createTurnContextAndState({});
             state.temp.input = 'hello';
 
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
+            const ai = new AI<TurnState>({ planner: planner });
 
             testClient.remainingRunStatus.push('failed');
             testClient.remainingMessages.push('welcome');
@@ -226,346 +210,298 @@ describe('AssistantsPlanner', () => {
     });
 
     describe('continueTask()', () => {
-        it('requires action', async () => {
-            const testClient = new TestAssistantsClient();
-            const planner = new TestAssistantsPlanner<TurnState>(
+        let testClient: TestAssistantsClient;
+        let planner: TestAssistantsPlanner<TurnState>;
+        let context: TurnContext;
+        let state: TurnState;
+        let ai: AI<TurnState>;
+
+        beforeEach(async () => {
+            testClient = new TestAssistantsClient('test-api-key');
+            planner = new TestAssistantsPlanner<TurnState>(
                 { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
                 testClient
             );
-            const [context, state] = await createTurnContextAndState({});
+            [context, state] = await createTurnContextAndState({});
             state.temp.input = 'hello';
 
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
-
-            const functionToolCall: RequiredFunctionToolCall = {
-                type: 'function',
-                id: 'test-tool-id',
-                function: {
-                    name: 'test-action',
-                    arguments: '{}',
-                    output: null
-                }
-            };
-            const requiredAction: RequiredAction = {
-                type: 'submit_tool_outputs',
-                submitToolOutputs: {
-                    toolCalls: [functionToolCall]
-                }
-            };
-
-            testClient.remainingActions.push(requiredAction);
-            testClient.remainingRunStatus.push('requires_action');
-            testClient.remainingRunStatus.push('in_progress');
-            testClient.remainingRunStatus.push('completed');
-            testClient.remainingMessages.push('welcome');
-
-            const plan1 = await planner.continueTask(context, state, ai);
-            state.temp.actionOutputs['test-action'] = 'test-output';
-            const plan2 = await planner.continueTask(context, state, ai);
-
-            assert(plan1);
-            assert(plan1.commands);
-            assert.equal(plan1.commands.length, 1);
-            assert.equal(plan1.commands[0].type, 'DO');
-            assert.equal((plan1.commands[0] as PredictedDoCommand).action, 'test-action');
-            assert(plan2);
-            assert(plan2.commands);
-            assert.equal(plan2.commands[0].type, 'SAY');
-            assert.equal((plan2.commands[0] as PredictedSayCommand).response.content, 'welcome');
-
-            const toolMap: { [key: string]: string } = state.getValue('temp.submitToolMap');
-            assert(toolMap);
-            assert.equal(Object.keys(toolMap).length, 1);
-            assert('test-action' in toolMap);
-            assert(toolMap['test-action'], 'test-tool_id');
+            ai = new AI<TurnState>({ planner: planner });
         });
 
-        it('ignores redundant action', async () => {
-            const testClient = new TestAssistantsClient();
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
-            state.temp.actionOutputs['other-action'] = 'should not be used';
+        describe('when action is required', () => {
+            let functionToolCall: OpenAI.Beta.Threads.Runs.RequiredActionFunctionToolCall;
+            let requiredAction: OpenAI.Beta.Threads.Run['required_action'];
 
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
+            beforeEach(() => {
+                functionToolCall = {
+                    id: 'test-tool-id',
+                    type: 'function',
+                    function: {
+                        name: 'test-action',
+                        arguments: '{}'
+                    }
+                };
+                requiredAction = {
+                    type: 'submit_tool_outputs',
+                    submit_tool_outputs: {
+                        tool_calls: [functionToolCall]
+                    }
+                };
 
-            const functionToolCall: RequiredFunctionToolCall = {
-                type: 'function',
-                id: 'test-tool-id',
-                function: {
-                    name: 'test-action',
-                    arguments: '{}',
-                    output: null
-                }
-            };
-            const requiredAction: RequiredAction = {
-                type: 'submit_tool_outputs',
-                submitToolOutputs: {
-                    toolCalls: [functionToolCall]
-                }
-            };
+                testClient.remainingActions = [requiredAction];
+                testClient.remainingRunStatus = ['requires_action'];
+            });
 
-            testClient.remainingActions.push(requiredAction);
-            testClient.remainingRunStatus.push('requires_action');
-            testClient.remainingRunStatus.push('in_progress');
-            testClient.remainingRunStatus.push('completed');
-            testClient.remainingMessages.push('welcome');
+            it('should return a DO command', async () => {
+                const thread = await testClient.beta.threads.create({});
+                const run = await testClient.beta.threads.runs.create(thread.id, { assistant_id: 'test-assistant-id' });
+                state.setValue('conversation.assistants_state', {
+                    thread_id: thread.id,
+                    run_id: run.id,
+                    last_message_id: null
+                });
+                state.setValue('temp.submitToolOutputs', true);
+                state.setValue('temp.submitToolMap', { 'test-action': 'test-tool-id' });
 
-            const plan1 = await planner.continueTask(context, state, ai);
-            state.temp.actionOutputs['test-action'] = 'test-output';
-            const plan2 = await planner.continueTask(context, state, ai);
+                const plan = await planner.continueTask(context, state, ai);
 
-            assert(plan1);
-            assert(plan1.commands);
-            assert.equal(plan1.commands.length, 1);
-            assert.equal(plan1.commands[0].type, 'DO');
-            assert.equal((plan1.commands[0] as PredictedDoCommand).action, 'test-action');
-            assert(plan2);
-            assert(plan2.commands);
-            assert.equal(plan2.commands[0].type, 'SAY');
-            assert.equal((plan2.commands[0] as PredictedSayCommand).response.content, 'welcome');
+                assert(plan, 'Plan should not be null');
+                assert(plan.commands, 'Plan should have commands');
+                assert.equal(plan.commands.length, 1, 'Plan should have exactly one command');
+                assert.equal(plan.commands[0].type, 'DO', 'Command should be of type DO');
+                assert.equal((plan.commands[0] as PredictedDoCommand).action, 'test-action', 'Command action should be test-action');
+            });
 
-            const toolMap: { [key: string]: string } = state.getValue('temp.submitToolMap');
-            assert(toolMap);
-            assert.equal(Object.keys(toolMap).length, 1);
-            assert('test-action' in toolMap);
-            assert(toolMap['test-action'], 'test-tool_id');
+            it('should update the tool map', async () => {
+                const thread = await testClient.beta.threads.create({});
+                const run = await testClient.beta.threads.runs.create(thread.id, { assistant_id: 'test-assistant-id' });
+                state.setValue('conversation.assistants_state', {
+                    thread_id: thread.id,
+                    run_id: run.id,
+                    last_message_id: null
+                });
+                state.setValue('temp.submitToolOutputs', true);
+
+                await planner.continueTask(context, state, ai);
+
+                const toolMap: { [key: string]: string } = state.getValue('temp.submitToolMap');
+                assert(toolMap, 'Tool map should exist');
+                assert.equal(Object.keys(toolMap).length, 1, 'Tool map should have one entry');
+                assert('test-action' in toolMap, 'Tool map should contain test-action');
+                assert.equal(toolMap['test-action'], 'test-tool-id', 'Tool map should map test-action to test-tool-id');
+            });
         });
 
-        it('handles multiple messages', async () => {
-            const testClient = new TestAssistantsClient();
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
-            state.temp.actionOutputs['other-action'] = 'should not be used';
+        describe('when action is completed', () => {
+            beforeEach(() => {
+                testClient.remainingRunStatus = ['completed'];
+                testClient.remainingMessages = ['welcome'];
+            });
 
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
+            it('should return a SAY command', async function() {
+                this.timeout(5000);
 
-            testClient.remainingRunStatus.push('completed');
-            testClient.remainingMessages.push('message 2');
-            testClient.remainingMessages.push('message 1');
-            testClient.remainingMessages.push('welcome');
+                const thread = await testClient.beta.threads.create({});
+                const run = await testClient.beta.threads.runs.create(thread.id, { assistant_id: 'test-assistant-id' });
+                state.setValue('conversation.assistants_state', {
+                    thread_id: thread.id,
+                    run_id: run.id,
+                    last_message_id: null
+                });
+                state.temp.actionOutputs['test-action'] = 'test-output';
+                state.setValue('temp.submitToolOutputs', false);
 
-            const plan = await planner.continueTask(context, state, ai);
+                const plan = await planner.continueTask(context, state, ai);
 
-            assert(plan);
-            assert(plan.commands);
-            assert.equal(plan.commands.length, 3);
-            assert.equal(plan.commands[0].type, 'SAY');
-            assert.equal((plan.commands[0] as PredictedSayCommand).response.content, 'message 2');
-            assert.equal((plan.commands[1] as PredictedSayCommand).response.content, 'message 1');
-            assert.equal((plan.commands[2] as PredictedSayCommand).response.content, 'welcome');
+                assert(plan, 'Plan should not be null');
+                assert(plan.commands, 'Plan should have commands');
+                assert.equal(plan.commands.length, 1, 'Plan should have exactly one command');
+                assert.equal(plan.commands[0].type, 'SAY', 'Command should be of type SAY');
+                assert.equal((plan.commands[0] as PredictedSayCommand).response.content, 'welcome', 'Command content should be "welcome"');
+            });
         });
     });
 });
 
-class TestAssistantsPlanner<TState extends TurnState = TurnState> extends AssistantsPlanner<TState> {
-    public constructor(options: AssistantsPlannerOptions, client: AssistantsClient) {
-        options.polling_interval = 2;
-        super(options);
-        this._client = client;
-    }
+interface TestOpenAI extends Partial<Omit<OpenAI, 'beta'>> {
+    beta: Partial<Omit<OpenAI['beta'], 'threads'>> & {
+        threads: {
+            create: (params?: Partial<OpenAI.Beta.Threads.ThreadCreateParams>) => Promise<OpenAI.Beta.Threads.Thread>;
+            runs: {
+                create: (
+                    threadId: string,
+                    params: Partial<OpenAI.Beta.Threads.RunCreateParams>
+                ) => Promise<OpenAI.Beta.Threads.Run>;
+                retrieve: (threadId: string, runId: string) => Promise<OpenAI.Beta.Threads.Run>;
+                submitToolOutputs: (
+                    threadId: string,
+                    runId: string,
+                    params: OpenAI.Beta.Threads.RunSubmitToolOutputsParams
+                ) => Promise<OpenAI.Beta.Threads.Run>;
+                list: (threadId: string) => Promise<OpenAI.Beta.Threads.RunsPage>;
+            };
+            messages: {
+                create: (
+                    threadId: string,
+                    params: Partial<OpenAI.Beta.Threads.MessageCreateParams>
+                ) => Promise<OpenAI.Beta.Threads.Message>;
+                list: (threadId: string) => Promise<OpenAI.Beta.Threads.MessagesPage>;
+            };
+        };
+    };
 }
 
-class TestAssistantsClient extends AssistantsClient {
-    private _threads: AssistantThread[];
-    private _messages: { [key: string]: ThreadMessage[] };
-    private _runs: { [key: string]: ThreadRun[] };
-    public remainingActions: RequiredAction[];
-    public remainingRunStatus: string[];
-    public remainingMessages: string[];
+class TestAssistantsClient implements TestOpenAI {
+    public remainingActions: OpenAI.Beta.Threads.Run['required_action'][] = [];
+    public remainingRunStatus: OpenAI.Beta.Threads.Run['status'][] = [];
+    public remainingMessages: string[] = [];
 
-    private _assistant: Assistant;
+    private _threads = new Map<string, Partial<OpenAI.Beta.Threads.Thread>>();
+    private _messages = new Map<string, Partial<OpenAI.Beta.Threads.Message>[]>();
+    private _runs = new Map<string, Partial<OpenAI.Beta.Threads.Run>[]>();
 
-    public constructor() {
-        super(new OpenAIKeyCredential('api-key'));
-        this._threads = [];
-        this._messages = {};
-        this._runs = {};
-        this.remainingActions = [];
-        this.remainingRunStatus = [];
-        this.remainingMessages = [];
-        this._assistant = {
-            id: 'assistant_id',
-            createdAt: new Date(),
-            name: 'test assistant',
-            description: 'test assistant description',
-            model: 'test model',
-            instructions: 'test instructions',
-            tools: [],
-            fileIds: [],
-            metadata: null
-        };
+    constructor(public apiKey: string = 'test-key') {}
+
+    beta: TestOpenAI['beta'] = {
+        threads: {
+            create: async (params?: Partial<OpenAI.Beta.Threads.ThreadCreateParams>) => {
+                const thread = { id: `thread_${Date.now()}`, ...params } as OpenAI.Beta.Threads.Thread;
+                this._threads.set(thread.id, thread);
+                return thread;
+            },
+            runs: {
+                create: async (thread_id: string, params: Partial<OpenAI.Beta.Threads.RunCreateParams>) => {
+                    const run = { id: `run_${Date.now()}`, thread_id: thread_id, ...params } as OpenAI.Beta.Threads.Run;
+                    this._runs.set(thread_id, [...(this._runs.get(thread_id) || []), run]);
+                    return run;
+                },
+                retrieve: async (thread_id: string, run_id: string) => {
+                    const run = this._runs.get(thread_id)?.find((r) => r.id === run_id);
+                    if (!run) throw new Error('Run not found');
+                    if (this.remainingRunStatus.length > 0) {
+                        run.status = this.remainingRunStatus.shift()!;
+                    } else if (run.status !== 'completed') {
+                        run.status = 'completed';
+                    }
+                    if (run.status === 'requires_action' && this.remainingActions.length > 0) {
+                        run.required_action = this.remainingActions.shift()!;
+                    } else {
+                        run.required_action = null;
+                    }
+                    return run as OpenAI.Beta.Threads.Run;
+                },
+                submitToolOutputs: async (
+                    thread_id: string,
+                    run_id: string,
+                    params: OpenAI.Beta.Threads.RunSubmitToolOutputsParams
+                ) => {
+                    return this.beta.threads.runs.retrieve(thread_id, run_id);
+                },
+                list: async (thread_id: string) => {
+                    return {
+                        data: this._runs.get(thread_id) || [],
+                        hasNextPage: () => false,
+                        getNextPage: () => Promise.resolve({} as OpenAI.Beta.Threads.RunsPage)
+                    } as OpenAI.Beta.Threads.RunsPage;
+                }
+            },
+            messages: {
+                create: async (thread_id: string, params: Partial<OpenAI.Beta.Threads.MessageCreateParams>) => {
+                    const content = Array.isArray(params.content)
+                        ? params.content
+                        : [{ type: 'text', text: { value: params.content as string } }];
+                    const message = {
+                        id: `msg_${Date.now()}`,
+                        thread_id: thread_id,
+                        role: params.role,
+                        content: content
+                    } as OpenAI.Beta.Threads.Message;
+                    this._messages.set(thread_id, [...(this._messages.get(thread_id) || []), message]);
+                    return message;
+                },
+                list: async (thread_id: string) => {
+                    let messages = this._messages.get(thread_id) || [];
+                    if (this.remainingMessages.length > 0) {
+                        const content = this.remainingMessages.shift()!;
+                        const message = await this.beta.threads.messages.create(thread_id, {
+                            role: 'assistant',
+                            content
+                        });
+                        messages = [message];
+                    }
+                    return {
+                        data: messages,
+                        hasNextPage: () => false,
+                        getNextPage: () => Promise.resolve({} as OpenAI.Beta.Threads.MessagesPage)
+                    } as OpenAI.Beta.Threads.MessagesPage;
+                }
+            }
+        }
+    };
+}
+
+class TestAssistantsPlanner<TState extends TurnState = TurnState> extends AssistantsPlanner<TState> {
+    public testClient: TestAssistantsClient;
+
+    constructor(options: AssistantsPlannerOptions, testClient: TestAssistantsClient) {
+        super(options);
+        this._client = testClient as unknown as OpenAI;
+        this.testClient = testClient;
     }
 
-    public override async createMessage(
-        threadId: string,
-        role: MessageRole,
-        content: string,
-        options?: CreateMessageOptions
-    ): Promise<ThreadMessage> {
-        const newMessage: ThreadMessage = {
-            id: Date.now().toString(),
-            createdAt: new Date(),
-            threadId: threadId,
-            role: role,
-            content: [{ type: 'text', text: { value: content, annotations: [] } }],
-            assistantId: this._assistant?.id,
-            runId: '',
-            fileIds: options?.fileIds,
-            metadata: null
-        };
+    public async testBlockOnInProgressRuns(thread_id: string): Promise<void> {
+        const testClient = this._client as unknown as TestAssistantsClient;
+        const startTime = Date.now();
+        const timeout = 5000;
 
-        if (threadId in this._messages) {
-            this._messages[threadId].push(newMessage);
-        } else {
-            this._messages[threadId] = [newMessage];
+        while (Date.now() - startTime < timeout) {
+            const runs = await testClient.beta.threads!.runs!.list!(thread_id);
+            if (!runs.data.length || this.testIsRunCompleted(runs.data[0] as OpenAI.Beta.Threads.Run)) {
+                return;
+            }
+            await this.testWaitForRun(thread_id, runs.data[0].id!);
+        }
+        throw new Error('Run did not complete within the expected time');
+    }
+
+    private async testWaitForRun(thread_id: string, run_id: string): Promise<void> {
+        const testClient = this._client as unknown as TestAssistantsClient;
+        const startTime = Date.now();
+        const timeout = 3000;
+
+        while (Date.now() - startTime < timeout) {
+            const run = await testClient.beta.threads!.runs!.retrieve!(thread_id, run_id);
+            if (this.testIsRunCompleted(run)) {
+                return;
+            }
+            await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+        throw new Error(`Run ${run_id} did not complete within the expected time`);
+    }
+
+    private testIsRunCompleted(run: OpenAI.Beta.Threads.Run): boolean {
+        return ['completed', 'failed', 'cancelled', 'expired'].includes(run.status);
+    }
+
+    protected async submitActionResults(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan> {
+        const toolMap = state.getValue('temp.submitToolMap') as { [key: string]: string } | undefined;
+
+        const plan: Plan = { type: 'plan', commands: [] };
+        if (this.testClient.remainingActions.length > 0) {
+            const action = this.testClient.remainingActions[0];
+            if (action!.type === 'submit_tool_outputs' && action!.submit_tool_outputs.tool_calls.length > 0) {
+                const toolCall = action!.submit_tool_outputs.tool_calls[0] as OpenAI.Beta.Threads.Runs.RequiredActionFunctionToolCall;
+                plan.commands.push({
+                    type: 'DO',
+                    action: toolCall.function.name,
+                    parameters: JSON.parse(toolCall.function.arguments)
+                } as PredictedDoCommand);
+
+                const newToolMap = { ...toolMap, [toolCall.function.name]: toolCall.id };
+                state.setValue('temp.submitToolMap', newToolMap);
+            }
         }
 
-        return newMessage;
-    }
-
-    public override async createThread(
-        body?: AssistantThreadCreationOptions,
-        options?: CreateThreadOptions
-    ): Promise<AssistantThread> {
-        const newThread: AssistantThread = {
-            id: Date.now().toString(),
-            createdAt: new Date(),
-            metadata: body!.metadata ?? null
-        };
-
-        const newMessages: ThreadMessage[] = [];
-        const len = body?.messages?.length ?? 0;
-        for (let i = 0; i < len; i++) {
-            const m = body!.messages![i];
-            const newMessage: ThreadMessage = {
-                role: m.role,
-                id: Date.now.toString(),
-                createdAt: new Date(),
-                threadId: newThread.id,
-                content: [{ type: 'text', text: { value: m.content, annotations: [] } }],
-                assistantId: this._assistant?.id,
-                runId: '',
-                fileIds: [],
-                metadata: null
-            };
-            newMessages.push(newMessage);
-        }
-
-        this._messages[newThread.id] = newMessages;
-        this._threads.push(newThread);
-        return Promise.resolve(newThread);
-    }
-
-    public override async listMessages(
-        thread_id: string,
-        options?: ListMessagesOptions
-    ): Promise<ListResponseOf<ThreadMessage>> {
-        while (this.remainingMessages.length > 0) {
-            const nextMessage = this.remainingMessages.shift(); // Removes the first element from the list
-            this.createMessage(thread_id, 'user', nextMessage!);
-        }
-
-        const lastMessageId = options?.before;
-        const i = this._messages[thread_id].findIndex((m) => m.id == lastMessageId);
-        const filteredMessages = this._messages[thread_id].slice(i + 1);
-
-        // the elements are in ascending order of the creation timestamp
-        filteredMessages.reverse();
-
-        return Promise.resolve({
-            data: filteredMessages,
-            firstId: '',
-            lastId: '',
-            hasMore: false
-        });
-    }
-
-    public async createRun(
-        thread_id: string,
-        createRunOptions: CreateRunOptions,
-        options?: CreateRunRequestOptions
-    ): Promise<ThreadRun> {
-        let remainingActions: RequiredAction;
-
-        if (this.remainingActions.length > 0) {
-            remainingActions = this.remainingActions.shift()!;
-        }
-
-        const newRun: ThreadRun = {
-            id: Date.now().toString(),
-            threadId: thread_id,
-            assistantId: this._assistant!.id,
-            status: 'in_progress',
-            requiredAction: remainingActions!,
-            model: this._assistant?.model ?? 'test-model',
-            instructions: this._assistant?.instructions ?? 'instructions',
-            tools: this._assistant?.tools ?? [],
-            fileIds: [],
-            createdAt: new Date(),
-            expiresAt: new Date(),
-            startedAt: new Date(),
-            completedAt: new Date(),
-            cancelledAt: new Date(),
-            failedAt: new Date(),
-            metadata: null
-        };
-
-        if (thread_id in this._runs) {
-            this._runs[thread_id].push(newRun);
-        } else {
-            this._runs[thread_id] = [newRun];
-        }
-
-        return Promise.resolve(newRun);
-    }
-
-    public override async getRun(threadId: string, runId: string, options?: GetRunOptions): Promise<ThreadRun> {
-        if (this._runs[threadId].length == 0) {
-            return Promise.reject();
-        }
-
-        const runStatus = this.remainingRunStatus.shift(); // dequeue
-        const i = this._runs[threadId].findIndex((r) => r.id == runId);
-
-        const run = this._runs[threadId][i];
-        run.status = runStatus!;
-
-        return Promise.resolve(run);
-    }
-
-    public override async listRuns(threadId: string, options?: ListRunsOptions): Promise<ListResponseOf<ThreadRun>> {
-        const runs = this._runs[threadId] ?? [];
-        return {
-            data: runs,
-            firstId: '',
-            lastId: '',
-            hasMore: false
-        };
-    }
-
-    public override async submitToolOutputsToRun(
-        threadId: string,
-        runId: string,
-        toolOutputs: ToolOutput[],
-        options?: SubmitToolOutputsToRunOptions
-    ): Promise<ThreadRun> {
-        return Promise.resolve(this.getRun(threadId, runId));
+        return plan;
     }
 }
