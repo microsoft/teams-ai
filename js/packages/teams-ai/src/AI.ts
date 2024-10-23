@@ -8,10 +8,12 @@
 
 import { TurnContext } from 'botbuilder';
 
+import { TooManyStepsParameters } from './types';
+
 import * as actions from './actions';
 import { DefaultModerator } from './moderators';
 import { Moderator } from './moderators/Moderator';
-import { PredictedDoCommand, Planner, Plan } from './planners';
+import { Plan, Planner, PredictedDoCommand } from './planners';
 import { TurnState } from './TurnState';
 
 /**
@@ -118,6 +120,8 @@ export class AI<TState extends TurnState = TurnState> {
     /**
      * A text string that can be returned from an action to stop the AI system from continuing
      * to execute the current plan.
+     * @remarks
+     * This command is incompatible and should not be used with `tools` augmentation 
      */
     public static readonly StopCommandName = actions.StopCommandName;
 
@@ -240,6 +244,13 @@ export class AI<TState extends TurnState = TurnState> {
      */
     public get planner(): Planner<TState> {
         return this._options.planner;
+    }
+
+    /**
+     * @returns {boolean} Returns the feedback loop flag.
+     */
+    public get enableFeedbackLoop(): boolean {
+        return this._options.enable_feedback_loop;
     }
 
     /**
@@ -393,7 +404,7 @@ export class AI<TState extends TurnState = TurnState> {
                 // Check for timeout
                 if (Date.now() - start_time! > max_time || ++step_count! > max_steps) {
                     completed = false;
-                    const parameters: actions.TooManyStepsParameters = {
+                    const parameters: TooManyStepsParameters = {
                         max_steps,
                         max_time,
                         start_time: start_time!,

@@ -8,7 +8,7 @@
 
 import { stringify } from 'yaml';
 
-import { ClientCitation } from './actions';
+import { ClientCitation } from './types';
 import { Tokenizer } from './tokenizers';
 
 /**

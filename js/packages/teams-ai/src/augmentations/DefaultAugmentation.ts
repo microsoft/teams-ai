@@ -10,9 +10,9 @@ import { TurnContext } from 'botbuilder-core';
 
 import { Memory } from '../MemoryFork';
 import { Plan, PredictedSayCommand } from '../planners';
+import { PromptResponse } from '../types';
 import { PromptSection } from '../prompts';
 import { Tokenizer } from '../tokenizers';
-import { PromptResponse } from '../types';
 import { Validation } from '../validators';
 
 import { Augmentation } from './Augmentation';

@@ -7,15 +7,14 @@
  */
 
 import { TurnContext } from 'botbuilder-core';
-import { Schema } from 'jsonschema';
 
-import { Memory } from '../MemoryFork';
-import { ChatCompletionAction } from '../models';
-import { Message, PromptSection } from '../prompts';
-import { Tokenizer } from '../tokenizers';
-import { PromptResponse } from '../types';
-import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from '../planners';
 import { ActionResponseValidator, JSONResponseValidator, Validation } from '../validators';
+import { ChatCompletionAction } from '../models';
+import { InnerMonologue, InnerMonologueSchema, PromptResponse } from '../types';
+import { Memory } from '../MemoryFork';
+import { Message, PromptSection } from '../prompts';
+import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from '../planners';
+import { Tokenizer } from '../tokenizers';
 
 import { Augmentation } from './Augmentation';
 import { ActionAugmentationSection } from './ActionAugmentationSection';
@@ -29,73 +28,6 @@ const MISSING_ACTION_FEEDBACK = `The JSON returned had errors. Apply these fixes
  * @private
  */
 const SAY_REDIRECT_FEEDBACK = `The JSON returned was missing an action. Return a valid JSON object that contains your thoughts and uses the SAY action.`;
-
-/**
- * Structure used to track the inner monologue of an LLM.
- */
-export interface InnerMonologue {
-    /**
-     * The LLM's thoughts.
-     */
-    thoughts: {
-        /**
-         * The LLM's current thought.
-         */
-        thought: string;
-
-        /**
-         * The LLM's reasoning for the current thought.
-         */
-        reasoning: string;
-
-        /**
-         * The LLM's plan for the future.
-         */
-        plan: string;
-    };
-
-    /**
-     * The next action to perform.
-     */
-    action: {
-        /**
-         * Name of the action to perform.
-         */
-        name: string;
-
-        /**
-         * Optional. Parameters for the action.
-         */
-        parameters?: Record<string, any>;
-    };
-}
-
-/**
- * JSON schema for validating an `InnerMonologue`.
- */
-export const InnerMonologueSchema: Schema = {
-    type: 'object',
-    properties: {
-        thoughts: {
-            type: 'object',
-            properties: {
-                thought: { type: 'string' },
-                reasoning: { type: 'string' },
-                plan: { type: 'string' }
-            },
-            required: ['thought', 'reasoning', 'plan']
-        },
-        action: {
-            type: 'object',
-            properties: {
-                name: { type: 'string' },
-                parameters: { type: 'object' }
-            },
-            required: ['name']
-        }
-    },
-    required: ['thoughts', 'action']
-};
 
 /**
  * The 'monologue' augmentation.

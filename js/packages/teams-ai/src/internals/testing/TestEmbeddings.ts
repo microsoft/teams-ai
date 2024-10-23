@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { EmbeddingsModel, EmbeddingsResponse, EmbeddingsResponseStatus } from '../../embeddings/EmbeddingsModel';
+import { EmbeddingsModel, EmbeddingsResponse, EmbeddingsResponseStatus } from '../../types/EmbeddingsModel';
 
 /**
  * A test model that can be used to test the prompt completion system.

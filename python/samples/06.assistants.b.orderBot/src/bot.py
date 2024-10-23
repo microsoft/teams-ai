@@ -133,10 +133,10 @@ async def turn_state_factory(context: TurnContext):
 
 @app.ai.action("place_order")
 async def on_place_order(
-    context: ActionTurnContext[Order],
+    context: ActionTurnContext,
     state: AppTurnState,
 ):
-    card = generate_card_for_order(context.data)
+    card = generate_card_for_order(Order.from_dict(context.data))
     await context.send_activity(MessageFactory.attachment(card))
     return "order placed"
 

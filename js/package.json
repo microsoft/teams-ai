@@ -21,16 +21,16 @@
     },
     "dependencies": {
         "botbuilder": "^4.23.1",
-        "openai": "4.61.0"
+        "openai": "4.68.2"
     },
     "devDependencies": {
         "@azure/logger": "^1.1.4",
         "@azure/ms-rest-js": "2.7.0",
-        "@microsoft/api-extractor": "^7.47.7",
+        "@microsoft/api-extractor": "^7.47.11",
         "@standardlabs/is-private": "^1.0.1",
         "@types/jsonwebtoken": "9.0.4",
-        "@types/lodash": "^4.17.10",
-        "@types/mocha": "^10.0.7",
+        "@types/lodash": "^4.17.12",
+        "@types/mocha": "^10.0.9",
         "@types/node": "^20.16.1",
         "@types/sinon": "^10.0.19",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
@@ -46,7 +46,7 @@
         "eslint-plugin-only-warn": "^1.1.0",
         "eslint-plugin-prettier": "^5.2.1",
         "exorcist": "^2.0.0",
-        "express": "^4.20.0",
+        "express": "^4.21.1",
         "mocha-junit-reporter": "^2.0.0",
         "mocha": "^10.7.3",
         "ms-rest-azure": "^3.0.2",

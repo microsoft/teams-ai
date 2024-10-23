@@ -7,11 +7,12 @@
  */
 
 import { TurnContext } from 'botbuilder-core';
-import { PromptResponseValidator } from '../validators';
-import { Plan } from '../planners';
-import { PromptSection } from '../prompts';
+
 import { Memory } from '../MemoryFork';
+import { Plan } from '../planners';
 import { PromptResponse } from '../types';
+import { PromptResponseValidator } from '../validators';
+import { PromptSection } from '../prompts';
 
 /**
  * An augmentation is a component that can be added to a prompt template to add additional
