@@ -36,9 +36,17 @@
         public IList<string>? BlocklistNames { get; set; }
 
         /// <summary>
-        /// When set to true, further analyses of harmful content will not be performed in cases where blocklists are hit. When set to false, all analyses of harmful content will be performed, whether or not blocklists are hit.
+        /// When set to true, further analyses of harmful content will not be performed in cases where blocklists are hit.
+        /// When set to false, all analyses of harmful content will be performed, whether or not blocklists are hit.
         /// </summary>
+        [Obsolete("use HaltOnBlockListHit")]
         public bool? BreakByBlocklists { get; set; }
+
+        /// <summary>
+        /// When set to true, further analyses of harmful content will not be performed in cases where blocklists are hit.
+        /// When set to false, all analyses of harmful content will be performed, whether or not blocklists are hit.
+        /// </summary>
+        public bool? HaltOnBlockListHit { get; set; }
 
         /// <summary>
         /// Create an instance of the AzureContentSafetyModeratorOptions class.
