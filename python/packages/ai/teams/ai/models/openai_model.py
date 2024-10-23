@@ -80,6 +80,24 @@ class AzureOpenAIModelOptions:
 class OpenAIModel(PromptCompletionModel):
     """
     A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
+
+    The model has been updated to support calling OpenAI's new o1 family of models. That currently
+    comes with a few constraints. These constraints are mostly handled for you but are worth noting:
+
+    - The o1 models introduce a new `max_completion_tokens` parameter and they've deprecated
+    the `max_tokens` parameter. The model will automatically convert the incoming `max_tokens
+    ` parameter to `max_completion_tokens` for you. But you should be aware that o1 has hidden
+    token usage and costs that aren't constrained by the `max_completion_tokens` parameter. 
+    This means that you may see an increase in token usage and costs when using the o1 models.
+
+    - The o1 models do not currently support the sending of system message so the model will 
+    map them to user message in this case.
+
+    - The o1 models do not currently support setting the `temperature`, `top_p`, and 
+    `presence_penalty` parameters so they will be ignored.
+
+    - The o1 models do not currently support the use of tools so you will need to use the 
+    "monologue" augmentation to call actions.
     """
 
     _options: Union[OpenAIModelOptions, AzureOpenAIModelOptions]
@@ -162,6 +180,7 @@ class OpenAIModel(PromptCompletionModel):
             if template.config.completion.model is not None
             else self._options.default_model
         )
+        is_o1_model = model.startswith("o1-")
 
         res = await template.prompt.render_as_messages(
             context=context,
@@ -232,10 +251,17 @@ class OpenAIModel(PromptCompletionModel):
                     content=msg.content if msg.content else "",
                 )
             elif msg.role == "system":
-                param = chat.ChatCompletionSystemMessageParam(
-                    role="system",
-                    content=msg.content if msg.content is not None else "",
-                )
+                # o1 models do not support system messages
+                if is_o1_model:
+                    param = chat.ChatCompletionUserMessageParam(
+                        role="user",
+                        content=msg.content if msg.content is not None else "",
+                    )
+                else:
+                    param = chat.ChatCompletionSystemMessageParam(
+                        role="system",
+                        content=msg.content if msg.content is not None else "",
+                    )
 
                 if msg.name:
                     param["name"] = msg.name
@@ -250,11 +276,13 @@ class OpenAIModel(PromptCompletionModel):
             completion = await self._client.chat.completions.create(
                 messages=messages,
                 model=model,
-                presence_penalty=template.config.completion.presence_penalty,
+                presence_penalty=(
+                    template.config.completion.presence_penalty if not is_o1_model else 0
+                ),
                 frequency_penalty=template.config.completion.frequency_penalty,
-                top_p=template.config.completion.top_p,
-                temperature=template.config.completion.temperature,
-                max_tokens=template.config.completion.max_tokens,
+                top_p=template.config.completion.top_p if not is_o1_model else 1,
+                temperature=template.config.completion.temperature if not is_o1_model else 1,
+                max_completion_tokens=template.config.completion.max_tokens,
                 tools=tools if len(tools) > 0 else NOT_GIVEN,
                 tool_choice=tool_choice if len(tools) > 0 else NOT_GIVEN,
                 parallel_tool_calls=parallel_tool_calls if len(tools) > 0 else NOT_GIVEN,
@@ -266,8 +294,7 @@ class OpenAIModel(PromptCompletionModel):
 
             # Handle tools flow
             action_calls = []
-            response_message = completion.choices[0].message
-            tool_calls = response_message.tool_calls
+            tool_calls = completion.choices[0].message.tool_calls
 
             if is_tools_aug and tool_calls:
                 for curr_tool_call in tool_calls:
