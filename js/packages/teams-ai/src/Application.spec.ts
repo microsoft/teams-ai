@@ -11,7 +11,14 @@ import {
     MessageReactionTypes,
     TestAdapter,
     O365ConnectorCardActionQuery,
-    FileConsentCardResponse
+    FileConsentCardResponse,
+    TurnContext,
+    TeamsInfo,
+    ConversationReference,
+    TeamDetails,
+    ChannelInfo,
+    TeamsChannelAccount,
+    TeamsPagedMembersResult
 } from 'botbuilder';
 
 import {
@@ -918,6 +925,305 @@ describe('Application', () => {
                 await app.run(context);
                 assert.equal(handlerCalled, true);
             });
+        });
+    });
+
+    describe('getTeamChannels', () => {
+        let app = new Application();
+        let stubContext: sinon.SinonStubbedInstance<TurnContext>;
+        const returnedChannels: ChannelInfo[] = [{ id: 'testChannelId', name: 'testName' }];
+
+        beforeEach(() => {
+            app = new Application({ adapter: new TeamsAdapter() });
+            stubContext = sandbox.createStubInstance(TurnContext);
+            const stubAdapter = sandbox.createStubInstance(CloudAdapter);
+            (
+                stubAdapter.continueConversationAsync as unknown as sinon.SinonStub<
+                    [string, Partial<ConversationReference>, (context: TurnContext) => Promise<void>],
+                    Promise<void>
+                >
+            ).callsFake(async (fakeBotAppId, ref, logic) => {
+                await logic(stubContext);
+            });
+            sandbox.stub(app, 'adapter').get(() => stubAdapter);
+            sandbox.stub(TeamsInfo, 'getTeamChannels').resolves(returnedChannels);
+        });
+
+        it('should return empty array if conversationType is not channel', async () => {
+            sandbox.stub(TurnContext, 'getConversationReference').returns({
+                conversation: {
+                    isGroup: false,
+                    conversationType: 'personal',
+                    id: 'testChannelId',
+                    name: 'testName'
+                }
+            });
+            const continueConversationAsyncStub = sandbox.stub(testAdapter, 'continueConversationAsync').resolves();
+
+            const channels = await app.getTeamChannels(new TurnContext(testAdapter, {}));
+
+            assert.equal(channels.length, 0);
+            assert(continueConversationAsyncStub.notCalled);
+        });
+
+        it('should return channel array if conversationType is channel with defined teamId', async () => {
+            sandbox.stub(TurnContext, 'getConversationReference').returns({
+                conversation: {
+                    isGroup: false,
+                    conversationType: 'channel',
+                    id: 'testChannelId',
+                    name: 'testName'
+                }
+            });
+            sandbox.stub(TurnContext.prototype, 'activity').get(() => {
+                return {
+                    channelData: {
+                        team: {
+                            id: 'testId'
+                        }
+                    }
+                };
+            });
+
+            const channels = await app.getTeamChannels({
+                conversation: {
+                    isGroup: false,
+                    conversationType: 'channel',
+                    id: 'testChannelId',
+                    name: 'testName'
+                }
+            });
+
+            assert.deepEqual(channels, returnedChannels);
+        });
+
+        it('should return channel array if conversationType is channel with defined conversationId and undefined name', async () => {
+            sandbox.stub(TurnContext, 'getConversationReference').returns({
+                conversation: {
+                    isGroup: false,
+                    conversationType: 'channel',
+                    id: 'testChannelId',
+                    name: 'testName'
+                }
+            });
+            sandbox.stub(TurnContext.prototype, 'activity').get(() => {
+                return {
+                    conversation: {
+                        id: 'teamId'
+                    }
+                };
+            });
+
+            const channels = await app.getTeamChannels({
+                conversation: {
+                    isGroup: false,
+                    conversationType: 'channel',
+                    id: 'testChannelId',
+                    name: 'testName'
+                }
+            });
+
+            assert.deepEqual(channels, returnedChannels);
+        });
+
+        it('should return empty array if conversationType is channel with defined name', async () => {
+            sandbox.stub(TurnContext, 'getConversationReference').returns({
+                conversation: {
+                    isGroup: false,
+                    conversationType: 'channel',
+                    id: 'testChannelId',
+                    name: 'testName'
+                }
+            });
+            sandbox.stub(TurnContext.prototype, 'activity').get(() => {
+                return {
+                    conversation: {
+                        name: 'teamName',
+                        id: 'teamId'
+                    }
+                };
+            });
+
+            const channels = await app.getTeamChannels({
+                conversation: {
+                    isGroup: false,
+                    conversationType: 'channel',
+                    id: 'testChannelId',
+                    name: 'testName'
+                }
+            });
+
+            assert.equal(channels.length, 0);
+        });
+    });
+
+    describe('getTeamDetails', () => {
+        let app = new Application();
+        let stubContext: sinon.SinonStubbedInstance<TurnContext>;
+        const returnedDetails: TeamDetails = {
+            id: 'teamId',
+            name: 'teamName'
+        };
+
+        beforeEach(() => {
+            app = new Application({ adapter: new TeamsAdapter() });
+            stubContext = sandbox.createStubInstance(TurnContext);
+            const stubAdapter = sandbox.createStubInstance(CloudAdapter);
+            (
+                stubAdapter.continueConversationAsync as unknown as sinon.SinonStub<
+                    [string, Partial<ConversationReference>, (context: TurnContext) => Promise<void>],
+                    Promise<void>
+                >
+            ).callsFake(async (fakeBotAppId, ref, logic) => {
+                await logic(stubContext);
+            });
+            sandbox.stub(app, 'adapter').get(() => stubAdapter);
+            sandbox.stub(TeamsInfo, 'getTeamDetails').resolves(returnedDetails);
+        });
+
+        it('should return undefined details if conversationType is not channel', async () => {
+            sandbox.stub(TurnContext, 'getConversationReference').returns({
+                conversation: {
+                    isGroup: false,
+                    conversationType: 'personal',
+                    id: 'testChannelId',
+                    name: 'testName'
+                }
+            });
+            const continueConversationAsyncStub = sandbox.stub(testAdapter, 'continueConversationAsync').resolves();
+
+            const details = await app.getTeamDetails(new TurnContext(testAdapter, {}));
+
+            assert.equal(details, undefined);
+            assert(continueConversationAsyncStub.notCalled);
+        });
+
+        it('should return team details if conversationType is channel with defined teamId', async () => {
+            sandbox.stub(TurnContext, 'getConversationReference').returns({
+                conversation: {
+                    isGroup: false,
+                    conversationType: 'channel',
+                    id: 'testChannelId',
+                    name: 'testName'
+                }
+            });
+            sandbox.stub(TurnContext.prototype, 'activity').get(() => {
+                return {
+                    channelData: {
+                        team: {
+                            id: 'testId'
+                        }
+                    }
+                };
+            });
+
+            const details = await app.getTeamDetails({
+                conversation: {
+                    isGroup: false,
+                    conversationType: 'channel',
+                    id: 'testChannelId',
+                    name: 'testName'
+                }
+            });
+
+            assert.deepEqual(details, returnedDetails);
+        });
+
+        it('should return team details if conversationType is channel with defined conversationId and undefined name', async () => {
+            sandbox.stub(TurnContext, 'getConversationReference').returns({
+                conversation: {
+                    isGroup: false,
+                    conversationType: 'channel',
+                    id: 'testChannelId',
+                    name: 'testName'
+                }
+            });
+            sandbox.stub(TurnContext.prototype, 'activity').get(() => {
+                return {
+                    conversation: {
+                        id: 'teamId'
+                    }
+                };
+            });
+
+            const details = await app.getTeamDetails({
+                conversation: {
+                    isGroup: false,
+                    conversationType: 'channel',
+                    id: 'testChannelId',
+                    name: 'testName'
+                }
+            });
+
+            assert.deepEqual(details, returnedDetails);
+        });
+
+        it('should return undefined if conversationType is channel with defined name', async () => {
+            sandbox.stub(TurnContext, 'getConversationReference').returns({
+                conversation: {
+                    isGroup: false,
+                    conversationType: 'channel',
+                    id: 'testChannelId',
+                    name: 'testName'
+                }
+            });
+            sandbox.stub(TurnContext.prototype, 'activity').get(() => {
+                return {
+                    conversation: {
+                        name: 'teamName',
+                        id: 'teamId'
+                    }
+                };
+            });
+
+            const details = await app.getTeamDetails({
+                conversation: {
+                    isGroup: false,
+                    conversationType: 'channel',
+                    id: 'testChannelId',
+                    name: 'testName'
+                }
+            });
+
+            assert.equal(details, undefined);
+        });
+    });
+
+    describe('getPagedMembers', () => {
+        let app = new Application();
+        let stubContext: sinon.SinonStubbedInstance<TurnContext>;
+        const returnedPagedMembers: TeamsPagedMembersResult = {
+            continuationToken: 'token',
+            members: [{} as TeamsChannelAccount, {} as TeamsChannelAccount]
+        };
+
+        beforeEach(() => {
+            app = new Application({ adapter: new TeamsAdapter() });
+            stubContext = sandbox.createStubInstance(TurnContext);
+            const stubAdapter = sandbox.createStubInstance(CloudAdapter);
+            (
+                stubAdapter.continueConversationAsync as unknown as sinon.SinonStub<
+                    [string, Partial<ConversationReference>, (context: TurnContext) => Promise<void>],
+                    Promise<void>
+                >
+            ).callsFake(async (fakeBotAppId, ref, logic) => {
+                await logic(stubContext);
+            });
+            sandbox.stub(app, 'adapter').get(() => stubAdapter);
+            sandbox.stub(TeamsInfo, 'getPagedMembers').resolves(returnedPagedMembers);
+        });
+
+        it('should return paged members result', async () => {
+            const pagedMembers = await app.getPagedMembers({
+                conversation: {
+                    isGroup: false,
+                    conversationType: 'channel',
+                    id: 'testChannelId',
+                    name: 'testName'
+                }
+            });
+
+            assert.deepEqual(pagedMembers, returnedPagedMembers);
         });
     });
 });
