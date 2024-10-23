@@ -38,7 +38,7 @@ if (!string.IsNullOrEmpty(config.OpenAI?.ApiKey))
 {
     // Create OpenAI Model
     builder.Services.AddSingleton<OpenAIModel>(sp => new(
-        new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-3.5-turbo")
+        new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-4o")
         {
             LogRequests = true
         },
@@ -70,11 +70,6 @@ else
 {
     throw new Exception("please configure settings for either OpenAI or Azure");
 }
-
-//builder.Services.AddSingleton<IDataSource>((sp) =>
-//{
-//    return new KernelMemoryDataSource("teams-ai", sp.GetService<IKernelMemory>()!);
-//});
 
 // Create the bot as transient. In this case the ASP Controller is expecting an IBot.
 builder.Services.AddTransient<IBot>(sp =>
