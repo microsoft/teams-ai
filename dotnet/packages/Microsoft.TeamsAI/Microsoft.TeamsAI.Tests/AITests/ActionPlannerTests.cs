@@ -328,7 +328,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             await state.LoadStateAsync(null, turnContext);
             state.Temp.Input = "test";
             var planner = new ActionPlanner<TurnState>(options, new TestLoggerFactory());
-            var ai = new AI<TurnState>(new(planner));
+            var ai = new AI<TurnState>(new(planner) { EnableFeedbackLoop = true });
 
             // Act
             var result = await planner.ContinueTaskAsync(turnContext, state, ai);

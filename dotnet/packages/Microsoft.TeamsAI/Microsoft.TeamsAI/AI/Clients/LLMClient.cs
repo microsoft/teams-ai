@@ -66,6 +66,7 @@ namespace Microsoft.Teams.AI.AI.Clients
 
         private readonly string? _startStreamingMessage;
         private ResponseReceivedHandler? _endStreamHandler;
+        private bool? _enableFeedbackLoop;
 
         /// <summary>
         /// Creates a new `LLMClient` instance.
@@ -84,6 +85,7 @@ namespace Microsoft.Teams.AI.AI.Clients
 
             this._startStreamingMessage = Options.StartStreamingMessage;
             this._endStreamHandler = Options.EndStreamHandler;
+            this._enableFeedbackLoop = Options.EnableFeedbackLoop;
         }
 
         /// <summary>
@@ -171,6 +173,14 @@ namespace Microsoft.Teams.AI.AI.Clients
                     // Create streamer and send initial message
                     streamer = new StreamingResponse(context);
                     memory.SetValue("temp.streamer", streamer);
+
+                    if (this._enableFeedbackLoop != null)
+                    {
+                        streamer.EnableFeedbackLoop = this._enableFeedbackLoop;
+                    }
+
+                    streamer.EnableGeneratedByAILabel = true;
+
                     if (!string.IsNullOrEmpty(this._startStreamingMessage))
                     {
                         streamer.QueueInformativeUpdate(this._startStreamingMessage!);

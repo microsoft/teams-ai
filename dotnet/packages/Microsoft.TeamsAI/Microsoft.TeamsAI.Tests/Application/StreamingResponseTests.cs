@@ -5,6 +5,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.Application;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.Tests.TestUtils;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Moq;
 
 namespace Microsoft.Teams.AI.Tests.Application
@@ -198,6 +199,34 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
+        public async Task Test_SendTextChunk_SendsFinalMessageWithPoweredByAIFeatures()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            ITurnContext turnContext = new TurnContext(adapter, new Activity(
+                text: "hello",
+                channelId: "channelId",
+                recipient: new() { Id = "recipientId" },
+                conversation: new() { Id = "conversationId" },
+                from: new() { Id = "fromId" }
+            ));
+            StreamingResponse streamer = new(turnContext);
+            streamer.QueueTextChunk("first");
+            await streamer.WaitForQueue();
+            streamer.QueueTextChunk("second");
+            await streamer.WaitForQueue();
+            streamer.EnableFeedbackLoop = true;
+            streamer.EnableGeneratedByAILabel = true;
+            await streamer.EndStream();
+            Assert.Equal(2, streamer.UpdatesSent());
+        }
+
+        [Fact]
         public async Task Test_SendTextChunk_SendsFinalMessageWithAttachments()
         {
             // Arrange
@@ -255,7 +284,7 @@ namespace Microsoft.Teams.AI.Tests.Application
 
 
             // Assert
-            Assert.Equal("Error occured when sending activity while streaming: Forbidden operation", ex.Message);
+            Assert.Equal("Error occurred when sending activity while streaming", ex.Message);
         }
     }
 }
