@@ -5,16 +5,19 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
+import asyncio
 import json
 from dataclasses import dataclass
 from logging import Logger
-from typing import Callable, List, Optional, Union
+from typing import Callable, List, Optional, Union, cast
 
 import openai
 from botbuilder.core import TurnContext
-from openai import NOT_GIVEN
+from openai import NOT_GIVEN, AsyncStream
 from openai.types import chat, shared_params
 from openai.types.chat.chat_completion_message_tool_call_param import Function
+
+from teams.streaming.prompt_chunk import PromptChunk
 
 from ...state import MemoryBase
 from ..prompts.message import ActionCall, ActionFunction, Message, MessageContext
@@ -22,6 +25,7 @@ from ..prompts.prompt_functions import PromptFunctions
 from ..prompts.prompt_template import PromptTemplate
 from ..tokenizers import Tokenizer
 from .prompt_completion_model import PromptCompletionModel
+from .prompt_completion_model_emitter import PromptCompletionModelEmitter
 from .prompt_response import PromptResponse
 
 
@@ -45,6 +49,9 @@ class OpenAIModelOptions:
 
     logger: Optional[Logger] = None
     "Optional. When set the model will log requests"
+
+    stream: bool = False
+    "Optional. Whether the model's responses should be streamed back."
 
 
 @dataclass
@@ -75,6 +82,9 @@ class AzureOpenAIModelOptions:
 
     logger: Optional[Logger] = None
     "Optional. When set the model will log requests"
+
+    stream: bool = False
+    "Optional. Whether the model's responses should be streamed back."
 
 
 class OpenAIModel(PromptCompletionModel):
@@ -116,6 +126,7 @@ class OpenAIModel(PromptCompletionModel):
                 organization=options.organization,
                 default_headers={"User-Agent": self.user_agent},
             )
+        self.events = PromptCompletionModelEmitter()
 
     async def complete_prompt(
         self,
@@ -162,6 +173,17 @@ class OpenAIModel(PromptCompletionModel):
             if template.config.completion.model is not None
             else self._options.default_model
         )
+
+        if self._options.stream and self.events is not None:
+            # Signal start of completion
+            self.events.emit_before_completion(
+                context=context,
+                memory=memory,
+                functions=functions,
+                tokenizer=tokenizer,
+                template=template,
+                streaming=True,
+            )
 
         res = await template.prompt.render_as_messages(
             context=context,
@@ -259,8 +281,67 @@ class OpenAIModel(PromptCompletionModel):
                 tool_choice=tool_choice if len(tools) > 0 else NOT_GIVEN,
                 parallel_tool_calls=parallel_tool_calls if len(tools) > 0 else NOT_GIVEN,
                 extra_body=extra_body,
+                stream=self._options.stream,
             )
 
+            if self._options.stream:
+                # Log start of streaming
+                if self._options.logger is not None:
+                    self._options.logger.debug("STREAM STARTED:")
+
+                # Enumerate the stream chunks
+                message_content = ""
+                message: Message[str] = Message(role="assistant", content="")
+                completion = cast(AsyncStream[chat.ChatCompletionChunk], completion)
+
+                async for chunk in completion:
+                    delta = chunk.choices[0].delta
+
+                    if delta.role:
+                        message.role = delta.role
+
+                    if delta.content:
+                        message_content += delta.content
+
+                    # TODO: Handle tool calls
+
+                    if self._options.logger is not None:
+                        self._options.logger.debug("CHUNK", delta)
+
+                    curr_delta_message = PromptChunk(
+                        delta=Message[str](role=str(delta.role), content=delta.content)
+                    )
+
+                    if self.events is not None:
+                        self.events.emit_chunk_received(context, memory, curr_delta_message)
+
+                message.content = message_content
+
+                # Log stream completion
+                if self._options.logger is not None:
+                    self._options.logger.debug("STREAM COMPLETED:")
+
+                res_input: Optional[Union[Message, List[Message]]] = None
+                last_message = len(res.output) - 1
+
+                # Skips the first message which is the prompt
+                if last_message > 0 and res.output[last_message].role != "assistant":
+                    res_input = res.output[last_message]
+
+                response = PromptResponse[str](input=res_input, message=message)
+
+                streamer = memory.get("temp.streamer")
+                if (
+                    (self.events is not None)
+                    and (streamer is not None)
+                ):
+                    self.events.emit_response_received(context, memory, response, streamer)
+
+                # Let any pending events flush before returning
+                await asyncio.sleep(0)
+                return response
+
+            completion = cast(chat.ChatCompletion, completion)
             if self._options.logger is not None:
                 self._options.logger.debug("COMPLETION:\n%s", completion.model_dump_json())
 

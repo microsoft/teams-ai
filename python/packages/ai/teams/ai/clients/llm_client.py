@@ -12,7 +12,9 @@ from typing import Any, List, Optional, Union
 from botbuilder.core import TurnContext
 
 from ...state import Memory, MemoryBase
-from ..models import PromptCompletionModel, PromptResponse
+from ...streaming.prompt_chunk import PromptChunk
+from ...streaming.streaming_response import StreamingResponse
+from ..models import PromptCompletionModel, PromptResponse, ResponseReceivedHandler, StreamingEventTypes
 from ..prompts import (
     ConversationHistorySection,
     Message,
@@ -68,6 +70,16 @@ class LLMClientOptions:
     Optional. When set the model will log requests
     """
 
+    start_streaming_message: Optional[str] = ""
+    """
+    Optional message to send a client at the start of a streaming response.
+    """
+
+    end_stream_handler: Optional[ResponseReceivedHandler] = None
+    """
+    Optional handler to run when a stream is about to conclude.
+    """
+
 
 class LLMClient:
     """
@@ -75,6 +87,8 @@ class LLMClient:
     """
 
     _options: LLMClientOptions
+    _start_streaming_message: Optional[str] = ""
+    _end_stream_handler: Optional[ResponseReceivedHandler] = None
 
     @property
     def options(self) -> LLMClientOptions:
@@ -111,6 +125,54 @@ class LLMClient:
         """
 
         remaining_attempts = remaining_attempts or self._options.max_repair_attempts
+
+        # Define event handlers
+        is_streaming = False
+        streamer: Optional[StreamingResponse] = None
+
+        def before_completion(
+            ctx: TurnContext,
+            memory: MemoryBase,
+            functions: PromptFunctions,
+            tokenizer: Tokenizer,
+            template: PromptTemplate,
+            streaming: bool,
+        ) -> None:
+            # Ignore events for other contexts
+            if context != ctx:
+                return
+
+            # Check for a streaming response
+            if streaming:
+                is_streaming = True
+
+            # Create streamer and send initial message
+            streamer = StreamingResponse(context)
+            memory.set("temp.streamer", streamer)
+            if self.options.start_streaming_message:
+                streamer.queue_informative_update(self.options.start_streaming_message)
+
+        def chunk_received(
+            ctx: TurnContext,
+            memory: MemoryBase,
+            chunk: PromptChunk,
+        ) -> None:
+            if (context != ctx) or streamer is None:
+                return
+
+            # Send chunk to client
+            text = chunk.delta.content if (chunk.delta and chunk.delta.content) else ""
+            if len(text) > 0:
+                streamer.queue_text_chunk(text)
+
+        # Subscribe to model events
+        if self._options.model.events is not None:
+            self._options.model.events.subscribe(StreamingEventTypes.BEFORE_COMPLETION, before_completion)
+            self._options.model.events.subscribe(StreamingEventTypes.CHUNK_RECEIVED, chunk_received)
+            
+            if self._options.end_stream_handler is not None:
+                handler: ResponseReceivedHandler = self._options.end_stream_handler
+                self._options.model.events.subscribe(StreamingEventTypes.RESPONSE_RECEIVED, handler)
 
         try:
             if remaining_attempts <= 0:
@@ -187,9 +249,26 @@ class LLMClient:
 
             self._add_message_to_history(memory, self._options.history_variable, res.input)
             self._add_message_to_history(memory, self._options.history_variable, res.message)
+
+            if is_streaming and res.status == "success":
+                # Delete message from response to avoid sending it twice
+                res.message = None
+
+            # End the stream if streaming
+            if streamer is not None:
+                await streamer.end_stream()
             return res
         except Exception as err:  # pylint: disable=broad-except
             return PromptResponse(status="error", error=str(err))
+        finally:
+            # Unsubscribe from model events
+            if self._options.model.events is not None:
+                self._options.model.events.unsubscribe(StreamingEventTypes.BEFORE_COMPLETION, before_completion)
+                self._options.model.events.unsubscribe(StreamingEventTypes.CHUNK_RECEIVED, chunk_received)
+
+                if self._options.end_stream_handler is not None:
+                    handler: ResponseReceivedHandler = self._options.end_stream_handler
+                    self._options.model.events.unsubscribe(StreamingEventTypes.RESPONSE_RECEIVED, handler)
 
     def _add_message_to_history(
         self, memory: MemoryBase, variable: str, messages: Union[Message[Any], List[Message[Any]]]

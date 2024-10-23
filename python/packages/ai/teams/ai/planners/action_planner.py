@@ -15,6 +15,7 @@ from ...app_error import ApplicationError
 from ...state import MemoryBase, TurnState
 from ..augmentations.default_augmentation import DefaultAugmentation
 from ..clients import LLMClient, LLMClientOptions
+from ..models import ResponseReceivedHandler
 from ..models.prompt_completion_model import PromptCompletionModel
 from ..models.prompt_response import PromptResponse
 from ..prompts.prompt_functions import PromptFunctions
@@ -55,6 +56,12 @@ class ActionPlannerOptions:
 
     logger: Optional[Logger] = None
     "Optional. When set the model will log requests"
+
+    start_streaming_message: Optional[str] = ""
+    "Optional message to send a client at the start of a streaming response."
+
+    end_stream_handler: Optional[ResponseReceivedHandler] = None
+    " Optional handler to run when a stream is about to conclude."
 
 
 class ActionPlanner(Planner[StateT]):
@@ -97,7 +104,11 @@ class ActionPlanner(Planner[StateT]):
         if res.status != "success":
             raise ApplicationError(res.error or "[ActionPlanner]: failed task")
 
-        return await augmentation.create_plan_from_response(context, state, res)
+        # Check to see if we have a response
+        # When a streaming response is used, the response message will be undefined.
+        if res.message is not None:
+            return await augmentation.create_plan_from_response(context, state, res)
+        return Plan()
 
     async def complete_prompt(
         self,
@@ -138,6 +149,8 @@ class ActionPlanner(Planner[StateT]):
                 input_variable="temp.input",
                 validator=validator,
                 logger=self._options.logger,
+                start_streaming_message=self._options.start_streaming_message,
+                end_stream_handler=self._options.end_stream_handler,
             )
         )
 
