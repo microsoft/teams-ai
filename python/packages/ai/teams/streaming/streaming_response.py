@@ -34,7 +34,7 @@ class StreamingResponse:
     _ended: bool = False
 
     _queue: List[Callable[[], Activity]] = []
-    _queue_sync: Optional[Awaitable[None]] = None
+    _queue_sync: Optional[asyncio.Task] = None
     _chunk_queued: bool = False
 
     def __init__(self, context: TurnContext) -> None:
@@ -83,7 +83,7 @@ class StreamingResponse:
         activity = Activity(
             type="typing",
             text=text,
-            channel_data={"stream_type":"informative", "stream_sequence":self._next_sequence}
+            channel_data={"streamType":"informative", "streamSequence":self._next_sequence}
             # channel_data=StreamingChannelData(
             #     stream_type=StreamTypes.INFORMATIVE, stream_sequence=self._next_sequence
             # ),
@@ -106,7 +106,7 @@ class StreamingResponse:
         # Queue the next chunk
         self.queue_next_chunk()
 
-    def end_stream(self) -> Awaitable[None]:
+    async def end_stream(self) -> None:
         """
         Ends the stream.
         """
@@ -119,17 +119,14 @@ class StreamingResponse:
         self.queue_next_chunk()
 
         # Wait for the queue to drain
-        return self.wait_for_queue()
+        await self.wait_for_queue()
 
-    def wait_for_queue(self) -> Awaitable[None]:
+    async def wait_for_queue(self):
         """
         Waits for the outoging acitivty queue to be empty.
         """
         if self._queue_sync:
-            return self._queue_sync
-        future: asyncio.Future = asyncio.Future()
-        future.set_result(None)
-        return future
+            await self._queue_sync
 
     def queue_next_chunk(self) -> None:
         """
@@ -141,7 +138,7 @@ class StreamingResponse:
 
         # Queue a chunk of text to be sent
         self._chunk_queued = True
-        self.queue_activity(lambda: self._format_next_chunk())
+        self.queue_activity(self._format_next_chunk)
 
     def _format_next_chunk(self) -> Activity:
         """
@@ -154,12 +151,12 @@ class StreamingResponse:
                 text=self._message,
                 attachments=self._attachments,
                 # channel_data=StreamingChannelData(stream_type=StreamTypes.FINAL),
-                channel_data={"stream_type":"final"}
+                channel_data={"streamType":"final"}
             )
         activity = Activity(
             type="typing",
             text=self._message,
-            channel_data={"stream_type":"streaming", "stream_sequence":self._next_sequence}
+            channel_data={"streamType":"streaming", "streamSequence":self._next_sequence}
             # channel_data=StreamingChannelData(
             #     stream_type=StreamTypes.STREAMING, stream_sequence=self._next_sequence
             # ),
@@ -175,7 +172,7 @@ class StreamingResponse:
         self._queue.append(factory)
 
         # If there's no sync in progress, start one
-        if not self._queue_sync:
+        if not self._queue_sync or self._queue_sync.done():
             self._queue_sync = asyncio.create_task(self.drain_queue())
 
     async def drain_queue(self):
@@ -190,6 +187,8 @@ class StreamingResponse:
 
                 # Send activity
                 await self.send_activity(activity)
+        except:
+            raise
         finally:
             # Queue is empty, mark as idle
             self._queue_sync = None
@@ -202,8 +201,8 @@ class StreamingResponse:
 
         # Set activity ID to the assigned stream ID
         if self._stream_id:
-            channel_data = vars(activity.channel_data)
-            channel_data["stream_id"] = self._stream_id
+            channel_data = activity.channel_data
+            channel_data["streamId"] = self._stream_id
             activity.channel_data = channel_data
 
         # Send activity
