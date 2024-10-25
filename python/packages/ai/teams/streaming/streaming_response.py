@@ -247,7 +247,6 @@ class StreamingResponse:
                     AIEntity(additional_type=["AIGeneratedContent"], citation=[])
                 )
 
-        print("THIS IS THE ACTIVITY IM SENDING", activity)
         # Send activity
         response = await self._context.send_activity(activity)
         await asyncio.sleep(1.5)
