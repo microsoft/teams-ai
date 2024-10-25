@@ -4,11 +4,10 @@ Licensed under the MIT License.
 """
 
 from unittest import IsolatedAsyncioTestCase
-from unittest.mock import MagicMock
-import pytest
 
-from botbuilder.core import TurnContext, CardFactory
-from botbuilder.schema import Activity, ChannelAccount, ConversationAccount, Attachment
+import pytest
+from botbuilder.core import CardFactory, TurnContext
+from botbuilder.schema import Activity, Attachment, ChannelAccount, ConversationAccount
 
 from teams.app_error import ApplicationError
 from teams.streaming.streaming_response import StreamingResponse
@@ -54,11 +53,11 @@ class TestStreamingResponse(IsolatedAsyncioTestCase):
     async def test_informative_update_assert_throws(self):
         context = self.create_mock_context()
         streamer = StreamingResponse(context)
-        streamer.end_stream()
+        await streamer.end_stream()
 
         with self.assertRaises(ApplicationError):
             streamer.queue_informative_update("first")
-    
+
     @pytest.mark.asyncio
     async def test_send_text_chunk(self):
         context = self.create_mock_context()
@@ -68,7 +67,7 @@ class TestStreamingResponse(IsolatedAsyncioTestCase):
         streamer.queue_text_chunk("second")
         await streamer.wait_for_queue()
         self.assertEqual(streamer.updates_sent(), 2)
-    
+
     @pytest.mark.asyncio
     async def test_send_text_chunk_assert_throws(self):
         context = self.create_mock_context()
@@ -77,19 +76,19 @@ class TestStreamingResponse(IsolatedAsyncioTestCase):
         await streamer.wait_for_queue()
         streamer.queue_text_chunk("second")
         await streamer.wait_for_queue()
-        streamer.end_stream()
+        await streamer.end_stream()
 
         with self.assertRaises(ApplicationError):
             streamer.queue_text_chunk("third")
         self.assertEqual(streamer.updates_sent(), 2)
-    
+
     @pytest.mark.asyncio
     async def test_end_stream(self):
         context = self.create_mock_context()
         streamer = StreamingResponse(context)
-        streamer.end_stream()
+        await streamer.end_stream()
         self.assertEqual(streamer.updates_sent(), 0)
-    
+
     @pytest.mark.asyncio
     async def test_send_final_message(self):
         context = self.create_mock_context()
@@ -98,9 +97,9 @@ class TestStreamingResponse(IsolatedAsyncioTestCase):
         await streamer.wait_for_queue()
         streamer.queue_text_chunk("second")
         await streamer.wait_for_queue()
-        streamer.end_stream()
+        await streamer.end_stream()
         self.assertEqual(streamer.updates_sent(), 2)
-    
+
     @pytest.mark.asyncio
     async def test_send_final_chunk_attachment(self):
         context = self.create_mock_context()
@@ -110,23 +109,25 @@ class TestStreamingResponse(IsolatedAsyncioTestCase):
         streamer.queue_text_chunk("second")
         await streamer.wait_for_queue()
 
-        adaptive_card = CardFactory.adaptive_card({
-            "type": "AdaptiveCard",
-            "schema": 'http://adaptivecards.io/schemas/adaptive-card.json',
-            "version": '1.6',
-            "body": 
-                [{
-                    "text": 'This is an example of an attachment..',
-                    "wrap": True,
-                    "type": 'TextBlock'
-                }]
-        })
+        adaptive_card = CardFactory.adaptive_card(
+            {
+                "type": "AdaptiveCard",
+                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "version": "1.6",
+                "body": [
+                    {
+                        "text": "This is an example of an attachment..",
+                        "wrap": True,
+                        "type": "TextBlock",
+                    }
+                ],
+            }
+        )
 
         attachment = Attachment(
-            content=adaptive_card,
-            content_type="application/vnd.microsoft.card.adaptive"
+            content=adaptive_card, content_type="application/vnd.microsoft.card.adaptive"
         )
         streamer._attachments = [attachment]
-        streamer.end_stream()
+        await streamer.end_stream()
         self.assertEqual(len(streamer._attachments), 1)
         self.assertEqual(streamer.updates_sent(), 2)

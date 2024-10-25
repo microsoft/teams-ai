@@ -97,16 +97,16 @@ class OpenAIModel(PromptCompletionModel):
     - The o1 models introduce a new `max_completion_tokens` parameter and they've deprecated
     the `max_tokens` parameter. The model will automatically convert the incoming `max_tokens
     ` parameter to `max_completion_tokens` for you. But you should be aware that o1 has hidden
-    token usage and costs that aren't constrained by the `max_completion_tokens` parameter. 
+    token usage and costs that aren't constrained by the `max_completion_tokens` parameter.
     This means that you may see an increase in token usage and costs when using the o1 models.
 
-    - The o1 models do not currently support the sending of system message so the model will 
+    - The o1 models do not currently support the sending of system message so the model will
     map them to user message in this case.
 
-    - The o1 models do not currently support setting the `temperature`, `top_p`, and 
+    - The o1 models do not currently support setting the `temperature`, `top_p`, and
     `presence_penalty` parameters so they will be ignored.
 
-    - The o1 models do not currently support the use of tools so you will need to use the 
+    - The o1 models do not currently support the use of tools so you will need to use the
     "monologue" augmentation to call actions.
     """
 
@@ -154,6 +154,7 @@ class OpenAIModel(PromptCompletionModel):
         tokenizer: Tokenizer,
         template: PromptTemplate,
     ) -> PromptResponse[str]:
+        # pylint: disable-msg=too-many-locals
         max_input_tokens = template.config.completion.max_input_tokens
 
         # Setup tools if enabled
@@ -333,8 +334,8 @@ class OpenAIModel(PromptCompletionModel):
 
                     # TODO: Handle tool calls
 
-                    # if self._options.logger is not None:
-                    #     self._options.logger.debug("CHUNK", delta)
+                    if self._options.logger is not None:
+                        self._options.logger.debug(f"CHUNK ${delta}")
 
                     curr_delta_message = PromptChunk(
                         delta=Message[str](role=str(delta.role), content=delta.content)
@@ -359,10 +360,7 @@ class OpenAIModel(PromptCompletionModel):
                 response = PromptResponse[str](input=res_input, message=message)
 
                 streamer = memory.get("temp.streamer")
-                if (
-                    (self.events is not None)
-                    and (streamer is not None)
-                ):
+                if (self.events is not None) and (streamer is not None):
                     self.events.emit_response_received(context, memory, response, streamer)
 
                 # Let any pending events flush before returning

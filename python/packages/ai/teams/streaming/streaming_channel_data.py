@@ -5,24 +5,31 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
-from .stream_types import StreamTypes
+from dataclasses_json import DataClassJsonMixin, config, dataclass_json
 
 
+@dataclass_json
 @dataclass
-class StreamingChannelData:
+class StreamingChannelData(DataClassJsonMixin):
     """A file sent by the user to the bot.
 
     Attributes:
-        stream_type (StreamTypes): The type of message being sent.
+        stream_type (str): The type of message being sent.
         stream_sequence (int): The sequence number of the message in the stream.
             Starts at 1 for the first message, and increments from there.
         stream_id (Optional[str]): The ID of the stream.
             Assigned after the initial update is sent.
+        feedback_loop_enabled (Optional[bool]): Whether the feedback loop is enabled.
     """
 
-    stream_type: StreamTypes
-    stream_sequence: Optional[int] = None
-    stream_id: Optional[str] = None
+    stream_type: str = field(metadata=config(field_name="streamType"))
+    stream_sequence: Optional[int] = field(
+        default=None, metadata=config(field_name="streamSequence")
+    )
+    stream_id: Optional[str] = field(default=None, metadata=config(field_name="streamId"))
+    feedback_loop_enabled: Optional[bool] = field(
+        default=None, metadata=config(field_name="feedbackLoopEnabled")
+    )

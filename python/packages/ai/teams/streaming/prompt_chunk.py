@@ -13,6 +13,10 @@ from ..ai.prompts.message import Message
 
 @dataclass
 class PromptChunk:
+    """
+    Streaming chunk passed in the `ChunkReceived` event.
+    """
+
     delta: Optional[Message[str]] = None
     """
     Delta for the response message being buffered up.

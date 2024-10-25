@@ -11,36 +11,35 @@ from botbuilder.core import TurnContext
 
 from ...app_error import ApplicationError
 from ...state.memory import MemoryBase
-from ...streaming.prompt_chunk import PromptChunk
-from ...streaming.streaming_response import StreamingResponse
+from ...streaming import PromptChunk, StreamHandlerTypes, StreamingResponse
+from ...streaming.streaming_handlers import (
+    BeforeCompletionHandler,
+    ChunkReceivedHandler,
+    ResponseReceivedHandler,
+    StreamEventHandler,
+)
 from ..prompts.prompt_functions import PromptFunctions
 from ..prompts.prompt_template import PromptTemplate
 from ..tokenizers import Tokenizer
-from ...streaming.streaming_events import (
-    BeforeCompletionHandler,
-    ChunkReceivedHandler,
-    StreamingEventTypes,
-    ResponseReceivedHandler,
-    Events
-)
 from .prompt_response import PromptResponse
 
+
 class PromptCompletionModelEmitter:
-    handlers: Dict[StreamingEventTypes, List[Events]]
+    handlers: Dict[StreamHandlerTypes, List[StreamEventHandler]]
 
     def __init__(self):
         self.handlers = {}
-        for event in StreamingEventTypes:
+        for event in StreamHandlerTypes:
             self.handlers[event] = []
 
-    def subscribe(self, event: StreamingEventTypes, handler: Events) -> None:
+    def subscribe(self, event: StreamHandlerTypes, handler: StreamEventHandler) -> None:
         if event in self.handlers:
-            return self.handlers[event].append(handler)
-    
-    def unsubscribe(self, event: StreamingEventTypes, handler: Events) -> None:
+            self.handlers[event].append(handler)
+
+    def unsubscribe(self, event: StreamHandlerTypes, handler: StreamEventHandler) -> None:
         if event in self.handlers:
             if self.handlers[event].count(handler) == 1:
-                return self.handlers[event].remove(handler)
+                self.handlers[event].remove(handler)
 
     def emit_before_completion(
         self,
@@ -51,27 +50,27 @@ class PromptCompletionModelEmitter:
         template: PromptTemplate,
         streaming: bool,
     ) -> None:
-        if StreamingEventTypes.BEFORE_COMPLETION in self.handlers:
-            for handler in self.handlers[StreamingEventTypes.BEFORE_COMPLETION]:
+        if StreamHandlerTypes.BEFORE_COMPLETION in self.handlers:
+            for handler in self.handlers[StreamHandlerTypes.BEFORE_COMPLETION]:
                 handler = cast(BeforeCompletionHandler, handler)
                 try:
                     handler(context, memory, functions, tokenizer, template, streaming)
                 except Exception as e:
-                    raise ApplicationError(f"Failed to execute BeforeCompletion handler. {e}")
-    
+                    raise ApplicationError("Failed to execute BeforeCompletion handler.") from e
+
     def emit_chunk_received(
         self,
         context: TurnContext,
         memory: MemoryBase,
         chunk: PromptChunk,
     ) -> None:
-        if StreamingEventTypes.CHUNK_RECEIVED in self.handlers:
-            for handler in self.handlers[StreamingEventTypes.CHUNK_RECEIVED]:
+        if StreamHandlerTypes.CHUNK_RECEIVED in self.handlers:
+            for handler in self.handlers[StreamHandlerTypes.CHUNK_RECEIVED]:
                 handler = cast(ChunkReceivedHandler, handler)
                 try:
                     handler(context, memory, chunk)
                 except Exception as e:
-                    raise ApplicationError(f"Failed to execute ChunkReceived handler. {e}")
+                    raise ApplicationError("Failed to execute ChunkReceived handler.") from e
 
     def emit_response_received(
         self,
@@ -80,10 +79,10 @@ class PromptCompletionModelEmitter:
         response: PromptResponse[str],
         streamer: StreamingResponse,
     ) -> None:
-        if StreamingEventTypes.RESPONSE_RECEIVED in self.handlers:
-                for handler in self.handlers[StreamingEventTypes.RESPONSE_RECEIVED]:
-                    handler = cast(ResponseReceivedHandler, handler)
-                    try:
-                        handler(context, memory, response, streamer)
-                    except Exception as e:
-                        raise ApplicationError(f"Failed to execute ResponseReceived handler. {e}")
+        if StreamHandlerTypes.RESPONSE_RECEIVED in self.handlers:
+            for handler in self.handlers[StreamHandlerTypes.RESPONSE_RECEIVED]:
+                handler = cast(ResponseReceivedHandler, handler)
+                try:
+                    handler(context, memory, response, streamer)
+                except Exception as e:
+                    raise ApplicationError("Failed to execute ResponseReceived handler") from e

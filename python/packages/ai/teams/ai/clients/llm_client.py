@@ -14,7 +14,12 @@ from botbuilder.core import TurnContext
 from ...state import Memory, MemoryBase
 from ...streaming.prompt_chunk import PromptChunk
 from ...streaming.streaming_response import StreamingResponse
-from ..models import PromptCompletionModel, PromptResponse, ResponseReceivedHandler, StreamingEventTypes
+from ..models import (
+    PromptCompletionModel,
+    PromptResponse,
+    ResponseReceivedHandler,
+    StreamHandlerTypes,
+)
 from ..prompts import (
     ConversationHistorySection,
     Message,
@@ -72,13 +77,16 @@ class LLMClientOptions:
 
     start_streaming_message: Optional[str] = ""
     """
-    Optional message to send a client at the start of a streaming response.
+    Optional message to send at the start of a streaming response.
     """
 
     end_stream_handler: Optional[ResponseReceivedHandler] = None
     """
     Optional handler to run when a stream is about to conclude.
     """
+
+    enable_feedback_loop: Optional[bool] = False
+    "Optional. Enables the Teams thumbs up or down buttons."
 
 
 class LLMClient:
@@ -89,6 +97,7 @@ class LLMClient:
     _options: LLMClientOptions
     _start_streaming_message: Optional[str] = ""
     _end_stream_handler: Optional[ResponseReceivedHandler] = None
+    _enable_feedback_loop: Optional[bool] = False
 
     @property
     def options(self) -> LLMClientOptions:
@@ -103,6 +112,9 @@ class LLMClient:
         """
 
         self._options = options
+        self._start_streaming_message = options.start_streaming_message
+        self._end_stream_handler = options.end_stream_handler
+        self._enable_feedback_loop = options.enable_feedback_loop
 
     async def complete_prompt(
         self,
@@ -138,6 +150,7 @@ class LLMClient:
             template: PromptTemplate,
             streaming: bool,
         ) -> None:
+            # pylint: disable=unused-argument
             # Ignore events for other contexts
             if context != ctx:
                 return
@@ -147,35 +160,43 @@ class LLMClient:
                 nonlocal is_streaming
                 is_streaming = True
 
-            # Create streamer and send initial message
             nonlocal streamer
             streamer = StreamingResponse(context)
             memory.set("temp.streamer", streamer)
-            if self.options.start_streaming_message:
-                streamer.queue_informative_update(self.options.start_streaming_message)
+
+            if self._enable_feedback_loop is not None:
+                streamer.set_feedback_loop(self._enable_feedback_loop)
+
+            streamer.set_generated_by_ai_label(True)
+
+            if self._start_streaming_message:
+                streamer.queue_informative_update(self._start_streaming_message)
 
         def chunk_received(
             ctx: TurnContext,
             memory: MemoryBase,
             chunk: PromptChunk,
         ) -> None:
+            # pylint: disable=unused-argument
             nonlocal streamer
-            if (context != ctx) or streamer is None:
+            if (context != ctx) or (streamer is None):
                 return
 
-            # Send chunk to client
             text = chunk.delta.content if (chunk.delta and chunk.delta.content) else ""
             if len(text) > 0:
                 streamer.queue_text_chunk(text)
 
         # Subscribe to model events
         if self._options.model.events is not None:
-            self._options.model.events.subscribe(StreamingEventTypes.BEFORE_COMPLETION, before_completion)
-            self._options.model.events.subscribe(StreamingEventTypes.CHUNK_RECEIVED, chunk_received)
-            
-            if self._options.end_stream_handler is not None:
-                handler: ResponseReceivedHandler = self._options.end_stream_handler
-                self._options.model.events.subscribe(StreamingEventTypes.RESPONSE_RECEIVED, handler)
+            self._options.model.events.subscribe(
+                StreamHandlerTypes.BEFORE_COMPLETION, before_completion
+            )
+            self._options.model.events.subscribe(StreamHandlerTypes.CHUNK_RECEIVED, chunk_received)
+
+            if self._end_stream_handler is not None:
+                self._options.model.events.subscribe(
+                    StreamHandlerTypes.RESPONSE_RECEIVED, self._end_stream_handler
+                )
 
         try:
             if remaining_attempts <= 0:
@@ -257,7 +278,6 @@ class LLMClient:
                 # Delete message from response to avoid sending it twice
                 res.message = None
 
-            # End the stream if streaming
             if streamer is not None:
                 await streamer.end_stream()
             return res
@@ -266,12 +286,17 @@ class LLMClient:
         finally:
             # Unsubscribe from model events
             if self._options.model.events is not None:
-                self._options.model.events.unsubscribe(StreamingEventTypes.BEFORE_COMPLETION, before_completion)
-                self._options.model.events.unsubscribe(StreamingEventTypes.CHUNK_RECEIVED, chunk_received)
+                self._options.model.events.unsubscribe(
+                    StreamHandlerTypes.BEFORE_COMPLETION, before_completion
+                )
+                self._options.model.events.unsubscribe(
+                    StreamHandlerTypes.CHUNK_RECEIVED, chunk_received
+                )
 
-                if self._options.end_stream_handler is not None:
-                    handler: ResponseReceivedHandler = self._options.end_stream_handler
-                    self._options.model.events.unsubscribe(StreamingEventTypes.RESPONSE_RECEIVED, handler)
+                if self._end_stream_handler is not None:
+                    self._options.model.events.unsubscribe(
+                        StreamHandlerTypes.RESPONSE_RECEIVED, self._end_stream_handler
+                    )
 
     def _add_message_to_history(
         self, memory: MemoryBase, variable: str, messages: Union[Message[Any], List[Message[Any]]]

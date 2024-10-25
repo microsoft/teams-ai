@@ -6,17 +6,16 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from typing import Callable, Union
-from enum import Enum
 
 from botbuilder.core import TurnContext
 
-from ..state.memory import MemoryBase
-from .prompt_chunk import PromptChunk
-from .streaming_response import StreamingResponse
+from ..ai.models.prompt_response import PromptResponse
 from ..ai.prompts.prompt_functions import PromptFunctions
 from ..ai.prompts.prompt_template import PromptTemplate
 from ..ai.tokenizers import Tokenizer
-from ..ai.models.prompt_response import PromptResponse
+from ..state.memory import MemoryBase
+from .prompt_chunk import PromptChunk
+from .streaming_response import StreamingResponse
 
 BeforeCompletionHandler = Callable[
     [TurnContext, MemoryBase, PromptFunctions, Tokenizer, PromptTemplate, bool], None
@@ -31,9 +30,4 @@ ResponseReceivedHandler = Callable[
 ]
 "Triggered after the model finishes returning a response."
 
-Events = Union[BeforeCompletionHandler, ChunkReceivedHandler, ResponseReceivedHandler]
-
-class StreamingEventTypes(str, Enum):
-    BEFORE_COMPLETION = "BeforeCompletion"
-    CHUNK_RECEIVED = "ChunkReceived"
-    RESPONSE_RECEIVED = "ResponseReceived"
+StreamEventHandler = Union[BeforeCompletionHandler, ChunkReceivedHandler, ResponseReceivedHandler]

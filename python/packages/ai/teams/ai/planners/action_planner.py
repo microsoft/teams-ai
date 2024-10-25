@@ -58,10 +58,13 @@ class ActionPlannerOptions:
     "Optional. When set the model will log requests"
 
     start_streaming_message: Optional[str] = ""
-    "Optional message to send a client at the start of a streaming response."
+    "Optional message to send at the start of a streaming response."
 
     end_stream_handler: Optional[ResponseReceivedHandler] = None
-    " Optional handler to run when a stream is about to conclude."
+    "Optional handler to run when a stream is about to conclude."
+
+    enable_feedback_loop: Optional[bool] = False
+    "Optional. Enables the Teams thumbs up or down buttons."
 
 
 class ActionPlanner(Planner[StateT]):
@@ -71,6 +74,7 @@ class ActionPlanner(Planner[StateT]):
 
     _options: ActionPlannerOptions
     _prompt_factory: ActionPlannerPromptFactory
+    _enable_feedback_loop: Optional[bool] = False
 
     @property
     def options(self) -> ActionPlannerOptions:
@@ -85,6 +89,7 @@ class ActionPlanner(Planner[StateT]):
         """
 
         self._options = options
+        self._enable_feedback_loop = options.enable_feedback_loop
 
         if isinstance(self._options.default_prompt, str):
             self._prompt_factory = self._default_prompt_factory(self._options.default_prompt)
@@ -97,6 +102,7 @@ class ActionPlanner(Planner[StateT]):
     async def continue_task(self, context: TurnContext, state: TurnState) -> Plan:
         template = await self._prompt_factory(context, state, self)
         augmentation = template.augmentation or DefaultAugmentation()
+
         res = await self.complete_prompt(
             context=context, memory=state, prompt=template, validator=augmentation
         )
@@ -151,6 +157,7 @@ class ActionPlanner(Planner[StateT]):
                 logger=self._options.logger,
                 start_streaming_message=self._options.start_streaming_message,
                 end_stream_handler=self._options.end_stream_handler,
+                enable_feedback_loop=self._enable_feedback_loop,
             )
         )
 
