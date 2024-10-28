@@ -183,8 +183,12 @@ class LLMClient:
                 return
 
             text = chunk.delta.content if (chunk.delta and chunk.delta.content) else ""
+            citations = (
+                chunk.delta.context.citations if (chunk.delta and chunk.delta.context) else None
+            )
+
             if len(text) > 0:
-                streamer.queue_text_chunk(text)
+                streamer.queue_text_chunk(text, citations)
 
         # Subscribe to model events
         if self._options.model.events is not None:

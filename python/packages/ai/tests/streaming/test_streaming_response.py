@@ -9,6 +9,7 @@ import pytest
 from botbuilder.core import CardFactory, TurnContext
 from botbuilder.schema import Activity, Attachment, ChannelAccount, ConversationAccount
 
+from teams.ai.prompts.message import Citation
 from teams.app_error import ApplicationError
 from teams.streaming.streaming_response import StreamingResponse
 from tests.utils.adapter import SimpleAdapter
@@ -67,6 +68,25 @@ class TestStreamingResponse(IsolatedAsyncioTestCase):
         streamer.queue_text_chunk("second")
         await streamer.wait_for_queue()
         self.assertEqual(streamer.updates_sent(), 2)
+
+    @pytest.mark.asyncio
+    async def test_send_text_chunk_with_irrelevant_citations(self):
+        context = self.create_mock_context()
+        streamer = StreamingResponse(context)
+        streamer.queue_text_chunk(
+            "first",
+            [
+                Citation(
+                    content="test-content", url="https://example.com", title="test", filepath="test"
+                )
+            ],
+        )
+        await streamer.wait_for_queue()
+        streamer.queue_text_chunk("second")
+        await streamer.wait_for_queue()
+        self.assertEqual(streamer.updates_sent(), 2)
+        self.assertEqual(streamer.message, "firstsecond")
+        self.assertEqual(streamer.citations, None)
 
     @pytest.mark.asyncio
     async def test_send_text_chunk_assert_throws(self):
@@ -130,4 +150,18 @@ class TestStreamingResponse(IsolatedAsyncioTestCase):
         streamer._attachments = [attachment]
         await streamer.end_stream()
         self.assertEqual(len(streamer._attachments), 1)
+        self.assertEqual(streamer.updates_sent(), 2)
+
+    @pytest.mark.asyncio
+    async def test_send_final_chunk_with_feedback_and_label(self):
+        context = self.create_mock_context()
+        streamer = StreamingResponse(context)
+        streamer.queue_text_chunk("first")
+        await streamer.wait_for_queue()
+        streamer.set_feedback_loop(True)
+        streamer.set_generated_by_ai_label(True)
+        streamer.queue_text_chunk("second")
+        await streamer.wait_for_queue()
+        await streamer.end_stream()
+
         self.assertEqual(streamer.updates_sent(), 2)

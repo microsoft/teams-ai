@@ -11,7 +11,12 @@ from typing import Callable, List, Optional
 from botbuilder.core import TurnContext
 from botbuilder.schema import Activity, Attachment, Entity
 
-from ..ai.citations import AIEntity
+from teams.ai.citations.citations import Appearance, SensitivityUsageInfo
+from teams.utils import snippet
+from teams.utils.citations import format_citations_response, get_used_citations
+
+from ..ai.citations import AIEntity, ClientCitation
+from ..ai.prompts.message import Citation
 from ..app_error import ApplicationError
 from .streaming_channel_data import StreamingChannelData
 
@@ -33,6 +38,8 @@ class StreamingResponse:
     _attachments: List[Attachment] = []
     _ended: bool = False
 
+    _citations: Optional[List[ClientCitation]] = []
+    _sensitivity_label: Optional[SensitivityUsageInfo] = None
     _enable_feedback_loop: Optional[bool] = False
     _enable_generated_by_ai_label: Optional[bool] = False
 
@@ -61,6 +68,13 @@ class StreamingResponse:
         """
         return self._message
 
+    @property
+    def citations(self) -> Optional[List[ClientCitation]]:
+        """
+        Returns the list of citations.
+        """
+        return self._citations
+
     def set_attachments(self, attachments: List[Attachment]) -> None:
         """
         Sets the attachments to attach to the final chunk.
@@ -75,6 +89,13 @@ class StreamingResponse:
             or disable feedback loop.
         """
         self._enable_feedback_loop = enable_feedback_loop
+
+    def set_sensitivity_label(self, sensitivity_label: SensitivityUsageInfo) -> None:
+        """
+        Sets the sensitivity label to attach to the final chunk.
+        :param sensitivity_label: SensitivityUsageInfo object.
+        """
+        self._sensitivity_label = sensitivity_label
 
     def set_generated_by_ai_label(self, enable_generated_by_ai_label: bool) -> None:
         """
@@ -109,7 +130,7 @@ class StreamingResponse:
         self.queue_activity(lambda: activity)
         self._next_sequence += 1
 
-    def queue_text_chunk(self, text: str) -> None:
+    def queue_text_chunk(self, text: str, citations: Optional[List[Citation]] = None) -> None:
         """
         Queues a chunk of partial message text to be sent to the client.
         The text we be sent as quickly as possible to the client. Chunks may be combined before
@@ -120,6 +141,34 @@ class StreamingResponse:
             raise ApplicationError("The stream has already ended.")
 
         self._message += text
+
+        if citations and len(citations) > 0:
+            if not self._citations:
+                self._citations = []
+            curr_pos = len(self._citations)
+
+            for citation in citations:
+                self._citations.append(
+                    ClientCitation(
+                        position=f"{curr_pos}",
+                        appearance=Appearance(
+                            name=citation.title or f"Document {curr_pos}",
+                            abstract=snippet(citation.content, 477),
+                        ),
+                    )
+                )
+                curr_pos += 1
+
+            # If there are citations, modify the content so that the sources are numbers
+            # instead of [doc1], [doc2], etc.
+            self._message = (
+                self._message
+                if len(self._citations) == 0
+                else format_citations_response(self._message)
+            )
+
+            # If there are citations, filter out the citations unused in content.
+            self._citations = get_used_citations(self._message, self._citations)
 
         # Queue the next chunk
         self.queue_next_chunk()
@@ -194,7 +243,9 @@ class StreamingResponse:
             try:
                 self._queue_sync = self.drain_queue()
             except Exception as e:
-                raise ApplicationError("Erroroccured when sending activity while streaming:") from e
+                raise ApplicationError(
+                    "Error occured when sending activity while streaming:"
+                ) from e
 
     def drain_queue(self) -> asyncio.Task:
         async def _drain_queue():
@@ -244,7 +295,11 @@ class StreamingResponse:
 
             if self._enable_generated_by_ai_label:
                 activity.entities.append(
-                    AIEntity(additional_type=["AIGeneratedContent"], citation=[])
+                    AIEntity(
+                        additional_type=["AIGeneratedContent"],
+                        citation=self._citations if self._citations else [],
+                        usage_info=self._sensitivity_label,
+                    )
                 )
 
         # Send activity

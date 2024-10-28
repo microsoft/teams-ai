@@ -22,6 +22,7 @@ class AIEntity(Entity):
         "id_": {"key": "@id", "type": "str"},
         "additional_type": {"key": "additionalType", "type": "[str]"},
         "citation": {"key": "citation", "type": "[ClientCitation]"},
+        "usage_info": {"key": "usageInfo", "type": "SensitivityUsageInfo"},
     }
 
     additional_type: Optional[list[str]]
@@ -30,6 +31,7 @@ class AIEntity(Entity):
     type_: str = "Message"
     context_: str = "https://schema.org"
     id_: str = ""
+    usage_info: Optional[SensitivityUsageInfo] = field(default=None)
 
 
 @dataclass

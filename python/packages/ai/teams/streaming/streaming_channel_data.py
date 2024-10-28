@@ -14,7 +14,12 @@ from dataclasses_json import DataClassJsonMixin, config, dataclass_json
 @dataclass_json
 @dataclass
 class StreamingChannelData(DataClassJsonMixin):
-    """A file sent by the user to the bot.
+    """
+    Structure of the outgoing channelData field for streaming responses.
+    The expected sequence of stream_types is:
+    "informative", "streaming", "streaming",..."final".
+
+    Once the "final" message is sent, the stream is considered ended.
 
     Attributes:
         stream_type (str): The type of message being sent.

@@ -338,7 +338,15 @@ class OpenAIModel(PromptCompletionModel):
                         self._options.logger.debug(f"CHUNK ${delta}")
 
                     curr_delta_message = PromptChunk(
-                        delta=Message[str](role=str(delta.role), content=delta.content)
+                        delta=Message[str](
+                            role=str(delta.role),
+                            content=delta.content,
+                            context=(
+                                MessageContext.from_dict(delta.context)
+                                if hasattr(delta, "context")
+                                else None
+                            ),
+                        )
                     )
 
                     if self.events is not None:
