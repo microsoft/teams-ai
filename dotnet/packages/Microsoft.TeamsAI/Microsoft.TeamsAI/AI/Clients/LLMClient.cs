@@ -197,9 +197,12 @@ namespace Microsoft.Teams.AI.AI.Clients
 
                 // Send chunk to client
                 string text = args.Chunk.delta?.GetContent<string>() ?? "";
+                IList<Citation>? citations = args.Chunk.delta?.Context?.Citations ?? null;
+
+
                 if (text.Length > 0)
                 {
-                    streamer.QueueTextChunk(text);
+                    streamer.QueueTextChunk(text, citations);
                 }
             });
 
