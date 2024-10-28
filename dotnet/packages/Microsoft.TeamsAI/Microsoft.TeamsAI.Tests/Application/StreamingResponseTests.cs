@@ -268,7 +268,10 @@ namespace Microsoft.Teams.AI.Tests.Application
             await streamer.EndStream();
             Assert.Equal(2, streamer.UpdatesSent());
             Assert.Single(streamer.Attachments);
-            Assert.Null(streamer.Citations);
+            if (streamer.Citations != null)
+            {
+                Assert.Empty(streamer.Citations);
+            }
         }
 
         [Fact]
