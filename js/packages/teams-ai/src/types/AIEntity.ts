@@ -7,6 +7,7 @@
  */
 
 import { ClientCitation } from './ClientCitation';
+import { SensitivityUsageInfo } from './SensitivityUsageInfo';
 
 export interface AIEntity {
     /**
@@ -38,4 +39,9 @@ export interface AIEntity {
      * Optional; if citations object is included, the  sent activity will include the citations, referenced in the activity text.
      */
     citation?: ClientCitation[];
+
+    /**u
+     * Optional; if usage_info object is included, the sent activity will include the sensitivity usage information.
+     */
+    usageInfo?: SensitivityUsageInfo;
 }

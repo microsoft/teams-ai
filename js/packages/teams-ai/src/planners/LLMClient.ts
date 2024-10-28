@@ -327,8 +327,10 @@ export class LLMClient<TContent = any> {
 
             // Send chunk to client
             const text = chunk.delta?.content ?? '';
+            const citations = chunk.delta?.context?.citations ?? undefined;
+
             if (text.length > 0) {
-                streamer.queueTextChunk(text);
+                streamer.queueTextChunk(text, citations);
             }
         };
 
