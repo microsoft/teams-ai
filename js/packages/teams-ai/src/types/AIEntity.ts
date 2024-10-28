@@ -40,7 +40,7 @@ export interface AIEntity {
      */
     citation?: ClientCitation[];
 
-    /**u
+    /**
      * Optional; if usage_info object is included, the sent activity will include the sensitivity usage information.
      */
     usageInfo?: SensitivityUsageInfo;
