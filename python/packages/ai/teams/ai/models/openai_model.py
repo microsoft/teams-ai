@@ -202,77 +202,15 @@ class OpenAIModel(PromptCompletionModel):
         if self._options.logger is not None:
             self._options.logger.debug(f"PROMPT:\n{res.output}")
 
-        messages: List[chat.ChatCompletionMessageParam] = []
-
-        for msg in res.output:
-            param: Union[
-                chat.ChatCompletionUserMessageParam,
-                chat.ChatCompletionAssistantMessageParam,
-                chat.ChatCompletionSystemMessageParam,
-                chat.ChatCompletionToolMessageParam,
-            ] = chat.ChatCompletionUserMessageParam(
-                role="user",
-                content=msg.content if msg.content is not None else "",
-            )
-
-            if msg.name:
-                setattr(param, "name", msg.name)
-
-            if msg.role == "assistant":
-                param = chat.ChatCompletionAssistantMessageParam(
-                    role="assistant",
-                    content=msg.content if msg.content is not None else "",
-                )
-
-                tool_call_params: List[chat.ChatCompletionMessageToolCallParam] = []
-
-                if msg.action_calls and len(msg.action_calls) > 0:
-                    for tool_call in msg.action_calls:
-                        tool_call_params.append(
-                            chat.ChatCompletionMessageToolCallParam(
-                                id=tool_call.id,
-                                function=Function(
-                                    name=tool_call.function.name,
-                                    arguments=tool_call.function.arguments,
-                                ),
-                                type=tool_call.type,
-                            )
-                        )
-                    param["content"] = None
-                    param["tool_calls"] = tool_call_params
-
-                if msg.name:
-                    param["name"] = msg.name
-
-            elif msg.role == "tool":
-                param = chat.ChatCompletionToolMessageParam(
-                    role="tool",
-                    tool_call_id=msg.action_call_id if msg.action_call_id else "",
-                    content=msg.content if msg.content else "",
-                )
-            elif msg.role == "system":
-                # o1 models do not support system messages
-                if is_o1_model:
-                    param = chat.ChatCompletionUserMessageParam(
-                        role="user",
-                        content=msg.content if msg.content is not None else "",
-                    )
-                else:
-                    param = chat.ChatCompletionSystemMessageParam(
-                        role="system",
-                        content=msg.content if msg.content is not None else "",
-                    )
-
-                if msg.name:
-                    param["name"] = msg.name
-
-            messages.append(param)
+        messages: List[chat.ChatCompletionMessageParam]
+        messages = self._map_messages(res.output, is_o1_model)
 
         try:
             extra_body = {}
             if template.config.completion.data_sources is not None:
                 extra_body["data_sources"] = template.config.completion.data_sources
 
+            max_tokens = template.config.completion.max_tokens
             completion = await self._client.chat.completions.create(
                 messages=messages,
                 model=model,
@@ -282,8 +220,8 @@ class OpenAIModel(PromptCompletionModel):
                 frequency_penalty=template.config.completion.frequency_penalty,
                 top_p=template.config.completion.top_p if not is_o1_model else 1,
                 temperature=template.config.completion.temperature if not is_o1_model else 1,
-                max_tokens=template.config.completion.max_tokens if not is_o1_model else NOT_GIVEN,
-                max_completion_tokens=template.config.completion.max_tokens if is_o1_model else NOT_GIVEN,
+                max_tokens=max_tokens if not is_o1_model else NOT_GIVEN,
+                max_completion_tokens=max_tokens if is_o1_model else NOT_GIVEN,
                 tools=tools if len(tools) > 0 else NOT_GIVEN,
                 tool_choice=tool_choice if len(tools) > 0 else NOT_GIVEN,
                 parallel_tool_calls=parallel_tool_calls if len(tools) > 0 else NOT_GIVEN,
@@ -350,3 +288,70 @@ class OpenAIModel(PromptCompletionModel):
                 status of {err.code}: {err.message}
                 """,
             )
+
+    def _map_messages(self, msgs: List[Message], is_o1_model: bool):
+        output = []
+        for msg in msgs:
+            param: Union[
+                chat.ChatCompletionUserMessageParam,
+                chat.ChatCompletionAssistantMessageParam,
+                chat.ChatCompletionSystemMessageParam,
+                chat.ChatCompletionToolMessageParam,
+            ] = chat.ChatCompletionUserMessageParam(
+                role="user",
+                content=msg.content if msg.content is not None else "",
+            )
+
+            if msg.name:
+                setattr(param, "name", msg.name)
+
+            if msg.role == "assistant":
+                param = chat.ChatCompletionAssistantMessageParam(
+                    role="assistant",
+                    content=msg.content if msg.content is not None else "",
+                )
+
+                tool_call_params: List[chat.ChatCompletionMessageToolCallParam] = []
+
+                if msg.action_calls and len(msg.action_calls) > 0:
+                    for tool_call in msg.action_calls:
+                        tool_call_params.append(
+                            chat.ChatCompletionMessageToolCallParam(
+                                id=tool_call.id,
+                                function=Function(
+                                    name=tool_call.function.name,
+                                    arguments=tool_call.function.arguments,
+                                ),
+                                type=tool_call.type,
+                            )
+                        )
+                    param["content"] = None
+                    param["tool_calls"] = tool_call_params
+
+                if msg.name:
+                    param["name"] = msg.name
+
+            elif msg.role == "tool":
+                param = chat.ChatCompletionToolMessageParam(
+                    role="tool",
+                    tool_call_id=msg.action_call_id if msg.action_call_id else "",
+                    content=msg.content if msg.content else "",
+                )
+            elif msg.role == "system":
+                # o1 models do not support system messages
+                if is_o1_model:
+                    param = chat.ChatCompletionUserMessageParam(
+                        role="user",
+                        content=msg.content if msg.content is not None else "",
+                    )
+                else:
+                    param = chat.ChatCompletionSystemMessageParam(
+                        role="system",
+                        content=msg.content if msg.content is not None else "",
+                    )
+
+                if msg.name:
+                    param["name"] = msg.name
+
+            output.append(param)
+        return output
