@@ -120,7 +120,7 @@ namespace Microsoft.Teams.AI.Application
         /// Queues a chunk of partial message text to be sent to the client.
         /// </summary>
         /// <param name="text">Partial text of the message to send.</param>
-        /// <param name="citations"=null>Citations to include in the message.</param>
+        /// <param name="citations">Citations to include in the message.</param>
         /// <exception cref="TeamsAIException">Throws if the stream has already ended.</exception>
         public void QueueTextChunk(string text, IList<Citation>? citations = null)
         {
