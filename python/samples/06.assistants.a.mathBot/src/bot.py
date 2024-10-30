@@ -92,7 +92,7 @@ async def setup_assistant(context: TurnContext, state: AppTurnState):
                 assistant = await AssistantsPlanner.create_assistant(
                     api_key=config.AZURE_OPENAI_KEY,
                     azure_ad_token_provider=None,
-                    api_version="",
+                    api_version="2024-05-01-preview",
                     organization="",
                     endpoint=config.AZURE_OPENAI_ENDPOINT,
                     request=params,
@@ -101,7 +101,7 @@ async def setup_assistant(context: TurnContext, state: AppTurnState):
                 assistant = await AssistantsPlanner.create_assistant(
                     api_key=None,
                     azure_ad_token_provider=get_bearer_token_provider(DefaultAzureCredential(), 'https://cognitiveservices.azure.com/.default'),
-                    api_version="",
+                    api_version="2024-05-01-preview",
                     organization="",
                     endpoint=config.AZURE_OPENAI_ENDPOINT,
                     request=params,
