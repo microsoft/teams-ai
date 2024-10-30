@@ -98,21 +98,23 @@ describe('OpenAIModel', () => {
         });
 
         const mockResponse = {
-            choices: [{
-                message: {
-                    role: 'assistant',
-                    content: 'Test response',
-                    context: {
-                        citations: [
-                            {
-                                content: 'Citation content',
-                                title: 'Citation title',
-                                url: 'https://citation.url'
-                            }
-                        ]
+            choices: [
+                {
+                    message: {
+                        role: 'assistant',
+                        content: 'Test response',
+                        context: {
+                            citations: [
+                                {
+                                    content: 'Citation content',
+                                    title: 'Citation title',
+                                    url: 'https://citation.url'
+                                }
+                            ]
+                        }
                     }
                 }
-            }]
+            ]
         };
 
         // Mock the API call
