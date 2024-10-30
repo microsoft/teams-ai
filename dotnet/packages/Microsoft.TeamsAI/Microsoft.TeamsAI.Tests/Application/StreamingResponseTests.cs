@@ -2,6 +2,8 @@
 using AdaptiveCards;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
+using Microsoft.Teams.AI.AI.Action;
+using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.Application;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.Tests.TestUtils;
@@ -216,12 +218,15 @@ namespace Microsoft.Teams.AI.Tests.Application
                 from: new() { Id = "fromId" }
             ));
             StreamingResponse streamer = new(turnContext);
-            streamer.QueueTextChunk("first");
+            List<Citation> citations = new List<Citation>();
+            citations.Add(new Citation(content: "test-content", title: "test", url: "https://example.com"));
+            streamer.QueueTextChunk("first", citations);
             await streamer.WaitForQueue();
             streamer.QueueTextChunk("second");
             await streamer.WaitForQueue();
             streamer.EnableFeedbackLoop = true;
             streamer.EnableGeneratedByAILabel = true;
+            streamer.SensitivityLabel = new SensitivityUsageInfo() { Name= "Sensitivity"};
             await streamer.EndStream();
             Assert.Equal(2, streamer.UpdatesSent());
         }
@@ -263,6 +268,10 @@ namespace Microsoft.Teams.AI.Tests.Application
             await streamer.EndStream();
             Assert.Equal(2, streamer.UpdatesSent());
             Assert.Single(streamer.Attachments);
+            if (streamer.Citations != null)
+            {
+                Assert.Empty(streamer.Citations);
+            }
         }
 
         [Fact]

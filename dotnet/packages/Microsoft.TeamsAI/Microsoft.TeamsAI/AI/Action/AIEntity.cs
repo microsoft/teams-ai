@@ -43,6 +43,12 @@ namespace Microsoft.Teams.AI.AI.Action
         /// </summary>
         [JsonProperty(PropertyName = "citation")]
         public List<ClientCitation> Citation { get; set; } = new();
+
+        /// <summary>
+        /// Optional sensitivity content information.
+        /// </summary>
+        [JsonProperty(PropertyName = "usageInfo")]
+        public SensitivityUsageInfo? UsageInfo { get; set; }
     }
 
     /// <summary>
