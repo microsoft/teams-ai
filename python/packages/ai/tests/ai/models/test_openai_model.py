@@ -103,23 +103,22 @@ class MockAsyncCompletions:
     create_params = None
 
     def __init__(
-        self, should_error=False, has_tool_call=False, has_tool_calls=False, is_o1_model=False
+        self, should_error=False, has_tool_call=False, has_tool_calls=False
     ) -> None:
         self.should_error = should_error
         self.has_tool_call = has_tool_call
         self.has_tool_calls = has_tool_calls
-        self.messages = []
 
     async def create(self, **kwargs) -> chat.ChatCompletion:
         self.create_params = kwargs
-        
+
         if self.should_error:
             raise openai.BadRequestError(
                 "bad request",
                 response=httpx.Response(400, request=httpx.Request(method="method", url="url")),
                 body=None,
             )
-            
+
         if self.has_tool_call:
             return await self.handle_tool_call(**kwargs)
 
@@ -319,7 +318,7 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
         self.assertEqual(
             create_params["messages"][0]["role"], "user"
         )
-    
+
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
     async def test_o1_model_should_use_max_completion_tokens_param(self, mock_async_openai):
         context = self.create_mock_context()
