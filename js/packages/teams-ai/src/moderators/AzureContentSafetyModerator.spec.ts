@@ -119,10 +119,12 @@ describe('AzureContentSafetyModerator', () => {
                     status: '200',
                     statusText: 'OK',
                     data: {
-                        categoriesAnalysis: [{
-                            category: 'Hate',
-                            severity: 1
-                        }]
+                        categoriesAnalysis: [
+                            {
+                                category: 'Hate',
+                                severity: 1
+                            }
+                        ]
                     }
                 })
             );
@@ -170,10 +172,12 @@ describe('AzureContentSafetyModerator', () => {
                     status: '200',
                     statusText: 'OK',
                     data: {
-                        categoriesAnalysis: [{
-                            category: 'Hate',
-                            severity: 7
-                        }]
+                        categoriesAnalysis: [
+                            {
+                                category: 'Hate',
+                                severity: 7
+                            }
+                        ]
                     }
                 })
             );

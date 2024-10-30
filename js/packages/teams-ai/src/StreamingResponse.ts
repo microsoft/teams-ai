@@ -7,7 +7,9 @@
  */
 
 import { Activity, Attachment, TurnContext, Entity } from 'botbuilder-core';
-import { AIEntity } from './types';
+import { AIEntity, ClientCitation, SensitivityUsageInfo } from './types';
+import { Citation } from './prompts/Message';
+import { Utilities } from './Utilities';
 
 /**
  * A helper class for streaming responses to the client.
@@ -35,6 +37,8 @@ export class StreamingResponse {
     // Powered by AI feature flags
     private _enableFeedbackLoop = false;
     private _enableGeneratedByAILabel = false;
+    private _citations?: ClientCitation[] = [];
+    private _sensitivityLabel?: SensitivityUsageInfo;
 
     /**
      * Creates a new StreamingResponse instance.
@@ -53,6 +57,13 @@ export class StreamingResponse {
      */
     public get streamId(): string | undefined {
         return this._streamId;
+    }
+
+    /**
+     * Gets the citations of the current response.
+     */
+    public get citations(): ClientCitation[] | undefined {
+        return this._citations;
     }
 
     /**
@@ -89,14 +100,43 @@ export class StreamingResponse {
      * The text we be sent as quickly as possible to the client. Chunks may be combined before
      * delivery to the client.
      * @param {string} text Partial text of the message to send.
+     * @param {Citation[]} citations Citations to be included in the message.
      */
-    public queueTextChunk(text: string): void {
+    public queueTextChunk(text: string, citations?: Citation[]): void {
         if (this._ended) {
             throw new Error('The stream has already ended.');
         }
 
         // Update full message text
         this._message += text;
+
+        if (citations && citations.length > 0) {
+            if (!this._citations) {
+                this._citations = [];
+            }
+            let currPos = this._citations.length;
+
+            for (const citation of citations) {
+                const clientCitation: ClientCitation = {
+                    '@type': 'Claim',
+                    position: `${currPos + 1}`,
+                    appearance: {
+                        '@type': 'DigitalDocument',
+                        name: citation.title || `Document #${currPos + 1}`,
+                        abstract: Utilities.snippet(citation.content, 477)
+                    }
+                };
+                currPos++;
+                this._citations.push(clientCitation);
+            }
+
+            // If there are citations, modify the content so that the sources are numbers instead of [doc1], [doc2], etc.
+            this._message =
+                this._citations.length == 0 ? this._message : Utilities.formatCitationsResponse(this._message);
+
+            // If there are citations, filter out the citations unused in content.
+            this._citations = Utilities.getUsedCitations(this._message, this._citations) ?? undefined;
+        }
 
         // Queue the next chunk
         this.queueNextChunk();
@@ -125,6 +165,14 @@ export class StreamingResponse {
      */
     public setAttachments(attachments: Attachment[]): void {
         this._attachments = attachments;
+    }
+
+    /**
+     * Sets the sensitivity label to attach to the final chunk.
+     * @param sensitivityLabel The sensitivty label.
+     */
+    public setSensitivityLabel(sensitivityLabel: SensitivityUsageInfo): void {
+        this._sensitivityLabel = sensitivityLabel;
     }
 
     /**
@@ -279,7 +327,9 @@ export class StreamingResponse {
                     '@type': 'Message',
                     '@context': 'https://schema.org',
                     '@id': '',
-                    additionalType: ['AIGeneratedContent']
+                    additionalType: ['AIGeneratedContent'],
+                    citation: this._citations && this._citations.length > 0 ? this._citations : [],
+                    usageInfo: this._sensitivityLabel
                 } as AIEntity);
             }
         }

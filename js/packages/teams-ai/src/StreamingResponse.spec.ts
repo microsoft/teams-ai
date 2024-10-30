@@ -2,6 +2,7 @@ import assert from 'assert';
 import { TestAdapter } from 'botbuilder';
 import { CardFactory } from 'botbuilder-core';
 import { StreamingResponse } from './StreamingResponse';
+import { Citation } from './prompts/Message';
 
 describe('StreamingResponse', function () {
     describe('constructor()', () => {
@@ -163,6 +164,34 @@ describe('StreamingResponse', function () {
             });
         });
 
+        it('should send a final message with text and citations', async () => {
+            const adapter = new TestAdapter();
+            await adapter.sendTextToBot('test', async (context) => {
+                const response = new StreamingResponse(context);
+                response.queueTextChunk('first', [
+                    { content: 'test-content', url: 'https://example.com', title: 'test', filepath: 'test' } as Citation
+                ]);
+                response.queueTextChunk('second');
+                await response.waitForQueue();
+                await response.endStream();
+                assert(response.updatesSent == 2, 'updatesSent should be 2');
+                assert(response.citations == undefined, 'no citations matched');
+
+                // Validate sent activities
+                const activities = adapter.activeQueue;
+                assert.equal(activities.length, 3, 'should have sent 3 activities');
+                assert.equal(activities[0].channelData.streamSequence, 1, 'first activity streamSequence should be 1');
+                assert.equal(activities[1].channelData.streamSequence, 2, 'second activity streamSequence should be 2');
+                assert.equal(activities[2].type, 'message', 'final activity type should be "message"');
+                assert.equal(activities[2].text, 'firstsecond', 'final activity text should be "firstsecond"');
+                assert.deepEqual(
+                    activities[2].channelData,
+                    { streamType: 'final', streamId: response.streamId, feedbackLoopEnabled: false },
+                    'final activity channelData should match'
+                );
+            });
+        });
+
         it('should send a final message with powered by AI features', async () => {
             const adapter = new TestAdapter();
             await adapter.sendTextToBot('test', async (context) => {
@@ -209,7 +238,9 @@ describe('StreamingResponse', function () {
                             '@type': 'Message',
                             '@context': 'https://schema.org',
                             '@id': '',
-                            additionalType: ['AIGeneratedContent']
+                            additionalType: ['AIGeneratedContent'],
+                            citation: [],
+                            usageInfo: undefined
                         }
                     ],
                     'final activity entities obj should match'

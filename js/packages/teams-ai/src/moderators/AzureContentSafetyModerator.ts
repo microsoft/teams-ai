@@ -45,7 +45,7 @@ export interface AzureOpenAIModeratorOptions extends OpenAIModeratorOptions {
     /**
      * @deprecated
      * use `haltOnBlocklistHit`
-     * 
+     *
      * When set to true, further analyses of harmful content will not be performed in cases where blocklists are hit.
      * When set to false, all analyses of harmful content will be performed, whether or not blocklists are hit.
      * Default value is false.
@@ -160,9 +160,11 @@ export class AzureContentSafetyModerator<TState extends TurnState = TurnState> e
 
         const predicate = (category: AzureOpenAIModeratorCategory) => {
             return (c: ContentSafetyHarmCategory) => {
-                return c.category === category &&
+                return (
+                    c.category === category &&
                     c.severity > 0 &&
                     c.severity <= this._azureContentSafetyCategories[category].severity
+                );
             };
         };
 
