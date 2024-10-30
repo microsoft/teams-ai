@@ -60,7 +60,7 @@ class AzureOpenAIAssistantsOptions:
 
     api_key: Optional[str] = None
     "The AzureOpenAI API key."
-    
+
     azure_ad_token_provider: Optional[Callable[..., str]] = None
     """Optional. A function that returns an access token for Microsoft Entra 
     (formerly known as Azure Active Directory), which will be invoked in every request.
