@@ -560,7 +560,7 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
         params = beta.AssistantCreateParams(model="123")
 
         assistant = await AssistantsPlanner.create_assistant(
-            api_key="", api_version="", organization="", endpoint="", request=params
+            api_key="", azure_ad_token_provider=None, api_version="", organization="", endpoint="", request=params
         )
 
         self.assertTrue(mock_async_openai.called)
@@ -573,6 +573,7 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
 
         assistant = await AssistantsPlanner.create_assistant(
             api_key="",
+            azure_ad_token_provider=None,
             api_version="",
             organization="",
             endpoint="this is my endpoint",
