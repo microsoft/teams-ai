@@ -1,0 +1,89 @@
+[
+    {
+        "name": "createList",
+        "description": "Creates a new list with an optional set of initial items",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "string",
+                    "description": "The name of the list to create"
+                },
+                "items": {
+                    "type": "array",
+                    "description": "The items to add to the list",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "list"
+            ]
+        }
+    },
+    {
+        "name": "deleteList",
+        "description": "Deletes a list",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "string",
+                    "description": "The name of the list to delete"
+                }
+            },
+            "required": [
+                "list"
+            ]
+        }
+    },
+    {
+        "name": "addItems",
+        "description": "Adds one or more items to a list",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "string",
+                    "description": "The name of the list to add the item to"
+                },
+                "items": {
+                    "type": "array",
+                    "description": "The items to add to the list",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "list",
+                "items"
+            ]
+        }
+    },
+    {
+        "name": "removeItems",
+        "description": "Removes one or more items from a list",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "string",
+                    "description": "The name of the list to remove the item from"
+                },
+                "items": {
+                    "type": "array",
+                    "description": "The items to remove from the list",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "list",
+                "items"
+            ]
+        }
+    }
+]
