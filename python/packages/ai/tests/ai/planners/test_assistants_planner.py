@@ -588,6 +588,23 @@ class TestAssistantsPlanner(IsolatedAsyncioTestCase):
         self.assertTrue(mock_async_azure_openai.called)
         self.assertEqual(assistant.id, ASSISTANT_ID)
         self.assertEqual(assistant.model, ASSISTANT_MODEL)
+    
+    @mock.patch("openai.AsyncAzureOpenAI", return_value=MockAsyncOpenAI())
+    async def test_create_azure_openai_assistant_with_az_token_provider(self, mock_async_azure_openai):
+        params = beta.AssistantCreateParams(model="123")
+
+        assistant = await AssistantsPlanner.create_assistant(
+            api_key=None,
+            azure_ad_token_provider=lambda: "test-token",
+            api_version="",
+            organization="",
+            endpoint="this is my endpoint",
+            request=params,
+        )
+
+        self.assertTrue(mock_async_azure_openai.called)
+        self.assertEqual(assistant.id, ASSISTANT_ID)
+        self.assertEqual(assistant.model, ASSISTANT_MODEL)
 
     @mock.patch(
         "openai.AsyncOpenAI",
