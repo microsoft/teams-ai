@@ -22,27 +22,40 @@ from teams.ai.planners import (
 
 from config import Config
 from state import AppTurnState
+from azure.identity import get_bearer_token_provider, DefaultAzureCredential
 
 config = Config()
 
-if config.OPENAI_KEY is None and config.AZURE_OPENAI_KEY is None:
+if config.OPENAI_KEY is None and config.AZURE_OPENAI_ENDPOINT is None:
     raise RuntimeError(
-        "Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set."
+        "Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_ENDPOINT is set."
     )
 
 planner: AssistantsPlanner
 
 # Create Assistant Planner
-if config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
-    planner = AssistantsPlanner[AppTurnState](
-        AzureOpenAIAssistantsOptions(
-            api_key=config.AZURE_OPENAI_KEY,
-            api_version="2024-02-15-preview",
-            endpoint=config.AZURE_OPENAI_ENDPOINT,
-            default_model="gpt-4",
-            assistant_id=config.ASSISTANT_ID,
+if config.AZURE_OPENAI_ENDPOINT:
+    if config.AZURE_OPENAI_KEY:
+        planner = AssistantsPlanner[AppTurnState](
+            AzureOpenAIAssistantsOptions(
+                api_key=config.AZURE_OPENAI_KEY,
+                api_version="2024-05-01-preview",
+                endpoint=config.AZURE_OPENAI_ENDPOINT,
+                default_model="gpt-4o",
+                assistant_id=config.ASSISTANT_ID,
+            )
         )
-    )
+    else:
+        # Managed Identity Auth
+        planner = AssistantsPlanner[AppTurnState](
+            AzureOpenAIAssistantsOptions(
+                azure_ad_token_provider=get_bearer_token_provider(DefaultAzureCredential(), 'https://cognitiveservices.azure.com/.default'),
+                api_version="2024-05-01-preview",
+                endpoint=config.AZURE_OPENAI_ENDPOINT,
+                default_model="gpt-4o",
+                assistant_id=config.ASSISTANT_ID,
+            )
+        )
 else:
     planner = AssistantsPlanner[AppTurnState](
         OpenAIAssistantsOptions(api_key=config.OPENAI_KEY, assistant_id=config.ASSISTANT_ID)
@@ -69,22 +82,34 @@ async def setup_assistant(context: TurnContext, state: AppTurnState):
             name="Math Tutor",
             instructions="You are a personal math tutor. Write and run code to answer math questions.",
             tools=[CodeInterpreterToolParam(type="code_interpreter")],
-            model="gpt-4",
+            model="gpt-4o",
         )
 
         assistant: Assistant
 
-        if config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
-            assistant = await AssistantsPlanner.create_assistant(
-                api_key=config.AZURE_OPENAI_KEY,
-                api_version="",
-                organization="",
-                endpoint=config.AZURE_OPENAI_ENDPOINT,
-                request=params,
-            )
+        if config.AZURE_OPENAI_ENDPOINT:
+            if config.AZURE_OPENAI_KEY:
+                assistant = await AssistantsPlanner.create_assistant(
+                    api_key=config.AZURE_OPENAI_KEY,
+                    azure_ad_token_provider=None,
+                    api_version="2024-05-01-preview",
+                    organization="",
+                    endpoint=config.AZURE_OPENAI_ENDPOINT,
+                    request=params,
+                )
+            else:
+                assistant = await AssistantsPlanner.create_assistant(
+                    api_key=None,
+                    azure_ad_token_provider=get_bearer_token_provider(DefaultAzureCredential(), 'https://cognitiveservices.azure.com/.default'),
+                    api_version="2024-05-01-preview",
+                    organization="",
+                    endpoint=config.AZURE_OPENAI_ENDPOINT,
+                    request=params,
+                )
         else:
             assistant = await AssistantsPlanner.create_assistant(
                 api_key=config.OPENAI_KEY,
+                azure_ad_token_provider=None,
                 api_version="",
                 organization="",
                 endpoint="",

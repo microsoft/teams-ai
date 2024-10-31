@@ -9,7 +9,7 @@ import asyncio
 import json
 from dataclasses import dataclass
 from importlib.metadata import version
-from typing import Dict, Generic, List, Optional, TypeVar, Union
+from typing import Callable, Dict, Generic, List, Optional, TypeVar, Union
 
 import openai
 from botbuilder.core import TurnContext
@@ -49,10 +49,6 @@ class AzureOpenAIAssistantsOptions:
     """
     Options for configuring the AssistantsPlanner for AzureOpenAI.
     """
-
-    api_key: str
-    "The AzureOpenAI API key."
-
     default_model: str
     "Default name of the Azure OpenAI deployment (model) to use."
 
@@ -61,6 +57,14 @@ class AzureOpenAIAssistantsOptions:
 
     endpoint: str
     "Deployment endpoint to use."
+
+    api_key: Optional[str] = None
+    "The AzureOpenAI API key."
+
+    azure_ad_token_provider: Optional[Callable[..., str]] = None
+    """Optional. A function that returns an access token for Microsoft Entra 
+    (formerly known as Azure Active Directory), which will be invoked in every request.
+    """
 
     polling_interval: float = DEFAULT_POLLING_INTERVAL
     "Optional. Polling interval in seconds. Defaults to 1 second"
@@ -140,6 +144,7 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
             self._client = openai.AsyncAzureOpenAI(
                 api_key=options.api_key,
                 api_version=options.api_version,
+                azure_ad_token_provider=options.azure_ad_token_provider,
                 azure_endpoint=options.endpoint,
                 organization=options.organization if options.organization else None,
                 default_headers={"User-Agent": self.user_agent},
@@ -196,7 +201,8 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
 
     @staticmethod
     async def create_assistant(
-        api_key: str,
+        api_key: Optional[str],
+        azure_ad_token_provider: Optional[Callable[..., str]],
         api_version: Optional[str],
         organization: Optional[str],
         endpoint: Optional[str],
@@ -221,6 +227,7 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
             user_agent = f"teamsai-py/{version('teams-ai')}"
             client = openai.AsyncAzureOpenAI(
                 api_key=api_key,
+                azure_ad_token_provider=azure_ad_token_provider,
                 api_version=api_version if api_version else "2024-02-15-preview",
                 azure_endpoint=endpoint,
                 organization=organization if organization else None,
