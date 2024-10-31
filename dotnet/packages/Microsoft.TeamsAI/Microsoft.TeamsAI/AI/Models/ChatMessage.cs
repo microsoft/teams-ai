@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using Azure.AI.OpenAI;
-using Azure.AI.OpenAI.Chat;
+﻿using Azure.AI.OpenAI.Chat;
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.Utilities;
@@ -113,7 +111,7 @@ namespace Microsoft.Teams.AI.AI.Models
             if (chatCompletion.FunctionCall != null && chatCompletion.FunctionCall.FunctionName != string.Empty)
             {
                 this.Name = chatCompletion.FunctionCall.FunctionName;
-                this.FunctionCall = new FunctionCall(chatCompletion.FunctionCall.FunctionName, chatCompletion.FunctionCall.FunctionArguments);
+                this.FunctionCall = new FunctionCall(chatCompletion.FunctionCall.FunctionName, chatCompletion.FunctionCall.FunctionArguments.ToString());
             }
 
             if (chatCompletion.ToolCalls != null && chatCompletion.ToolCalls.Count > 0)
@@ -127,7 +125,7 @@ namespace Microsoft.Teams.AI.AI.Models
             }
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-            AzureChatMessageContext? azureContext = chatCompletion.GetAzureMessageContext();
+            ChatMessageContext? azureContext = chatCompletion.GetMessageContext();
 #pragma warning restore AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             if (azureContext != null)
             {
@@ -155,7 +153,7 @@ namespace Microsoft.Teams.AI.AI.Models
             if (streamingChatCompletionUpdate.FunctionCallUpdate != null && streamingChatCompletionUpdate.FunctionCallUpdate.FunctionName != string.Empty)
             {
                 this.Name = streamingChatCompletionUpdate.FunctionCallUpdate.FunctionName;
-                this.FunctionCall = new FunctionCall(streamingChatCompletionUpdate.FunctionCallUpdate.FunctionName, streamingChatCompletionUpdate.FunctionCallUpdate.FunctionArgumentsUpdate);
+                this.FunctionCall = new FunctionCall(streamingChatCompletionUpdate.FunctionCallUpdate.FunctionName, streamingChatCompletionUpdate.FunctionCallUpdate.FunctionArgumentsUpdate.ToString());
             }
 
             if (streamingChatCompletionUpdate.ToolCallUpdates != null && streamingChatCompletionUpdate.ToolCallUpdates.Count > 0)
@@ -168,7 +166,7 @@ namespace Microsoft.Teams.AI.AI.Models
             }
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-            AzureChatMessageContext? azureContext = streamingChatCompletionUpdate.GetAzureMessageContext();
+            ChatMessageContext? azureContext = streamingChatCompletionUpdate.GetMessageContext();
 #pragma warning restore AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             if (azureContext != null)
             {
@@ -204,12 +202,12 @@ namespace Microsoft.Teams.AI.AI.Models
                 {
                     if (contentPart is TextContentPart textPart)
                     {
-                        contentItems.Add(ChatMessageContentPart.CreateTextMessageContentPart(textPart.Text));
+                        contentItems.Add(ChatMessageContentPart.CreateTextPart(textPart.Text));
                         textContentBuilder.AppendLine(textPart.Text);
                     }
                     else if (contentPart is ImageContentPart imagePart)
                     {
-                        contentItems.Add(ChatMessageContentPart.CreateImageMessageContentPart(new Uri(imagePart.ImageUrl)));
+                        contentItems.Add(ChatMessageContentPart.CreateImagePart(new Uri(imagePart.ImageUrl)));
                     }
                 }
             }
@@ -245,8 +243,8 @@ namespace Microsoft.Teams.AI.AI.Models
 
                 if (this.FunctionCall != null)
                 {
-                    ChatFunctionCall functionCall = new(this.FunctionCall.Name ?? "", this.FunctionCall.Arguments ?? "");
-                    assistantMessage = new AssistantChatMessage(functionCall, textContent);
+                    ChatFunctionCall functionCall = new(this.FunctionCall.Name ?? "", BinaryData.FromString(this.FunctionCall.Arguments ?? ""));
+                    assistantMessage = new AssistantChatMessage(functionCall);
                 }
                 else if (this.ActionCalls != null)
                 {
@@ -255,7 +253,7 @@ namespace Microsoft.Teams.AI.AI.Models
                     {
                         toolCalls.Add(actionCall.ToChatToolCall());
                     }
-                    assistantMessage = new AssistantChatMessage(toolCalls, textContent);
+                    assistantMessage = new AssistantChatMessage(toolCalls);
                 }
                 else
                 {
@@ -394,7 +392,7 @@ namespace Microsoft.Teams.AI.AI.Models
             }
             
             Id = toolCall.Id;
-            Function = new ActionFunction(toolCall.FunctionName, toolCall.FunctionArguments);
+            Function = new ActionFunction(toolCall.FunctionName, toolCall.FunctionArguments.ToString());
         }
 
         /// <summary>
@@ -409,15 +407,15 @@ namespace Microsoft.Teams.AI.AI.Models
                 throw new TeamsAIException($"Invalid ActionCall type: {toolCall.GetType().Name}");
             }
 
-            Id = toolCall.Id;
-            Function = new ActionFunction(toolCall.FunctionName, toolCall.FunctionArgumentsUpdate);
+            Id = toolCall.ToolCallId;
+            Function = new ActionFunction(toolCall.FunctionName, toolCall.FunctionArgumentsUpdate.ToString());
         }
 
         internal ChatToolCall ToChatToolCall()
         {
             if (this.Type == ActionCallType.Function)
             {
-                return ChatToolCall.CreateFunctionToolCall(Id, Function!.Name, Function.Arguments);
+                return ChatToolCall.CreateFunctionToolCall(Id, Function!.Name, BinaryData.FromString(Function.Arguments));
             }
 
             throw new TeamsAIException($"Invalid tool type: {this.Type}");

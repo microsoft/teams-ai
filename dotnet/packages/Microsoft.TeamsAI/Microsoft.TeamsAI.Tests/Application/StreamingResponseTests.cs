@@ -2,9 +2,13 @@
 using AdaptiveCards;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
+using Microsoft.Teams.AI.AI.Action;
+using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.Application;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.Tests.TestUtils;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Moq;
 
 namespace Microsoft.Teams.AI.Tests.Application
 {
@@ -197,6 +201,37 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
+        public async Task Test_SendTextChunk_SendsFinalMessageWithPoweredByAIFeatures()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            ITurnContext turnContext = new TurnContext(adapter, new Activity(
+                text: "hello",
+                channelId: "channelId",
+                recipient: new() { Id = "recipientId" },
+                conversation: new() { Id = "conversationId" },
+                from: new() { Id = "fromId" }
+            ));
+            StreamingResponse streamer = new(turnContext);
+            List<Citation> citations = new List<Citation>();
+            citations.Add(new Citation(content: "test-content", title: "test", url: "https://example.com"));
+            streamer.QueueTextChunk("first", citations);
+            await streamer.WaitForQueue();
+            streamer.QueueTextChunk("second");
+            await streamer.WaitForQueue();
+            streamer.EnableFeedbackLoop = true;
+            streamer.EnableGeneratedByAILabel = true;
+            streamer.SensitivityLabel = new SensitivityUsageInfo() { Name= "Sensitivity"};
+            await streamer.EndStream();
+            Assert.Equal(2, streamer.UpdatesSent());
+        }
+
+        [Fact]
         public async Task Test_SendTextChunk_SendsFinalMessageWithAttachments()
         {
             // Arrange
@@ -233,6 +268,32 @@ namespace Microsoft.Teams.AI.Tests.Application
             await streamer.EndStream();
             Assert.Equal(2, streamer.UpdatesSent());
             Assert.Single(streamer.Attachments);
+            if (streamer.Citations != null)
+            {
+                Assert.Empty(streamer.Citations);
+            }
+        }
+
+        [Fact]
+        public async Task Test_SendActivityThrowsException_AssertThrows()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            var turnContextMock = new Mock<ITurnContext>();
+            turnContextMock.Setup((tc) => tc.SendActivityAsync(It.IsAny<Activity>(), It.IsAny<CancellationToken>())).ThrowsAsync(new Exception("Forbidden operation"));
+            
+            // Act
+            StreamingResponse streamer = new(turnContextMock.Object);
+            Exception ex = await Assert.ThrowsAsync<TeamsAIException>(() => streamer.EndStream());
+
+
+            // Assert
+            Assert.Equal("Error occurred when sending activity while streaming", ex.Message);
         }
     }
 }

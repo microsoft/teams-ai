@@ -38,6 +38,8 @@ namespace Microsoft.Teams.AI.AI.Planners
 
         private readonly ILoggerFactory? _logger;
 
+        private bool _enableFeedbackLoop;
+
         /// <summary>
         /// Creates a new `ActionPlanner` instance.
         /// </summary>
@@ -104,11 +106,14 @@ namespace Microsoft.Teams.AI.AI.Planners
         public async Task<Plan> ContinueTaskAsync(ITurnContext context, TState state, AI<TState> ai, CancellationToken cancellationToken = default)
         {
             PromptTemplate template = await this.Options.DefaultPrompt(context, state, this);
+
+            this._enableFeedbackLoop = ai.Options.EnableFeedbackLoop;
+
             PromptResponse response = await this.CompletePromptAsync(context, state, template, template.Augmentation, cancellationToken);
 
             if (response.Status != PromptResponseStatus.Success)
             {
-                throw new Exception(response.Error?.Message ?? "[Action Planner]: an error has occurred");
+                throw new Exception(response.Error?.Message ?? "[Action Planner]: an error has occurred", response.Error);
             }
 
             // Check to see if we have a response
@@ -176,6 +181,7 @@ namespace Microsoft.Teams.AI.AI.Planners
                 LogRepairs = this.Options.LogRepairs,
                 StartStreamingMessage = this.Options.StartStreamingMessage,
                 EndStreamHandler = this.Options.EndStreamHandler,
+                EnableFeedbackLoop = this._enableFeedbackLoop,
             }, this._logger);
 
             return await client.CompletePromptAsync(context, memory, this.Prompts, cancellationToken);

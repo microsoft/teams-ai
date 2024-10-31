@@ -34,13 +34,32 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
+        public void Test_SetMaxTokens()
+        {
+            // Arrange
+            var options = new OpenAIModelOptions("test-key", "test-model");
+            var chatCompletionOptions = new ChatCompletionOptions();
+            var model = new OpenAIModel(options);
+            var testTokens = 100;
+
+            // Act
+            model.SetMaxTokens(testTokens, chatCompletionOptions);
+
+            // Assert
+            MethodInfo info = chatCompletionOptions.GetType().GetMethod("get__deprecatedMaxTokens", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            int maxTokens = (int)info.Invoke(chatCompletionOptions, null)!;
+            Assert.Equal(testTokens, maxTokens);
+        }
+
+
+        [Fact]
         public void Test_Constructor_AzureOpenAI_InvalidAzureApiVersion()
         {
             // Arrange
             var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/");
             var versions = new List<string>
             {
-                "2024-04-01-preview", "2024-05-01-preview", "2024-06-01"
+                "2024-06-01", "2024-08-01-preview", "2024-10-01-preview"
             };
 
             // Act
@@ -279,8 +298,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
 
             Assert.NotNull(result.Message.ActionCalls);
             Assert.Single(result.Message.ActionCalls);
-            Assert.Equal("testAction", result.Message.ActionCalls[0].Function.Name);
-
+            Assert.Equal("testAction", result.Message.ActionCalls[0].Function!.Name);
+            
             Assert.Null(result.Error);
             Assert.Equal(ChatRole.Assistant, result.Message.Role);
             Assert.Null(result.Message.Content);
@@ -326,7 +345,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
                 ]
             }}"));
 
-            TestAsyncResultCollection<StreamingChatCompletionUpdate> updates = new(update!, Mock.Of<PipelineResponse>());
+            TestAsyncCollectionResult<StreamingChatCompletionUpdate> updates = new(update!, Mock.Of<PipelineResponse>());
 
             var response = new TestResponse(200, string.Empty);
             clientMock.Setup((client) =>

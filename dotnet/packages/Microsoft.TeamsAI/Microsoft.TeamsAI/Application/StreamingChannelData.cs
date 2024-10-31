@@ -34,5 +34,12 @@ namespace Microsoft.Teams.AI.Application
         /// </summary>
         [JsonProperty(PropertyName = "streamId")]
         public string? streamId { get; set; }
+
+        /// <summary>
+        /// Sets the Feedback Loop in Teams that allows a user to
+        /// give thumbs up or down to a response.
+        /// </summary>
+        [JsonProperty(PropertyName = "feedbackLoopEnabled")]
+        public bool? feedbackLoopEnabled { get; set; }
     }
 }

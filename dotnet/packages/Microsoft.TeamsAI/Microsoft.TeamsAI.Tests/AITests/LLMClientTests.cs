@@ -176,6 +176,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 StartStreamingMessage = "Begin streaming",
                 EndStreamHandler = handler,
+                EnableFeedbackLoop = true,
             };
             LLMClient<object> client = new(options, null);
             TestMemory memory = new();

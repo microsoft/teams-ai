@@ -1,0 +1,27 @@
+{
+	"profiles": {
+		// Debug project within Teams
+		"Microsoft Teams (browser)": {
+			"commandName": "Project",
+			"dotnetRunMessages": true,
+			"launchBrowser": true,
+			"launchUrl": "https://teams.microsoft.com/l/app/576b3387-9ef7-4aff-9da7-acc2ad2f6d0f?installAppPackage=true&webjoin=true&appTenantId=d247b24d-59a3-4042-8253-90aa371a6eb4&login_hint=kavinsingh_microsoft.com",
+			"applicationUrl": "http://localhost:5130",
+			"environmentVariables": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+			"hotReloadProfile": "aspnetcore"
+		}
+		//// Uncomment following profile to debug project only (without launching Teams)
+		//,
+		//"Start Project (not in Teams)": {
+		//  "commandName": "Project",
+		//  "dotnetRunMessages": true,
+		//  "applicationUrl": "https://localhost:7130;http://localhost:5130",
+		//  "environmentVariables": {
+		//    "ASPNETCORE_ENVIRONMENT": "Development"
+		//  },
+		//  "hotReloadProfile": "aspnetcore"
+		//}
+	}
+}

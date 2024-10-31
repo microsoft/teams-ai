@@ -39,8 +39,8 @@ namespace Microsoft.Teams.AI.Application
         public async Task<List<InputFile>> DownloadFilesAsync(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken = default)
         {
             // Filter out HTML attachments
-            IEnumerable<Attachment> attachments = turnContext.Activity.Attachments.Where((a) => !a.ContentType.StartsWith("text/html"));
-            if (!attachments.Any())
+            IEnumerable<Attachment>? attachments = turnContext.Activity.Attachments?.Where((a) => !a.ContentType.StartsWith("text/html"));
+            if (attachments == null || !attachments.Any())
             {
                 return new List<InputFile>();
             }

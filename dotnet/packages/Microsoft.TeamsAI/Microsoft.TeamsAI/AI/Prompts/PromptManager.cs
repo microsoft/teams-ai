@@ -128,7 +128,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
                 template.Prompt.Sections = new List<PromptSection>() { 
                     // The "1" place holder is to make this a fixed section so it is rendered in the correct order.
                     // TODO: When implementing the new layout engine class refactor this.
-                    new GroupSection(ChatRole.System, template.Prompt.Sections, 1) 
+                    new GroupSection(ChatRole.System, template.Prompt.Sections, 1)
                 };
 
                 if (template.Configuration.Completion.IncludeHistory)

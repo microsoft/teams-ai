@@ -8,7 +8,7 @@ using Microsoft.Teams.AI.Application;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
-using OpenAI;
+using OAI = OpenAI;
 using OpenAI.Assistants;
 using OpenAI.Files;
 using System.ClientModel;
@@ -32,7 +32,7 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
 
         private readonly AssistantsPlannerOptions _options;
         private readonly AssistantClient _client;
-        private readonly FileClient _fileClient;
+        private readonly OpenAIFileClient _fileClient;
 
         // TODO: Write trace logs
 #pragma warning disable IDE0052 // Remove unread private members
@@ -189,14 +189,14 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             // Loop until the last run is completed
             while (true)
             {
-                AsyncPageCollection<ThreadRun>? runs = _client.GetRunsAsync(threadId, new() { Order = ListOrder.NewestFirst }, cancellationToken);
+                AsyncCollectionResult<ThreadRun>? runs = _client.GetRunsAsync(threadId, new() { Order = RunCollectionOrder.Descending }, cancellationToken);
 
                 if (runs == null)
                 {
                     return;
                 }
 
-                ThreadRun? run = runs.GetAllValuesAsync().GetAsyncEnumerator().Current;
+                ThreadRun? run = runs.GetAsyncEnumerator().Current;
                 if (run == null || _IsRunCompleted(run))
                 {
                     return;
@@ -210,9 +210,9 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
         private async Task<Plan> _GeneratePlanFromMessagesAsync(string threadId, string lastMessageId, CancellationToken cancellationToken)
         {
             // Find the new messages
-            AsyncPageCollection<ThreadMessage> messages = _client.GetMessagesAsync(threadId, new() { Order = ListOrder.NewestFirst }, cancellationToken);
+            AsyncCollectionResult<ThreadMessage> messages = _client.GetMessagesAsync(threadId, new() { Order = MessageCollectionOrder.Descending }, cancellationToken);
             List<ThreadMessage> newMessages = new();
-            await foreach (ThreadMessage message in messages.GetAllValuesAsync())
+            await foreach (ThreadMessage message in messages)
             {
                 if (string.Equals(message.Id, lastMessageId))
                 {
@@ -380,7 +380,7 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             return azureOpenAI.GetAssistantClient();
         }
 
-        internal FileClient _CreateFileClient(string apiKey, string? endpoint = null)
+        internal OpenAIFileClient _CreateFileClient(string apiKey, string? endpoint = null)
         {
             Verify.ParamNotNull(apiKey);
 
@@ -388,22 +388,22 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             {
                 // Azure OpenAI
                 AzureOpenAIClient azureOpenAI = new(new Uri(endpoint), new ApiKeyCredential(apiKey));
-                return azureOpenAI.GetFileClient();
+                return azureOpenAI.GetOpenAIFileClient();
             }
             else
             {
                 // OpenAI
-                return new FileClient(apiKey);
+                return new OpenAIFileClient(apiKey);
             }
         }
 
-        internal FileClient _CreateFileClient(TokenCredential tokenCredential, string endpoint)
+        internal OpenAIFileClient _CreateFileClient(TokenCredential tokenCredential, string endpoint)
         {
             Verify.ParamNotNull(tokenCredential);
             Verify.ParamNotNull(endpoint);
 
             AzureOpenAIClient azureOpenAI = new(new Uri(endpoint), tokenCredential);
-            return azureOpenAI.GetFileClient();
+            return azureOpenAI.GetOpenAIFileClient();
         }
 
         private async Task<ThreadMessage> _CreateUserThreadMessageAsync(string threadId, TState state, CancellationToken cancellationToken)
@@ -417,16 +417,16 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             IList<InputFile>? inputFiles = state.Temp?.InputFiles.Where((file) => file.Filename != null && file.Filename != string.Empty).ToList();
             if (inputFiles != null && inputFiles.Count > 0)
             {
-                List<Task<ClientResult<OpenAIFileInfo>>> fileUploadTasks = new();
+                List<Task<ClientResult<OAI.Files.OpenAIFile>>> fileUploadTasks = new();
                 foreach (InputFile file in inputFiles)
                 {
                     fileUploadTasks.Add(_fileClient.UploadFileAsync(file.Content, file.Filename!, FileUploadPurpose.Assistants));
                 }
 
-                ClientResult<OpenAIFileInfo>[] uploadedFiles = await Task.WhenAll(fileUploadTasks);
+                ClientResult<OAI.Files.OpenAIFile>[] uploadedFiles = await Task.WhenAll(fileUploadTasks);
                 for (int i = 0; i < uploadedFiles.Count(); i++)
                 {
-                    OpenAIFileInfo file = uploadedFiles[i];
+                    OAI.Files.OpenAIFile file = uploadedFiles[i];
                     if (inputFiles[i].ContentType.StartsWith("image/"))
                     {
                         messages.Add(MessageContent.FromImageFileId(file.Id, MessageImageDetail.Auto));

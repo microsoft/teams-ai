@@ -27,14 +27,18 @@ namespace Microsoft.Teams.AI.AI.Models
         /// Creates a MessageContext using OpenAI.Chat.AzureChatMessageContext.
         /// </summary>
         /// <param name="azureContext"></param>
-        internal MessageContext(AzureChatMessageContext azureContext)
+#pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        internal MessageContext(ChatMessageContext azureContext)
+#pragma warning restore AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         {
             if (azureContext.Citations != null)
             {
-                foreach (AzureChatCitation citation in azureContext.Citations)
+#pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+                foreach (ChatCitation citation in azureContext.Citations)
                 {
-                    this.Citations.Add(new Citation(citation.Content, citation.Title, citation.Url));
+                    this.Citations.Add(new Citation(citation.Content, citation.Title, citation.Uri.ToString()));
                 }
+#pragma warning restore AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             }
 
             this.Intent = azureContext.Intent;

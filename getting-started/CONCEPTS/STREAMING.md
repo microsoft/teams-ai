@@ -65,6 +65,7 @@ Once `endStream()` is called, the stream is considered ended and no further upda
 - The informative message is rendered only at the beginning of each message returned from the LLM.
 - Attachments can only be sent in the final streamed chunk.
 - Streaming is not available in conjunction with AI SDK's function calls yet.
+- Streaming does not work with OpenAI's `o1` models.
 
 
 ### Setup Instructions:
