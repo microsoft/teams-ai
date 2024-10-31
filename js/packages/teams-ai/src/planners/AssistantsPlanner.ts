@@ -158,6 +158,12 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         return await client.beta.assistants.create(request);
     }
 
+    /**
+     * @private
+     * @param {TurnState} state - The application Turn State.
+     * @param {string} input - The thread input.
+     * @returns {Promise<string>} The created thread.
+     */
     private async ensureThreadCreated(state: TState, input: string): Promise<string> {
         const assistantsState = this.ensureAssistantsState(state);
         if (assistantsState.thread_id == null) {
@@ -174,6 +180,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @private
      * Waits for a run to complete.
      * @param {string} thread_id - The ID of the thread.
      * @param {string} run_id - The ID of the run.
@@ -196,6 +203,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @private
      * Submits action results to the assistant.
      * @param {TurnContext} context - The turn context.
      * @param {TState} state - The turn state.
@@ -254,6 +262,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @private
      * Submits user input to the assistant.
      * @param {TurnContext} context - The turn context.
      * @param {TState} state - The turn state.
@@ -304,6 +313,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @private
      * Generates a plan from tool calls.
      * @param {TState} state - The turn state.
      * @param {OpenAI.Beta.Threads.Runs.RequiredActionFunctionToolCall[]} toolCalls - The tool calls to generate the plan from.
@@ -329,6 +339,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @private
      * Generates a plan from messages.
      * @param {string} thread_id - The ID of the thread.
      * @param {string} last_message_id - The ID of the last message.
@@ -367,6 +378,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @private
      * Ensures that the assistants state exists in the turn state.
      * @param {TState} state - The turn state.
      * @returns {AssistantsState} The assistants state.
@@ -384,6 +396,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @private
      * Updates the assistants state in the turn state.
      * @param {TState} state - The turn state.
      * @param {AssistantsState} assistantsState - The new assistants state.
@@ -393,6 +406,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @private
      * Blocks until all in-progress runs are completed.
      * @param {string} thread_id - The ID of the thread.
      */
