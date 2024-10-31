@@ -74,7 +74,7 @@ export interface AssistantsPlannerOptions {
  */
 export class AssistantsPlanner<TState extends TurnState = TurnState> implements Planner<TState> {
     private readonly _options: AssistantsPlannerOptions;
-    protected _client: OpenAI;
+    private _client: OpenAI;
 
     /**
      * Creates a new `AssistantsPlanner` instance.
@@ -202,7 +202,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
      * @param {AI<TState>} ai - The AI instance.
      * @returns {Promise<Plan>} A plan based on the action results.
      */
-    protected async submitActionResults(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan> {
+    private async submitActionResults(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan> {
         const assistantsState = this.ensureAssistantsState(state);
 
         const actionOutputs = state.temp.actionOutputs;
@@ -224,15 +224,18 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
 
         const results = await this.waitForRun(assistantsState.thread_id!, run.id, true);
         switch (results.status) {
-            case 'requires_action':
+            case 'requires_action': {
                 state.setValue(SUBMIT_TOOL_OUTPUTS_VARIABLE, true);
                 return this.generatePlanFromTools(state, results.required_action!.submit_tool_outputs.tool_calls);
-            case 'completed':
+            }
+            case 'completed': {
                 state.setValue(SUBMIT_TOOL_OUTPUTS_VARIABLE, false);
                 return this.generatePlanFromMessages(assistantsState.thread_id!, assistantsState.last_message_id!);
-            case 'cancelled':
+            }
+            case 'cancelled': {
                 return { type: 'plan', commands: [] };
-            case 'expired':
+            }
+            case 'expired': {
                 const expiredCommand: PredictedDoCommand = {
                     type: 'DO',
                     action: AI.TooManyStepsActionName,
@@ -242,6 +245,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
                     type: 'plan',
                     commands: [expiredCommand]
                 };
+            }
             default:
                 throw new Error(
                     `Run failed ${results.status}. ErrorCode: ${results.last_error?.code}. ErrorMessage: ${results.last_error?.message}`
@@ -274,12 +278,14 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
             case 'requires_action':
                 state.setValue(SUBMIT_TOOL_OUTPUTS_VARIABLE, true);
                 return this.generatePlanFromTools(state, results.required_action!.submit_tool_outputs.tool_calls);
-            case 'completed':
+            case 'completed': {
                 state.setValue(SUBMIT_TOOL_OUTPUTS_VARIABLE, false);
                 return this.generatePlanFromMessages(threadId, message.id);
-            case 'cancelled':
+            }
+            case 'cancelled': {
                 return { type: 'plan', commands: [] };
-            case 'expired':
+            }
+            case 'expired': {
                 const expiredCommand: PredictedDoCommand = {
                     type: 'DO',
                     action: AI.TooManyStepsActionName,
@@ -289,6 +295,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
                     type: 'plan',
                     commands: [expiredCommand]
                 };
+            }
             default:
                 throw new Error(
                     `Run failed ${results.status}. ErrorCode: ${results.last_error?.code}. ErrorMessage: ${results.last_error?.message}`
@@ -364,7 +371,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
      * @param {TState} state - The turn state.
      * @returns {AssistantsState} The assistants state.
      */
-    protected ensureAssistantsState(state: TState): AssistantsState {
+    private ensureAssistantsState(state: TState): AssistantsState {
         if (!state.hasValue(this._options.assistants_state_variable!)) {
             state.setValue(this._options.assistants_state_variable!, {
                 thread_id: null,
@@ -412,4 +419,3 @@ interface AssistantsState {
     run_id: string | null;
     last_message_id: string | null;
 }
-

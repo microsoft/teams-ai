@@ -2,506 +2,288 @@
 
 import assert from 'assert';
 import OpenAI from 'openai';
-import { Activity } from 'botframework-schema';
-import { TestAdapter, TurnContext } from 'botbuilder-core';
+import { TurnContext, TestAdapter } from 'botbuilder-core';
+import sinon from 'sinon';
 
 import { TurnState } from '../TurnState';
 import { AssistantsPlanner, AssistantsPlannerOptions } from './AssistantsPlanner';
 import { AI } from '../AI';
-import { Plan, PredictedDoCommand, PredictedSayCommand } from './Planner';
+import { PredictedDoCommand, PredictedSayCommand } from './Planner';
 
 describe('AssistantsPlanner', () => {
-    const createTurnContextAndState = async (activity: Partial<Activity>): Promise<[TurnContext, TurnState]> => {
+    let planner: AssistantsPlanner<TurnState>;
+    let openAIStub: sinon.SinonStubbedInstance<OpenAI>;
+    let context: TurnContext;
+    let state: TurnState;
+    let ai: AI<TurnState>;
+
+    beforeEach(async () => {
+        openAIStub = sinon.createStubInstance(OpenAI);
+        openAIStub.beta = {
+            threads: {
+                create: sinon.stub().resolves({ id: 'test-thread-id' }),
+                runs: {
+                    create: sinon.stub().resolves({ id: 'test-run-id', status: 'completed' }),
+                    retrieve: sinon.stub().resolves({ id: 'test-run-id', status: 'completed' }),
+                    submitToolOutputs: sinon.stub().resolves({ id: 'test-run-id', status: 'completed' }),
+                    list: sinon.stub().resolves({ data: [{ id: 'test-run-id', status: 'completed' }] })
+                },
+                messages: {
+                    create: sinon.stub().resolves({ id: 'test-message-id' }),
+                    list: sinon.stub().resolves({
+                        data: [
+                            {
+                                id: 'test-message-id',
+                                content: [{ type: 'text', text: { value: 'Test response' } }]
+                            }
+                        ]
+                    })
+                }
+            }
+        } as unknown as OpenAI['beta'];
+
+        const options: AssistantsPlannerOptions = {
+            apiKey: 'test-key',
+            assistant_id: 'test-assistant-id'
+        };
+
+        planner = new AssistantsPlanner<TurnState>(options);
+        (planner as any)._client = openAIStub;
+
         const testAdapter = new TestAdapter();
-        const context = new TurnContext(testAdapter, {
-            channelId: 'msteams',
-            recipient: { id: 'bot', name: 'bot' },
-            from: { id: 'user', name: 'user' },
-            conversation: { id: 'convo', isGroup: false, conversationType: 'personal', name: 'convo' },
-            ...activity
+        context = new TurnContext(testAdapter, {
+            type: 'message',
+            text: 'test input',
+            channelId: 'test',
+            from: { id: 'user', name: 'User' },
+            recipient: { id: 'bot', name: 'Bot' },
+            conversation: { id: 'conversation', isGroup: false, conversationType: 'personal', name: 'Conversation' },
+            channelData: {}
         });
-        const state: TurnState = new TurnState();
+
+        state = new TurnState();
         await state.load(context);
         state.temp = {
-            input: '',
+            input: 'test input',
             inputFiles: [],
             lastOutput: '',
             actionOutputs: {},
             authTokens: {}
         };
 
-        return [context, state];
-    };
+        ai = new AI<TurnState>({ planner });
+    });
 
-    describe('beginTask', async () => {
-        it('expects a single reply', async function () {
-            const testClient = new TestAssistantsClient('test-api-key');
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
+    afterEach(() => {
+        sinon.restore();
+    });
 
-            const ai = new AI<TurnState>({ planner: planner });
+    describe('beginTask', () => {
+        it('should create a thread and run, then return a plan', async () => {
+            const threadId = 'test-thread-id';
+            const runId = 'test-run-id';
 
-            testClient.remainingRunStatus.push('completed');
-            testClient.remainingMessages.push('welcome');
+            // Ensure the stub for messages.list returns the expected message
+            (openAIStub.beta.threads.messages.list as sinon.SinonStub).resolves({
+                data: [
+                    {
+                        id: 'test-message-id',
+                        content: [{ type: 'text', text: { value: 'Sent response' } }]
+                    },
+                    {
+                        id: 'test-message-id-2',
+                        content: [{ type: 'text', text: { value: 'New response' } }]
+                    }
+                ]
+            });
 
-            const thread = await testClient.beta.threads.create({});
-            state.setValue('conversation.assistants_state', {
-                thread_id: thread.id,
-                run_id: null,
-                last_message_id: null
+            // Ensure the stub for waitForRun returns a completed status
+            (openAIStub.beta.threads.runs.retrieve as sinon.SinonStub).resolves({
+                id: runId,
+                status: 'completed',
+                last_message_id: 'old-test-message-id'
             });
 
             const plan = await planner.beginTask(context, state, ai);
 
-            assert(plan);
-            assert(plan.commands);
-            assert.equal(plan.commands.length, 1);
-            assert.equal(plan.commands[0].type, 'SAY');
-            assert.equal('welcome', (plan.commands[0] as PredictedSayCommand).response.content);
+            sinon.assert.calledOnce(openAIStub.beta.threads.create as sinon.SinonStub);
+            sinon.assert.calledWith(openAIStub.beta.threads.runs.create as sinon.SinonStub, threadId, {
+                assistant_id: 'test-assistant-id'
+            });
+            sinon.assert.calledWith(openAIStub.beta.threads.runs.retrieve as sinon.SinonStub, threadId, runId);
+            sinon.assert.calledWith(openAIStub.beta.threads.messages.list as sinon.SinonStub, threadId);
+
+            assert.strictEqual(plan.type, 'plan');
+            assert.strictEqual(plan.commands.length, 1);
+            assert.strictEqual(plan.commands[0].type, 'SAY');
+            assert.strictEqual((plan.commands[0] as PredictedSayCommand).response.content, 'New response');
         });
 
-        it('waits for current run', async function () {
-            const testClient = new TestAssistantsClient('test-api-key');
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
-
-            const ai = new AI<TurnState>({ planner: planner });
-
-            testClient.remainingRunStatus.push('in_progress', 'in_progress', 'completed');
-            testClient.remainingMessages.push('welcome');
-
-            const thread = await testClient.beta.threads.create({});
-            await testClient.beta.threads.runs.create(thread.id, { assistant_id: 'test-assistant-id' });
-            state.setValue('conversation.assistants_state', {
-                thread_id: thread.id,
-                run_id: null,
-                last_message_id: null
+        it('should handle run cancellation', async () => {
+            (openAIStub.beta.threads.runs.retrieve as sinon.SinonStub).resolves({
+                id: 'test-run-id',
+                status: 'cancelled'
             });
 
-            await planner.testBlockOnInProgressRuns(thread.id);
-
             const plan = await planner.beginTask(context, state, ai);
 
-            assert(plan, 'Plan should not be null');
-            assert(plan.commands, 'Plan should have commands');
-            assert.equal(plan.commands.length, 1, 'Plan should have one command');
-            assert.equal(plan.commands[0].type, 'SAY', 'Command should be of type SAY');
-            assert.equal(
-                (plan.commands[0] as PredictedSayCommand).response.content,
-                'welcome',
-                'Command content should be "welcome"'
-            );
+            assert.strictEqual(plan.type, 'plan');
+            assert.strictEqual(plan.commands.length, 0);
         });
 
-        it('waits for previous run', async function () {
-            this.timeout(2500);
-
-            const testClient = new TestAssistantsClient('test-api-key');
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
-
-            const ai = new AI<TurnState>({ planner: planner });
-
-            testClient.remainingRunStatus.push('in_progress', 'failed', 'in_progress', 'completed');
-            testClient.remainingMessages.push('welcome');
-
-            const thread = await testClient.beta.threads.create({});
-            const previousRun = await testClient.beta.threads.runs.create(thread.id, { assistant_id: 'assistant_id' });
-            state.setValue('conversation.assistants_state', {
-                thread_id: thread.id,
-                run_id: previousRun.id,
-                last_message_id: null
+        it('should handle run expiration', async () => {
+            (openAIStub.beta.threads.runs.retrieve as sinon.SinonStub).resolves({
+                id: 'test-run-id',
+                status: 'expired'
             });
 
-            await planner.testBlockOnInProgressRuns(thread.id);
-
             const plan = await planner.beginTask(context, state, ai);
 
-            assert(plan, 'Plan should not be null');
-            assert(plan.commands, 'Plan should have commands');
-            assert.equal(plan.commands.length, 1, 'Plan should have one command');
-            assert.equal(plan.commands[0].type, 'SAY', 'Command should be of type SAY');
-            assert.equal(
-                (plan.commands[0] as PredictedSayCommand).response.content,
-                'welcome',
-                'Command content should be "welcome"'
-            );
+            assert.strictEqual(plan.type, 'plan');
+            assert.strictEqual(plan.commands.length, 1);
+            assert.strictEqual(plan.commands[0].type, 'DO');
+            assert.strictEqual((plan.commands[0] as PredictedDoCommand).action, AI.TooManyStepsActionName);
         });
 
-        it('run cancelled', async () => {
-            const testClient = new TestAssistantsClient('test-api-key');
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
+        it('should throw an error on run failure', async () => {
+            (openAIStub.beta.threads.runs.retrieve as sinon.SinonStub).resolves({
+                id: 'test-run-id',
+                status: 'failed',
+                last_error: { code: 'test_error', message: 'Test error message' }
+            });
+
+            await assert.rejects(
+                () => planner.beginTask(context, state, ai),
+                /Run failed failed. ErrorCode: test_error. ErrorMessage: Test error message/
             );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
-
-            const ai = new AI<TurnState>({ planner: planner });
-
-            testClient.remainingRunStatus.push('cancelled');
-            testClient.remainingMessages.push('welcome');
-
-            const plan = await planner.beginTask(context, state, ai);
-
-            assert(plan);
-            assert(plan.commands);
-            assert.equal(plan.commands.length, 0);
-        });
-
-        it('run expired', async () => {
-            const testClient = new TestAssistantsClient('test-api-key');
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
-
-            const ai = new AI<TurnState>({ planner: planner });
-
-            testClient.remainingRunStatus.push('expired');
-            testClient.remainingMessages.push('welcome');
-
-            const plan = await planner.beginTask(context, state, ai);
-
-            assert(plan);
-            assert(plan.commands);
-            assert.equal(plan.commands.length, 1);
-            assert.equal(plan.commands[0].type, 'DO');
-            assert.equal((plan.commands[0] as PredictedDoCommand).action, AI.TooManyStepsActionName);
-        });
-
-        it('run failed', async () => {
-            const testClient = new TestAssistantsClient('test-api-key');
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
-
-            const ai = new AI<TurnState>({ planner: planner });
-
-            testClient.remainingRunStatus.push('failed');
-            testClient.remainingMessages.push('welcome');
-
-            try {
-                await planner.beginTask(context, state, ai);
-            } catch (e) {
-                assert((e as Error).message.indexOf('Run failed') >= 0);
-                return;
-            }
-
-            assert.fail();
         });
     });
 
-    describe('continueTask()', () => {
-        let testClient: TestAssistantsClient;
-        let planner: TestAssistantsPlanner<TurnState>;
-        let context: TurnContext;
-        let state: TurnState;
-        let ai: AI<TurnState>;
+    describe('continueTask', () => {
+        it('should continue an existing thread and run', async () => {
+            state.setValue('conversation.assistants_state', {
+                thread_id: 'existing-thread-id',
+                run_id: 'existing-run-id',
+                last_message_id: 'existing-message-id'
+            });
 
-        beforeEach(async () => {
-            testClient = new TestAssistantsClient('test-api-key');
-            planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
+            // Ensure the stub for messages.list returns the expected message
+            (openAIStub.beta.threads.messages.list as sinon.SinonStub).resolves({
+                data: [
+                    {
+                        id: 'test-message-id',
+                        content: [{ type: 'text', text: { value: 'Sent response' } }]
+                    },
+                    {
+                        id: 'test-message-id-2',
+                        content: [{ type: 'text', text: { value: 'New response' } }]
+                    }
+                ]
+            });
 
-            ai = new AI<TurnState>({ planner: planner });
+            const plan = await planner.continueTask(context, state, ai);
+
+            sinon.assert.notCalled(openAIStub.beta.threads.create as sinon.SinonStub);
+            sinon.assert.calledWith(openAIStub.beta.threads.runs.create as sinon.SinonStub, 'existing-thread-id', {
+                assistant_id: 'test-assistant-id'
+            });
+            sinon.assert.calledWith(openAIStub.beta.threads.messages.list as sinon.SinonStub, 'existing-thread-id');
+            sinon.assert.calledWith(openAIStub.beta.threads.messages.list as sinon.SinonStub, 'existing-thread-id');
+
+            assert.strictEqual(plan.type, 'plan');
+            assert.strictEqual(plan.commands.length, 1);
+            assert.strictEqual(plan.commands[0].type, 'SAY');
         });
 
-        describe('when action is required', () => {
-            let functionToolCall: OpenAI.Beta.Threads.Runs.RequiredActionFunctionToolCall;
-            let requiredAction: OpenAI.Beta.Threads.Run['required_action'];
-
-            beforeEach(() => {
-                functionToolCall = {
-                    id: 'test-tool-id',
-                    type: 'function',
-                    function: {
-                        name: 'test-action',
-                        arguments: '{}'
-                    }
-                };
-                requiredAction = {
+        it('should handle required actions', async () => {
+            (openAIStub.beta.threads.runs.retrieve as sinon.SinonStub).resolves({
+                id: 'test-run-id',
+                status: 'requires_action',
+                required_action: {
                     type: 'submit_tool_outputs',
                     submit_tool_outputs: {
-                        tool_calls: [functionToolCall]
+                        tool_calls: [
+                            {
+                                id: 'test-tool-call-id',
+                                type: 'function',
+                                function: {
+                                    name: 'test_function',
+                                    arguments: '{"arg1": "value1"}'
+                                }
+                            }
+                        ]
                     }
-                };
-
-                testClient.remainingActions = [requiredAction];
-                testClient.remainingRunStatus = ['requires_action'];
+                }
             });
 
-            it('should return a DO command', async () => {
-                const thread = await testClient.beta.threads.create({});
-                const run = await testClient.beta.threads.runs.create(thread.id, { assistant_id: 'test-assistant-id' });
-                state.setValue('conversation.assistants_state', {
-                    thread_id: thread.id,
-                    run_id: run.id,
-                    last_message_id: null
-                });
-                state.setValue('temp.submitToolOutputs', true);
-                state.setValue('temp.submitToolMap', { 'test-action': 'test-tool-id' });
+            const plan = await planner.continueTask(context, state, ai);
 
-                const plan = await planner.continueTask(context, state, ai);
-
-                assert(plan, 'Plan should not be null');
-                assert(plan.commands, 'Plan should have commands');
-                assert.equal(plan.commands.length, 1, 'Plan should have exactly one command');
-                assert.equal(plan.commands[0].type, 'DO', 'Command should be of type DO');
-                assert.equal((plan.commands[0] as PredictedDoCommand).action, 'test-action', 'Command action should be test-action');
-            });
-
-            it('should update the tool map', async () => {
-                const thread = await testClient.beta.threads.create({});
-                const run = await testClient.beta.threads.runs.create(thread.id, { assistant_id: 'test-assistant-id' });
-                state.setValue('conversation.assistants_state', {
-                    thread_id: thread.id,
-                    run_id: run.id,
-                    last_message_id: null
-                });
-                state.setValue('temp.submitToolOutputs', true);
-
-                await planner.continueTask(context, state, ai);
-
-                const toolMap: { [key: string]: string } = state.getValue('temp.submitToolMap');
-                assert(toolMap, 'Tool map should exist');
-                assert.equal(Object.keys(toolMap).length, 1, 'Tool map should have one entry');
-                assert('test-action' in toolMap, 'Tool map should contain test-action');
-                assert.equal(toolMap['test-action'], 'test-tool-id', 'Tool map should map test-action to test-tool-id');
-            });
+            assert.strictEqual(plan.type, 'plan');
+            assert.strictEqual(plan.commands.length, 1);
+            assert.strictEqual(plan.commands[0].type, 'DO');
+            assert.strictEqual((plan.commands[0] as PredictedDoCommand).action, 'test_function');
+            assert.deepStrictEqual((plan.commands[0] as PredictedDoCommand).parameters, { arg1: 'value1' });
         });
+    });
 
-        describe('when action is completed', () => {
-            beforeEach(() => {
-                testClient.remainingRunStatus = ['completed'];
-                testClient.remainingMessages = ['welcome'];
+    describe('submitActionResults', () => {
+        it('should submit action results and return a plan', async () => {
+            const threadId = 'test-thread-id';
+            const runId = 'test-run-id';
+            state.setValue('conversation.assistants_state', {
+                thread_id: threadId,
+                run_id: runId,
+                last_message_id: 'test-message-id'
+            });
+            state.temp.actionOutputs = { test_function: 'test output' };
+            state.setValue('temp.submitToolMap', { test_function: 'test-tool-call-id' });
+
+            // Ensure the stub for messages.list returns the expected message
+            (openAIStub.beta.threads.messages.list as sinon.SinonStub).resolves({
+                data: [
+                    {
+                        id: 'test-message-id',
+                        content: [{ type: 'text', text: { value: 'Sent response' } }]
+                    },
+                    {
+                        id: 'test-message-id-2',
+                        content: [{ type: 'text', text: { value: 'New response' } }]
+                    }
+                ]
             });
 
-            it('should return a SAY command', async function() {
-                this.timeout(5000);
+            const plan = await (planner as any).submitActionResults(context, state, ai);
 
-                const thread = await testClient.beta.threads.create({});
-                const run = await testClient.beta.threads.runs.create(thread.id, { assistant_id: 'test-assistant-id' });
-                state.setValue('conversation.assistants_state', {
-                    thread_id: thread.id,
-                    run_id: run.id,
-                    last_message_id: null
+            sinon.assert.calledWith(
+                openAIStub.beta.threads.runs.submitToolOutputs as sinon.SinonStub,
+                threadId,
+                runId,
+                {
+                    tool_outputs: [{ tool_call_id: 'test-tool-call-id', output: 'test output' }]
+                }
+            );
+            sinon.assert.calledWith(openAIStub.beta.threads.messages.list as sinon.SinonStub, threadId);
+            assert.strictEqual(plan.type, 'plan');
+            assert.strictEqual(plan.commands.length, 1);
+            assert.strictEqual(plan.commands[0].type, 'SAY');
+        });
+    });
+
+    describe('blockOnInProgressRuns', () => {
+        it('should wait for in-progress runs to complete', async () => {
+            (openAIStub.beta.threads.runs.list as sinon.SinonStub)
+                .onFirstCall()
+                .resolves({
+                    data: [{ id: 'run-1', status: 'in_progress' }]
+                })
+                .onSecondCall()
+                .resolves({
+                    data: [{ id: 'run-1', status: 'completed' }]
                 });
-                state.temp.actionOutputs['test-action'] = 'test-output';
-                state.setValue('temp.submitToolOutputs', false);
 
-                const plan = await planner.continueTask(context, state, ai);
+            await (planner as any).blockOnInProgressRuns('test-thread-id');
 
-                assert(plan, 'Plan should not be null');
-                assert(plan.commands, 'Plan should have commands');
-                assert.equal(plan.commands.length, 1, 'Plan should have exactly one command');
-                assert.equal(plan.commands[0].type, 'SAY', 'Command should be of type SAY');
-                assert.equal((plan.commands[0] as PredictedSayCommand).response.content, 'welcome', 'Command content should be "welcome"');
-            });
+            sinon.assert.calledWith(openAIStub.beta.threads.runs.list as sinon.SinonStub, 'test-thread-id');
         });
     });
 });
-
-interface TestOpenAI extends Partial<Omit<OpenAI, 'beta'>> {
-    beta: Partial<Omit<OpenAI['beta'], 'threads'>> & {
-        threads: {
-            create: (params?: Partial<OpenAI.Beta.Threads.ThreadCreateParams>) => Promise<OpenAI.Beta.Threads.Thread>;
-            runs: {
-                create: (
-                    threadId: string,
-                    params: Partial<OpenAI.Beta.Threads.RunCreateParams>
-                ) => Promise<OpenAI.Beta.Threads.Run>;
-                retrieve: (threadId: string, runId: string) => Promise<OpenAI.Beta.Threads.Run>;
-                submitToolOutputs: (
-                    threadId: string,
-                    runId: string,
-                    params: OpenAI.Beta.Threads.RunSubmitToolOutputsParams
-                ) => Promise<OpenAI.Beta.Threads.Run>;
-                list: (threadId: string) => Promise<OpenAI.Beta.Threads.RunsPage>;
-            };
-            messages: {
-                create: (
-                    threadId: string,
-                    params: Partial<OpenAI.Beta.Threads.MessageCreateParams>
-                ) => Promise<OpenAI.Beta.Threads.Message>;
-                list: (threadId: string) => Promise<OpenAI.Beta.Threads.MessagesPage>;
-            };
-        };
-    };
-}
-
-class TestAssistantsClient implements TestOpenAI {
-    public remainingActions: OpenAI.Beta.Threads.Run['required_action'][] = [];
-    public remainingRunStatus: OpenAI.Beta.Threads.Run['status'][] = [];
-    public remainingMessages: string[] = [];
-
-    private _threads = new Map<string, Partial<OpenAI.Beta.Threads.Thread>>();
-    private _messages = new Map<string, Partial<OpenAI.Beta.Threads.Message>[]>();
-    private _runs = new Map<string, Partial<OpenAI.Beta.Threads.Run>[]>();
-
-    constructor(public apiKey: string = 'test-key') {}
-
-    beta: TestOpenAI['beta'] = {
-        threads: {
-            create: async (params?: Partial<OpenAI.Beta.Threads.ThreadCreateParams>) => {
-                const thread = { id: `thread_${Date.now()}`, ...params } as OpenAI.Beta.Threads.Thread;
-                this._threads.set(thread.id, thread);
-                return thread;
-            },
-            runs: {
-                create: async (thread_id: string, params: Partial<OpenAI.Beta.Threads.RunCreateParams>) => {
-                    const run = { id: `run_${Date.now()}`, thread_id: thread_id, ...params } as OpenAI.Beta.Threads.Run;
-                    this._runs.set(thread_id, [...(this._runs.get(thread_id) || []), run]);
-                    return run;
-                },
-                retrieve: async (thread_id: string, run_id: string) => {
-                    const run = this._runs.get(thread_id)?.find((r) => r.id === run_id);
-                    if (!run) throw new Error('Run not found');
-                    if (this.remainingRunStatus.length > 0) {
-                        run.status = this.remainingRunStatus.shift()!;
-                    } else if (run.status !== 'completed') {
-                        run.status = 'completed';
-                    }
-                    if (run.status === 'requires_action' && this.remainingActions.length > 0) {
-                        run.required_action = this.remainingActions.shift()!;
-                    } else {
-                        run.required_action = null;
-                    }
-                    return run as OpenAI.Beta.Threads.Run;
-                },
-                submitToolOutputs: async (
-                    thread_id: string,
-                    run_id: string,
-                    params: OpenAI.Beta.Threads.RunSubmitToolOutputsParams
-                ) => {
-                    return this.beta.threads.runs.retrieve(thread_id, run_id);
-                },
-                list: async (thread_id: string) => {
-                    return {
-                        data: this._runs.get(thread_id) || [],
-                        hasNextPage: () => false,
-                        getNextPage: () => Promise.resolve({} as OpenAI.Beta.Threads.RunsPage)
-                    } as OpenAI.Beta.Threads.RunsPage;
-                }
-            },
-            messages: {
-                create: async (thread_id: string, params: Partial<OpenAI.Beta.Threads.MessageCreateParams>) => {
-                    const content = Array.isArray(params.content)
-                        ? params.content
-                        : [{ type: 'text', text: { value: params.content as string } }];
-                    const message = {
-                        id: `msg_${Date.now()}`,
-                        thread_id: thread_id,
-                        role: params.role,
-                        content: content
-                    } as OpenAI.Beta.Threads.Message;
-                    this._messages.set(thread_id, [...(this._messages.get(thread_id) || []), message]);
-                    return message;
-                },
-                list: async (thread_id: string) => {
-                    let messages = this._messages.get(thread_id) || [];
-                    if (this.remainingMessages.length > 0) {
-                        const content = this.remainingMessages.shift()!;
-                        const message = await this.beta.threads.messages.create(thread_id, {
-                            role: 'assistant',
-                            content
-                        });
-                        messages = [message];
-                    }
-                    return {
-                        data: messages,
-                        hasNextPage: () => false,
-                        getNextPage: () => Promise.resolve({} as OpenAI.Beta.Threads.MessagesPage)
-                    } as OpenAI.Beta.Threads.MessagesPage;
-                }
-            }
-        }
-    };
-}
-
-class TestAssistantsPlanner<TState extends TurnState = TurnState> extends AssistantsPlanner<TState> {
-    public testClient: TestAssistantsClient;
-
-    constructor(options: AssistantsPlannerOptions, testClient: TestAssistantsClient) {
-        super(options);
-        this._client = testClient as unknown as OpenAI;
-        this.testClient = testClient;
-    }
-
-    public async testBlockOnInProgressRuns(thread_id: string): Promise<void> {
-        const testClient = this._client as unknown as TestAssistantsClient;
-        const startTime = Date.now();
-        const timeout = 5000;
-
-        while (Date.now() - startTime < timeout) {
-            const runs = await testClient.beta.threads!.runs!.list!(thread_id);
-            if (!runs.data.length || this.testIsRunCompleted(runs.data[0] as OpenAI.Beta.Threads.Run)) {
-                return;
-            }
-            await this.testWaitForRun(thread_id, runs.data[0].id!);
-        }
-        throw new Error('Run did not complete within the expected time');
-    }
-
-    private async testWaitForRun(thread_id: string, run_id: string): Promise<void> {
-        const testClient = this._client as unknown as TestAssistantsClient;
-        const startTime = Date.now();
-        const timeout = 3000;
-
-        while (Date.now() - startTime < timeout) {
-            const run = await testClient.beta.threads!.runs!.retrieve!(thread_id, run_id);
-            if (this.testIsRunCompleted(run)) {
-                return;
-            }
-            await new Promise((resolve) => setTimeout(resolve, 100));
-        }
-        throw new Error(`Run ${run_id} did not complete within the expected time`);
-    }
-
-    private testIsRunCompleted(run: OpenAI.Beta.Threads.Run): boolean {
-        return ['completed', 'failed', 'cancelled', 'expired'].includes(run.status);
-    }
-
-    protected async submitActionResults(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan> {
-        const toolMap = state.getValue('temp.submitToolMap') as { [key: string]: string } | undefined;
-
-        const plan: Plan = { type: 'plan', commands: [] };
-        if (this.testClient.remainingActions.length > 0) {
-            const action = this.testClient.remainingActions[0];
-            if (action!.type === 'submit_tool_outputs' && action!.submit_tool_outputs.tool_calls.length > 0) {
-                const toolCall = action!.submit_tool_outputs.tool_calls[0] as OpenAI.Beta.Threads.Runs.RequiredActionFunctionToolCall;
-                plan.commands.push({
-                    type: 'DO',
-                    action: toolCall.function.name,
-                    parameters: JSON.parse(toolCall.function.arguments)
-                } as PredictedDoCommand);
-
-                const newToolMap = { ...toolMap, [toolCall.function.name]: toolCall.id };
-                state.setValue('temp.submitToolMap', newToolMap);
-            }
-        }
-
-        return plan;
-    }
-}
