@@ -19,7 +19,10 @@ using ServiceVersion = Azure.AI.OpenAI.AzureOpenAIClientOptions.ServiceVersion;
 using Azure.AI.OpenAI.Chat;
 using OpenAI.Chat;
 using Microsoft.Teams.AI.Application;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("Microsoft.Teams.AI.Tests")]
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 namespace Microsoft.Teams.AI.AI.Models
 {
@@ -223,6 +226,10 @@ namespace Microsoft.Teams.AI.AI.Models
                 chatCompletionOptions.Temperature = 1;
                 chatCompletionOptions.TopP = 1;
                 chatCompletionOptions.PresencePenalty = 0;
+            } else
+            {
+                // `MaxOutputTokenCount` is not supported for non-o1 Azure OpenAI models, hence it needs to be set for it to work.
+                SetMaxTokens(completion.MaxTokens, chatCompletionOptions);
             }
 
             // Set tools configurations
@@ -246,6 +253,12 @@ namespace Microsoft.Teams.AI.AI.Models
             if (_useAzure)
             {
                 AddAzureChatExtensionConfigurations(chatCompletionOptions, additionalData);
+            }
+
+            if (_options.LogRequests!.Value)
+            {
+                _logger.LogTrace("CHAT COMPLETION CONFIG:");
+                _logger.LogTrace(JsonSerializer.Serialize(chatCompletionOptions, _serializerOptions));
             }
 
 
@@ -457,6 +470,12 @@ namespace Microsoft.Teams.AI.AI.Models
                     }
                 }
             }
+        }
+
+        internal void SetMaxTokens(int maxTokens, ChatCompletionOptions options)
+        {
+            MethodInfo setMaxTokens = options.GetType().GetMethod("set__deprecatedMaxTokens", BindingFlags.NonPublic | BindingFlags.Instance);
+            setMaxTokens.Invoke(options, new object[] { maxTokens });
         }
     }
 }

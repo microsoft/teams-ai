@@ -34,6 +34,25 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
+        public void Test_SetMaxTokens()
+        {
+            // Arrange
+            var options = new OpenAIModelOptions("test-key", "test-model");
+            var chatCompletionOptions = new ChatCompletionOptions();
+            var model = new OpenAIModel(options);
+            var testTokens = 100;
+
+            // Act
+            model.SetMaxTokens(testTokens, chatCompletionOptions);
+
+            // Assert
+            MethodInfo info = chatCompletionOptions.GetType().GetMethod("get__deprecatedMaxTokens", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            int maxTokens = (int)info.Invoke(chatCompletionOptions, null)!;
+            Assert.Equal(testTokens, maxTokens);
+        }
+
+
+        [Fact]
         public void Test_Constructor_AzureOpenAI_InvalidAzureApiVersion()
         {
             // Arrange
