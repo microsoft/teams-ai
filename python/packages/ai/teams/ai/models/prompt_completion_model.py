@@ -6,11 +6,13 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from botbuilder.core import TurnContext
 
 from ...state import MemoryBase
 from ...user_agent import _UserAgent
+from ..models.prompt_completion_model_emitter import PromptCompletionModelEmitter
 from ..prompts.prompt_functions import PromptFunctions
 from ..prompts.prompt_template import PromptTemplate
 from ..tokenizers import Tokenizer
@@ -21,6 +23,8 @@ class PromptCompletionModel(ABC, _UserAgent):
     """
     An AI model that can be used to complete prompts.
     """
+
+    events: Optional[PromptCompletionModelEmitter] = None
 
     @abstractmethod
     async def complete_prompt(

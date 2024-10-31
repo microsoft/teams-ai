@@ -146,7 +146,11 @@ class TestLLMClient(IsolatedAsyncioTestCase):
         state = await TurnState[ConversationState, UserState, TempState].load(context)
 
         model = OpenAIModel(OpenAIModelOptions(api_key="", default_model="model"))
-        client = LLMClient(LLMClientOptions(model))
+        client = LLMClient(
+            LLMClientOptions(
+                model, start_streaming_message="Loading results", enable_feedback_loop=True
+            )
+        )
         response = await client.complete_prompt(
             context=context,
             memory=state,
