@@ -756,10 +756,10 @@
   resolved "https://registry.yarnpkg.com/@microsoft/recognizers-text/-/recognizers-text-1.3.1.tgz#eda98a9148101ecdb04ed1424082d472b04aabd9"
   integrity sha512-HikLoRUgSzM4OKP3JVBzUUp3Q7L4wgI17p/3rERF01HVmopcujY3i6wgx8PenCwbenyTNxjr1AwSDSVuFlYedQ==
 
-"@microsoft/teams-js@^2.29.0":
-  version "2.29.0"
-  resolved "https://registry.yarnpkg.com/@microsoft/teams-js/-/teams-js-2.29.0.tgz#739167b79a045355cf5c6b79f5d586e58f2ba87f"
-  integrity sha512-g0nw3OR+Mz3AEbT4zeMcBE69MY2UOQx0MaYO26x0UVy/0Ilip2OUEA+qIRlw/uraTYJaCsh0csm1/i44UWGcLQ==
+"@microsoft/teams-js@^2.30.0":
+  version "2.30.0"
+  resolved "https://registry.yarnpkg.com/@microsoft/teams-js/-/teams-js-2.30.0.tgz#26f91ae6072425d9c86cac841ebc3458f1fa7f31"
+  integrity sha512-zTy2EHuODZ2g4fXLvnKXdZse44n06iXGambmJnGDDCb6JRvG5dQwJp//swLoxBYs2iHL40TJdyUDoB6sTl6KXg==
   dependencies:
     base64-js "^1.3.1"
     debug "^4.3.3"
