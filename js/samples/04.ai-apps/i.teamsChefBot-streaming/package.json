@@ -22,7 +22,7 @@
         "url": "https://github.com/microsoft/teams-ai"
     },
     "dependencies": {
-        "@microsoft/teams-ai": "~1.5.3",
+        "@microsoft/teams-ai": "~1.6.0",
         "@microsoft/teams-js": "^2.30.0",
         "botbuilder": "^4.23.1",
         "dotenv": "^16.4.5",
