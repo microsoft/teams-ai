@@ -987,10 +987,10 @@
   resolved "https://registry.yarnpkg.com/@types/argparse/-/argparse-1.0.38.tgz#a81fd8606d481f873a3800c6ebae4f1d768a56a9"
   integrity sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==
 
-"@types/assert@^1.5.10":
-  version "1.5.10"
-  resolved "https://registry.yarnpkg.com/@types/assert/-/assert-1.5.10.tgz#27eceb3e0705d1d76a4ec0a5586a48921d209eee"
-  integrity sha512-qEO+AUgYab7GVbeDDgUNCU3o0aZUoIMpNAe+w5LDbRxfxQX7vQAdDgwj1AroX+i8KaV56FWg0srXlSZROnsrIQ==
+"@types/assert@^1.5.11":
+  version "1.5.11"
+  resolved "https://registry.yarnpkg.com/@types/assert/-/assert-1.5.11.tgz#0b022efe761e14cca3d0f8ad1fd77a403de0071e"
+  integrity sha512-FjS1mxq2dlGr9N4z72/DO+XmyRS3ZZIoVn998MEopAN/OmyN28F4yumRL5pOw2z+hbFLuWGYuF2rrw5p11xM5A==
 
 "@types/body-parser@*":
   version "1.19.5"

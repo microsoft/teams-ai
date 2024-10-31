@@ -46,7 +46,7 @@
         "follow-redirects": "^1.15.0"
     },
     "devDependencies": {
-        "@types/assert": "^1.5.10",
+        "@types/assert": "^1.5.11",
         "@types/express": "^4.17.21",
         "@types/jsonwebtoken": "^9.0.4",
         "@types/mocha": "^10.0.9",
