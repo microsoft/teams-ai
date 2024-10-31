@@ -2,6 +2,7 @@ import assert from 'assert';
 import { TestAdapter } from 'botbuilder';
 import { CardFactory } from 'botbuilder-core';
 import { StreamingResponse } from './StreamingResponse';
+import { Citation } from './prompts/Message';
 
 describe('StreamingResponse', function () {
     describe('constructor()', () => {
@@ -130,7 +131,11 @@ describe('StreamingResponse', function () {
                 const activity = adapter.getNextReply();
                 assert.equal(activity.type, 'message', 'activity.type should be "message"');
                 assert.equal(activity.text, '', 'activity.text should be ""');
-                assert.deepEqual(activity.channelData, { streamType: 'final' }, 'activity.channelData should match');
+                assert.deepEqual(
+                    activity.channelData,
+                    { streamType: 'final', feedbackLoopEnabled: false },
+                    'activity.channelData should match'
+                );
             });
         });
 
@@ -153,8 +158,92 @@ describe('StreamingResponse', function () {
                 assert.equal(activities[2].text, 'firstsecond', 'final activity text should be "firstsecond"');
                 assert.deepEqual(
                     activities[2].channelData,
-                    { streamType: 'final', streamId: response.streamId },
+                    { streamType: 'final', streamId: response.streamId, feedbackLoopEnabled: false },
                     'final activity channelData should match'
+                );
+            });
+        });
+
+        it('should send a final message with text and citations', async () => {
+            const adapter = new TestAdapter();
+            await adapter.sendTextToBot('test', async (context) => {
+                const response = new StreamingResponse(context);
+                response.queueTextChunk('first', [
+                    { content: 'test-content', url: 'https://example.com', title: 'test', filepath: 'test' } as Citation
+                ]);
+                response.queueTextChunk('second');
+                await response.waitForQueue();
+                await response.endStream();
+                assert(response.updatesSent == 2, 'updatesSent should be 2');
+                assert(response.citations == undefined, 'no citations matched');
+
+                // Validate sent activities
+                const activities = adapter.activeQueue;
+                assert.equal(activities.length, 3, 'should have sent 3 activities');
+                assert.equal(activities[0].channelData.streamSequence, 1, 'first activity streamSequence should be 1');
+                assert.equal(activities[1].channelData.streamSequence, 2, 'second activity streamSequence should be 2');
+                assert.equal(activities[2].type, 'message', 'final activity type should be "message"');
+                assert.equal(activities[2].text, 'firstsecond', 'final activity text should be "firstsecond"');
+                assert.deepEqual(
+                    activities[2].channelData,
+                    { streamType: 'final', streamId: response.streamId, feedbackLoopEnabled: false },
+                    'final activity channelData should match'
+                );
+            });
+        });
+
+        it('should send a final message with powered by AI features', async () => {
+            const adapter = new TestAdapter();
+            await adapter.sendTextToBot('test', async (context) => {
+                const response = new StreamingResponse(context);
+                response.queueTextChunk('first');
+                response.queueTextChunk('second');
+                response.setFeedbackLoop(true);
+                response.setGeneratedByAILabel(true);
+                await response.waitForQueue();
+                await response.endStream();
+                assert(response.updatesSent == 2, 'updatesSent should be 2');
+
+                // Validate sent activities
+                const activities = adapter.activeQueue;
+                assert.equal(activities.length, 3, 'should have sent 3 activities');
+                assert.equal(activities[0].channelData.streamSequence, 1, 'first activity streamSequence should be 1');
+                assert.equal(activities[0].entities!.length, 1, 'length of first activity entities should be 1');
+                assert.deepEqual(
+                    activities[0].entities,
+                    [{ type: 'streaminfo', properties: { ...activities[0].channelData } }],
+                    'first activity entities should match'
+                );
+                assert.equal(activities[1].channelData.streamSequence, 2, 'second activity streamSequence should be 2');
+                assert.equal(activities[1].entities!.length, 1, 'length of second activity entities should be 1');
+                assert.deepEqual(
+                    activities[1].entities,
+                    [{ type: 'streaminfo', properties: { ...activities[1].channelData } }],
+                    'second activity entities should match'
+                );
+                assert.equal(activities[2].type, 'message', 'final activity type should be "message"');
+                assert.equal(activities[2].text, 'firstsecond', 'final activity text should be "firstsecond"');
+
+                assert.deepEqual(
+                    activities[2].channelData,
+                    { streamType: 'final', streamId: response.streamId, feedbackLoopEnabled: true },
+                    'final activity channelData should match'
+                );
+                assert.deepEqual(
+                    activities[2].entities,
+                    [
+                        { type: 'streaminfo', properties: { streamType: 'final', streamId: response.streamId } },
+                        {
+                            type: 'https://schema.org/Message',
+                            '@type': 'Message',
+                            '@context': 'https://schema.org',
+                            '@id': '',
+                            additionalType: ['AIGeneratedContent'],
+                            citation: [],
+                            usageInfo: undefined
+                        }
+                    ],
+                    'final activity entities obj should match'
                 );
             });
         });
@@ -191,7 +280,7 @@ describe('StreamingResponse', function () {
                 assert.equal(activities[2].text, 'firstsecond', 'final activity text should be "firstsecond"');
                 assert.deepEqual(
                     activities[2].channelData,
-                    { streamType: 'final', streamId: response.streamId },
+                    { streamType: 'final', streamId: response.streamId, feedbackLoopEnabled: false },
                     'final activity channelData should match'
                 );
                 assert.notEqual(activities[2].attachments, null);

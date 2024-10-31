@@ -23,6 +23,7 @@ from teams.ai.planners import (
     AzureOpenAIAssistantsOptions,
     OpenAIAssistantsOptions,
 )
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
 from config import Config
 from food_order_card import generate_card_for_order
@@ -31,24 +32,36 @@ from state import AppTurnState
 
 config = Config()
 
-if config.OPENAI_KEY is None and config.AZURE_OPENAI_KEY is None:
+if config.OPENAI_KEY is None and config.AZURE_OPENAI_ENDPOINT is None:
     raise RuntimeError(
-        "Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set."
+        "Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_ENDPOINT is set."
     )
 
 planner: AssistantsPlanner
 
 # Create Assistant Planner
-if config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
-    planner = AssistantsPlanner[AppTurnState](
-        AzureOpenAIAssistantsOptions(
-            api_key=config.AZURE_OPENAI_KEY,
-            api_version="2024-02-15-preview",
-            endpoint=config.AZURE_OPENAI_ENDPOINT,
-            default_model="gpt-4",
-            assistant_id=config.ASSISTANT_ID,
+if config.AZURE_OPENAI_ENDPOINT:
+    if config.AZURE_OPENAI_KEY:
+        planner = AssistantsPlanner[AppTurnState](
+            AzureOpenAIAssistantsOptions(
+                api_key=config.AZURE_OPENAI_KEY,
+                api_version="2024-05-01-preview",
+                endpoint=config.AZURE_OPENAI_ENDPOINT,
+                default_model="gpt-4o",
+                assistant_id=config.ASSISTANT_ID,
+            )
         )
-    )
+    else:
+        # Managed Identity Auth
+        planner = AssistantsPlanner[AppTurnState](
+            AzureOpenAIAssistantsOptions(
+                azure_ad_token_provider=get_bearer_token_provider(DefaultAzureCredential(), 'https://cognitiveservices.azure.com/.default'),
+                api_version="2024-05-01-preview",
+                endpoint=config.AZURE_OPENAI_ENDPOINT,
+                default_model="gpt-4o",
+                assistant_id=config.ASSISTANT_ID,
+            )
+        )
 else:
     planner = AssistantsPlanner[AppTurnState](
         OpenAIAssistantsOptions(api_key=config.OPENAI_KEY, assistant_id=config.ASSISTANT_ID)
@@ -96,22 +109,34 @@ async def setup_assistant(context: TurnContext, state: AppTurnState):
                         ),
                     )
                 ],
-                model="gpt-4",
+                model="gpt-4o",
             )
 
             assistant: Assistant
 
-            if config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
-                assistant = await AssistantsPlanner.create_assistant(
-                    api_key=config.AZURE_OPENAI_KEY,
-                    api_version="",
-                    organization="",
-                    endpoint=config.AZURE_OPENAI_ENDPOINT,
-                    request=params,
-                )
+            if config.AZURE_OPENAI_ENDPOINT:
+                if config.AZURE_OPENAI_KEY:
+                    assistant = await AssistantsPlanner.create_assistant(
+                        api_key=config.AZURE_OPENAI_KEY,
+                        azure_ad_token_provider=None,
+                        api_version="2024-05-01-preview",
+                        organization="",
+                        endpoint=config.AZURE_OPENAI_ENDPOINT,
+                        request=params,
+                    )
+                else:
+                    assistant = await AssistantsPlanner.create_assistant(
+                        api_key=None,
+                        azure_ad_token_provider=get_bearer_token_provider(DefaultAzureCredential(), 'https://cognitiveservices.azure.com/.default'),
+                        api_version="2024-05-01-preview",
+                        organization="",
+                        endpoint=config.AZURE_OPENAI_ENDPOINT,
+                        request=params,
+                    )
             else:
                 assistant = await AssistantsPlanner.create_assistant(
                     api_key=config.OPENAI_KEY,
+                    azure_ad_token_provider=None,
                     api_version="",
                     organization="",
                     endpoint="",
@@ -133,10 +158,10 @@ async def turn_state_factory(context: TurnContext):
 
 @app.ai.action("place_order")
 async def on_place_order(
-    context: ActionTurnContext[Order],
+    context: ActionTurnContext,
     state: AppTurnState,
 ):
-    card = generate_card_for_order(context.data)
+    card = generate_card_for_order(Order.from_dict(context.data))
     await context.send_activity(MessageFactory.attachment(card))
     return "order placed"
 

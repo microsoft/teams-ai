@@ -2,7 +2,7 @@
     "name": "@microsoft/teams-ai",
     "author": "Microsoft Corp.",
     "description": "SDK focused on building AI based applications for Microsoft Teams.",
-    "version": "1.5.1",
+    "version": "1.5.3",
     "license": "MIT",
     "keywords": [
         "botbuilder",
@@ -25,18 +25,18 @@
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
     "peerDependencies": {
-        "botbuilder": "^4.23.0",
-        "openai": "^4.61.0"
+        "botbuilder": "^4.23.1",
+        "openai": "^4.68.2"
     },
     "dependencies": {
         "@azure/openai-assistants": "1.0.0-beta.6",
         "@azure/msal-node": "^2.15.0",
         "axios": "^1.7.5",
         "botbuilder-dialogs": "^4.23.1",
-        "botframework-connector": "^4.23.0",
-        "botframework-schema": "^4.23.0",
-        "botframework-streaming": "^4.23.0",
-        "gpt-tokenizer": "^2.5.0",
+        "botframework-connector": "^4.23.1",
+        "botframework-schema": "^4.23.1",
+        "botframework-streaming": "^4.23.1",
+        "gpt-tokenizer": "^2.5.1",
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
         "uuid": "^9.0.1",
@@ -46,7 +46,7 @@
         "follow-redirects": "^1.15.0"
     },
     "devDependencies": {
-        "@types/assert": "^1.5.10",
+        "@types/assert": "^1.5.11",
         "@types/express": "^4.17.21",
         "@types/jsonwebtoken": "^9.0.4",
         "@types/mocha": "^10.0.9",

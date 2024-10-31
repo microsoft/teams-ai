@@ -304,7 +304,7 @@ class AI(Generic[StateT]):
                         position=f"{i + 1}",
                         appearance=Appearance(
                             name=citation.title or f"Document {i + 1}",
-                            abstract=snippet(citation.content, 480),
+                            abstract=snippet(citation.content, 477),
                         ),
                     )
                 )
