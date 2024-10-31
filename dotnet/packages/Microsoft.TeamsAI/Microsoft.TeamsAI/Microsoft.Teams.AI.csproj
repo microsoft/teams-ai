@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <PackageId>Microsoft.Teams.AI</PackageId>
     <Product>Microsoft Teams AI SDK</Product>
-    <Version>1.7.0</Version>
+    <Version>1.8.0</Version>
     <Authors>Microsoft</Authors>
     <Company>Microsoft</Company>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
@@ -52,11 +52,6 @@
 
   <ItemGroup>
     <None Include="..\README.md" Pack="true" PackagePath="\" />
-    <None Include="C:\Users\kavinsingh\source\repos\teams-ai\dotnet\packages\Microsoft.TeamsAI\Microsoft.TeamsAI\.editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EditorConfigFiles Remove="C:\Users\kavinsingh\source\repos\teams-ai\dotnet\packages\Microsoft.TeamsAI\Microsoft.TeamsAI\.editorconfig" />
   </ItemGroup>
 
 </Project>
