@@ -80,7 +80,10 @@ export class ToolsAugmentation implements Augmentation<string> {
                     try {
                         parameters = JSON.parse(toolCall.function.arguments);
                     } catch (err) {
-                        console.warn(`ToolsAugmentation: Error parsing tool arguments for ${toolCall.function.name}:`, err);
+                        console.warn(
+                            `ToolsAugmentation: Error parsing tool arguments for ${toolCall.function.name}:`,
+                            err
+                        );
                         console.warn('Arguments:', toolCall.function.arguments);
                     }
                 }
