@@ -4776,10 +4776,10 @@ gpt-3-encoder@1.1.4:
   resolved "https://registry.yarnpkg.com/gpt-3-encoder/-/gpt-3-encoder-1.1.4.tgz#d6cdaacf5824857e133b6065247c757fc7e4fa72"
   integrity sha512-fSQRePV+HUAhCn7+7HL7lNIXNm6eaFWFbNLOOGtmSJ0qJycyQvj60OvRlH7mee8xAMjBDNRdMXlMwjAbMTDjkg==
 
-gpt-tokenizer@^2.5.1:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/gpt-tokenizer/-/gpt-tokenizer-2.5.1.tgz#ff1175b9ae1325f0f5281e9797af078cb29295dc"
-  integrity sha512-26zNjvGrIf+a6yWg5l2DvNT4LXAmotHyx7IomHVhXiUs62BwKVFLv/l8yRQQrkUDc2XDtzCdjcNuJqzOjxxiPA==
+gpt-tokenizer@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/gpt-tokenizer/-/gpt-tokenizer-2.6.0.tgz#2d941218b1f8826f0780965a94977079ca14ae98"
+  integrity sha512-4NzSmroimN+yEg8KFmG+URerBtVHrOIXhcohn5TgmaKWzVOIeZ5AJshQzI3lJybYnLk4HWHWy/deIw+VSfcw2g==
 
 graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0:
   version "4.2.11"
