@@ -313,7 +313,7 @@ namespace Microsoft.Teams.AI.Application
                 {
                     Properties = JObject.FromObject(new {
                         streamId = ((StreamingChannelData) activity.ChannelData).streamId,
-                        streamType = ((StreamingChannelData) activity.ChannelData).StreamType,
+                        streamType = ((StreamingChannelData) activity.ChannelData).StreamType.ToString(),
                         streamSequence = ((StreamingChannelData) activity.ChannelData).StreamSequence,
 
                     })
