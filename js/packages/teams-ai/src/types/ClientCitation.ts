@@ -9,27 +9,27 @@
 import { SensitivityUsageInfo } from './SensitivityUsageInfo';
 
 export type ClientCitationIconName =
-    'Microsoft Word' |
-    'Microsoft Excel' |
-    'Microsoft PowerPoint' |
-    'Microsoft OneNote' |
-    'Microsoft SharePoint' |
-    'Microsoft Visio' |
-    'Microsoft Loop' |
-    'Microsoft Whiteboard' |
-    'Adobe Illustrator' |
-    'Adobe Photoshop' |
-    'Adobe InDesign' |
-    'Adobe Flash' |
-    'Sketch' |
-    'Source Code' |
-    'Image' |
-    'GIF' |
-    'Video' |
-    'Sound' |
-    'ZIP' |
-    'Text' |
-    'PDF';
+    | 'Microsoft Word'
+    | 'Microsoft Excel'
+    | 'Microsoft PowerPoint'
+    | 'Microsoft OneNote'
+    | 'Microsoft SharePoint'
+    | 'Microsoft Visio'
+    | 'Microsoft Loop'
+    | 'Microsoft Whiteboard'
+    | 'Adobe Illustrator'
+    | 'Adobe Photoshop'
+    | 'Adobe InDesign'
+    | 'Adobe Flash'
+    | 'Sketch'
+    | 'Source Code'
+    | 'Image'
+    | 'GIF'
+    | 'Video'
+    | 'Sound'
+    | 'ZIP'
+    | 'Text'
+    | 'PDF';
 
 /**
  * Represents a Teams client citation to be included in a message. See Bot messages with AI-generated content for more details.

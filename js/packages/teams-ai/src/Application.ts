@@ -156,7 +156,7 @@ export interface FeedbackLoopData {
          */
         feedback: string | Record<string, any>;
     };
-    
+
     /**
      * The activity ID that the feedback was provided on.
      */
