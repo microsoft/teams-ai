@@ -37,7 +37,7 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
             citations = data.response.context!.citations.map((citation, i) => {
                 const clientCitation: ClientCitation = {
                     '@type': 'Claim',
-                    position: `${i + 1}`,
+                    position: i + 1,
                     appearance: {
                         '@type': 'DigitalDocument',
                         name: citation.title || `Document #${i + 1}`,

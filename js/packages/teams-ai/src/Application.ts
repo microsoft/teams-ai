@@ -149,12 +149,14 @@ export interface FeedbackLoopData {
         /**
          * 'like' or 'dislike'
          */
-        reaction: string;
+        reaction: 'like' | 'dislike';
+
         /**
          * The response the user provides when prompted with "What did you like/dislike?" after pressing one of the feedback buttons.
          */
-        feedback: string;
+        feedback: string | Record<string, any>;
     };
+    
     /**
      * The activity ID that the feedback was provided on.
      */
