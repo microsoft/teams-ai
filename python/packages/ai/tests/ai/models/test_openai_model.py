@@ -102,9 +102,7 @@ class MockAsyncCompletions:
     has_tool_calls = False
     create_params = None
 
-    def __init__(
-        self, should_error=False, has_tool_call=False, has_tool_calls=False
-    ) -> None:
+    def __init__(self, should_error=False, has_tool_call=False, has_tool_calls=False) -> None:
         self.should_error = should_error
         self.has_tool_call = has_tool_call
         self.has_tool_calls = has_tool_calls
@@ -315,9 +313,7 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
         self.assertTrue(mock_async_openai.called)
         self.assertEqual(res.status, "success")
         create_params = mock_async_openai.return_value.chat.completions.create_params
-        self.assertEqual(
-            create_params["messages"][0]["role"], "user"
-        )
+        self.assertEqual(create_params["messages"][0]["role"], "user")
 
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
     async def test_o1_model_should_use_max_completion_tokens_param(self, mock_async_openai):
@@ -348,12 +344,8 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
         self.assertTrue(mock_async_openai.called)
         self.assertEqual(res.status, "success")
         create_params = mock_async_openai.return_value.chat.completions.create_params
-        self.assertEqual(
-            create_params["max_completion_tokens"], 1000
-        )
-        self.assertEqual(
-            create_params["max_tokens"], openai.NOT_GIVEN
-        )
+        self.assertEqual(create_params["max_completion_tokens"], 1000)
+        self.assertEqual(create_params["max_tokens"], openai.NOT_GIVEN)
 
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
     async def test_non_o1_model_should_use_max_tokens_param(self, mock_async_openai):
@@ -384,12 +376,8 @@ class TestOpenAIModel(IsolatedAsyncioTestCase):
         self.assertTrue(mock_async_openai.called)
         self.assertEqual(res.status, "success")
         create_params = mock_async_openai.return_value.chat.completions.create_params
-        self.assertEqual(
-            create_params["max_tokens"], 1000
-        )
-        self.assertEqual(
-            create_params["max_completion_tokens"], openai.NOT_GIVEN
-        )
+        self.assertEqual(create_params["max_tokens"], 1000)
+        self.assertEqual(create_params["max_completion_tokens"], openai.NOT_GIVEN)
 
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
     async def test_should_succeed_on_prev_tool_calls(self, mock_async_openai):

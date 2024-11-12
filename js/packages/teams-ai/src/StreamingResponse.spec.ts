@@ -211,14 +211,14 @@ describe('StreamingResponse', function () {
                 assert.equal(activities[0].entities!.length, 1, 'length of first activity entities should be 1');
                 assert.deepEqual(
                     activities[0].entities,
-                    [{ type: 'streaminfo', properties: { ...activities[0].channelData } }],
+                    [{ type: 'streaminfo', ...activities[0].channelData }],
                     'first activity entities should match'
                 );
                 assert.equal(activities[1].channelData.streamSequence, 2, 'second activity streamSequence should be 2');
                 assert.equal(activities[1].entities!.length, 1, 'length of second activity entities should be 1');
                 assert.deepEqual(
                     activities[1].entities,
-                    [{ type: 'streaminfo', properties: { ...activities[1].channelData } }],
+                    [{ type: 'streaminfo', ...activities[1].channelData }],
                     'second activity entities should match'
                 );
                 assert.equal(activities[2].type, 'message', 'final activity type should be "message"');
@@ -232,7 +232,7 @@ describe('StreamingResponse', function () {
                 assert.deepEqual(
                     activities[2].entities,
                     [
-                        { type: 'streaminfo', properties: { streamType: 'final', streamId: response.streamId } },
+                        { type: 'streaminfo', streamType: 'final', streamId: response.streamId },
                         {
                             type: 'https://schema.org/Message',
                             '@type': 'Message',

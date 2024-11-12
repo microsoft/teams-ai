@@ -307,9 +307,7 @@ export class StreamingResponse {
         activity.entities = [
             {
                 type: 'streaminfo',
-                properties: {
-                    ...activity.channelData
-                }
+                ...activity.channelData
             } as Entity
         ];
 
