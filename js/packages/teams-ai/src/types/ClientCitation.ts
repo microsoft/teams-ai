@@ -68,13 +68,12 @@ export interface ClientCitation {
         url?: string;
 
         /**
-         * Content of the citation. (max length 160)
-         * Must be clipped if longer than 480 characters.
+         * Extract of the referenced content. (max length 160)
          */
         abstract: string;
 
         /**
-         * Used for icon; for now it is ignored.
+         * Encoding format of the ` citation.appearance.text` field. 
          */
         encodingFormat?: 'application/vnd.microsoft.card.adaptive';
 
