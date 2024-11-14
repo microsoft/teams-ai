@@ -110,33 +110,8 @@ export class StreamingResponse {
         // Update full message text
         this._message += text;
 
-        if (citations && citations.length > 0) {
-            if (!this._citations) {
-                this._citations = [];
-            }
-            let currPos = this._citations.length;
-
-            for (const citation of citations) {
-                const clientCitation: ClientCitation = {
-                    '@type': 'Claim',
-                    position: `${currPos + 1}`,
-                    appearance: {
-                        '@type': 'DigitalDocument',
-                        name: citation.title || `Document #${currPos + 1}`,
-                        abstract: Utilities.snippet(citation.content, 477)
-                    }
-                };
-                currPos++;
-                this._citations.push(clientCitation);
-            }
-
-            // If there are citations, modify the content so that the sources are numbers instead of [doc1], [doc2], etc.
-            this._message =
-                this._citations.length == 0 ? this._message : Utilities.formatCitationsResponse(this._message);
-
-            // If there are citations, filter out the citations unused in content.
-            this._citations = Utilities.getUsedCitations(this._message, this._citations) ?? undefined;
-        }
+        // If there are citations, modify the content so that the sources are numbers instead of [doc1], [doc2], etc.
+        this._message = Utilities.formatCitationsResponse(this._message);
 
         // Queue the next chunk
         this.queueNextChunk();
@@ -174,6 +149,34 @@ export class StreamingResponse {
     public setSensitivityLabel(sensitivityLabel: SensitivityUsageInfo): void {
         this._sensitivityLabel = sensitivityLabel;
     }
+
+    /**
+     * Sets the citations for the full message.
+     * @param {Citation[]} citations Citations to be included in the message.
+     */
+    public setCitations(citations: Citation[]): void {
+            if (citations.length > 0) {
+                if (!this._citations) {
+                    this._citations = [];
+                }
+                let currPos = this._citations.length;
+    
+                for (const citation of citations) {
+                    const clientCitation: ClientCitation = {
+                        '@type': 'Claim',
+                        position: `${currPos + 1}`,
+                        appearance: {
+                            '@type': 'DigitalDocument',
+                            name: citation.title || `Document #${currPos + 1}`,
+                            abstract: Utilities.snippet(citation.content, 477)
+                        }
+                    };
+                    currPos++;
+                    this._citations.push(clientCitation);
+                }
+            }
+    }
+    
 
     /**
      * Sets the Feedback Loop in Teams that allows a user to
@@ -310,6 +313,19 @@ export class StreamingResponse {
                 ...activity.channelData
             } as Entity
         ];
+
+        if (this._citations && !this._ended) {
+            // Filter out the citations unused in content.
+            const currCitations = Utilities.getUsedCitations(this._message, this._citations) ?? undefined;
+            activity.entities.push({
+                type: 'https://schema.org/Message',
+                '@type': 'Message',
+                '@context': 'https://schema.org',
+                '@id': '',
+                citation: currCitations && currCitations.length > 0 ? currCitations : [],
+            } as AIEntity);
+
+        }
 
         // Add in Powered by AI feature flags
         if (this._ended) {

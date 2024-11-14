@@ -329,8 +329,12 @@ export class LLMClient<TContent = any> {
             const text = chunk.delta?.content ?? '';
             const citations = chunk.delta?.context?.citations ?? undefined;
 
+            if (citations) {
+                streamer.setCitations(citations);
+            }
+
             if (text.length > 0) {
-                streamer.queueTextChunk(text, citations);
+                streamer.queueTextChunk(text);
             }
         };
 
