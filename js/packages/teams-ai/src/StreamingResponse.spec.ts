@@ -168,14 +168,15 @@ describe('StreamingResponse', function () {
             const adapter = new TestAdapter();
             await adapter.sendTextToBot('test', async (context) => {
                 const response = new StreamingResponse(context);
-                response.queueTextChunk('first', [
+                response.setCitations([
                     { content: 'test-content', url: 'https://example.com', title: 'test', filepath: 'test' } as Citation
                 ]);
+                response.queueTextChunk('first');
                 response.queueTextChunk('second');
                 await response.waitForQueue();
                 await response.endStream();
                 assert(response.updatesSent == 2, 'updatesSent should be 2');
-                assert(response.citations == undefined, 'no citations matched');
+                assert(response.citations?.length == 1, 'added 1 citation');
 
                 // Validate sent activities
                 const activities = adapter.activeQueue;

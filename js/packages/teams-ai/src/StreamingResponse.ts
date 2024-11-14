@@ -155,28 +155,27 @@ export class StreamingResponse {
      * @param {Citation[]} citations Citations to be included in the message.
      */
     public setCitations(citations: Citation[]): void {
-            if (citations.length > 0) {
-                if (!this._citations) {
-                    this._citations = [];
-                }
-                let currPos = this._citations.length;
-    
-                for (const citation of citations) {
-                    const clientCitation: ClientCitation = {
-                        '@type': 'Claim',
-                        position: `${currPos + 1}`,
-                        appearance: {
-                            '@type': 'DigitalDocument',
-                            name: citation.title || `Document #${currPos + 1}`,
-                            abstract: Utilities.snippet(citation.content, 477)
-                        }
-                    };
-                    currPos++;
-                    this._citations.push(clientCitation);
-                }
+        if (citations.length > 0) {
+            if (!this._citations) {
+                this._citations = [];
             }
+            let currPos = this._citations.length;
+
+            for (const citation of citations) {
+                const clientCitation: ClientCitation = {
+                    '@type': 'Claim',
+                    position: `${currPos + 1}`,
+                    appearance: {
+                        '@type': 'DigitalDocument',
+                        name: citation.title || `Document #${currPos + 1}`,
+                        abstract: Utilities.snippet(citation.content, 477)
+                    }
+                };
+                currPos++;
+                this._citations.push(clientCitation);
+            }
+        }
     }
-    
 
     /**
      * Sets the Feedback Loop in Teams that allows a user to
@@ -314,7 +313,7 @@ export class StreamingResponse {
             } as Entity
         ];
 
-        if (this._citations && !this._ended) {
+        if (this._citations && this._citations.length > 0 && !this._ended) {
             // Filter out the citations unused in content.
             const currCitations = Utilities.getUsedCitations(this._message, this._citations) ?? undefined;
             activity.entities.push({
@@ -322,9 +321,8 @@ export class StreamingResponse {
                 '@type': 'Message',
                 '@context': 'https://schema.org',
                 '@id': '',
-                citation: currCitations && currCitations.length > 0 ? currCitations : [],
+                citation: currCitations
             } as AIEntity);
-
         }
 
         // Add in Powered by AI feature flags
@@ -350,7 +348,7 @@ export class StreamingResponse {
 
         // Send activity
         const response = await this._context.sendActivity(activity);
-        await new Promise((resolve) => setTimeout(resolve, 1.5));
+        await new Promise((resolve) => setTimeout(resolve, 1500));
 
         // Save assigned stream ID
         if (!this._streamId) {
