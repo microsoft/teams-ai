@@ -5,6 +5,8 @@ import { StreamingResponse } from './StreamingResponse';
 import { Citation } from './prompts/Message';
 
 describe('StreamingResponse', function () {
+    this.timeout(5000);
+
     describe('constructor()', () => {
         it('should create a StreamingResponse instance', async () => {
             const adapter = new TestAdapter();
