@@ -19,6 +19,7 @@ if (process.env.AZURE_OPENAI_KEY) {
 }
 
 const { AssistantsPlanner } = preview;
+let assistantId = '';
 
 // Create Assistant if no ID is provided, this will require you to restart the program and fill in the process.env.ASSISTANT_ID afterwards.
 if (!process.env.ASSISTANT_ID) {
@@ -43,13 +44,16 @@ if (!process.env.ASSISTANT_ID) {
                         }
                     }
                 ],
-                model: 'gpt-4'
+                model: 'gpt-4o-mini'
             },
-            endpoint
+            endpoint ?? undefined,
+            endpoint ? { apiVersion: process.env.OPENAI_API_VERSION } : undefined
         );
 
         console.log(`Created a new assistant with an ID of: ${assistant.id}`);
-        process.exit();
+        console.log('Be sure to add this ID to your environment variables as ASSISTANT_ID before your next restart.');
+        assistantId = assistant.id;
+        process.env.ASSISTANT_ID = assistantId;
     })();
 }
 
@@ -57,7 +61,7 @@ if (!process.env.ASSISTANT_ID) {
 const planner = new AssistantsPlanner({
     apiKey: apiKey,
     endpoint: endpoint,
-    assistant_id: process.env.ASSISTANT_ID!
+    assistant_id: process.env.ASSISTANT_ID ?? assistantId
 });
 
 // Define storage and application
@@ -78,12 +82,15 @@ app.message('/reset', async (context, state) => {
 });
 
 app.ai.action<Order>('place_order', async (context, state, order) => {
+    console.log('place order');
     const card = generateCardForOrder(order);
     await context.sendActivity(MessageFactory.attachment(CardFactory.adaptiveCard(card)));
     return `order placed`;
 });
 
 app.ai.action(AI.HttpErrorActionName, async (context, state, data) => {
+    // console.log(context);
+    console.log(data);
     await context.sendActivity('An AI request failed. Please try again later.');
     return AI.StopCommandName;
 });

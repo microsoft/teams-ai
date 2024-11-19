@@ -226,7 +226,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
             }
         }
 
-        const run = await this._client.beta.threads.runs.submitToolOutputs(
+        const run = await this._client.beta.threads.runs.submitToolOutputsAndPoll(
             assistantsState.thread_id!,
             assistantsState.run_id!,
             { tool_outputs: toolOutputs }
