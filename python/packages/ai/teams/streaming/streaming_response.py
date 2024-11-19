@@ -111,6 +111,24 @@ class StreamingResponse:
         """
         return self._next_sequence - 1
 
+    def set_citations(self, citations: List[Citation]) -> None:
+        if len(citations) > 0:
+            if not self._citations:
+                self._citations = []
+            curr_pos = len(self._citations)
+
+            for citation in citations:
+                self._citations.append(
+                    ClientCitation(
+                        position=f"{curr_pos}",
+                        appearance=Appearance(
+                            name=citation.title or f"Document {curr_pos}",
+                            abstract=snippet(citation.content, 477),
+                        ),
+                    )
+                )
+                curr_pos += 1
+
     def queue_informative_update(self, text: str) -> None:
         """
         Queue an informative update to be sent to the client.
@@ -141,34 +159,10 @@ class StreamingResponse:
             raise ApplicationError("The stream has already ended.")
 
         self._message += text
-
-        if citations and len(citations) > 0:
-            if not self._citations:
-                self._citations = []
-            curr_pos = len(self._citations)
-
-            for citation in citations:
-                self._citations.append(
-                    ClientCitation(
-                        position=f"{curr_pos}",
-                        appearance=Appearance(
-                            name=citation.title or f"Document {curr_pos}",
-                            abstract=snippet(citation.content, 477),
-                        ),
-                    )
-                )
-                curr_pos += 1
-
-            # If there are citations, modify the content so that the sources are numbers
-            # instead of [doc1], [doc2], etc.
-            self._message = (
-                self._message
-                if len(self._citations) == 0
-                else format_citations_response(self._message)
-            )
-
-            # If there are citations, filter out the citations unused in content.
-            self._citations = get_used_citations(self._message, self._citations)
+        
+        # If there are citations, modify the content so that the sources are numbers
+        # instead of [doc1], [doc2], etc.
+        self._message = format_citations_response(self._message)
 
         # Queue the next chunk
         self.queue_next_chunk()
@@ -286,6 +280,16 @@ class StreamingResponse:
         activity.entities = [
             Entity(type="streaminfo", **entity_args),
         ]
+
+        # If there are citations, filter out the citations unused in content.
+        if self._citations and len(self._citations) > 0 and self._ended == False:
+            currCitations = get_used_citations(self._message, self._citations)
+            activity.entities.append(
+                    AIEntity(
+                        additional_type=[],
+                        citation=currCitations if currCitations else [],
+                    )
+            )
 
         # Add in Powered by AI feature flags
         if self._ended:
