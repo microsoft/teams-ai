@@ -7,7 +7,7 @@
  */
 
 import { TurnContext } from 'botbuilder';
-import OpenAI from 'openai';
+import OpenAI, { AzureClientOptions, AzureOpenAI } from 'openai';
 
 import { AI } from '../AI';
 import { TurnState } from '../TurnState';
@@ -87,7 +87,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
             ...options
         };
 
-        this._client = new OpenAI({ apiKey: options.apiKey, baseURL: options.endpoint });
+        this._client = AssistantsPlanner.createClient(options.apiKey, options.endpoint, this._options);
     }
 
     /**
@@ -147,14 +147,16 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
      * @param {string} apiKey - OpenAI API key.
      * @param {OpenAI.Beta.AssistantCreateParams} request - Definition of the assistant to create.
      * @param {string} endpoint - The Azure OpenAI resource endpoint.
+     * @param {Record<string, string | undefined>} azureClientOptions - The Azure OpenAI client options.
      * @returns {Promise<OpenAI.Beta.Assistant>} The created assistant.
      */
     public static async createAssistant(
         apiKey: string,
         request: OpenAI.Beta.AssistantCreateParams,
-        endpoint?: string
+        endpoint?: string,
+        azureClientOptions?: AzureClientOptions
     ): Promise<OpenAI.Beta.Assistant> {
-        const client = new OpenAI({ apiKey, baseURL: endpoint });
+        const client = AssistantsPlanner.createClient(apiKey, endpoint, azureClientOptions);
         return await client.beta.assistants.create(request);
     }
 
@@ -421,6 +423,23 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
                 return; // Latest run is completed, so we're done
             }
             await this.waitForRun(thread_id, latestRun.id);
+        }
+    }
+
+    /**
+     * @private
+     * @param {string} apiKey - The api key
+     * @param {Record<string, string | undefined>} azureClientOptions
+     * @param {string} endpoint  - The Azure OpenAI resource endpoint
+     * @returns {AssistantsClient} the client
+     */
+    private static createClient(apiKey: string, endpoint?: string, azureClientOptions?: AzureClientOptions): OpenAI {
+        if (endpoint) {
+            // Azure OpenAI
+            return new AzureOpenAI({ endpoint, apiKey, ...azureClientOptions });
+        } else {
+            // OpenAI
+            return new OpenAI({ apiKey });
         }
     }
 }
