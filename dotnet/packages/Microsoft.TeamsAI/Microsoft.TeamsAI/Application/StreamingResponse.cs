@@ -93,6 +93,40 @@ namespace Microsoft.Teams.AI.Application
         }
 
         /// <summary>
+        ///  Sets the citations for the full message.
+        /// </summary>
+        /// <param name="citations">Citations to be included in the message.</param>
+        public void SetCitations(IList<Citation> citations)
+        {
+            if (citations.Count > 0)
+            {
+                if (this.Citations == null)
+                {
+                    this.Citations = new List<ClientCitation>();
+                }
+
+                int currPos = this.Citations.Count;
+
+                foreach (Citation citation in citations)
+                {
+                    string abs = CitationUtils.Snippet(citation.Content, 480);
+
+                    this.Citations.Add(new ClientCitation()
+                    {
+                        Position = $"{currPos}",
+                        Appearance = new ClientCitationAppearance()
+                        {
+                            Name = citation.Title,
+                            Abstract = abs
+                        }
+                    });
+                    currPos++;
+                }
+
+            }
+        }
+
+        /// <summary>
         /// Queues an informative update to be sent to the client.
         /// </summary>
         /// <param name="text">Text of the update to send.</param>
@@ -131,38 +165,8 @@ namespace Microsoft.Teams.AI.Application
 
             Message += text;
 
-            if (citations != null && citations.Count > 0)
-            {
-                if (this.Citations == null)
-                {
-                    this.Citations = new List<ClientCitation>();
-                }
-
-                int currPos = this.Citations.Count;
-
-                foreach (Citation citation in citations)
-                {
-                    string abs = CitationUtils.Snippet(citation.Content, 480);
-
-                    this.Citations.Add(new ClientCitation()
-                    {
-                        Position = $"{currPos}",
-                        Appearance = new ClientCitationAppearance()
-                        {
-                            Name = citation.Title,
-                            Abstract = abs
-                        }
-                    });
-                    currPos++;
-                }
-
-                // If there are citations, modify the content so that the sources are numbers instead of [doc1], [doc2], etc.
-                this.Message = this.Citations.Count == 0 ? this.Message : CitationUtils.FormatCitationsResponse(this.Message);
-
-                // If there are citations, filter out the citations unused in content.
-                this.Citations = this.Citations.Count > 0 ? CitationUtils.GetUsedCitations(this.Message, this.Citations) : new List<ClientCitation>();
-
-            }
+            // If there are citations, modify the content so that the sources are numbers instead of [doc1], [doc2], etc.
+            this.Message = CitationUtils.FormatCitationsResponse(this.Message);
 
             QueueNextChunk();
         }
@@ -319,6 +323,19 @@ namespace Microsoft.Teams.AI.Application
                     })
                 }
             };
+
+            if (this.Citations != null && this.Citations.Count > 0 && !this._ended)
+            {
+                // If there are citations, filter out the citations unused in content.
+                List<ClientCitation>? currCitations = CitationUtils.GetUsedCitations(this.Message, this.Citations);
+                AIEntity entity = new AIEntity();
+                if (currCitations != null && currCitations.Count > 0)
+                {
+                    entity.Citation = currCitations;
+                }
+
+                activity.Entities.Add(entity);
+            }
 
             // Add in Powered by AI feature flags
             if (this._ended)

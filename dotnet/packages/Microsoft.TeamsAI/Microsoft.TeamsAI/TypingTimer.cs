@@ -1,6 +1,7 @@
 ﻿using Microsoft.Teams.AI.Utilities;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Builder;
+using Microsoft.Teams.AI.Application;
 
 namespace Microsoft.Teams.AI
 {
@@ -121,7 +122,7 @@ namespace Microsoft.Teams.AI
             {
                 foreach (Activity activity in activities)
                 {
-                    if (activity.Type == ActivityTypes.Message)
+                    if (activity.Type == ActivityTypes.Message || activity.GetChannelData<StreamingChannelData>()?.StreamType != null)
                     {
                         Dispose();
                         break;
