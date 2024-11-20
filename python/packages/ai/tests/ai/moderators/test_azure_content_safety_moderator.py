@@ -28,11 +28,19 @@ class MockContentSafetyClient:
 class MockContentSafetyClientWithResults:
     def analyze_text(self, *_args, **_kwargs: Any):
         return {
-            "blocklistsMatchResults": [],
-            "hateResult": {"category": "Hate", "severity": 6},
-            "selfHarmResult": {"category": "SelfHarm", "severity": 0},
-            "sexualResult": {"category": "Sexual", "severity": 0},
-            "violenceResult": {"category": "Violence", "severity": 0},
+            "blocklistsMatch": [
+                 {
+                    "blocklistName": "string",
+                    "blocklistItemId": "string",
+                    "blocklistItemText": "bleed"
+                }
+            ],
+            "categoriesAnalysis": [
+                {"category": "Hate", "severity": 6},
+                {"category": "SelfHarm", "severity": 0},
+                {"category": "Sexual", "severity": 0},
+                {"category": "Violence", "severity": 0},    
+            ]
         }
 
 

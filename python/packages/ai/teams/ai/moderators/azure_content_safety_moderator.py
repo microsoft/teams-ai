@@ -49,6 +49,13 @@ class AzureContentSafetyModeratorOptions(OpenAIModeratorOptions):
     You could attach multiple lists name here.
     """
 
+    halt_on_blocklist_hit: Optional[bool] = False
+    """
+     When set to true, further analyses of harmful content will not be performed in cases where blocklists are hit.
+     When set to false, all analyses of harmful content will be performed, whether or not blocklists are hit.
+     Default value is false.
+     """
+
 
 class AzureContentSafetyModerator(Generic[StateT], Moderator[StateT]):
     """
@@ -95,6 +102,7 @@ class AzureContentSafetyModerator(Generic[StateT], Moderator[StateT]):
                     text=input,
                     categories=self._options.categories,
                     blocklist_names=self._options.blocklist_names,
+                    halt_on_blocklist_hit=self._options.halt_on_blocklist_hit,
                 )
             )
 
@@ -102,21 +110,20 @@ class AzureContentSafetyModerator(Generic[StateT], Moderator[StateT]):
             categories: Dict[str, bool] = {}
             category_scores: Dict[str, int] = {}
 
-            category_results = ["hateResult", "selfHarmResult", "sexualResult", "violenceResult"]
+            categories_analysis = res["categoriesAnalysis"]
 
-            for category in category_results:
-                result = res[category] if category in res else None
-                if result is not None:
-                    category = result["category"].lower()
-                    if category == "selfharm":
-                        category = "self_harm"
-                    categories[category] = result["severity"] is not None and result["severity"] > 0
-                    category_scores[category] = (
-                        0 if result["severity"] is None else result["severity"]
-                    )
-                    if result["severity"] is not None and result["severity"] > 0:
-                        flagged = True
-
+            for result in categories_analysis:
+                category = result["category"].lower()
+                if category == "selfharm":
+                    category = "self_harm"
+                categories[category] = (
+                    result["severity"] is not None and result["severity"] > 0
+                )
+                category_scores[category] = (
+                    0 if result["severity"] is None else result["severity"]
+                )
+                if result["severity"] is not None and result["severity"] > 0:
+                    flagged = True
             return (
                 None
                 if not flagged
@@ -156,6 +163,7 @@ class AzureContentSafetyModerator(Generic[StateT], Moderator[StateT]):
                             ),
                             categories=self._options.categories,
                             blocklist_names=self._options.blocklist_names,
+                            halt_on_blocklist_hit=self._options.halt_on_blocklist_hit,
                         )
                     )
 
@@ -163,27 +171,20 @@ class AzureContentSafetyModerator(Generic[StateT], Moderator[StateT]):
                     categories: Dict[str, bool] = {}
                     category_scores: Dict[str, int] = {}
 
-                    category_results = [
-                        "hateResult",
-                        "selfHarmResult",
-                        "sexualResult",
-                        "violenceResult",
-                    ]
+                    categories_analysis = res["categoriesAnalysis"]
 
-                    for category in category_results:
-                        result = res[category] if category in res else None
-                        if result is not None:
-                            category = result["category"].lower()
-                            if category == "selfharm":
-                                category = "self_harm"
-                            categories[category] = (
-                                result["severity"] is not None and result["severity"] > 0
-                            )
-                            category_scores[category] = (
-                                0 if result["severity"] is None else result["severity"]
-                            )
-                            if result["severity"] is not None and result["severity"] > 0:
-                                flagged = True
+                    for result in categories_analysis:
+                        category = result["category"].lower()
+                        if category == "selfharm":
+                            category = "self_harm"
+                        categories[category] = (
+                            result["severity"] is not None and result["severity"] > 0
+                        )
+                        category_scores[category] = (
+                            0 if result["severity"] is None else result["severity"]
+                        )
+                        if result["severity"] is not None and result["severity"] > 0:
+                            flagged = True
 
                     if flagged:
                         return Plan(
