@@ -1,4 +1,4 @@
-import { Application, preview, AI } from '@microsoft/teams-ai';
+import { Application, preview, AI, TurnState } from '@microsoft/teams-ai';
 import { CardFactory, MemoryStorage, MessageFactory, TurnContext } from 'botbuilder';
 import { Order } from './foodOrderViewSchema';
 import { generateCardForOrder } from './foodOrderCard';
@@ -76,21 +76,18 @@ const app = new Application({
 // Export bots run() function
 export const run = (context: TurnContext) => app.run(context);
 
-app.message('/reset', async (context, state) => {
+app.message('/reset', async (context: TurnContext, state: TurnState) => {
     state.deleteConversationState();
     await context.sendActivity(`Ok lets start this over.`);
 });
 
-app.ai.action<Order>('place_order', async (context, state, order) => {
-    console.log('place order');
+app.ai.action<Order>('place_order', async (context: TurnContext, state: TurnState, order: Order) => {
     const card = generateCardForOrder(order);
     await context.sendActivity(MessageFactory.attachment(CardFactory.adaptiveCard(card)));
     return `order placed`;
 });
 
-app.ai.action(AI.HttpErrorActionName, async (context, state, data) => {
-    // console.log(context);
-    console.log(data);
+app.ai.action(AI.HttpErrorActionName, async (context: TurnContext, state: TurnState, _data: unknown) => {
     await context.sendActivity('An AI request failed. Please try again later.');
     return AI.StopCommandName;
 });
