@@ -39,17 +39,19 @@ const SUBMIT_TOOL_OUTPUTS_MAP = 'temp.submitToolMap';
  */
 export interface AssistantsPlannerOptions {
     /**
-     * The OpenAI or Azure OpenAI API key.
+     * The OpenAI or Azure OpenAI API key. Required.
      */
     apiKey: string;
 
     /**
      * The Azure OpenAI resource endpoint.
+     * @remarks
+     * Required when using Azure OpenAI. Not used for OpenAI.
      */
     endpoint?: string;
 
     /**
-     * The ID of the assistant to use.
+     * The ID of the assistant to use. Required.
      */
     assistant_id: string;
 
@@ -69,8 +71,14 @@ export interface AssistantsPlannerOptions {
 }
 
 /**
- * A Planner that uses the OpenAI Assistants API.
+ * A Planner that uses the OpenAI Assistants API to generate plans for the AI system.
  * @template TState Optional. Type of application state.
+ * @remarks
+ * This planner manages conversations through OpenAI's thread-based system, handling:
+ * - Thread creation and management
+ * - Message submission
+ * - Tool/function calling
+ * - Response processing
  */
 export class AssistantsPlanner<TState extends TurnState = TurnState> implements Planner<TState> {
     private readonly _options: AssistantsPlannerOptions;
@@ -104,8 +112,10 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
      * @param {AI<TState>} ai - The AI system that is generating the plan.
      * @returns {Promise<Plan>} The plan that was generated.
      */
-    public beginTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan> {
-        return this.continueTask(context, state, ai);
+    public async beginTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan> {
+        const threadId = await this.ensureThreadCreated(state, context.activity.text);
+        await this.blockOnInProgressRuns(threadId);
+        return await this.submitUserInput(context, state, ai);
     }
 
     /**
@@ -126,29 +136,17 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
      * @returns {Promise<Plan>} The plan that was generated.
      */
     public async continueTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan> {
-        // Create a new thread if we don't have one already
-        const threadId = await this.ensureThreadCreated(state, context.activity.text);
-
-        if (state.getValue(SUBMIT_TOOL_OUTPUTS_VARIABLE)) {
-            // Handle required actions
-            return await this.submitActionResults(context, state, ai);
-        }
-
-        // Wait for any current runs to complete since you can't add messages or start new runs
-        // if there's already one in progress
-        await this.blockOnInProgressRuns(threadId);
-
-        // Submit user input
-        return await this.submitUserInput(context, state, ai);
+        return await this.submitActionResults(context, state, ai);
     }
 
     /**
-     * Static helper method for programmatically creating an assistant.
+     * Creates a new assistant using the OpenAI Assistants API.
      * @param {string} apiKey - OpenAI API key.
      * @param {OpenAI.Beta.AssistantCreateParams} request - Definition of the assistant to create.
-     * @param {string} endpoint - The Azure OpenAI resource endpoint.
-     * @param {Record<string, string | undefined>} azureClientOptions - The Azure OpenAI client options.
+     * @param {string} endpoint - Optional. The Azure OpenAI resource endpoint. Required when using Azure OpenAI.
+     * @param {Record<string, string | undefined>} azureClientOptions - Optional. The Azure OpenAI client options.
      * @returns {Promise<OpenAI.Beta.Assistant>} The created assistant.
+     * @throws {Error} If the assistant creation fails.
      */
     public static async createAssistant(
         apiKey: string,
@@ -161,10 +159,11 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * Ensures a thread exists for the current conversation.
      * @private
      * @param {TurnState} state - The application Turn State.
-     * @param {string} input - The thread input.
-     * @returns {Promise<string>} The created thread.
+     * @param {string} input - The initial thread input.
+     * @returns {Promise<string>} The thread ID.
      */
     private async ensureThreadCreated(state: TState, input: string): Promise<string> {
         const assistantsState = this.ensureAssistantsState(state);
@@ -177,6 +176,12 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         return assistantsState.thread_id;
     }
 
+    /**
+     * Checks if a run has reached a terminal state.
+     * @private
+     * @param {OpenAI.Beta.Threads.Run} run - The run to check.
+     * @returns {boolean} True if the run is in a completed state.
+     */
     private isRunCompleted(run: OpenAI.Beta.Threads.Run): boolean {
         return ['completed', 'failed', 'cancelled', 'expired'].includes(run.status);
     }
@@ -225,7 +230,8 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
                 toolOutputs.push({ tool_call_id: toolCallId, output });
             }
         }
-
+        // check this method; check for new run or no new run
+        console.log('calling runs submittooloutputs');
         const run = await this._client.beta.threads.runs.submitToolOutputsAndPoll(
             assistantsState.thread_id!,
             assistantsState.run_id!,
@@ -279,7 +285,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
             content: state.temp.input
         });
 
-        const run = await this._client.beta.threads.runs.create(threadId, {
+        const run = await this._client.beta.threads.runs.createAndPoll(threadId, {
             assistant_id: this._options.assistant_id
         });
 
@@ -349,7 +355,9 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
      */
     private async generatePlanFromMessages(thread_id: string, last_message_id: string): Promise<Plan> {
         const messages = await this._client.beta.threads.messages.list(thread_id);
-        const newMessages = messages.data.filter((message) => message.id !== last_message_id);
+
+        const lastMessageIndex = messages.data.findIndex((message) => message.id === last_message_id);
+        const newMessages = lastMessageIndex >= 0 ? messages.data.slice(0, lastMessageIndex) : [];
 
         const plan: Plan = { type: 'plan', commands: [] };
         newMessages.forEach((message) => {
@@ -415,6 +423,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     private async blockOnInProgressRuns(thread_id: string): Promise<void> {
         while (true) {
             const runs = await this._client.beta.threads.runs.list(thread_id, { limit: 1 });
+
             if (runs.data.length === 0) {
                 return; // No runs, so we're done
             }
@@ -429,9 +438,9 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     /**
      * @private
      * @param {string} apiKey - The api key
-     * @param {Record<string, string | undefined>} azureClientOptions
      * @param {string} endpoint  - The Azure OpenAI resource endpoint
-     * @returns {AssistantsClient} the client
+     * @param {Record<string, string | undefined>} azureClientOptions - The Azure OpenAI client options.
+     * @returns {OpenAI} the client
      */
     private static createClient(apiKey: string, endpoint?: string, azureClientOptions?: AzureClientOptions): OpenAI {
         if (endpoint) {
