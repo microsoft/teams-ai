@@ -24,9 +24,18 @@ describe('AssistantsPlanner', () => {
                 create: sinon.stub().resolves({ id: 'test-thread-id' }),
                 runs: {
                     create: sinon.stub().resolves({ id: 'test-run-id', status: 'completed' }),
+                    createAndPoll: sinon.stub().resolves({ id: 'test-run-id', status: 'completed' }),
                     retrieve: sinon.stub().resolves({ id: 'test-run-id', status: 'completed' }),
                     submitToolOutputs: sinon.stub().resolves({ id: 'test-run-id', status: 'completed' }),
-                    list: sinon.stub().resolves({ data: [{ id: 'test-run-id', status: 'completed' }] })
+                    submitToolOutputsAndPoll: sinon.stub().resolves({ id: 'test-run-id', status: 'completed' }),
+                    list: sinon.stub().resolves({
+                        data: [
+                            {
+                                id: 'test-run-id',
+                                status: 'completed'
+                            }
+                        ]
+                    })
                 },
                 messages: {
                     create: sinon.stub().resolves({ id: 'test-message-id' }),
@@ -80,38 +89,29 @@ describe('AssistantsPlanner', () => {
 
     describe('beginTask', () => {
         it('should create a thread and run, then return a plan', async () => {
-            const threadId = 'test-thread-id';
-            const runId = 'test-run-id';
-
-            // Ensure the stub for messages.list returns the expected message
             (openAIStub.beta.threads.messages.list as sinon.SinonStub).resolves({
                 data: [
                     {
-                        id: 'test-message-id',
-                        content: [{ type: 'text', text: { value: 'Sent response' } }]
-                    },
-                    {
                         id: 'test-message-id-2',
                         content: [{ type: 'text', text: { value: 'New response' } }]
+                    },
+                    {
+                        id: 'test-message-id',
+                        content: [{ type: 'text', text: { value: 'Test response' } }]
                     }
                 ]
-            });
-
-            // Ensure the stub for waitForRun returns a completed status
-            (openAIStub.beta.threads.runs.retrieve as sinon.SinonStub).resolves({
-                id: runId,
-                status: 'completed',
-                last_message_id: 'old-test-message-id'
             });
 
             const plan = await planner.beginTask(context, state, ai);
 
             sinon.assert.calledOnce(openAIStub.beta.threads.create as sinon.SinonStub);
-            sinon.assert.calledWith(openAIStub.beta.threads.runs.create as sinon.SinonStub, threadId, {
+            sinon.assert.calledWith(openAIStub.beta.threads.messages.create as sinon.SinonStub, 'test-thread-id', {
+                role: 'user',
+                content: 'test input'
+            });
+            sinon.assert.calledWith(openAIStub.beta.threads.runs.createAndPoll as sinon.SinonStub, 'test-thread-id', {
                 assistant_id: 'test-assistant-id'
             });
-            sinon.assert.calledWith(openAIStub.beta.threads.runs.retrieve as sinon.SinonStub, threadId, runId);
-            sinon.assert.calledWith(openAIStub.beta.threads.messages.list as sinon.SinonStub, threadId);
 
             assert.strictEqual(plan.type, 'plan');
             assert.strictEqual(plan.commands.length, 1);
@@ -161,38 +161,54 @@ describe('AssistantsPlanner', () => {
 
     describe('continueTask', () => {
         it('should continue an existing thread and run', async () => {
+            // Setup the initial state
             state.setValue('conversation.assistants_state', {
                 thread_id: 'existing-thread-id',
                 run_id: 'existing-run-id',
                 last_message_id: 'existing-message-id'
             });
 
-            // Ensure the stub for messages.list returns the expected message
+            // Setup action outputs
+            state.temp.actionOutputs = { test_function: 'test output' };
+            state.setValue('temp.submitToolMap', { test_function: 'test-tool-call-id' });
+            state.setValue('temp.submitToolOutputs', true);
+
+            // Mock messages list response
             (openAIStub.beta.threads.messages.list as sinon.SinonStub).resolves({
                 data: [
                     {
-                        id: 'test-message-id',
-                        content: [{ type: 'text', text: { value: 'Sent response' } }]
+                        id: 'new-message-id',
+                        content: [{ type: 'text', text: { value: 'New response' } }]
                     },
                     {
-                        id: 'test-message-id-2',
-                        content: [{ type: 'text', text: { value: 'New response' } }]
+                        id: 'existing-message-id',
+                        content: [{ type: 'text', text: { value: 'Old response' } }]
                     }
                 ]
             });
 
             const plan = await planner.continueTask(context, state, ai);
 
-            sinon.assert.notCalled(openAIStub.beta.threads.create as sinon.SinonStub);
-            sinon.assert.calledWith(openAIStub.beta.threads.runs.create as sinon.SinonStub, 'existing-thread-id', {
-                assistant_id: 'test-assistant-id'
-            });
-            sinon.assert.calledWith(openAIStub.beta.threads.messages.list as sinon.SinonStub, 'existing-thread-id');
-            sinon.assert.calledWith(openAIStub.beta.threads.messages.list as sinon.SinonStub, 'existing-thread-id');
+            // Verify submitToolOutputsAndPoll was called with correct arguments
+            sinon.assert.calledWith(
+                openAIStub.beta.threads.runs.submitToolOutputsAndPoll as sinon.SinonStub,
+                'existing-thread-id',
+                'existing-run-id',
+                {
+                    tool_outputs: [
+                        {
+                            tool_call_id: 'test-tool-call-id',
+                            output: 'test output'
+                        }
+                    ]
+                }
+            );
 
+            // Verify the plan structure
             assert.strictEqual(plan.type, 'plan');
             assert.strictEqual(plan.commands.length, 1);
             assert.strictEqual(plan.commands[0].type, 'SAY');
+            assert.strictEqual((plan.commands[0] as PredictedSayCommand).response.content, 'New response');
         });
 
         it('should handle required actions', async () => {
@@ -228,44 +244,59 @@ describe('AssistantsPlanner', () => {
 
     describe('submitActionResults', () => {
         it('should submit action results and return a plan', async () => {
-            const threadId = 'test-thread-id';
-            const runId = 'test-run-id';
+            // Setup the initial state
             state.setValue('conversation.assistants_state', {
-                thread_id: threadId,
-                run_id: runId,
+                thread_id: 'test-thread-id',
+                run_id: 'test-run-id',
                 last_message_id: 'test-message-id'
             });
+
+            // Setup action outputs
             state.temp.actionOutputs = { test_function: 'test output' };
             state.setValue('temp.submitToolMap', { test_function: 'test-tool-call-id' });
 
-            // Ensure the stub for messages.list returns the expected message
+            // Mock messages list response with messages before last_message_id
             (openAIStub.beta.threads.messages.list as sinon.SinonStub).resolves({
                 data: [
                     {
-                        id: 'test-message-id',
-                        content: [{ type: 'text', text: { value: 'Sent response' } }]
+                        id: 'new-message-id',
+                        content: [{ type: 'text', text: { value: 'New response' } }]
                     },
                     {
-                        id: 'test-message-id-2',
-                        content: [{ type: 'text', text: { value: 'New response' } }]
+                        id: 'test-message-id',
+                        content: [{ type: 'text', text: { value: 'Old response' } }]
                     }
                 ]
             });
 
+            // Mock the run completion
+            (openAIStub.beta.threads.runs.submitToolOutputsAndPoll as sinon.SinonStub).resolves({
+                id: 'test-run-id',
+                status: 'completed'
+            });
+
             const plan = await (planner as any).submitActionResults(context, state, ai);
 
+            // Verify submitToolOutputsAndPoll was called with correct arguments
             sinon.assert.calledWith(
-                openAIStub.beta.threads.runs.submitToolOutputs as sinon.SinonStub,
-                threadId,
-                runId,
+                openAIStub.beta.threads.runs.submitToolOutputsAndPoll as sinon.SinonStub,
+                'test-thread-id',
+                'test-run-id',
                 {
-                    tool_outputs: [{ tool_call_id: 'test-tool-call-id', output: 'test output' }]
+                    tool_outputs: [
+                        {
+                            tool_call_id: 'test-tool-call-id',
+                            output: 'test output'
+                        }
+                    ]
                 }
             );
-            sinon.assert.calledWith(openAIStub.beta.threads.messages.list as sinon.SinonStub, threadId);
+
+            // Verify the plan structure
             assert.strictEqual(plan.type, 'plan');
             assert.strictEqual(plan.commands.length, 1);
             assert.strictEqual(plan.commands[0].type, 'SAY');
+            assert.strictEqual((plan.commands[0] as PredictedSayCommand).response.content, 'New response');
         });
     });
 
