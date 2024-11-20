@@ -373,20 +373,26 @@ export class OpenAIModel implements PromptCompletionModel {
                     if (delta.content) {
                         message.content += delta.content;
                     }
+
                     // Handle tool calls
+                    // - We don't know how many tool calls there will be so we need to add them one-by-one.
                     if (delta.tool_calls) {
-                        message.action_calls = delta.tool_calls.map(
-                            (toolCall: OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall) => {
-                                return {
-                                    id: toolCall.id,
-                                    function: {
-                                        name: toolCall.function!.name,
-                                        arguments: toolCall.function!.arguments
-                                    },
-                                    type: toolCall.type
-                                } as ActionCall;
-                            }
-                        );
+                        // Create action calls array if it doesn't exist
+                        if (!Array.isArray(message.action_calls)) {
+                            message.action_calls = [];
+                        }
+
+                        // Add tool calls to action calls
+                        for (const toolCall of delta.tool_calls) {
+                            message.action_calls.push({
+                                id: toolCall.id,
+                                function: {
+                                    name: toolCall.function!.name,
+                                    arguments: toolCall.function!.arguments
+                                },
+                                type: toolCall.type
+                            } as ActionCall);
+                        }
                     }
 
                     // Signal chunk received
