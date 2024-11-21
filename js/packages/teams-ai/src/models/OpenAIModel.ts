@@ -384,14 +384,32 @@ export class OpenAIModel implements PromptCompletionModel {
 
                         // Add tool calls to action calls
                         for (const toolCall of delta.tool_calls) {
-                            message.action_calls.push({
-                                id: toolCall.id,
-                                function: {
-                                    name: toolCall.function!.name,
-                                    arguments: toolCall.function!.arguments
-                                },
-                                type: toolCall.type
-                            } as ActionCall);
+                            // Add empty tool call to message if new index
+                            // - Note that a single tool call can span multiple chunks.
+                            const index = toolCall.index;
+                            if (index >= message.action_calls.length) {
+                                message.action_calls.push({ id: '', function: { name: '', arguments: '' }, type: '' } as any);
+                            }
+
+                            // Set ID if provided
+                            if (toolCall.id) {
+                                message.action_calls[index].id = toolCall.id;
+                            }
+
+                            // Set type if provided
+                            if (toolCall.type) {
+                                message.action_calls[index].type = toolCall.type;
+                            }
+
+                            // Append function name if provided
+                            if (toolCall.function?.name) {
+                                message.action_calls[index].function.name += toolCall.function.name;
+                            }
+
+                            // Append function arguments if provided
+                            if (toolCall.function?.arguments) {
+                               message.action_calls[index].function.arguments += toolCall.function.arguments;
+                            }
                         }
                     }
 
