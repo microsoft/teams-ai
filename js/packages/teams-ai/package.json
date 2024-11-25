@@ -49,7 +49,7 @@
         "@types/assert": "^1.5.11",
         "@types/express": "^4.17.21",
         "@types/jsonwebtoken": "^9.0.4",
-        "@types/mocha": "^10.0.9",
+        "@types/mocha": "^10.0.10",
         "@types/node": "^20.16.1",
         "@types/uuid": "^9.0.8",
         "botbuilder-core": "^4.22.1",
