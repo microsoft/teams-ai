@@ -49,6 +49,7 @@ class AzureOpenAIAssistantsOptions:
     """
     Options for configuring the AssistantsPlanner for AzureOpenAI.
     """
+
     default_model: str
     "Default name of the Azure OpenAI deployment (model) to use."
 
