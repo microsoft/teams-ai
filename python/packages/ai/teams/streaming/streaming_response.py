@@ -149,6 +149,7 @@ class StreamingResponse:
         self._next_sequence += 1
 
     def queue_text_chunk(self, text: str, citations: Optional[List[Citation]] = None) -> None:
+        # pylint: disable=unused-argument
         """
         Queues a chunk of partial message text to be sent to the client.
         The text we be sent as quickly as possible to the client. Chunks may be combined before
@@ -159,7 +160,7 @@ class StreamingResponse:
             raise ApplicationError("The stream has already ended.")
 
         self._message += text
-        
+
         # If there are citations, modify the content so that the sources are numbers
         # instead of [doc1], [doc2], etc.
         self._message = format_citations_response(self._message)
@@ -282,12 +283,12 @@ class StreamingResponse:
         ]
 
         # If there are citations, filter out the citations unused in content.
-        if self._citations and len(self._citations) > 0 and self._ended == False:
-            currCitations = get_used_citations(self._message, self._citations)
+        if self._citations and len(self._citations) > 0 and self._ended is False:
+            curr_citations = get_used_citations(self._message, self._citations)
             activity.entities.append(
                     AIEntity(
                         additional_type=[],
-                        citation=currCitations if currCitations else [],
+                        citation=curr_citations if curr_citations else [],
                     )
             )
 
