@@ -230,10 +230,10 @@
   resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-14.16.0.tgz#f3470fcaec788dbe50859952cd499340bda23d7a"
   integrity sha512-1KOZj9IpcDSwpNiQNjt0jDYZpQvNZay7QAEi/5DLubay40iGYtLzya/jbjRPLyOTZhEKyL1MzPuw2HqBCjceYA==
 
-"@azure/msal-node@^2.13.1", "@azure/msal-node@^2.15.0", "@azure/msal-node@^2.16.1":
-  version "2.16.1"
-  resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-2.16.1.tgz#89828832e8e6c8a88cecc4ef6d8d4e4352116b77"
-  integrity sha512-1NEFpTmMMT2A7RnZuvRl/hUmJU+GLPjh+ShyIqPktG2PvSd2yvPnzGd/BxIBAAvJG5nr9lH4oYcQXepDbaE7fg==
+"@azure/msal-node@^2.13.1", "@azure/msal-node@^2.15.0", "@azure/msal-node@^2.16.2":
+  version "2.16.2"
+  resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-2.16.2.tgz#3eb768d36883ea6f9a939c0b5b467b518e78fffc"
+  integrity sha512-An7l1hEr0w1HMMh1LU+rtDtqL7/jw74ORlc9Wnh06v7TU/xpG39/Zdr1ZJu3QpjUfKJ+E0/OXMW8DRSWTlh7qQ==
   dependencies:
     "@azure/msal-common" "14.16.0"
     jsonwebtoken "^9.0.0"
@@ -761,10 +761,10 @@
   resolved "https://registry.yarnpkg.com/@microsoft/recognizers-text/-/recognizers-text-1.3.1.tgz#eda98a9148101ecdb04ed1424082d472b04aabd9"
   integrity sha512-HikLoRUgSzM4OKP3JVBzUUp3Q7L4wgI17p/3rERF01HVmopcujY3i6wgx8PenCwbenyTNxjr1AwSDSVuFlYedQ==
 
-"@microsoft/teams-js@^2.31.0":
-  version "2.31.0"
-  resolved "https://registry.yarnpkg.com/@microsoft/teams-js/-/teams-js-2.31.0.tgz#25e8453a26cdeeb72948672e2e04827ad744d9f9"
-  integrity sha512-MZLmMOqbPpDpooNkhBVw9v8Q474sLzne1YUP2sa1ZukCkoNPG9DOOKYbeX38CdvdZ1zfeteCUB920ZLXUKyzVA==
+"@microsoft/teams-js@^2.31.1":
+  version "2.31.1"
+  resolved "https://registry.yarnpkg.com/@microsoft/teams-js/-/teams-js-2.31.1.tgz#6f3989613ccf8b81efb983c48dda3ffc1ae15431"
+  integrity sha512-HzUYELJxukST2lG3dlTOjSZNg9G+6JeWcXF6gEJU6OEFpdWN2EKlUBw2q4VLQFwwHV2I9+eCOALOEHFhGtEQxQ==
   dependencies:
     base64-js "^1.3.1"
     debug "^4.3.3"
@@ -9449,10 +9449,10 @@ yaml@^1.10.0:
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.10.2.tgz#2301c5ffbf12b467de8da2333a459e29e7920e4b"
   integrity sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==
 
-yaml@^2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.6.0.tgz#14059ad9d0b1680d0f04d3a60fe00f3a857303c3"
-  integrity sha512-a6ae//JvKDEra2kdi1qzCyrJW/WZCgFi8ydDV+eXExl95t+5R+ijnqHJbz9tmMh8FUjx3iv2fCQ4dclAQlO2UQ==
+yaml@^2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.6.1.tgz#42f2b1ba89203f374609572d5349fb8686500773"
+  integrity sha512-7r0XPzioN/Q9kXBro/XPnA6kznR73DHq+GXh5ON7ZozRO6aMjbmiBuKste2wslTFkC5d1dw0GooOCepZXJ2SAg==
 
 yargs-parser@^13.1.2:
   version "13.1.2"
