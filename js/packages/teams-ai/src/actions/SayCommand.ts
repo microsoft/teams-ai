@@ -15,6 +15,7 @@ import { AIEntity, ClientCitation } from '../types';
 /**
  * @private
  * @param {boolean} feedbackLoopEnabled - If true, the feedback loop UI for Teams will be enabled.
+ * @param {'default' | 'custom'} feedbackLoopType - the type of UI to use for feedback loop
  * @returns {''} - An empty string.
  */
 export function sayCommand<TState extends TurnState = TurnState>(
@@ -77,7 +78,7 @@ export function sayCommand<TState extends TurnState = TurnState>(
         const activity: Partial<Activity> = {
             type: ActivityTypes.Message,
             text: contentText,
-            ...(isTeamsChannel ? channelData : {}),
+            ...(isTeamsChannel ? { channelData } : {}),
             entities: entities
         };
 
