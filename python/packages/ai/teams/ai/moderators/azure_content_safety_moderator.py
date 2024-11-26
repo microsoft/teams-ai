@@ -51,8 +51,10 @@ class AzureContentSafetyModeratorOptions(OpenAIModeratorOptions):
 
     halt_on_blocklist_hit: Optional[bool] = False
     """
-     When set to true, further analyses of harmful content will not be performed in cases where blocklists are hit.
-     When set to false, all analyses of harmful content will be performed, whether or not blocklists are hit.
+     When set to true, further analyses of harmful content will not be performed 
+     in cases where blocklists are hit.
+     When set to false, all analyses of harmful content will be performed, whether
+     or not blocklists are hit.
      Default value is false.
      """
 
@@ -116,12 +118,8 @@ class AzureContentSafetyModerator(Generic[StateT], Moderator[StateT]):
                 category = result["category"].lower()
                 if category == "selfharm":
                     category = "self_harm"
-                categories[category] = (
-                    result["severity"] is not None and result["severity"] > 0
-                )
-                category_scores[category] = (
-                    0 if result["severity"] is None else result["severity"]
-                )
+                categories[category] = result["severity"] is not None and result["severity"] > 0
+                category_scores[category] = 0 if result["severity"] is None else result["severity"]
                 if result["severity"] is not None and result["severity"] > 0:
                     flagged = True
             return (
