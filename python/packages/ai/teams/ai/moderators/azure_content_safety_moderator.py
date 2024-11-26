@@ -112,7 +112,7 @@ class AzureContentSafetyModerator(Generic[StateT], Moderator[StateT]):
             categories: Dict[str, bool] = {}
             category_scores: Dict[str, int] = {}
 
-            categories_analysis = res.categories_analysis
+            categories_analysis = res["categoriesAnalysis"]
 
             for result in categories_analysis:
                 category = result["category"].lower()
@@ -169,7 +169,7 @@ class AzureContentSafetyModerator(Generic[StateT], Moderator[StateT]):
                     categories: Dict[str, bool] = {}
                     category_scores: Dict[str, int] = {}
 
-                    categories_analysis = res.categories_analysis
+                    categories_analysis = res["categoriesAnalysis"]
 
                     for result in categories_analysis:
                         category = result["category"].lower()
