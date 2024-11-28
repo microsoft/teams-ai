@@ -38,15 +38,15 @@ This sample is configured to work only in the tenant in which the Azure app regi
     ```json
     "signInAudience": "AzureADMultipleOrgs"
     ```
-1. Navigate to the `teamsapp.local.yml` file and set
+2. Navigate to the `teamsapp.local.yml` file and set
     ```yml
     signInAudience: "AzureADMultipleOrgs" # Authenticate users with a Microsoft work or school account in your organization's Azure AD tenant (for example, single tenant).
     ```
-1. Navigate to the `wwwroot/auth-start.html` page and set
+3. Navigate to the `wwwroot/auth-start.html` page and set
     ```js
     let authorizeEndpoint = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${toQueryString(queryParams)}`;
     ```
-2. Navigate to the `Program.cs` file and on line 40 set 
+4. Navigate to the `Program.cs` file and on line 40 set 
     ```
     .WithTenantId("common")
     ```
