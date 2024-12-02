@@ -48,6 +48,8 @@ The expected sequence of calls is:
 2. `queueTextChunk()`, ..., 
 3. `endStream()`.
 
+Once `endStream()` is called, the stream is considered ended and no further updates can be sent.
+
 
 ## Configuration with Azure Open AI / Open AI
 
@@ -65,7 +67,6 @@ The expected sequence of calls is:
         - “Finding relevant work items”
 - The informative message is rendered only at the beginning of each message returned from the LLM.
 - Attachments can only be sent in the final streamed chunk.
-- Streaming is not available in conjunction with AI SDK's function calls yet.
 - Streaming does not work with OpenAI's `o1` models.
 - Tools Streaming only works with the `tools` augmentation. The `sequence` and `monologue` augmentations do not currently support streaming.
 - Streaming without tools support works with the `default` augmentation.
