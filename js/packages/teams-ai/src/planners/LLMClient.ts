@@ -327,14 +327,15 @@ export class LLMClient<TContent = any> {
                 return;
             }
 
-            // Ignore tool calls
-            // - see the tool call note below to understand why we're ignoring them.
-            if ((chunk.delta as any)?.tool_calls || chunk.delta?.action_calls) {
+            // Ignore calls without content
+            // - This is typically because the chunk represents a tool call.
+            // - See the note below for why we're handling tool calls this way.
+            if (!chunk.delta?.content) {
                 return;
             }
 
-            // Send chunk to client
-            const text = chunk.delta?.content ?? '';
+            // Send text chunk to client
+            const text = chunk.delta?.content;
             const citations = chunk.delta?.context?.citations ?? undefined;
 
             if (text.length > 0) {
