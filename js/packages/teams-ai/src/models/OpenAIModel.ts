@@ -354,6 +354,10 @@ export class OpenAIModel implements PromptCompletionModel {
                 params.presence_penalty = 0;
             }
 
+            // Check for tools augmentation
+            const isToolsAugmentation =
+            template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
+
             // Call chat completion API
             let message: Message<string>;
             const completion = await this._client.chat.completions.create(params);
@@ -376,7 +380,7 @@ export class OpenAIModel implements PromptCompletionModel {
 
                     // Handle tool calls
                     // - We don't know how many tool calls there will be so we need to add them one-by-one.
-                    if (delta.tool_calls) {
+                    if (isToolsAugmentation && delta.tool_calls) {
                         // Create action calls array if it doesn't exist
                         if (!Array.isArray(message.action_calls)) {
                             message.action_calls = [];
@@ -439,8 +443,6 @@ export class OpenAIModel implements PromptCompletionModel {
                     message.context = messageWithContext.context;
                 }
                 const actionCalls: ActionCall[] = [];
-                const isToolsAugmentation =
-                    template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
 
                 // Log tool calls to be added to message of type Message<string> as action_calls
                 if (isToolsAugmentation && responseMessage?.tool_calls) {
