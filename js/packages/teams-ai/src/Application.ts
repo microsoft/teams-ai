@@ -961,9 +961,9 @@ export class Application<TState extends TurnState = TurnState> {
     }
 
     /**
-     * Gets a pagined list of members of one-on-one, group, or team conversation.
+     * Gets a paginated list of members of one-on-one, group, or team conversation.
      * @param context - The context for the current turn with the user.
-     * @param {number} pageSize - Suggested number of entries on a page. Page size less than 50, are treated as 50, and greater than 500, are capped at 500.
+     * @param {number} pageSize - Suggested number of entries on a page. Page sizes with less than 50 are treated as 50, and greater than 500, are capped at 500.
      * @param {string} continuationToken - A continuation token.
      * @returns The TeamsPagedMembersResult with the list of members.
      */
