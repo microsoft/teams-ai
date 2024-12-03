@@ -24,7 +24,7 @@ namespace Microsoft.Teams.AI.AI.Tokenizers
         /// Creates an instance of `GPTTokenizer`
         /// </summary>
         /// <param name="model">model to encode/decode for</param>
-        public GPTTokenizer(string model) => this._encoding = TiktokenTokenizer.CreateForModel("gpt-4");
+        public GPTTokenizer(string model) => this._encoding = TiktokenTokenizer.CreateForModel(model);
 
         /// <summary>
         /// Encode
