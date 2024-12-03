@@ -230,8 +230,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
                 toolOutputs.push({ tool_call_id: toolCallId, output });
             }
         }
-        // check this method; check for new run or no new run
-        console.log('calling runs submittooloutputs');
+
         const run = await this._client.beta.threads.runs.submitToolOutputsAndPoll(
             assistantsState.thread_id!,
             assistantsState.run_id!,

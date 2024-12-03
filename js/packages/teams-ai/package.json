@@ -71,7 +71,8 @@
         "test": "npx mocha -r ts-node/register src/**/*.spec.ts",
         "test:debug": "ts-mocha src/**/*.spec.ts --inspect-brk",
         "test:coverage": "nyc --reporter=html --reporter=text --reporter=text-summary npm test",
-        "test:compat": "npx api-extractor run --verbose"
+        "test:compat": "npx api-extractor run --verbose",
+        "watch": "tsc -b --watch"
     },
     "files": [
         "_ts3.4",
