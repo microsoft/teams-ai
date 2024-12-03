@@ -13,7 +13,8 @@ import { Memory, MemoryFork } from '../MemoryFork';
 import {
     PromptCompletionModel,
     PromptCompletionModelBeforeCompletionEvent,
-    PromptCompletionModelChunkReceivedEvent
+    PromptCompletionModelChunkReceivedEvent,
+    PromptCompletionModelResponseReceivedEvent
 } from '../models';
 import { ConversationHistory, Message, Prompt, PromptFunctions, PromptTemplate } from '../prompts';
 import { StreamingResponse } from '../StreamingResponse';
@@ -91,6 +92,16 @@ export interface LLMClientOptions<TContent = any> {
      * Optional message to send a client at the start of a streaming response.
      */
     startStreamingMessage?: string;
+
+    /**
+     * Optional handler to run when a stream is about to conclude.
+     */
+    endStreamHandler?: PromptCompletionModelResponseReceivedEvent;
+
+    /**
+     * If true, the feedback loop will be enabled for streaming responses.
+     */
+    enableFeedbackLoop?: boolean;
 }
 
 /**
@@ -193,6 +204,8 @@ export interface ConfiguredLLMClientOptions<TContent = any> {
  */
 export class LLMClient<TContent = any> {
     private readonly _startStreamingMessage: string | undefined;
+    private readonly _endStreamHandler: PromptCompletionModelResponseReceivedEvent | undefined;
+    private readonly _enableFeedbackLoop: boolean | undefined;
 
     /**
      * Configured options for this LLMClient instance.
@@ -226,6 +239,8 @@ export class LLMClient<TContent = any> {
         }
 
         this._startStreamingMessage = options.startStreamingMessage;
+        this._endStreamHandler = options.endStreamHandler;
+        this._enableFeedbackLoop = options.enableFeedbackLoop;
     }
 
     /**
@@ -290,6 +305,14 @@ export class LLMClient<TContent = any> {
 
                 // Create streamer and send initial message
                 streamer = new StreamingResponse(context);
+                memory.setValue('temp.streamer', streamer);
+
+                if (this._enableFeedbackLoop != null) {
+                    streamer.setFeedbackLoop(this._enableFeedbackLoop);
+                }
+
+                streamer.setGeneratedByAILabel(true);
+
                 if (this._startStreamingMessage) {
                     streamer.queueInformativeUpdate(this._startStreamingMessage);
                 }
@@ -304,8 +327,10 @@ export class LLMClient<TContent = any> {
 
             // Send chunk to client
             const text = chunk.delta?.content ?? '';
+            const citations = chunk.delta?.context?.citations ?? undefined;
+
             if (text.length > 0) {
-                streamer.queueTextChunk(text);
+                streamer.queueTextChunk(text, citations);
             }
         };
 
@@ -313,6 +338,10 @@ export class LLMClient<TContent = any> {
         if (this.options.model.events) {
             this.options.model.events.on('beforeCompletion', beforeCompletion);
             this.options.model.events.on('chunkReceived', chunkReceived);
+
+            if (this._endStreamHandler) {
+                this.options.model.events.on('responseReceived', this._endStreamHandler);
+            }
         }
 
         try {
@@ -335,6 +364,10 @@ export class LLMClient<TContent = any> {
             if (this.options.model.events) {
                 this.options.model.events.off('beforeCompletion', beforeCompletion);
                 this.options.model.events.off('chunkReceived', chunkReceived);
+
+                if (this._endStreamHandler) {
+                    this.options.model.events.off('responseReceived', this._endStreamHandler);
+                }
             }
         }
     }

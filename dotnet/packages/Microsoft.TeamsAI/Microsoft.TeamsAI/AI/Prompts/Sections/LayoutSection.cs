@@ -5,6 +5,7 @@ using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
+    // TODO: Rewrite to be in parity with JS & Python SDK.
     /// <summary>
     /// Base layout section that renders a set of `auto`, `fixed` or `proportional` length sections.
     /// </summary>
@@ -19,7 +20,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         {
             get
             {
-                return this.Sections.Where(s => s.Tokens > -1).OrderBy(s => s.Required).ToList();
+                return this.Sections.Where(s => s.Tokens > -1).OrderBy(s => !s.Required).ToList();
             }
         }
 
@@ -27,7 +28,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         {
             get
             {
-                return this.Sections.Where(s => s.Tokens == -1).OrderBy(s => s.Required).ToList();
+                return this.Sections.Where(s => s.Tokens == -1).OrderBy(s => !s.Required).ToList();
             }
         }
 

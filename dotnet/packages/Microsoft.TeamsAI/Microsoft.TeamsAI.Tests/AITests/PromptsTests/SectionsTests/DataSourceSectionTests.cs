@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
     public class DataSourceSectionTests
     {
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldRender()
+        public async Task Test_RenderAsTextAsync_ShouldRender()
         {
             TextDataSource dataSource = new("test", "my text to use");
             DataSourceSection section = new(dataSource);
@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         }
 
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldTruncate()
+        public async Task Test_RenderAsTextAsync_ShouldTruncate()
         {
             TextDataSource dataSource = new("test", "my text to use");
             DataSourceSection section = new(dataSource);

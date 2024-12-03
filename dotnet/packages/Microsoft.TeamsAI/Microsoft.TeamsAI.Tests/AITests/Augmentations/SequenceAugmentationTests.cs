@@ -38,18 +38,18 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
                 Message = new(ChatRole.Assistant)
                 {
                     Content = @"{
-  ""type"": ""plan"",
-  ""commands"": [
-    {
-      ""type"": ""DO"",
-      ""action"": ""test""
-    },
-    {
-      ""type"": ""SAY"",
-      ""response"": ""hello""
-    }
-  ]
-}",
+                      ""type"": ""plan"",
+                      ""commands"": [
+                        {
+                          ""type"": ""DO"",
+                          ""action"": ""test""
+                        },
+                        {
+                          ""type"": ""SAY"",
+                          ""response"": ""hello""
+                        }
+                      ]
+                    }",
                     Context = new()
                     {
                         Intent = "test intent",

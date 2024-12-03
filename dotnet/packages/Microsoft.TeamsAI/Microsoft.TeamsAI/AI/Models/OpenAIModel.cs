@@ -18,13 +18,37 @@ using System.ClientModel;
 using ServiceVersion = Azure.AI.OpenAI.AzureOpenAIClientOptions.ServiceVersion;
 using Azure.AI.OpenAI.Chat;
 using OpenAI.Chat;
+using Microsoft.Teams.AI.Application;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("Microsoft.Teams.AI.Tests")]
+#pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 namespace Microsoft.Teams.AI.AI.Models
 {
     /// <summary>
-    /// A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
+    /// A `IPromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
     /// </summary>
-    public class OpenAIModel : IPromptCompletionModel
+    /// <remarks>
+    /// The model has been updated to support calling OpenAI's new o1 family of models. That currently 
+    /// comes with a few constraints. These constraints are mostly handled for you but are worth noting:
+    ///     
+    /// * The o1 models introduce a new `max_completion_tokens` parameter and they've deprecated the
+    ///   `max_tokens` parameter. The model will automatically convert the incoming `max_tokens` parameter
+    ///   to `max_completion_tokens` for you. But you should be aware that o1 has hidden token usage and costs
+    ///   that aren't constrained by the `max_completion_tokens` parameter. This means that you may see an
+    ///   increase in token usage and costs when using the o1 models. 
+    ///   
+    /// * The o1 models do not currently support the sending of system messages which just means that the 
+    /// `useSystemMessages` parameter is ignored when calling the o1 models.
+    /// 
+    /// * The o1 models do not currently support setting the `temperature`, `top_p`, and `presence_penalty` 
+    ///   parameters so they will be ignored.
+    /// 
+    /// * The o1 models do not currently support the use of tools so you will need to use the "monologue" 
+    ///   augmentation to call actions.
+    /// </remarks>
+    public class OpenAIModel : IPromptCompletionStreamingModel
     {
         private readonly BaseOpenAIModelOptions _options;
         private readonly ILogger _logger;
@@ -39,6 +63,11 @@ namespace Microsoft.Teams.AI.AI.Models
         };
 
         private static readonly string _userAgent = "AlphaWave";
+
+        /// <summary>
+        /// Events emitted by the model.
+        /// </summary>
+        public PromptCompletionModelEmitter? Events { get; set; } = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OpenAIModel"/> class.
@@ -138,143 +167,279 @@ namespace Microsoft.Teams.AI.AI.Models
         /// <inheritdoc/>
         public async Task<PromptResponse> CompletePromptAsync(ITurnContext turnContext, IMemory memory, IPromptFunctions<List<string>> promptFunctions, ITokenizer tokenizer, PromptTemplate promptTemplate, CancellationToken cancellationToken = default)
         {
-            DateTime startTime = DateTime.UtcNow;
-            int maxInputTokens = promptTemplate.Configuration.Completion.MaxInputTokens;
-
-
-            if (_options.CompletionType == CompletionType.Chat)
+            if (_options.CompletionType != CompletionType.Chat)
             {
-                // Render prompt
-                RenderedPromptSection<List<ChatMessage>> prompt = await promptTemplate.Prompt.RenderAsMessagesAsync(turnContext, memory, promptFunctions, tokenizer, maxInputTokens, cancellationToken);
-                if (prompt.TooLong)
+                throw new TeamsAIException("The legacy completion endpoint has been deprecated, please use the chat completions endpoint instead");
+            }
+
+            DateTime startTime = DateTime.UtcNow;
+            CompletionConfiguration completion = promptTemplate.Configuration.Completion;
+            int maxInputTokens = completion.MaxInputTokens;
+
+            if (this._options.Stream == true && Events != null)
+            {
+                // Signal start of completion
+                BeforeCompletionEventArgs beforeCompletionEventArgs = new(turnContext, memory, promptFunctions, tokenizer, promptTemplate, this._options.Stream ?? false);
+                Events.OnBeforeCompletion(beforeCompletionEventArgs);
+            }
+
+            // Render prompt
+            RenderedPromptSection<List<ChatMessage>> prompt = await promptTemplate.Prompt.RenderAsMessagesAsync(turnContext, memory, promptFunctions, tokenizer, maxInputTokens, cancellationToken);
+            if (prompt.TooLong)
+            {
+                return new PromptResponse
                 {
-                    return new PromptResponse
+                    Status = PromptResponseStatus.TooLong,
+                    Error = new($"The generated chat completion prompt had a length of {prompt.Length} tokens which exceeded the MaxInputTokens of {maxInputTokens}.")
+                };
+            }
+
+            // Get the model to use.
+            string model = promptTemplate.Configuration.Completion.Model ?? _deploymentName;
+            bool isO1Model = model.StartsWith("o1-");
+            bool useSystemMessages = !isO1Model && _options.UseSystemMessages.GetValueOrDefault(false);
+            if (!useSystemMessages && prompt.Output.Count > 0 && prompt.Output[0].Role == ChatRole.System)
+            {
+                prompt.Output[0].Role = ChatRole.User;
+            }
+
+            if (_options.LogRequests!.Value)
+            {
+                _logger.LogTrace("CHAT PROMPT:");
+                _logger.LogTrace(JsonSerializer.Serialize(prompt.Output, _serializerOptions));
+            }
+
+            // Map to OpenAI ChatMessage
+            IEnumerable<OAIChat.ChatMessage> chatMessages = prompt.Output.Select(chatMessage => chatMessage.ToOpenAIChatMessage());
+
+            ChatCompletionOptions chatCompletionOptions = new()
+            {
+                MaxOutputTokenCount = completion.MaxTokens,
+                Temperature = (float)completion.Temperature,
+                TopP = (float)completion.TopP,
+                PresencePenalty = (float)completion.PresencePenalty,
+                FrequencyPenalty = (float)completion.FrequencyPenalty,
+            };
+
+            if (isO1Model)
+            {
+                chatCompletionOptions.Temperature = 1;
+                chatCompletionOptions.TopP = 1;
+                chatCompletionOptions.PresencePenalty = 0;
+            } else
+            {
+                // `MaxOutputTokenCount` is not supported for non-o1 Azure OpenAI models, hence it needs to be set for it to work.
+                SetMaxTokens(completion.MaxTokens, chatCompletionOptions);
+            }
+
+            // Set tools configurations
+            bool isToolsAugmentation = promptTemplate.Configuration.Augmentation.Type == Augmentations.AugmentationType.Tools;
+            if (isToolsAugmentation)
+            {
+                chatCompletionOptions.ToolChoice = completion.GetOpenAIChatToolChoice();
+                chatCompletionOptions.AllowParallelToolCalls = completion.ParallelToolCalls;
+
+                if (promptTemplate.Actions.Count > 0)
+                {
+                    foreach (ChatCompletionAction action in promptTemplate.Actions)
                     {
-                        Status = PromptResponseStatus.TooLong,
-                        Error = new($"The generated chat completion prompt had a length of {prompt.Length} tokens which exceeded the MaxInputTokens of {maxInputTokens}.")
+                        chatCompletionOptions.Tools.Add(action.ToChatTool());
+                    }
+                }
+            }
+
+            // Add Azure chat extension configurations
+            IDictionary<string, JsonElement>? additionalData = promptTemplate.Configuration.Completion.AdditionalData;
+            if (_useAzure)
+            {
+                AddAzureChatExtensionConfigurations(chatCompletionOptions, additionalData);
+            }
+
+            if (_options.LogRequests!.Value)
+            {
+                _logger.LogTrace("CHAT COMPLETION CONFIG:");
+                _logger.LogTrace(JsonSerializer.Serialize(chatCompletionOptions, _serializerOptions));
+            }
+
+
+            PipelineResponse? rawResponse = null;
+            ClientResult<ChatCompletion>? chatCompletionsResponse = null;
+            PromptResponse promptResponse = new();
+            try
+            {
+                if (this._options.Stream == true)
+                {
+                    if (_options.LogRequests!.Value)
+                    {
+                        // TODO: Colorize
+                        _logger.LogTrace("STREAM STARTED:");
+                    }
+
+                    // Enumerate the stream chunks
+                    ChatMessage message = new(ChatRole.Assistant)
+                    {
+                        Content = ""
                     };
+                    AsyncCollectionResult<StreamingChatCompletionUpdate> streamCompletion = _openAIClient.GetChatClient(_deploymentName).CompleteChatStreamingAsync(chatMessages, chatCompletionOptions, cancellationToken);
+
+                    await foreach (StreamingChatCompletionUpdate delta in streamCompletion)
+                    {
+                        if (delta.Role != null)
+                        {
+                            string role = delta.Role.ToString();
+                            message.Role = new ChatRole(role);
+                        }
+
+                        if (delta.ContentUpdate.Count > 0)
+                        {
+                            message.Content += delta.ContentUpdate[0].Text;
+                        }
+
+                        // TODO: Handle tool calls
+
+                        ChatMessage currDeltaMessage = new(delta);
+                        PromptChunk chunk = new()
+                        {
+                            delta = currDeltaMessage
+                        };
+
+                        ChunkReceivedEventArgs args = new(turnContext, memory, chunk);
+
+                        // Signal chunk received
+                        if (_options.LogRequests!.Value)
+                        {
+                            _logger.LogTrace("CHUNK", delta);
+                        }
+
+                       Events!.OnChunkReceived(args);
+                    }
+
+                    promptResponse.Message = message;
+
+                    // Log stream completion
+                    if (_options.LogRequests!.Value)
+                    {
+                        _logger.LogTrace("STREAM COMPLETED");
+                    }
                 }
-                if (!_options.UseSystemMessages!.Value && prompt.Output.Count > 0 && prompt.Output[0].Role == ChatRole.System)
-                {
-                    prompt.Output[0].Role = ChatRole.User;
-                }
-                if (_options.LogRequests!.Value)
-                {
-                    // TODO: Colorize
-                    _logger.LogTrace("CHAT PROMPT:");
-                    _logger.LogTrace(JsonSerializer.Serialize(prompt.Output, _serializerOptions));
-                }
-
-                // Get input message
-                // - we're doing this here because the input message can be complex and include images.
-                ChatMessage? input = null;
-                int last = prompt.Output.Count - 1;
-                if (last >= 0 && prompt.Output[last].Role == "user")
-                {
-                    input = prompt.Output[last];
-                }
-
-                // Call chat completion API
-                IEnumerable<OAIChat.ChatMessage> chatMessages = prompt.Output.Select(chatMessage => chatMessage.ToOpenAIChatMessage());
-
-                ChatCompletionOptions? chatCompletionOptions = ModelReaderWriter.Read<ChatCompletionOptions>(BinaryData.FromString($@"{{
-                    ""max_tokens"": {promptTemplate.Configuration.Completion.MaxTokens},
-                    ""temperature"": {(float)promptTemplate.Configuration.Completion.Temperature},
-                    ""top_p"": {(float)promptTemplate.Configuration.Completion.TopP},
-                    ""presence_penalty"": {(float)promptTemplate.Configuration.Completion.PresencePenalty},
-                    ""frequency_penalty"": {(float)promptTemplate.Configuration.Completion.FrequencyPenalty}
-                }}"));
-
-                if (chatCompletionOptions == null)
-                {
-                    throw new TeamsAIException("Failed to create chat completions options");
-                }
-
-                // TODO: Use this once setters are added for the following fields in `OpenAI` package.
-                //OAIChat.ChatCompletionOptions chatCompletionsOptions = new()
-                //{
-                //    MaxTokens = maxInputTokens,
-                //    Temperature = (float)promptTemplate.Configuration.Completion.Temperature,
-                //    TopP = (float)promptTemplate.Configuration.Completion.TopP,
-                //    PresencePenalty = (float)promptTemplate.Configuration.Completion.PresencePenalty,
-                //    FrequencyPenalty = (float)promptTemplate.Configuration.Completion.FrequencyPenalty,
-                //};
-
-                // TODO: Use this once setters are added for the following fields in `OpenAI` package.
-                //OAIChat.ChatCompletionOptions chatCompletionsOptions = new()
-                //{
-                //    MaxTokens = maxInputTokens,
-                //    Temperature = (float)promptTemplate.Configuration.Completion.Temperature,
-                //    TopP = (float)promptTemplate.Configuration.Completion.TopP,
-                //    PresencePenalty = (float)promptTemplate.Configuration.Completion.PresencePenalty,
-                //    FrequencyPenalty = (float)promptTemplate.Configuration.Completion.FrequencyPenalty,
-                //};
-
-                IDictionary<string, JsonElement>? additionalData = promptTemplate.Configuration.Completion.AdditionalData;
-                if (_useAzure)
-                {
-                    AddAzureChatExtensionConfigurations(chatCompletionOptions, additionalData);
-                }
-
-                PipelineResponse? rawResponse;
-                ClientResult<ChatCompletion>? chatCompletionsResponse = null;
-                PromptResponse promptResponse = new();
-                try
-                {
-                    chatCompletionsResponse = await _openAIClient.GetChatClient(_deploymentName).CompleteChatAsync(chatMessages, chatCompletionOptions, cancellationToken);
+                else {
+                    chatCompletionsResponse = await _openAIClient.GetChatClient(model).CompleteChatAsync(chatMessages, chatCompletionOptions, cancellationToken);
                     rawResponse = chatCompletionsResponse.GetRawResponse();
-                    promptResponse.Status = PromptResponseStatus.Success;
                     promptResponse.Message = new ChatMessage(chatCompletionsResponse.Value);
-                    promptResponse.Input = input;
-                }
-                catch (ClientResultException e)
-                {
-                    // TODO: Verify if RequestFailedException is thrown when request fails.
-                    rawResponse = e.GetRawResponse();
-                    HttpOperationException httpOperationException = new(e);
-                    if (httpOperationException.StatusCode == (HttpStatusCode)429)
-                    {
-                        promptResponse.Status = PromptResponseStatus.RateLimited;
-                        promptResponse.Error = new("The chat completion API returned a rate limit error.");
-                    }
-                    else
-                    {
-                        promptResponse.Status = PromptResponseStatus.Error;
-                        promptResponse.Error = new($"The chat completion API returned an error status of {httpOperationException.StatusCode}: {httpOperationException.Message}");
-                    }
                 }
 
-                if (_options.LogRequests!.Value)
+                promptResponse.Status = PromptResponseStatus.Success;
+            }
+            catch (ClientResultException e)
+            {
+                rawResponse = e.GetRawResponse();
+                HttpOperationException httpOperationException = new(e);
+                if (httpOperationException.StatusCode == (HttpStatusCode)429)
                 {
-                    // TODO: Colorize
-                    _logger.LogTrace("RESPONSE:");
+                    promptResponse.Status = PromptResponseStatus.RateLimited;
+                    promptResponse.Error = new("The chat completion API returned a rate limit error.");
+                }
+                else
+                {
+                    promptResponse.Status = PromptResponseStatus.Error;
+                    promptResponse.Error = new($"The chat completion API returned an error status of {httpOperationException.StatusCode}: {httpOperationException.Message}");
+                }
+            }
+
+            if (_options.LogRequests!.Value)
+            {
+                _logger.LogTrace("RESPONSE:");
+                _logger.LogTrace($"duration {(DateTime.UtcNow - startTime).TotalMilliseconds} ms");
+                if (promptResponse.Status == PromptResponseStatus.Success && chatCompletionsResponse != null)
+                {
+                    _logger.LogTrace(JsonSerializer.Serialize(chatCompletionsResponse.Value, _serializerOptions));
+                }
+
+                if (rawResponse != null)
+                {
                     _logger.LogTrace($"status {rawResponse!.Status}");
-                    _logger.LogTrace($"duration {(DateTime.UtcNow - startTime).TotalMilliseconds} ms");
-                    if (promptResponse.Status == PromptResponseStatus.Success)
-                    {
-                        _logger.LogTrace(JsonSerializer.Serialize(chatCompletionsResponse!.Value, _serializerOptions));
-                    }
                     if (promptResponse.Status == PromptResponseStatus.RateLimited)
                     {
                         _logger.LogTrace("HEADERS:");
                         _logger.LogTrace(JsonSerializer.Serialize(rawResponse.Headers, _serializerOptions));
                     }
                 }
+            }
+
+            // Returns if the unsuccessful response
+            if (promptResponse.Status != PromptResponseStatus.Success || (chatCompletionsResponse == null && this._options.Stream == false))
+            {
                 return promptResponse;
             }
-            else
+
+            if (chatCompletionsResponse != null)
             {
-                throw new TeamsAIException("The legacy completion endpoint has been deprecated, please use the chat completions endpoint instead");
+                // Process response
+                ChatCompletion chatCompletion = chatCompletionsResponse.Value;
+                List<ActionCall> actionCalls = new();
+                IReadOnlyList<ChatToolCall> toolsCalls = chatCompletion.ToolCalls;
+                if (isToolsAugmentation && toolsCalls.Count > 0)
+                {
+                    foreach (ChatToolCall toolCall in toolsCalls)
+                    {
+                        actionCalls.Add(new ActionCall(toolCall));
+                    }
+                }
             }
+
+            if (this._options.Stream == true)
+            {
+                StreamingResponse? streamer = (StreamingResponse?)memory.GetValue("temp.streamer");
+
+                if (streamer == null)
+                {
+                    throw new TeamsAIException("The streaming object is empty");
+                }
+
+                ResponseReceivedEventArgs responseReceivedEventArgs = new(turnContext, memory, promptResponse, streamer);
+                Events!.OnResponseReceived(responseReceivedEventArgs);
+
+                // Let any pending events flush before returning
+                await Task.Delay(TimeSpan.FromSeconds(0));
+            }
+
+
+            List<ChatMessage>? inputs = new();
+            int lastMessage = prompt.Output.Count - 1;
+
+            // Skips the first message which is the prompt
+            if (lastMessage > 0 && prompt.Output[lastMessage].Role != ChatRole.Assistant)
+            {
+                inputs.Add(prompt.Output.ElementAt(lastMessage));
+
+                // Add remaining parallel tools calls
+                if (inputs[0].Role == ChatRole.Tool)
+                {
+                    int i;
+                    for (i = prompt.Output.Count - 1; i >= 0; i--)
+                    {
+                        if (prompt.Output[i].ActionCalls != null && prompt.Output[i].ActionCalls!.Count > 0)
+                        {
+                            break;
+                        }
+                    }
+                    int firstMessage = i + 1;
+                    inputs = prompt.Output.GetRange(firstMessage, prompt.Output.Count - firstMessage);
+                }
+            }
+            promptResponse.Input = inputs;
+
+            return promptResponse;
+
         }
 
         private ServiceVersion? ConvertStringToServiceVersion(string apiVersion)
         {
             return apiVersion switch
             {
-                "2024-04-01-preview" => ServiceVersion.V2024_04_01_Preview,
-                "2024-05-01-preview" => ServiceVersion.V2024_05_01_Preview,
                 "2024-06-01" => ServiceVersion.V2024_06_01,
+                "2024-08-01-preview" => ServiceVersion.V2024_08_01_Preview,
+                "2024-10-01-preview" => ServiceVersion.V2024_10_01_Preview,
                 _ => null,
             };
         }
@@ -293,12 +458,10 @@ namespace Microsoft.Teams.AI.AI.Models
                 {
                     try
                     {
-                        AzureChatDataSource? dataSource = ModelReaderWriter.Read<AzureChatDataSource>(BinaryData.FromObjectAsJson(item));
+                        ChatDataSource? dataSource = ModelReaderWriter.Read<ChatDataSource>(BinaryData.FromObjectAsJson(item));
                         if (dataSource != null)
                         {
-#pragma warning disable AOAI001
                             options.AddDataSource(dataSource);
-#pragma warning restore AOAI001
                         }
                     }
                     catch (Exception ex)
@@ -308,5 +471,12 @@ namespace Microsoft.Teams.AI.AI.Models
                 }
             }
         }
+
+        internal void SetMaxTokens(int maxTokens, ChatCompletionOptions options)
+        {
+            MethodInfo setMaxTokens = options.GetType().GetMethod("set__deprecatedMaxTokens", BindingFlags.NonPublic | BindingFlags.Instance);
+            setMaxTokens.Invoke(options, new object[] { maxTokens });
+        }
     }
 }
+#pragma warning restore AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

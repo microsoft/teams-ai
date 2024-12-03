@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
     public class GroupSectionTests
     {
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldRender()
+        public async Task Test_RenderAsTextAsync_ShouldRender()
         {
             GroupSection section = new(ChatRole.User, new()
             {
@@ -33,7 +33,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         }
 
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldTruncate()
+        public async Task Test_RenderAsTextAsync_ShouldTruncate()
         {
             GroupSection section = new(ChatRole.User, new()
             {

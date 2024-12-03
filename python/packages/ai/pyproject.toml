@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "teams-ai"
-version = "1.4.0"
+version = "1.5.0"
 description = "SDK focused on building AI based applications for Microsoft Teams."
 authors = ["Microsoft <teams@microsoft.com>"]
 readme = "README.md"
@@ -26,7 +26,7 @@ dataclasses-json = "^0.6.4"
 azure-ai-contentsafety = "^1.0.0"
 msal = "^1.28.0"
 botbuilder-dialogs = "^4.14.8"
-openai = "^1.27.0"
+openai = "^v1.52.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"

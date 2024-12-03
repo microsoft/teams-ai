@@ -83,7 +83,7 @@ builder.Services.AddTransient<IBot>(sp =>
         AzureOpenAIApiKey = config.Azure!.OpenAIApiKey!,
         AzureOpenAIEndpoint = config.Azure.OpenAIEndpoint!,
         AzureAISearchApiKey = config.Azure.AISearchApiKey!,
-        AzureAISearchEndpoint = new Uri(config.Azure.AISearchEndpoint!),
+        AzureAISearchEndpoint = new Uri(config.Azure.AISearchApiEndpoint!),
         AzureOpenAIEmbeddingDeployment = "text-embedding-ada-002",
     };
     AzureAISearchDataSource dataSource = new(options);

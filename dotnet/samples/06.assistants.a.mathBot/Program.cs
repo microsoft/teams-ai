@@ -11,6 +11,8 @@ using Azure.Core;
 using Azure.Identity;
 using System.Runtime.CompilerServices;
 
+#pragma warning disable OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -35,7 +37,7 @@ if (isAzureCredentialsSet)
 
     if (config.Azure!.OpenAIApiKey != string.Empty)
     {
-    apiKey = config.Azure!.OpenAIApiKey!;
+        apiKey = config.Azure!.OpenAIApiKey!;
     }
     else
     {
@@ -76,7 +78,6 @@ if (string.IsNullOrEmpty(assistantId))
         newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(tokenCredential!, assistantCreationOptions, "gpt-4o-mini", endpoint!).Result.Id;
     }
 
-    string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(apiKey, assistantCreateParams, "gpt-4", endpoint).Result.Id;
     Console.WriteLine($"Created a new assistant with an ID of: {newAssistantId}");
     Console.WriteLine("Copy and save above ID, and set `OpenAI:AssistantId` in appsettings.Development.json.");
     Console.WriteLine("Press any key to exit.");
@@ -150,3 +151,5 @@ app.UseRouting();
 app.MapControllers();
 
 app.Run();
+
+#pragma warning restore OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

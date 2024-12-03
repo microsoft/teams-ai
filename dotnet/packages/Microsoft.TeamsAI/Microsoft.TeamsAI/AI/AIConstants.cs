@@ -24,6 +24,9 @@ namespace Microsoft.Teams.AI.AI
         /// <summary>
         /// The type of command that will stop the running.
         /// </summary>
+        /// <remarks>
+        /// This command is incompatible and should not be used with `tools` augmentation 
+        /// </remarks>
         public const string StopCommand = "STOP";
 
         /// <summary>

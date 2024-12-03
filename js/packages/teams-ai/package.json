@@ -2,7 +2,7 @@
     "name": "@microsoft/teams-ai",
     "author": "Microsoft Corp.",
     "description": "SDK focused on building AI based applications for Microsoft Teams.",
-    "version": "1.4.0",
+    "version": "1.6.1",
     "license": "MIT",
     "keywords": [
         "botbuilder",
@@ -25,43 +25,42 @@
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
     "peerDependencies": {
-        "botbuilder": "^4.23.0",
-        "openai": "^4.41.1"
+        "botbuilder": "^4.23.1",
+        "openai": "^4.68.2"
     },
     "dependencies": {
-        "@azure/openai-assistants": "1.0.0-beta.5",
-        "@azure/msal-node": "^2.13.1",
+        "@azure/msal-node": "^2.16.1",
         "axios": "^1.7.5",
-        "botbuilder-dialogs": "^4.23.0",
-        "botframework-connector": "^4.23.0",
-        "botframework-schema": "^4.23.0",
-        "botframework-streaming": "^4.23.0",
-        "gpt-tokenizer": "^2.2.1",
+        "botbuilder-dialogs": "^4.23.1",
+        "botframework-connector": "^4.23.1",
+        "botframework-schema": "^4.23.1",
+        "botframework-streaming": "^4.23.1",
+        "gpt-tokenizer": "^2.6.2",
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
         "uuid": "^9.0.1",
-        "yaml": "^2.5.0"
+        "yaml": "^2.6.0"
     },
     "resolutions": {
         "follow-redirects": "^1.15.0"
     },
     "devDependencies": {
-        "@types/assert": "^1.5.10",
+        "@types/assert": "^1.5.11",
         "@types/express": "^4.17.21",
         "@types/jsonwebtoken": "^9.0.4",
-        "@types/mocha": "^10.0.7",
+        "@types/mocha": "^10.0.9",
         "@types/node": "^20.16.1",
         "@types/uuid": "^9.0.8",
         "botbuilder-core": "^4.22.1",
-        "eslint": "^8.57.0",
-        "express": "^4.19.2",
+        "eslint": "^8.57.1",
+        "express": "^4.21.1",
         "jsonwebtoken": "^9.0.2",
-        "mocha": "10.7.3",
+        "mocha": "10.8.2",
         "nyc": "^15.1.0",
         "rimraf": "5.0.10",
         "shx": "^0.3.4",
         "ts-mocha": "10.0.0",
-        "typescript": "^5.5.4"
+        "typescript": "~5.5.4"
     },
     "scripts": {
         "build": "tsc -b",
@@ -72,7 +71,8 @@
         "test": "npx mocha -r ts-node/register src/**/*.spec.ts",
         "test:debug": "ts-mocha src/**/*.spec.ts --inspect-brk",
         "test:coverage": "nyc --reporter=html --reporter=text --reporter=text-summary npm test",
-        "test:compat": "npx api-extractor run --verbose"
+        "test:compat": "npx api-extractor run --verbose",
+        "watch": "tsc -b --watch"
     },
     "files": [
         "_ts3.4",

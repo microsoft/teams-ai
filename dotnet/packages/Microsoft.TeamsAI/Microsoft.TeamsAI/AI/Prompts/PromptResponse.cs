@@ -16,7 +16,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <summary>
         /// User input message sent to the model. null if no input was sent.
         /// </summary>
-        public ChatMessage? Input { get; set; }
+        public IList<ChatMessage>? Input { get; set; }
 
         /// <summary>
         /// Message returned.

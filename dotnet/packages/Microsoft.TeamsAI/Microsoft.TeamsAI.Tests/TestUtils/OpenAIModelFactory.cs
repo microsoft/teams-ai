@@ -1,6 +1,7 @@
 ﻿using OpenAI.Assistants;
 using System.ClientModel;
 using System.ClientModel.Primitives;
+using OAI = OpenAI;
 
 namespace Microsoft.Teams.AI.Tests.TestUtils
 {
@@ -69,6 +70,12 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
                                     ""file_citation"": {{
                                         ""file_id"": ""{fileId}""
                                     }}
+                                }},
+                                {{
+                                    ""type"": ""file_path"",
+                                    ""file_path"": {{
+                                        ""file_id"": ""{fileId}""
+                                    }}
                                 }}
                             ]
                         }}
@@ -80,6 +87,22 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             var threadMessage = ModelReaderWriter.Read<ThreadMessage>(BinaryData.FromString(json))!;
 
             return threadMessage.Content[0];
+        }
+
+        public static OAI.Files.OpenAIFile CreateOpenAIFileInfo(string fileId)
+        {
+            var json = @$"{{
+                ""id"": ""{fileId}"",
+                ""object"": ""file"",
+                ""bytes"": 120000,
+                ""created_at"": 16761602,
+                ""filename"": ""salesOverview.pdf"",
+                ""purpose"": ""assistants""
+            }}";
+
+            var fileInfo = ModelReaderWriter.Read<OAI.Files.OpenAIFile>(BinaryData.FromString(json))!;
+
+            return fileInfo;
         }
 
         public static ThreadRun CreateThreadRun(string threadId, string runStatus, string? runId = null, IList<RequiredAction> requiredActions = null!)
@@ -137,23 +160,40 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
         }
     }
 
-    internal sealed class TestAsyncPageableCollection<T> : AsyncPageableCollection<T> where T : class
+    internal sealed class TestAsyncCollectionResult<T> : AsyncCollectionResult<T> where T : class
     {
         public List<T> Items;
-
         internal PipelineResponse _pipelineResponse;
 
-        public TestAsyncPageableCollection(List<T> items, PipelineResponse response)
+        public TestAsyncCollectionResult(List<T> items, PipelineResponse response)
         {
             Items = items;
             _pipelineResponse = response;
         }
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public override async IAsyncEnumerable<ResultPage<T>> AsPages(string? continuationToken = null, int? pageSizeHint = null)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        public TestAsyncCollectionResult(T item, PipelineResponse response)
         {
-            yield return ResultPage<T>.Create(Items, null, _pipelineResponse);
+            Items = new() { item };
+            _pipelineResponse = response;
+        }
+
+        public override ContinuationToken? GetContinuationToken(ClientResult page)
+        {
+            return ContinuationToken.FromBytes(BinaryData.FromString(""));
+        }
+
+        public async override IAsyncEnumerable<ClientResult> GetRawPagesAsync()
+        {
+            yield return await Task.FromResult(ClientResult.FromValue(Items, _pipelineResponse));
+        }
+
+        protected async override IAsyncEnumerable<T> GetValuesFromPageAsync(ClientResult page)
+        {
+            foreach (T item in Items) 
+            { 
+                yield return await Task.FromResult(item); 
+            }
+
         }
     }
 }

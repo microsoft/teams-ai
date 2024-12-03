@@ -10,8 +10,14 @@ using OrderBot.Models;
 using OpenAI.Assistants;
 using Azure.Core;
 using Azure.Identity;
-using System.Runtime.CompilerServices;
+using Microsoft.Teams.AI.Application;
+using OpenAI.Files;
+using OpenAI.VectorStores;
+using OpenAI;
+using Azure.AI.OpenAI;
+using System.ClientModel;
 
+#pragma warning disable OPENAI001
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -57,6 +63,60 @@ else
 // Missing Assistant ID, create new Assistant
 if (string.IsNullOrEmpty(assistantId))
 {
+    VectorStore store = null!;
+    try
+    {
+        OpenAIClient client;
+        if (endpoint != null)
+        {
+            if (apiKey != null)
+            {
+                client = new AzureOpenAIClient(new Uri(endpoint), new ApiKeyCredential(apiKey));
+            }
+            else
+            {
+                client = new AzureOpenAIClient(new Uri(endpoint), new DefaultAzureCredential());
+            }
+        }
+        else
+        {
+            client = new OpenAIClient(apiKey!);
+        }
+
+        // Create Vector Store
+        var storeClient = client.GetVectorStoreClient();
+        var storeCreationOperation = storeClient.CreateVectorStore(true);
+
+        // Upload file.
+        var fileClient = client.GetOpenAIFileClient();
+        var uploadedFile = fileClient.UploadFile("./assets/menu.pdf", FileUploadPurpose.Assistants);
+
+        // Attach file to vector store
+        var fileAssociation = storeClient.AddFileToVectorStore(store.Id, uploadedFile.Value.Id, true);
+
+        // Poll vector store until file is uploaded
+        var maxPollCount = 5;
+        var pollCount = 1;
+        while (store.FileCounts.Completed == 0 && pollCount <= maxPollCount)
+        {
+            // Wait a second
+            await Task.Delay(1000);
+            store = storeClient.GetVectorStore(store.Id);
+            pollCount += 1;
+        }
+
+        if (store.FileCounts.Completed == 0)
+        {
+            throw new Exception("Unable to attach file to vector store. Timed out");
+        }
+    }
+    catch (Exception e)
+    {
+        throw new Exception("Failed to upload file to vector store.", e.InnerException);
+    }
+
+    var fileSearchTool = new FileSearchToolResources();
+    fileSearchTool.VectorStoreIds.Add(store.Id);
     AssistantCreationOptions assistantCreationOptions = new()
     {
         Name = "Order Bot",
@@ -67,9 +127,18 @@ if (string.IsNullOrEmpty(assistantId))
             "If the customer doesn't specify the type of pizza, beer, or salad they want ask them.",
             "Verify the order is complete and accurate before placing it with the place_order function."
         }),
+        ToolResources = new ToolResources()
+        {
+            FileSearch = fileSearchTool
+        }
     };
 
-    assistantCreationOptions.Tools.Add(new FunctionToolDefinition("place_order", "Creates or updates a food order.", new BinaryData(OrderParameters.GetSchema())));
+    assistantCreationOptions.Tools.Add(new FunctionToolDefinition() { 
+        FunctionName = "place_order", 
+        Description = "Creates or updates a food order.",
+        Parameters = new BinaryData(OrderParameters.GetSchema())
+    });
+    assistantCreationOptions.Tools.Add(new FileSearchToolDefinition());
 
     string newAssistantId = "";
     if (apiKey != null)
@@ -91,8 +160,8 @@ if (string.IsNullOrEmpty(assistantId))
 
 // Prepare Configuration for ConfigurationBotFrameworkAuthentication
 builder.Configuration["MicrosoftAppType"] = "MultiTenant";
-builder.Configuration["MicrosoftAppId"] = ""; // config.BOT_ID;
-builder.Configuration["MicrosoftAppPassword"] = ""; // config.BOT_PASSWORD;
+builder.Configuration["MicrosoftAppId"] = config.BOT_ID;
+builder.Configuration["MicrosoftAppPassword"] = config.BOT_PASSWORD;
 
 // Create the Bot Framework Authentication to be used with the Bot Adapter.
 builder.Services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFrameworkAuthentication>();
@@ -123,11 +192,21 @@ builder.Services.AddTransient<IBot>(sp =>
 {
     ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
     IPlanner<AssistantsState> planner = new AssistantsPlanner<AssistantsState>(sp.GetService<AssistantsPlannerOptions>()!, loggerFactory);
+
+    TeamsAdapter adapter = sp.GetService<TeamsAdapter>()!;
+    TeamsAttachmentDownloaderOptions fileDownloaderOptions = new(config.BOT_ID!, adapter);
+
+    IInputFileDownloader<AssistantsState> teamsAttachmentDownloader = new TeamsAttachmentDownloader<AssistantsState>(fileDownloaderOptions);
+
     ApplicationOptions<AssistantsState> applicationOptions = new()
     {
-        AI = new AIOptions<AssistantsState>(planner),
+        AI = new AIOptions<AssistantsState>(planner) { AllowLooping = true },
         Storage = sp.GetService<IStorage>(),
-        LoggerFactory = loggerFactory
+        LoggerFactory = loggerFactory,
+        FileDownloaders = new List<IInputFileDownloader<AssistantsState>>() { teamsAttachmentDownloader },
+        LongRunningMessages = true,
+        Adapter = sp.GetService<TeamsAdapter>(),
+        BotAppId = config.BOT_ID
     };
 
     Application<AssistantsState> app = new(applicationOptions);
@@ -153,3 +232,4 @@ app.UseRouting();
 app.MapControllers();
 
 app.Run();
+#pragma warning restore OPENAI001

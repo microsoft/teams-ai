@@ -48,7 +48,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             // Assert
             Assert.Equal(AIConstants.StopCommand, result);
-            Assert.Equal(1, logs.Count);
+            Assert.Single(logs);
             Assert.Equal("An AI action named \"test-action\" was predicted but no handler was registered", logs[0]);
         }
 
@@ -68,7 +68,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             // Assert
             Assert.Equal(AIConstants.StopCommand, result);
-            Assert.Equal(1, logs.Count);
+            Assert.Single(logs);
             Assert.Equal("The users input has been moderated but no handler was registered for ___FlaggedInput___", logs[0]);
         }
 
@@ -88,7 +88,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             // Assert
             Assert.Equal(AIConstants.StopCommand, result);
-            Assert.Equal(1, logs.Count);
+            Assert.Single(logs);
             Assert.Equal("The bots output has been moderated but no handler was registered for ___FlaggedOutput___", logs[0]);
         }
 

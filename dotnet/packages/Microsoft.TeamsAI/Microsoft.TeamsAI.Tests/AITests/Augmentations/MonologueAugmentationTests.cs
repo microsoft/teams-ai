@@ -14,7 +14,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
     public class MonologueAugmentationTests
     {
         [Fact]
-        public async void Test_ValidateResponseAsync_ShouldSucceed()
+        public async Task Test_ValidateResponseAsync_ShouldSucceed()
         {
             Mock<ITurnContext> context = new();
             MemoryFork memory = new();
@@ -58,7 +58,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
         }
 
         [Fact]
-        public async void Test_ValidateResponseAsync_InvalidThoughts_ShouldFail()
+        public async Task Test_ValidateResponseAsync_InvalidThoughts_ShouldFail()
         {
             Mock<ITurnContext> context = new();
             MemoryFork memory = new();
@@ -126,7 +126,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
         }
 
         [Fact]
-        public async void Test_ValidateResponseAsync_InvalidAction_ShouldFail()
+        public async Task Test_ValidateResponseAsync_InvalidAction_ShouldFail()
         {
             Mock<ITurnContext> context = new();
             MemoryFork memory = new();
@@ -195,7 +195,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
         }
 
         [Fact]
-        public async void Test_CreatePlanFromResponseAsync_SayCommand_ShouldSucceed()
+        public async Task Test_CreatePlanFromResponseAsync_SayCommand_ShouldSucceed()
         {
             Mock<ITurnContext> context = new();
             MemoryFork memory = new();
@@ -273,7 +273,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
             var plan = await augmentation.CreatePlanFromResponseAsync(context.Object, memory, promptResponse);
 
             Assert.NotNull(plan);
-            Assert.Equal(1, plan.Commands.Count);
+            Assert.Single(plan.Commands);
             Assert.Equal("SAY", plan.Commands[0].Type);
             Assert.Equal("hello world", (plan.Commands[0] as PredictedSayCommand)?.Response.Content);
             Assert.Equal("test intent", (plan.Commands[0] as PredictedSayCommand)?.Response.Context?.Intent);
@@ -283,7 +283,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
         }
 
         [Fact]
-        public async void Test_CreatePlanFromResponseAsync_DoCommand_ShouldSucceed()
+        public async Task Test_CreatePlanFromResponseAsync_DoCommand_ShouldSucceed()
         {
             Mock<ITurnContext> context = new();
             MemoryFork memory = new();
@@ -353,7 +353,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
             var plan = await augmentation.CreatePlanFromResponseAsync(context.Object, memory, promptResponse);
 
             Assert.NotNull(plan);
-            Assert.Equal(1, plan.Commands.Count);
+            Assert.Single(plan.Commands);
             Assert.Equal("DO", plan.Commands[0].Type);
             Assert.Equal("test", (plan.Commands[0] as PredictedDoCommand)?.Action);
         }

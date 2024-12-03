@@ -18,7 +18,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
     public class UserInputMessageSectionTest
     {
         [Fact]
-        public async void Test_RenderAsMessagesAsync_ShoulderRender()
+        public async Task Test_RenderAsMessagesAsync_ShoulderRender()
         {
             // Arrange
             UserInputMessageSection section = new();

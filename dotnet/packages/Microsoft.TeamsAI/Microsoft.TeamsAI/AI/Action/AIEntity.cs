@@ -43,6 +43,12 @@ namespace Microsoft.Teams.AI.AI.Action
         /// </summary>
         [JsonProperty(PropertyName = "citation")]
         public List<ClientCitation> Citation { get; set; } = new();
+
+        /// <summary>
+        /// Optional sensitivity content information.
+        /// </summary>
+        [JsonProperty(PropertyName = "usageInfo")]
+        public SensitivityUsageInfo? UsageInfo { get; set; }
     }
 
     /// <summary>
@@ -100,7 +106,7 @@ namespace Microsoft.Teams.AI.AI.Action
         public string? Url { get; set; }
 
         /// <summary>
-        /// Content of the citation. Should be clipped if longer than ~500 characters.
+        /// Content of the citation. Must be clipped if longer than 480 characters.
         /// </summary>
         [JsonProperty(PropertyName = "abstract")]
         public string Abstract { get; set; } = string.Empty;

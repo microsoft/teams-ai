@@ -7,55 +7,17 @@
  */
 
 import { TurnContext } from 'botbuilder-core';
-import { Schema } from 'jsonschema';
 
 import { Memory } from '../MemoryFork';
 import { ChatCompletionAction } from '../models';
 import { Plan, PredictedDoCommand, PredictedSayCommand } from '../planners';
 import { Message, PromptSection } from '../prompts';
 import { Tokenizer } from '../tokenizers';
-import { PromptResponse } from '../types';
+import { PlanSchema, PromptResponse } from '../types';
 import { ActionResponseValidator, JSONResponseValidator, Validation } from '../validators';
 
 import { Augmentation } from './Augmentation';
 import { ActionAugmentationSection } from './ActionAugmentationSection';
-
-/**
- * JSON schema for a `Plan`.
- */
-export const PlanSchema: Schema = {
-    type: 'object',
-    properties: {
-        type: {
-            type: 'string',
-            enum: ['plan']
-        },
-        commands: {
-            type: 'array',
-            items: {
-                type: 'object',
-                properties: {
-                    type: {
-                        type: 'string',
-                        enum: ['DO', 'SAY']
-                    },
-                    action: {
-                        type: 'string'
-                    },
-                    parameters: {
-                        type: 'object'
-                    },
-                    response: {
-                        type: 'string'
-                    }
-                },
-                required: ['type']
-            },
-            minItems: 1
-        }
-    },
-    required: ['type', 'commands']
-};
 
 /**
  * The 'sequence' augmentation.

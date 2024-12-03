@@ -582,8 +582,12 @@ export class Application<TState extends TurnState = TurnState> {
                     context.activity.value?.action === 'accept'
             );
         };
-        const handlerWrapper = (context: TurnContext, state: TState) => {
-            return handler(context, state, context.activity.value as FileConsentCardResponse);
+        const handlerWrapper = async (context: TurnContext, state: TState) => {
+            await handler(context, state, context.activity.value as FileConsentCardResponse);
+            await context.sendActivity({
+                type: ActivityTypes.InvokeResponse,
+                value: { status: 200 }
+            });
         };
         this.addRoute(selector, handlerWrapper, true);
         return this;
@@ -604,8 +608,12 @@ export class Application<TState extends TurnState = TurnState> {
                     context.activity.value?.action === 'decline'
             );
         };
-        const handlerWrapper = (context: TurnContext, state: TState) => {
-            return handler(context, state, context.activity.value as FileConsentCardResponse);
+        const handlerWrapper = async (context: TurnContext, state: TState) => {
+            await handler(context, state, context.activity.value as FileConsentCardResponse);
+            await context.sendActivity({
+                type: ActivityTypes.InvokeResponse,
+                value: { status: 200 }
+            });
         };
         this.addRoute(selector, handlerWrapper, true);
         return this;

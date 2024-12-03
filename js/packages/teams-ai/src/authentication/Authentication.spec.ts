@@ -200,7 +200,7 @@ describe('Authentication', () => {
             assert.rejects(
                 async () => await auth.signInUser(context, state),
                 new AuthError(
-                    'Incomming activity is not a valid activity to initiate authentication flow.',
+                    'Incoming activity is not a valid activity to initiate authentication flow.',
                     'invalidActivity'
                 )
             );

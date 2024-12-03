@@ -13,3 +13,6 @@ dotnet_diagnostic.CS0618.severity = none
 
 # IDE0090: Use 'new(...)'
 dotnet_diagnostic.IDE0090.severity = none
+
+# OPENAI001: Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+dotnet_diagnostic.OPENAI001.severity = silent

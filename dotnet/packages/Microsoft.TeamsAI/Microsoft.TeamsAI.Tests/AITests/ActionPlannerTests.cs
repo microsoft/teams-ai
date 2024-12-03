@@ -15,7 +15,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
     public class ActionPlannerTests
     {
         [Fact]
-        public async void Test_CompletePromptAsync_HasPrompt()
+        public async Task Test_CompletePromptAsync_HasPrompt()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
@@ -50,7 +50,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_CompletePromptAsync_DoesNotHavePrompt()
+        public async Task Test_CompletePromptAsync_DoesNotHavePrompt()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
@@ -85,7 +85,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_ContinueTaskAsync_PromptResponseStatusError()
+        public async Task Test_ContinueTaskAsync_PromptResponseStatusError()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
@@ -127,7 +127,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_ContinueTaskAsync_PromptResponseStatusError_ErrorNull()
+        public async Task Test_ContinueTaskAsync_PromptResponseStatusError_ErrorNull()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
@@ -168,13 +168,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_ContinueTaskAsync_PlanNull()
+        public async Task Test_ContinueTaskAsync_PlanNull()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
             var response = new PromptResponse()
             {
-                Status = PromptResponseStatus.Success
+                Status = PromptResponseStatus.Success,
+                Message = new(ChatRole.System),
             };
             modelMock.Setup(model => model.CompletePromptAsync(
                 It.IsAny<ITurnContext>(),
@@ -224,13 +225,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_ContinueTaskAsync()
+        public async Task Test_ContinueTaskAsync()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
             var response = new PromptResponse()
             {
-                Status = PromptResponseStatus.Success
+                Status = PromptResponseStatus.Success,
+                Message = new(ChatRole.System),
             };
             modelMock.Setup(model => model.CompletePromptAsync(
                 It.IsAny<ITurnContext>(),
@@ -280,7 +282,65 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_BeginTaskAsync_PromptResponseStatusError()
+        public async Task Test_ContinueTaskAsync_Streaming()
+        {
+            // Arrange
+            var modelMock = new Mock<IPromptCompletionModel>();
+            var response = new PromptResponse()
+            {
+                Status = PromptResponseStatus.Success,
+            };
+            modelMock.Setup(model => model.CompletePromptAsync(
+                It.IsAny<ITurnContext>(),
+                It.IsAny<IMemory>(),
+                It.IsAny<IPromptFunctions<List<string>>>(),
+                It.IsAny<ITokenizer>(),
+                It.IsAny<PromptTemplate>(),
+                It.IsAny<CancellationToken>())).ReturnsAsync(response);
+            var promptTemplate = new PromptTemplate(
+                "prompt",
+                new(new() { })
+            );
+            var augmentationMock = new Mock<IAugmentation>();
+            var planMock = new Plan();
+            augmentationMock.Setup(augmentation => augmentation.CreatePlanFromResponseAsync(
+                It.IsAny<ITurnContext>(),
+                It.IsAny<IMemory>(),
+                It.IsAny<PromptResponse>(),
+                It.IsAny<CancellationToken>())).ReturnsAsync(planMock);
+            augmentationMock.Setup(augmentation => augmentation.ValidateResponseAsync(
+                It.IsAny<ITurnContext>(),
+                It.IsAny<IMemory>(),
+                It.IsAny<ITokenizer>(),
+                It.IsAny<PromptResponse>(),
+                It.IsAny<int>(),
+                It.IsAny<CancellationToken>())).ReturnsAsync(new Validation { Valid = true });
+            promptTemplate.Augmentation = augmentationMock.Object;
+            var prompts = new PromptManager();
+            prompts.AddPrompt("prompt", promptTemplate);
+            var options = new ActionPlannerOptions<TurnState>(
+                modelMock.Object,
+                prompts,
+                (context, state, planner) => Task.FromResult(promptTemplate)
+            );
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var state = new TurnState();
+            await state.LoadStateAsync(null, turnContext);
+            state.Temp.Input = "test";
+            var planner = new ActionPlanner<TurnState>(options, new TestLoggerFactory());
+            var ai = new AI<TurnState>(new(planner) { EnableFeedbackLoop = true });
+
+            // Act
+            var result = await planner.ContinueTaskAsync(turnContext, state, ai);
+
+            // Assert
+            Assert.Equal(planMock.Type, result.Type);
+            Assert.Equal(planMock.Commands, result.Commands);
+        }
+
+
+        [Fact]
+        public async Task Test_BeginTaskAsync_PromptResponseStatusError()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
@@ -322,7 +382,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_BeginTaskAsync_PromptResponseStatusError_ErrorNull()
+        public async Task Test_BeginTaskAsync_PromptResponseStatusError_ErrorNull()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
@@ -363,13 +423,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_BeginTaskAsync_PlanNull()
+        public async Task Test_BeginTaskAsync_PlanNull()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
             var response = new PromptResponse()
             {
-                Status = PromptResponseStatus.Success
+                Status = PromptResponseStatus.Success,
+                Message = new(ChatRole.System),
             };
             modelMock.Setup(model => model.CompletePromptAsync(
                 It.IsAny<ITurnContext>(),
@@ -419,13 +480,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void Test_BeginTaskAsync()
+        public async Task Test_BeginTaskAsync()
         {
             // Arrange
             var modelMock = new Mock<IPromptCompletionModel>();
             var response = new PromptResponse()
             {
-                Status = PromptResponseStatus.Success
+                Status = PromptResponseStatus.Success,
+                Message = new(ChatRole.System),
             };
             modelMock.Setup(model => model.CompletePromptAsync(
                 It.IsAny<ITurnContext>(),

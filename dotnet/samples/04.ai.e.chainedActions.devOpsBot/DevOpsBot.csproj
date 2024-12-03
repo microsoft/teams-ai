@@ -13,13 +13,12 @@
 
   <ItemGroup>
     <PackageReference Include="AdaptiveCards.Templating" Version="1.4.0" />
-    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.7" />
-    <PackageReference Include="Microsoft.Teams.AI" Version="1.5.*" />
+    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.9" />
+<PackageReference Include="Microsoft.Teams.AI" Version="1.8.*" />
   </ItemGroup>
 
   <!-- Include prompt as content in build output -->
   <ItemGroup>
-    <Folder Include="Prompts/Sequence/" />
     <Content Include="Prompts/*/skprompt.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -31,8 +30,14 @@
     <Content Remove="appPackage/**/*" />
     <None Include="appPackage/**/*" />
     <None Include="env/**/*" />
+    <Compile Remove="Prompts\Sequence\**" />
     <Content Remove="infra/**/*" />
+    <Content Remove="Prompts\Sequence\**" />
     <None Include="infra/**/*" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="Prompts\Sequence\**" />
+    <None Remove="Prompts\Sequence\**" />
   </ItemGroup>
 
   <!-- Exclude local settings from publish -->

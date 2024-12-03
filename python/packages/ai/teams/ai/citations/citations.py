@@ -22,6 +22,7 @@ class AIEntity(Entity):
         "id_": {"key": "@id", "type": "str"},
         "additional_type": {"key": "additionalType", "type": "[str]"},
         "citation": {"key": "citation", "type": "[ClientCitation]"},
+        "usage_info": {"key": "usageInfo", "type": "SensitivityUsageInfo"},
     }
 
     additional_type: Optional[list[str]]
@@ -30,6 +31,7 @@ class AIEntity(Entity):
     type_: str = "Message"
     context_: str = "https://schema.org"
     id_: str = ""
+    usage_info: Optional[SensitivityUsageInfo] = field(default=None)
 
 
 @dataclass
@@ -64,7 +66,7 @@ class Appearance(Model):
         name (str): The name of the document
         text (str): Optional; ignored in Teams
         url (str): The url of the document
-        abstract (str): Content of the citation. Should be clipped if longer than ~500 characters
+        abstract (str): Content of the citation. Must be clipped if longer than 480 characters
         encodingFormat (str): The encoding format of the citation
         image (str): Used for icon; for not it is ignored
         keywords (list[str]): The optional keywords to the citation

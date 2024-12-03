@@ -105,7 +105,7 @@ namespace Microsoft.Teams.AI.AI.Action
                 int i = 0;
                 foreach (Citation citation in command.Response.Context.Citations)
                 {
-                    string abs = CitationUtils.Snippet(citation.Content, 500);
+                    string abs = CitationUtils.Snippet(citation.Content, 477);
                     if (isTeamsChannel)
                     {
                         content.Replace("\n", "<br>");
@@ -141,12 +141,19 @@ namespace Microsoft.Teams.AI.AI.Action
                 entity.Citation = referencedCitations;
             }
 
+            List<Attachment>? attachments = new();
+            if (command.Response.Attachments != null)
+            {
+                attachments = command.Response.Attachments;
+            }
+
             await turnContext.SendActivityAsync(new Activity()
             {
                 Type = ActivityTypes.Message,
                 Text = contentText,
                 ChannelData = channelData,
-                Entities = new List<Entity>() { entity }
+                Entities = new List<Entity>() { entity },
+                Attachments = attachments
             }, cancellationToken);
 
             return string.Empty;

@@ -86,7 +86,7 @@ builder.Services.AddTransient<IBot>(sp =>
             prompts: prompts,
             defaultPrompt: async (context, state, planner) =>
             {
-                PromptTemplate template = prompts.GetPrompt("sequence");
+                PromptTemplate template = prompts.GetPrompt("tools");
                 return await Task.FromResult(template);
             }
         )

@@ -18,6 +18,11 @@
         /// <summary>
         /// Monologue
         /// </summary>
-        Monologue
+        Monologue,
+
+        /// <summary>
+        /// Tools
+        /// </summary>
+        Tools
     }
 }

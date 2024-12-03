@@ -69,7 +69,7 @@ if (process.env.OPENAI_KEY) {
                 severity: ModerationSeverity.High
             }
         ]
-        // breakByBlocklists: true,
+        // haltOnBlocklistHit: true,
         // blocklistNames: [] // Text blocklist Name. Only support following characters: 0-9 A-Z a-z - . _ ~. You could attach multiple lists name here.
     });
 }

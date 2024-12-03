@@ -35,7 +35,7 @@ builder.Services.AddSingleton<IStorage, MemoryStorage>();
 if (!string.IsNullOrEmpty(config.OpenAI?.ApiKey))
 {
     builder.Services.AddSingleton<OpenAIModel>(sp => new(
-        new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-3.5-turbo")
+        new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-4o")
         {
             LogRequests = true
         },
@@ -47,7 +47,7 @@ else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEm
     builder.Services.AddSingleton<OpenAIModel>(sp => new(
         new AzureOpenAIModelOptions(
             config.Azure.OpenAIApiKey,
-            "gpt-35-turbo",
+            "gpt-4o",
             config.Azure.OpenAIEndpoint
         )
         {
@@ -87,7 +87,7 @@ builder.Services.AddTransient<IBot>(sp =>
             prompts: prompts,
             defaultPrompt: async (context, state, planner) =>
             {
-                PromptTemplate template = prompts.GetPrompt("sequence");
+                PromptTemplate template = prompts.GetPrompt("tools");
                 return await Task.FromResult(template);
             }
         )

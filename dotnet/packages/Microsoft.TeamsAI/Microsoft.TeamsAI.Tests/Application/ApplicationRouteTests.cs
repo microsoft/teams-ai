@@ -687,7 +687,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             await app.OnTurnAsync(turnContext);
 
             // Assert
-            Assert.Equal(1, names.Count);
+            Assert.Single(names);
             Assert.Equal("1", names[0]);
         }
 
@@ -731,7 +731,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             await app.OnTurnAsync(turnContext);
 
             // Assert
-            Assert.Equal(1, names.Count);
+            Assert.Single(names);
             Assert.Equal("1", names[0]);
         }
 
@@ -775,7 +775,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             await app.OnTurnAsync(turnContext);
 
             // Assert
-            Assert.Equal(1, names.Count);
+            Assert.Single(names);
             Assert.Equal("1", names[0]);
         }
 
@@ -820,7 +820,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             await app.OnTurnAsync(turnContext);
 
             // Assert
-            Assert.Equal(1, names.Count);
+            Assert.Single(names);
             Assert.Equal("1", names[0]);
         }
 
@@ -863,7 +863,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             await app.OnTurnAsync(turnContext);
 
             // Assert
-            Assert.Equal(1, names.Count);
+            Assert.Single(names);
             Assert.Equal("1", names[0]);
         }
 
@@ -906,7 +906,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             await app.OnTurnAsync(turnContext);
 
             // Assert
-            Assert.Equal(1, names.Count);
+            Assert.Single(names);
             Assert.Equal("1", names[0]);
         }
 
@@ -949,7 +949,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             await app.OnTurnAsync(turnContext);
 
             // Assert
-            Assert.Equal(1, names.Count);
+            Assert.Single(names);
             Assert.Equal("1", names[0]);
         }
 
@@ -992,7 +992,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             await app.OnTurnAsync(turnContext);
 
             // Assert
-            Assert.Equal(1, names.Count);
+            Assert.Single(names);
             Assert.Equal("1", names[0]);
         }
 
@@ -1035,7 +1035,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             await app.OnTurnAsync(turnContext);
 
             // Assert
-            Assert.Equal(1, names.Count);
+            Assert.Single(names);
             Assert.Equal("1", names[0]);
         }
 
@@ -1078,7 +1078,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             await app.OnTurnAsync(turnContext);
 
             // Assert
-            Assert.Equal(1, names.Count);
+            Assert.Single(names);
             Assert.Equal("1", names[0]);
         }
 
@@ -1120,7 +1120,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             await app.OnTurnAsync(turnContext);
 
             // Assert
-            Assert.Equal(1, names.Count);
+            Assert.Single(names);
             Assert.Equal("1", names[0]);
         }
 
@@ -1941,7 +1941,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Single(names);
             Assert.Equal("config/fetch", names[0]);
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
@@ -2033,7 +2033,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Single(names);
             Assert.Equal("config/submit", names[0]);
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
@@ -2114,7 +2114,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Single(ids);
             Assert.Equal("test", ids[0]);
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
@@ -2195,7 +2195,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Single(ids);
             Assert.Equal("test", ids[0]);
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
@@ -2269,7 +2269,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Single(ids);
             Assert.Equal("test", ids[0]);
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
@@ -2343,7 +2343,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Single(ids);
             Assert.Equal("test", ids[0]);
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }

@@ -4,13 +4,14 @@ using OpenAI.Chat;
 
 namespace Microsoft.Teams.AI.Tests.AITests.Models
 {
-    internal class ChatCompletionToolCallTests
+    public sealed class ChatCompletionToolCallTests
     {
         [Fact]
+        [Obsolete]
         public void Test_ChatCompletionsToolCall_ToFunctionToolCall()
         {
             // Arrange
-            var functionToolCall = ChatToolCall.CreateFunctionToolCall("test-id", "test-name", "test-arg1");
+            var functionToolCall = ChatToolCall.CreateFunctionToolCall("test-id", "test-name", BinaryData.FromString("test-arg1"));
 
             // Act
             var azureSdkFunctionToolCall = ChatCompletionsToolCall.FromChatToolCall(functionToolCall);
@@ -24,6 +25,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         }
 
         [Fact]
+        [Obsolete]
         public void Test_ChatCompletionsToolCall_InvalidToolType()
         {
             // Arrange
@@ -36,6 +38,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             Assert.Equal("Invalid tool type: invalidToolType", ex.Message);
         }
 
+        [Obsolete]
         private sealed class InvalidToolCall : ChatCompletionsToolCall
         {
             public InvalidToolCall() : base("invalidToolType", "test-id")

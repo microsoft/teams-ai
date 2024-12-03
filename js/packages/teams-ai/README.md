@@ -16,4 +16,4 @@ To get started, take a look at the [getting started docs](https://github.com/mic
 
 ## Migration
 
-If you're migrating an existing project, switching to add on the Teams AI Library layer is quick and simple. See the [migration guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/JS.md).
+If you're migrating an existing project, switching to add on the Teams AI Library layer is quick and simple. See the [migration guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/01.JS.md).

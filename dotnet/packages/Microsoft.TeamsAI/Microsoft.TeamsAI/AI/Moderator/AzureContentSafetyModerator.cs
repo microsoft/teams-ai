@@ -96,11 +96,8 @@ namespace Microsoft.Teams.AI.AI.Moderator
             {
                 Response<AnalyzeTextResult> response = await _client.AnalyzeTextAsync(analyzeTextOptions);
 
-                bool flagged = response.Value.BlocklistsMatchResults.Count > 0
-                || _ShouldBeFlagged(response.Value.HateResult)
-                || _ShouldBeFlagged(response.Value.SelfHarmResult)
-                || _ShouldBeFlagged(response.Value.SexualResult)
-                || _ShouldBeFlagged(response.Value.ViolenceResult);
+                bool flagged = response.Value.BlocklistsMatch.Count > 0
+                || response.Value.CategoriesAnalysis.Any((ca) => _ShouldBeFlagged(ca));
                 if (flagged)
                 {
                     string actionName = isModelInput ? AIConstants.FlaggedInputActionName : AIConstants.FlaggedOutputActionName;
@@ -138,17 +135,54 @@ namespace Microsoft.Teams.AI.AI.Moderator
             return null;
         }
 
-        private bool _ShouldBeFlagged(TextAnalyzeSeverityResult result)
+        private bool _ShouldBeFlagged(TextCategoriesAnalysis result)
         {
             return result != null && result.Severity >= _options.SeverityLevel;
         }
 
         private ModerationResult BuildModerationResult(AnalyzeTextResult result)
         {
-            bool hate = _ShouldBeFlagged(result.HateResult);
-            bool selfHarm = _ShouldBeFlagged(result.SelfHarmResult);
-            bool sexual = _ShouldBeFlagged(result.SexualResult);
-            bool violence = _ShouldBeFlagged(result.ViolenceResult);
+            bool hate = false;
+            int hateSeverity = 0;
+            bool selfHarm = false;
+            int selfHarmSeverity = 0;
+            bool sexual = false;
+            int sexualSeverity = 0;
+            bool violence = false;
+            int violenceSeverity = 0;
+
+            foreach (TextCategoriesAnalysis textAnalysis in result.CategoriesAnalysis)
+            {
+                if (textAnalysis.Severity < _options.SeverityLevel)
+                {
+                    continue;
+                }
+
+                int severity = textAnalysis.Severity ?? 0;
+                if (textAnalysis.Category == TextCategory.Hate)
+                {
+                    hate = true;
+                    hateSeverity = severity;
+                }
+
+                if (textAnalysis.Category == TextCategory.Violence)
+                {
+                    violence = true;
+                    violenceSeverity = severity;
+                }
+
+                if (textAnalysis.Category == TextCategory.SelfHarm)
+                {
+                    selfHarm = true;
+                    selfHarmSeverity = severity;
+                }
+
+                if (textAnalysis.Category == TextCategory.Sexual)
+                {
+                    sexual = true;
+                    sexualSeverity = severity;
+                }
+            }
 
             return new()
             {
@@ -166,13 +200,13 @@ namespace Microsoft.Teams.AI.AI.Moderator
                 CategoryScores = new()
                 {
                     // Normalize the scores to be between 0 and 1 (highest severity is 6)
-                    Hate = (result.HateResult?.Severity ?? 0) / 6.0,
-                    HateThreatening = (result.HateResult?.Severity ?? 0) / 6.0,
-                    SelfHarm = (result.SelfHarmResult?.Severity ?? 0) / 6.0,
-                    Sexual = (result.SexualResult?.Severity ?? 0) / 6.0,
-                    SexualMinors = (result.SexualResult?.Severity ?? 0) / 6.0,
-                    Violence = (result.ViolenceResult?.Severity ?? 0) / 6.0,
-                    ViolenceGraphic = (result.ViolenceResult?.Severity ?? 0) / 6.0
+                    Hate = hateSeverity / 6.0,
+                    HateThreatening = hateSeverity / 6.0,
+                    SelfHarm = selfHarmSeverity / 6.0,
+                    Sexual = sexualSeverity / 6.0,
+                    SexualMinors = sexualSeverity / 6.0,
+                    Violence = violenceSeverity / 6.0,
+                    ViolenceGraphic = violenceSeverity / 6.0
                 }
             };
         }

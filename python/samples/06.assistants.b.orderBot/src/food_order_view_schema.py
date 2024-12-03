@@ -19,13 +19,13 @@ SaladStyle = Literal["Garden", "Greek"]
 class Pizza(DataClassJsonMixin):
     item_type = "pizza"
 
-    added_toppings: Optional[List[str]]
+    added_toppings: Optional[List[str]] = None
     "Toppings requested (examples: pepperoni, arugula)"
 
-    removed_toppings: Optional[List[str]]
+    removed_toppings: Optional[List[str]] = None
     "Toppings requested to be removed (examples: fresh garlic, anchovies)"
 
-    name: Optional[PizzaName]
+    name: Optional[PizzaName] = None
     "Used if the requester references a pizza by name"
 
     size: Optional[PizzaSize] = "large"
@@ -69,10 +69,10 @@ class Beer(DataClassJsonMixin):
 class Salad(DataClassJsonMixin):
     item_type = "salad"
 
-    added_ingredients: Optional[List[str]]
+    added_ingredients: Optional[List[str]] = None
     "Ingredients requested (examples: parmesan, croutons)"
 
-    removed_ingredients: Optional[List[str]]
+    removed_ingredients: Optional[List[str]] = None
     "Ingredients requested to be removed (example: red onions)"
 
     portion: Optional[SaladSize] = "half"

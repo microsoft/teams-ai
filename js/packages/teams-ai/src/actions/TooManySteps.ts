@@ -9,34 +9,11 @@
 import { TurnContext } from 'botbuilder-core';
 
 import { TurnState } from '../TurnState';
-
-/**
- * Parameters passed to the AI.TooManyStepsActionName action.
- */
-export interface TooManyStepsParameters {
-    /**
-     * Configured maximum number of steps allowed.
-     */
-    max_steps: number;
-
-    /**
-     * Configured maximum amount of time allowed.
-     */
-    max_time: number;
-
-    /**
-     * Time the AI system started processing the current activity.
-     */
-    start_time: number;
-
-    /**
-     * Number of steps that have been executed.
-     */
-    step_count: number;
-}
+import { TooManyStepsParameters } from '../types';
 
 /**
  * @private
+ * @returns {Function} A function that checks if the AI system has exceeded the maximum number of steps or time allowed.
  */
 export function tooManySteps<TState extends TurnState = TurnState>() {
     return async (_context: TurnContext, _state: TState, data: TooManyStepsParameters) => {

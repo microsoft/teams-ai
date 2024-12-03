@@ -1,3 +1,5 @@
+/// <reference types="mocha" />
+
 import { strict as assert } from 'assert';
 import sinon from 'sinon';
 import { OpenAIModel } from './OpenAIModel';
@@ -6,6 +8,9 @@ import { EventEmitter } from 'stream';
 describe('OpenAIModel', () => {
     const GPT35_MODEL = 'gpt-3.5-turbo';
     const goodEndpoint = 'https://test-endpoint.com';
+    const azureADTokenProvider = async () => {
+        return 'test';
+    };
     it('should construct with OpenAI parameters', () => {
         const model = new OpenAIModel({
             apiKey: 'test-api-key',
@@ -18,9 +23,19 @@ describe('OpenAIModel', () => {
         assert(!model['_useAzure']);
     });
 
-    it('should construct with AzureOpenAI parameters', () => {
+    it('should construct with AzureOpenAI parameters (azureApiKey)', () => {
         const model = new OpenAIModel({
             azureApiKey: 'test-azure-api-key',
+            azureEndpoint: goodEndpoint,
+            azureDefaultDeployment: GPT35_MODEL
+        });
+        assert(model instanceof OpenAIModel);
+        assert(model['_useAzure']);
+    });
+
+    it('should construct with AzureOpenAI parameters (azureADTokenProvider)', () => {
+        const model = new OpenAIModel({
+            azureADTokenProvider: azureADTokenProvider,
             azureEndpoint: goodEndpoint,
             azureDefaultDeployment: GPT35_MODEL
         });
@@ -73,5 +88,59 @@ describe('OpenAIModel', () => {
                 `OpenAIModel: The 'requestConfig' option is deprecated. Use 'clientOptions' instead.`
             )
         );
+    });
+
+    it('should handle citations in the context', async () => {
+        const model = new OpenAIModel({
+            apiKey: 'test-api-key',
+            endpoint: 'https://test-endpoint.com',
+            defaultModel: 'gpt-3.5-turbo'
+        });
+
+        const mockResponse = {
+            choices: [
+                {
+                    message: {
+                        role: 'assistant',
+                        content: 'Test response',
+                        context: {
+                            citations: [
+                                {
+                                    content: 'Citation content',
+                                    title: 'Citation title',
+                                    url: 'https://citation.url'
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        };
+
+        // Mock the API call
+        sinon.stub(model['_client'].chat.completions, 'create').resolves(mockResponse as any);
+
+        // Mock necessary parameters for completePrompt method
+        const context: any = {};
+        const memory: any = { getValue: () => ({}) };
+        const functions: any = {};
+        const tokenizer: any = {};
+        const template: any = {
+            config: { completion: {} },
+            prompt: { renderAsMessages: async () => ({ output: [] }) }
+        };
+
+        const result = await model.completePrompt(context, memory, functions, tokenizer, template);
+
+        assert.equal(result.status, 'success');
+        assert.equal(result.message?.role, 'assistant');
+        assert.equal(result.message?.content, 'Test response');
+        assert.deepEqual(result.message?.context?.citations, [
+            {
+                content: 'Citation content',
+                title: 'Citation title',
+                url: 'https://citation.url'
+            }
+        ]);
     });
 });

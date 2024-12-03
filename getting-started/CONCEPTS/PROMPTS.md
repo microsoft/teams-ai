@@ -14,6 +14,7 @@
 - [Planner](./PLANNER.md)
 - [Powered by AI](./POWERED-BY-AI.md)
 - [**Prompts**](./PROMPTS.md)
+- [Streaming](./STREAMING.md)
 - [Turns](./TURNS.md)
 - [User Authentication](./USER-AUTH.md)
 
@@ -102,7 +103,8 @@ This is the user's post: {{ $post }}
 **Javascript**
 
 ```typescript
-app.beforeTurn((context, state) => {
+// TurnEvents values include "beforeTurn" and "afterTurn"
+app.turn("beforeTurn", (context, state) => {
   state.temp.post = "Lorem Ipsum...";
 });
 ```
