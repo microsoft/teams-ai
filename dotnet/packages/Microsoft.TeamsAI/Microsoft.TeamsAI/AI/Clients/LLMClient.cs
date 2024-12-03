@@ -199,10 +199,15 @@ namespace Microsoft.Teams.AI.AI.Clients
                 string text = args.Chunk.delta?.GetContent<string>() ?? "";
                 IList<Citation>? citations = args.Chunk.delta?.Context?.Citations ?? null;
 
+                if (citations != null)
+                {
+                    streamer.SetCitations(citations);
+                }
+
 
                 if (text.Length > 0)
                 {
-                    streamer.QueueTextChunk(text, citations);
+                    streamer.QueueTextChunk(text);
                 }
             });
 
