@@ -91,7 +91,7 @@ async def on_lights_on(
 ):
     state.conversation.lights_on = True
     logging.info("[lights on]")
-    await context.send_activity("[lights on]")
+    # await context.send_activity("[lights on]")
     return "the lights are now on"
 
 
@@ -102,7 +102,7 @@ async def on_lights_off(
 ):
     state.conversation.lights_on = False
     logging.info("[lights off]")
-    await context.send_activity("[lights off]")
+    # await context.send_activity("[lights off]")
     return "the lights are now off"
 
 
@@ -113,7 +113,7 @@ async def on_pause(
 ):
     time_ms = int(context.data["time"]) if context.data["time"] else 1000
     logging.info(f"[pausing for {time_ms / 1000} seconds]")
-    await context.send_activity(f"[pausing for {time_ms / 1000} seconds]")
+    # await context.send_activity(f"[pausing for {time_ms / 1000} seconds]")
     time.sleep(time_ms / 1000)
     return "done pausing"
 
@@ -123,7 +123,9 @@ async def on_lights_status(
     _context: ActionTurnContext[Dict[str, Any]],
     state: AppTurnState,
 ):
-    return "the lights are on" if state.conversation.lights_on else "the lights are off"
+    light_status = "the lights are on" if state.conversation.lights_on else "the lights are off"
+    logging.info(f"{light_status}")
+    return light_status
 
 
 @app.error
@@ -131,8 +133,8 @@ async def on_error(context: TurnContext, error: Exception):
     # This check writes out errors to console log .vs. app insights.
     # NOTE: In production environment, you should consider logging this to Azure
     #       application insights.
-    print(f"\n [on_turn_error] unhandled error: {error}", file=sys.stderr)
+    logging.info(f"\n [on_turn_error] unhandled error: {error}, {sys.stderr}")
     traceback.print_exc()
 
     # Send a message to the user
-    await context.send_activity("The bot encountered an error or bug.")
+    # await context.send_activity("The bot encountered an error or bug.")
