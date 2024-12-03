@@ -91,7 +91,7 @@ async def on_lights_on(
 ):
     state.conversation.lights_on = True
     logging.info("[lights on]")
-    # await context.send_activity("[lights on]")
+    await context.send_activity("[lights on]")
     return "the lights are now on"
 
 
@@ -102,7 +102,7 @@ async def on_lights_off(
 ):
     state.conversation.lights_on = False
     logging.info("[lights off]")
-    # await context.send_activity("[lights off]")
+    await context.send_activity("[lights off]")
     return "the lights are now off"
 
 
@@ -113,7 +113,7 @@ async def on_pause(
 ):
     time_ms = int(context.data["time"]) if context.data["time"] else 1000
     logging.info(f"[pausing for {time_ms / 1000} seconds]")
-    # await context.send_activity(f"[pausing for {time_ms / 1000} seconds]")
+    await context.send_activity(f"[pausing for {time_ms / 1000} seconds]")
     time.sleep(time_ms / 1000)
     return "done pausing"
 
@@ -137,4 +137,4 @@ async def on_error(context: TurnContext, error: Exception):
     traceback.print_exc()
 
     # Send a message to the user
-    # await context.send_activity("The bot encountered an error or bug.")
+    await context.send_activity("The bot encountered an error or bug.")
