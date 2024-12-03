@@ -34,6 +34,7 @@ export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand
 
 /**
  * @private
+ * @returns {Promise<string>} A promise that resolves to a string indicating whether the AI system should continue executing the plan.
  */
 export function doCommand<TState extends TurnState = TurnState>() {
     return async (context: TurnContext, state: TState, data: PredictedDoCommandAndHandler<TState>, action?: string) => {

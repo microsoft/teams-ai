@@ -6,22 +6,24 @@
  * Licensed under the MIT License.
  */
 
+import { type AuthenticationResult, ConfidentialClientApplication } from '@azure/msal-node';
 import { Storage, TurnContext } from 'botbuilder';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
-import { AuthenticationResult, ConfidentialClientApplication } from '@azure/msal-node';
-import { TurnState } from '../TurnState';
+
 import { Application, Selector } from '../Application';
-import { MessageExtensionAuthenticationBase } from './MessageExtensionAuthenticationBase';
-import { BotAuthenticationBase, deleteTokenFromState, setTokenInState } from './BotAuthenticationBase';
-import * as UserTokenAccess from './UserTokenAccess';
+import { TurnState } from '../TurnState';
+
 import { AdaptiveCardAuthenticationBase } from './AdaptiveCardAuthenticationBase';
-import { TeamsSsoSettings } from './TeamsSsoSettings';
-import { OAuthPromptMessageExtensionAuthentication } from './OAuthMessageExtensionAuthentication';
+import { BotAuthenticationBase, deleteTokenFromState, setTokenInState } from './BotAuthenticationBase';
+import { MessageExtensionAuthenticationBase } from './MessageExtensionAuthenticationBase';
+import { OAuthAdaptiveCardAuthentication } from './OAuthAdaptiveCardAuthentication';
 import { OAuthBotAuthentication } from './OAuthBotAuthentication';
+import { OAuthPromptMessageExtensionAuthentication } from './OAuthMessageExtensionAuthentication';
+import { TeamsSsoAdaptiveCardAuthentication } from './TeamsSsoAdaptiveCardAuthentication';
 import { TeamsSsoBotAuthentication } from './TeamsSsoBotAuthentication';
 import { TeamsSsoMessageExtensionAuthentication } from './TeamsSsoMessageExtensionAuthentication';
-import { OAuthAdaptiveCardAuthentication } from './OAuthAdaptiveCardAuthentication';
-import { TeamsSsoAdaptiveCardAuthentication } from './TeamsSsoAdaptiveCardAuthentication';
+import { TeamsSsoSettings } from './TeamsSsoSettings';
+import * as UserTokenAccess from './UserTokenAccess';
 
 /**
  * User authentication service.
