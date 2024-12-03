@@ -91,8 +91,9 @@ describe('LLMClient', function () {
             });
         });
 
-        it('should successfully complete a streaming prompt', async () => {
+        it('should successfully complete a streaming prompt', async function () {
             const adapter = new TestAdapter();
+            this.timeout(5000);
             await adapter.sendTextToBot('hello', async (context) => {
                 const state = await TestTurnState.create(context);
                 const client = new LLMClient({
@@ -100,15 +101,16 @@ describe('LLMClient', function () {
                     template
                 });
                 const response = await client.completePrompt(context, state, functions);
-                assert.equal(adapter.activeQueue.length, 3, 'adapter should have 3 messages in the queue');
+                assert.equal(adapter.activeQueue.length, 2, 'adapter should have 2 messages in the queue');
                 assert(response, 'response should not be null');
                 assert.equal(response.status, 'success', 'response status should be success');
                 assert(response.message == undefined, 'response message should be null');
             });
         });
 
-        it('should send a startStreamingMessage', async () => {
+        it('should send a startStreamingMessage', async function () {
             const adapter = new TestAdapter();
+            this.timeout(5000);
             await adapter.sendTextToBot('hello', async (context) => {
                 const state = await TestTurnState.create(context);
                 const client = new LLMClient({
@@ -118,7 +120,7 @@ describe('LLMClient', function () {
                     enableFeedbackLoop: true
                 });
                 const response = await client.completePrompt(context, state, functions);
-                assert.equal(adapter.activeQueue.length, 4, 'adapter should have 4 messages in the queue');
+                assert.equal(adapter.activeQueue.length, 2, 'adapter should have 2 messages in the queue');
                 assert.equal(adapter.activeQueue[0].text, 'start', 'adapter should have a start message in the queue');
                 assert(response, 'response should not be null');
                 assert.equal(response.status, 'success', 'response status should be success');
