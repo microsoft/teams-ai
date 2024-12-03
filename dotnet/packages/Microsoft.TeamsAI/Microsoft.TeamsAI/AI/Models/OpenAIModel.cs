@@ -282,6 +282,7 @@ namespace Microsoft.Teams.AI.AI.Models
                     };
                     AsyncCollectionResult<StreamingChatCompletionUpdate> streamCompletion = _openAIClient.GetChatClient(_deploymentName).CompleteChatStreamingAsync(chatMessages, chatCompletionOptions, cancellationToken);
 
+                    var toolCallBuilder = new StreamingChatToolCallsBuilder();
                     await foreach (StreamingChatCompletionUpdate delta in streamCompletion)
                     {
                         if (delta.Role != null)
@@ -295,9 +296,19 @@ namespace Microsoft.Teams.AI.AI.Models
                             message.Content += delta.ContentUpdate[0].Text;
                         }
 
-                        // TODO: Handle tool calls
+                        // Handle tool calls
+                        if (isToolsAugmentation && delta.ToolCallUpdates != null && delta.ToolCallUpdates.Count > 0)
+                        {
+                            foreach (var toolCallUpdate in delta.ToolCallUpdates)
+                            {
+                                toolCallBuilder.Append(toolCallUpdate);
+                            }
+                        }
 
-                        ChatMessage currDeltaMessage = new(delta);
+                        ChatMessage currDeltaMessage = new(delta)
+                        {
+                            ActionCalls = message.ActionCalls // Ensure ActionCalls are included
+                        };
                         PromptChunk chunk = new()
                         {
                             delta = currDeltaMessage
@@ -311,7 +322,19 @@ namespace Microsoft.Teams.AI.AI.Models
                             _logger.LogTrace("CHUNK", delta);
                         }
 
-                       Events!.OnChunkReceived(args);
+                        Events!.OnChunkReceived(args);
+                    }
+
+                    // Add any tool calls to message
+                    var toolCalls = toolCallBuilder.Build();
+                    if (toolCalls.Count > 0)
+                    {
+                        message.ActionCalls = new List<ActionCall>();
+                        foreach (var toolCall in toolCalls)
+                        {
+                            var actionCall = new ActionCall(toolCall);
+                            message.ActionCalls.Add(actionCall);
+                        }
                     }
 
                     promptResponse.Message = message;
