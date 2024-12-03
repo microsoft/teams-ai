@@ -989,7 +989,7 @@ export class Application<TState extends TurnState = TurnState> {
     ): Promise<TeamsPagedMembersResult> {
         let pagedMembers: TeamsPagedMembersResult = { members: [], continuationToken: '' };
         await this.continueConversationAsync(context, async (ctx) => {
-            // Page size less than 50, are treated as 50, and greater than 500, are capped at 500.
+            // Page sizes with less than 50 are treated as 50, and greater than 500, are capped at 500.
             pagedMembers = await TeamsInfo.getPagedMembers(ctx, pageSize, continuationToken);
         });
 
