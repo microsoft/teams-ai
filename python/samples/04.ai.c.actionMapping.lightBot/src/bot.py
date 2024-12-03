@@ -9,6 +9,7 @@ import os
 import sys
 import time
 import traceback
+import logging
 from typing import Any, Dict, List
 
 from botbuilder.core import MemoryStorage, TurnContext
@@ -23,6 +24,9 @@ from teams.state import MemoryBase
 
 from config import Config
 from state import AppTurnState
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 config = Config()
 
@@ -45,6 +49,8 @@ elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
             default_model="gpt-4o",
             api_version="2023-03-15-preview",
             endpoint=config.AZURE_OPENAI_ENDPOINT,
+            logger=logger,
+            stream=True,
         )
     )
 
@@ -84,6 +90,7 @@ async def on_lights_on(
     state: AppTurnState,
 ):
     state.conversation.lights_on = True
+    logging.info("[lights on]")
     await context.send_activity("[lights on]")
     return "the lights are now on"
 
@@ -94,6 +101,7 @@ async def on_lights_off(
     state: AppTurnState,
 ):
     state.conversation.lights_on = False
+    logging.info("[lights off]")
     await context.send_activity("[lights off]")
     return "the lights are now off"
 
@@ -104,6 +112,7 @@ async def on_pause(
     _state: AppTurnState,
 ):
     time_ms = int(context.data["time"]) if context.data["time"] else 1000
+    logging.info(f"[pausing for {time_ms / 1000} seconds]")
     await context.send_activity(f"[pausing for {time_ms / 1000} seconds]")
     time.sleep(time_ms / 1000)
     return "done pausing"

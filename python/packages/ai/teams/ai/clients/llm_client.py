@@ -155,22 +155,22 @@ class LLMClient:
             if context != ctx:
                 return
 
+            nonlocal streamer
+
             # Check for a streaming response
             if streaming:
-                nonlocal is_streaming
-                is_streaming = True
+                streamer = memory.get("temp.streamer")
+                if not streamer:
+                    streamer = StreamingResponse(context)
+                    memory.set("temp.streamer", streamer)
 
-            nonlocal streamer
-            streamer = StreamingResponse(context)
-            memory.set("temp.streamer", streamer)
+                    if self._enable_feedback_loop is not None:
+                        streamer.set_feedback_loop(self._enable_feedback_loop)
 
-            if self._enable_feedback_loop is not None:
-                streamer.set_feedback_loop(self._enable_feedback_loop)
+                    streamer.set_generated_by_ai_label(True)
 
-            streamer.set_generated_by_ai_label(True)
-
-            if self._start_streaming_message:
-                streamer.queue_informative_update(self._start_streaming_message)
+                    if self._start_streaming_message:
+                        streamer.queue_informative_update(self._start_streaming_message)
 
         def chunk_received(
             ctx: TurnContext,
@@ -180,6 +180,13 @@ class LLMClient:
             # pylint: disable=unused-argument
             nonlocal streamer
             if (context != ctx) or (streamer is None):
+                return
+            
+            if chunk.delta and (
+                (chunk.delta.action_calls and len(chunk.delta.action_calls) > 0) or 
+                chunk.delta.action_call_id or 
+                getattr(chunk.delta, "tool_calls", None)
+            ):
                 return
 
             text = chunk.delta.content if (chunk.delta and chunk.delta.content) else ""
@@ -284,7 +291,20 @@ class LLMClient:
 
             if streamer is not None:
                 await streamer.end_stream()
+                
+                # Tool call handling
+                # Keep the streamer around during tool calls, letting them return as normal messages minus the content.
+                # When the tool call completes, reattach to the streamer for continued streaming to the client.
+                if res.message and isinstance(res.message.action_calls, list):
+                    res.message.content = ""
+                else:
+                    if res.status == "success":
+                        res.message = None
+
+                    await streamer.end_stream()
+                    memory.delete("temp.streamer")
             return res
+
         except Exception as err:  # pylint: disable=broad-except
             return PromptResponse(status="error", error=str(err))
         finally:
