@@ -142,8 +142,8 @@ const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
         planner,
-        enable_feedback_loop: true,
-    },
+        enable_feedback_loop: true
+    }
 });
 
 // Register your data source with planner
@@ -175,8 +175,8 @@ app.ai.action(AI.FlaggedOutputActionName, async (context: TurnContext, state: Ap
 });
 
 app.feedbackLoop(async (context, state, feedbackLoopData) => {
-    console.log("Feedback loop triggered");
-  });
+    console.log('Feedback loop triggered');
+});
 
 // Listen for incoming server requests.
 server.post('/api/messages', async (req, res) => {
