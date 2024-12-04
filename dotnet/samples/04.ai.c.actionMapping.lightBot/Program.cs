@@ -51,6 +51,7 @@ else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEm
             config.Azure.OpenAIEndpoint
         )
         {
+            Stream = true,
             LogRequests = true
         },
         sp.GetService<ILoggerFactory>()
