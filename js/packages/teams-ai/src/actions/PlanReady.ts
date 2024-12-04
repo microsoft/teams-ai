@@ -14,6 +14,7 @@ import { StopCommandName } from './Action';
 
 /**
  * @private
+ * @returns {Function} A function that takes TurnContext, TState, and Plan as arguments and returns a string or StopCommandName.
  */
 export function planReady<TState extends TurnState = TurnState>() {
     return async (_context: TurnContext, _state: TState, plan: Plan) => {
