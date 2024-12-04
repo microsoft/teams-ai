@@ -280,12 +280,12 @@ class OpenAIModel(PromptCompletionModel):
                             index = curr_tool_call.index
 
                             # Ensure the action_calls array is long enough
-                            while index >= len(message.action_calls):
+                            if index >= len(message.action_calls):
                                 message.action_calls.append(
                                 ActionCall(
                                         id="",
                                         function=ActionFunction(name="", arguments=""),
-                                        type="function",  # /python/packages/ai/teams/ai/prompts/message.py#L123
+                                        type="function",
                                         )
                                 )
 
@@ -297,7 +297,7 @@ class OpenAIModel(PromptCompletionModel):
                                     message.action_calls[index].function.name += curr_tool_call.function.name
                                 if curr_tool_call.function.arguments:
                                     message.action_calls[index].function.arguments += curr_tool_call.function.arguments
-                            if curr_tool_call.type == "function":  # Type must always match the expected value
+                            if curr_tool_call.type == "function":
                                 message.action_calls[index].type = curr_tool_call.type
 
                     if self._options.logger is not None:

@@ -185,7 +185,7 @@ class LLMClient:
             if chunk.delta and (
                 (chunk.delta.action_calls and len(chunk.delta.action_calls) > 0) or 
                 chunk.delta.action_call_id or 
-                getattr(chunk.delta, "tool_calls", None)
+                getattr(chunk.delta.content, "tool_calls", None)
             ):
                 return
 
@@ -285,24 +285,25 @@ class LLMClient:
             self._add_message_to_history(memory, self._options.history_variable, res.input)
             self._add_message_to_history(memory, self._options.history_variable, res.message)
 
-            if is_streaming and res.status == "success":
-                # Delete message from response to avoid sending it twice
-                res.message = None
+            # if is_streaming and res.status == "success":
+            #     # Delete message from response to avoid sending it twice
+            #     res.message = None
 
-            if streamer is not None:
-                await streamer.end_stream()
+            # if streamer is not None:
+            #     await streamer.end_stream()
                 
                 # Tool call handling
                 # Keep the streamer around during tool calls, letting them return as normal messages minus the content.
                 # When the tool call completes, reattach to the streamer for continued streaming to the client.
-                if res.message and isinstance(res.message.action_calls, list):
-                    res.message.content = ""
-                else:
-                    if res.status == "success":
-                        res.message = None
-
-                    await streamer.end_stream()
-                    memory.delete("temp.streamer")
+            if res.message and res.message.action_calls and len(res.message.action_calls) > 0:
+                res.message.content = ""
+            else:
+                if res.status == "success":
+                    res.message = None
+                    
+            if streamer is not None:
+                await streamer.end_stream()
+                memory.delete("temp.streamer")
             return res
 
         except Exception as err:  # pylint: disable=broad-except
