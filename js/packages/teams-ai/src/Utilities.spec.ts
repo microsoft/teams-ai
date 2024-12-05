@@ -87,7 +87,7 @@ describe('Utilities', () => {
             const citations = [
                 {
                     '@type': 'Claim',
-                    position: '1',
+                    position: 1,
                     appearance: {
                         '@type': 'DigitalDocument',
                         name: 'the title',
@@ -96,7 +96,7 @@ describe('Utilities', () => {
                 },
                 {
                     '@type': 'Claim',
-                    position: '2',
+                    position: 2,
                     appearance: {
                         '@type': 'DigitalDocument',
                         name: 'the title',
@@ -113,7 +113,7 @@ describe('Utilities', () => {
             const citations = [
                 {
                     '@type': 'Claim',
-                    position: '1',
+                    position: 1,
                     appearance: {
                         '@type': 'DigitalDocument',
                         name: 'the title',
@@ -122,7 +122,7 @@ describe('Utilities', () => {
                 },
                 {
                     '@type': 'Claim',
-                    position: '2',
+                    position: 2,
                     appearance: {
                         '@type': 'DigitalDocument',
                         name: 'the title',
@@ -131,7 +131,7 @@ describe('Utilities', () => {
                 },
                 {
                     '@type': 'Claim',
-                    position: '3',
+                    position: 3,
                     appearance: {
                         '@type': 'DigitalDocument',
                         name: 'the title',
@@ -140,7 +140,7 @@ describe('Utilities', () => {
                 },
                 {
                     '@type': 'Claim',
-                    position: '4',
+                    position: 4,
                     appearance: {
                         '@type': 'DigitalDocument',
                         name: 'the title',
