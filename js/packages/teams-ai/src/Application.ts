@@ -27,6 +27,7 @@ import { ReadReceiptInfo } from 'botframework-connector';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { AI, AIOptions } from './AI';
 import { Meetings } from './Meetings';
+import { Messages } from './Messages';
 import { MessageExtensions } from './MessageExtensions';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
 import { AuthenticationManager, AuthenticationOptions } from './authentication/Authentication';
@@ -153,12 +154,14 @@ export interface FeedbackLoopData {
         /**
          * 'like' or 'dislike'
          */
-        reaction: string;
+        reaction: 'like' | 'dislike';
+
         /**
          * The response the user provides when prompted with "What did you like/dislike?" after pressing one of the feedback buttons.
          */
-        feedback: string;
+        feedback: string | Record<string, any>;
     };
+
     /**
      * The activity ID that the feedback was provided on.
      */
@@ -245,6 +248,7 @@ export class Application<TState extends TurnState = TurnState> {
     private readonly _invokeRoutes: AppRoute<TState>[] = [];
     private readonly _adaptiveCards: AdaptiveCards<TState>;
     private readonly _meetings: Meetings<TState>;
+    private readonly _messages: Messages<TState>;
     private readonly _messageExtensions: MessageExtensions<TState>;
     private readonly _taskModules: TaskModules<TState>;
     private readonly _ai?: AI<TState>;
@@ -287,6 +291,7 @@ export class Application<TState extends TurnState = TurnState> {
         }
 
         this._adaptiveCards = new AdaptiveCards<TState>(this);
+        this._messages = new Messages<TState>(this);
         this._messageExtensions = new MessageExtensions<TState>(this);
         this._meetings = new Meetings<TState>(this);
         this._taskModules = new TaskModules<TState>(this);
@@ -352,6 +357,14 @@ export class Application<TState extends TurnState = TurnState> {
         }
 
         return this._authentication;
+    }
+
+    /**
+     * Fluent interface for accessing Messages specific features.
+     * @returns {Messages<TState>} The Messages instance.
+     */
+    public get messages(): Messages<TState> {
+        return this._messages;
     }
 
     /**
