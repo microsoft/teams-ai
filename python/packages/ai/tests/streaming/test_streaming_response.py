@@ -73,20 +73,16 @@ class TestStreamingResponse(IsolatedAsyncioTestCase):
     async def test_send_text_chunk_with_irrelevant_citations(self):
         context = self.create_mock_context()
         streamer = StreamingResponse(context)
-        streamer.queue_text_chunk(
-            "first",
-            [
-                Citation(
+        streamer.set_citations([ Citation(
                     content="test-content", url="https://example.com", title="test", filepath="test"
-                )
-            ],
-        )
+                )])
+        streamer.queue_text_chunk("first")
         await streamer.wait_for_queue()
         streamer.queue_text_chunk("second")
         await streamer.wait_for_queue()
         self.assertEqual(streamer.updates_sent(), 2)
         self.assertEqual(streamer.message, "firstsecond")
-        self.assertEqual(streamer.citations, None)
+        self.assertIsNotNone(streamer.citations)
 
     @pytest.mark.asyncio
     async def test_send_text_chunk_assert_throws(self):
