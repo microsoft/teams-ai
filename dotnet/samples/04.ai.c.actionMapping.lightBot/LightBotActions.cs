@@ -2,6 +2,9 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Action;
 using Microsoft.Teams.AI.AI;
+using System.Diagnostics;
+using System.Threading;
+using Microsoft.Teams.AI.State;
 
 namespace LightBot
 {
@@ -11,7 +14,7 @@ namespace LightBot
         public async Task<string> LightsOn([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] AppState turnState)
         {
             turnState.Conversation.LightsOn = true;
-            await turnContext.SendActivityAsync(MessageFactory.Text("[lights on]"));
+            Trace.WriteLine("[The lights are on]");
             return "the lights are now on";
         }
 
@@ -19,7 +22,7 @@ namespace LightBot
         public async Task<string> LightsOff([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] AppState turnState)
         {
             turnState.Conversation.LightsOn = false;
-            await turnContext.SendActivityAsync(MessageFactory.Text("[lights off]"));
+            Trace.WriteLine("[The lights are off]");
             return "the lights are now off";
         }
 
@@ -33,7 +36,7 @@ namespace LightBot
                 if (time != null && time is long timeLong)
                 {
                     int timeInt = (int)timeLong;
-                    await turnContext.SendActivityAsync(MessageFactory.Text($"[pausing for {timeInt / 1000} seconds]"));
+                    Trace.WriteLine($"[pausing for {timeInt / 1000} seconds]");
                     await Task.Delay(timeInt);
                 }
             }
@@ -44,14 +47,14 @@ namespace LightBot
         [Action("LightStatus")]
         public async Task<string> LightStatus([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] AppState turnState)
         {
-            await turnContext.SendActivityAsync(ResponseGenerator.LightStatus(turnState.Conversation.LightsOn));
+            Trace.WriteLine(ResponseGenerator.LightStatus(turnState.Conversation.LightsOn));
             return turnState.Conversation.LightsOn ? "the lights are on" : "the lights are off";
         }
 
         [Action(AIConstants.UnknownActionName)]
         public async Task<string> UnknownAction([ActionTurnContext] TurnContext turnContext, [ActionName] string action)
         {
-            await turnContext.SendActivityAsync(ResponseGenerator.UnknownAction(action ?? "Unknown"));
+            Trace.WriteLine(ResponseGenerator.UnknownAction(action ?? "Unknown"));
             return "unknown action";
         }
     }

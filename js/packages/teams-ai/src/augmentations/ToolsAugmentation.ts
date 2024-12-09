@@ -60,7 +60,7 @@ export class ToolsAugmentation implements Augmentation<string> {
      * Creates a plan given validated response value.
      * @param {TurnContext} context Context for the current turn of conversation.
      * @param {Memory} memory An interface for accessing state variables.
-     * @param {PromptResponse<string>} response The validated and transformed response for the prompt.
+     * @param {PromptResponse<string | ActionCall[]>} response The validated and transformed response for the prompt.
      * @returns {Promise<Plan>} The created plan.
      */
     public createPlanFromResponse(
@@ -74,14 +74,18 @@ export class ToolsAugmentation implements Augmentation<string> {
             const actionToolCalls: ActionCall[] = response.message.action_calls;
 
             for (const toolCall of actionToolCalls) {
-                let parameters;
+                let parameters = {};
 
-                try {
-                    parameters = JSON.parse(toolCall.function.arguments) ?? {};
-                } catch (err) {
-                    console.error('ToolsAugmentation parameters:', toolCall.function.arguments);
-                    console.error('ToolsAugmentation createPlanFromResponse: Error parsing tool arguments: ', err);
-                    parameters = {};
+                if (toolCall.function.arguments && toolCall.function.arguments.trim() !== '') {
+                    try {
+                        parameters = JSON.parse(toolCall.function.arguments);
+                    } catch (err) {
+                        console.warn(
+                            `ToolsAugmentation: Error parsing tool arguments for ${toolCall.function.name}:`,
+                            err
+                        );
+                        console.warn('Arguments:', toolCall.function.arguments);
+                    }
                 }
 
                 const doCommand: PredictedDoCommand = {

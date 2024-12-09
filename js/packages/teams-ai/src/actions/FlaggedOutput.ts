@@ -10,8 +10,9 @@ import { StopCommandName } from './Action';
 
 /**
  * @private
+ * @returns {() => Promise<string>} A function that logs an error and returns the StopCommandName.
  */
-export function flaggedOutput() {
+export function flaggedOutput(): () => Promise<string> {
     return async () => {
         console.error(
             `The bots output has been moderated but no handler was registered for 'AI.FlaggedOutputActionName'.`
