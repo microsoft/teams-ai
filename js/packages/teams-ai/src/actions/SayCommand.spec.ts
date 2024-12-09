@@ -188,7 +188,7 @@ describe('actions.sayCommand', () => {
                             citation: [
                                 {
                                     '@type': 'Claim',
-                                    position: '1',
+                                    position: 1,
                                     appearance: {
                                         '@type': 'DigitalDocument',
                                         name: 'the title',

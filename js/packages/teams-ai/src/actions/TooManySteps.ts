@@ -13,6 +13,7 @@ import { TooManyStepsParameters } from '../types';
 
 /**
  * @private
+ * @returns {Function} A function that checks if the AI system has exceeded the maximum number of steps or time allowed.
  */
 export function tooManySteps<TState extends TurnState = TurnState>() {
     return async (_context: TurnContext, _state: TState, data: TooManyStepsParameters) => {

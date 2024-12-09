@@ -10,6 +10,7 @@ import { StopCommandName } from './Action';
 
 /**
  * @private
+ * @returns {Function} An async function that logs an error message and returns StopCommandName.
  */
 export function flaggedInput() {
     return async () => {

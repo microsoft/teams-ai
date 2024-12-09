@@ -12,6 +12,7 @@ import { TurnState } from '../TurnState';
 
 /**
  * @private
+ * @returns {Promise<string>} A promise that resolves to a string.
  */
 export function httpError<TState extends TurnState = TurnState>() {
     return async (_context: TurnContext, _state: TState, err?: Error): Promise<string> => {

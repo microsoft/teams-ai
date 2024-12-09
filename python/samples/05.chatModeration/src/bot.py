@@ -35,7 +35,7 @@ if config.OPENAI_KEY:
     model = OpenAIModel(
         OpenAIModelOptions(
             api_key=config.OPENAI_KEY,
-            default_model="gpt-3.5-turbo"
+            default_model="gpt-4o"
         ))
     moderator = OpenAIModerator(
         OpenAIModeratorOptions(
@@ -47,7 +47,7 @@ elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
      model = OpenAIModel(
         AzureOpenAIModelOptions(
             api_key=config.AZURE_OPENAI_KEY,
-            default_model="gpt-35-turbo",
+            default_model="gpt-4o",
             api_version="2023-03-15-preview",
             endpoint=config.AZURE_OPENAI_ENDPOINT
         ))
@@ -55,7 +55,7 @@ elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
          AzureContentSafetyModeratorOptions(
              api_key=config.AZURE_CONTENT_SAFETY_KEY,
              moderate="both",
-             api_version="2023-04-30-preview",
+             api_version="2023-10-01",
              endpoint=config.AZURE_CONTENT_SAFETY_ENDPOINT
          )
      )

@@ -13,6 +13,7 @@ import { StopCommandName } from './Action';
 
 /**
  * @private
+ * @returns {Function} An async function that logs an error and returns StopCommandName.
  */
 export function unknown<TState extends TurnState = TurnState>() {
     return async (_context: TurnContext, _state: TState, _data: any, action?: string) => {

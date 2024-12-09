@@ -68,6 +68,12 @@ export interface AIOptions<TState extends TurnState> {
      * https://github.com/microsoft/teams-ai/blob/main/getting-started/CONCEPTS/POWERED-BY-AI.md
      */
     enable_feedback_loop?: boolean;
+
+    /**
+     * Optional. Only used when `enable_feedback_loop` == `true`. When set to `custom` the user will be presented with a text input
+     * to provide feedback.
+     */
+    feedback_loop_type?: 'default' | 'custom';
 }
 
 /**
@@ -104,6 +110,12 @@ export interface ConfiguredAIOptions<TState extends TurnState> {
      * If true, the AI system will enable the feedback loop in Teams that allows a user to give thumbs up or down to a response.
      */
     enable_feedback_loop: boolean;
+
+    /**
+     * Optional. Only used when `enable_feedback_loop` == `true`. When set to `custom` the user will be presented with a text input
+     * to provide feedback.
+     */
+    feedback_loop_type?: 'default' | 'custom';
 }
 
 /**
@@ -121,7 +133,7 @@ export class AI<TState extends TurnState = TurnState> {
      * A text string that can be returned from an action to stop the AI system from continuing
      * to execute the current plan.
      * @remarks
-     * This command is incompatible and should not be used with `tools` augmentation 
+     * This command is incompatible and should not be used with `tools` augmentation
      */
     public static readonly StopCommandName = actions.StopCommandName;
 
@@ -225,8 +237,11 @@ export class AI<TState extends TurnState = TurnState> {
         this.defaultAction(AI.HttpErrorActionName, actions.httpError());
         this.defaultAction(AI.PlanReadyActionName, actions.planReady());
         this.defaultAction(AI.DoCommandActionName, actions.doCommand());
-        this.defaultAction(AI.SayCommandActionName, actions.sayCommand(this._options.enable_feedback_loop));
         this.defaultAction(AI.TooManyStepsActionName, actions.tooManySteps());
+        this.defaultAction(AI.SayCommandActionName, actions.sayCommand(
+            this._options.enable_feedback_loop,
+            this._options.feedback_loop_type || 'default'
+        ));
     }
 
     /**
