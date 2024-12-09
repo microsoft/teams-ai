@@ -15,9 +15,13 @@ import { AIEntity, ClientCitation } from '../types';
 /**
  * @private
  * @param {boolean} feedbackLoopEnabled - If true, the feedback loop UI for Teams will be enabled.
+ * @param {'default' | 'custom'} feedbackLoopType - the type of UI to use for feedback loop
  * @returns {''} - An empty string.
  */
-export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEnabled: boolean = false) {
+export function sayCommand<TState extends TurnState = TurnState>(
+    feedbackLoopEnabled: boolean = false,
+    feedbackLoopType: 'default' | 'custom' = 'default',
+) {
     return async (context: TurnContext, _state: TState, data: PredictedSayCommand) => {
         if (!data.response?.content) {
             return '';
@@ -37,7 +41,7 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
             citations = data.response.context!.citations.map((citation, i) => {
                 const clientCitation: ClientCitation = {
                     '@type': 'Claim',
-                    position: `${i + 1}`,
+                    position: i + 1,
                     appearance: {
                         '@type': 'DigitalDocument',
                         name: citation.title || `Document #${i + 1}`,
@@ -54,6 +58,11 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
 
         // If there are citations, filter out the citations unused in content.
         const referencedCitations = citations ? Utilities.getUsedCitations(contentText, citations) : undefined;
+        const channelData = feedbackLoopEnabled && feedbackLoopType ? {
+            feedbackLoop: {
+                type: feedbackLoopType
+            }
+        } : { feedbackLoopEnabled };
 
         const entities: AIEntity[] = [
             {
@@ -65,10 +74,11 @@ export function sayCommand<TState extends TurnState = TurnState>(feedbackLoopEna
                 ...(referencedCitations ? { citation: referencedCitations } : {})
             }
         ];
+
         const activity: Partial<Activity> = {
             type: ActivityTypes.Message,
             text: contentText,
-            ...(isTeamsChannel ? { channelData: { feedbackLoopEnabled } } : {}),
+            ...(isTeamsChannel ? { channelData } : {}),
             entities: entities
         };
 

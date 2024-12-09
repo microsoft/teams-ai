@@ -28,9 +28,7 @@
             "type": "msedge",
             "request": "launch",
             "url": "https://teams.microsoft.com/l/app/${{local:TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
-            "cascadeTerminateToConfigurations": [
-                "Attach to Local Service"
-            ],
+            "cascadeTerminateToConfigurations": ["Attach to Local Service"],
             "presentation": {
                 "group": "all",
                 "hidden": true
@@ -42,9 +40,7 @@
             "type": "chrome",
             "request": "launch",
             "url": "https://teams.microsoft.com/l/app/${{local:TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
-            "cascadeTerminateToConfigurations": [
-                "Attach to Local Service"
-            ],
+            "cascadeTerminateToConfigurations": ["Attach to Local Service"],
             "presentation": {
                 "group": "all",
                 "hidden": true
@@ -67,10 +63,7 @@
     "compounds": [
         {
             "name": "Debug (Edge)",
-            "configurations": [
-                "Launch App (Edge)",
-                "Attach to Local Service"
-            ],
+            "configurations": ["Launch App (Edge)", "Attach to Local Service"],
             "preLaunchTask": "Start Teams App Locally",
             "presentation": {
                 "group": "all",
@@ -80,14 +73,21 @@
         },
         {
             "name": "Debug (Chrome)",
-            "configurations": [
-                "Launch App (Chrome)",
-                "Attach to Local Service"
-            ],
+            "configurations": ["Launch App (Chrome)", "Attach to Local Service"],
             "preLaunchTask": "Start Teams App Locally",
             "presentation": {
                 "group": "all",
                 "order": 2
+            },
+            "stopAll": true
+        },
+        {
+            "name": "Debug in Test Tool",
+            "configurations": ["Attach to Local Service"],
+            "preLaunchTask": "Start Teams App (Test Tool)",
+            "presentation": {
+                "group": "local",
+                "order": 1
             },
             "stopAll": true
         }
