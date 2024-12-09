@@ -21,6 +21,7 @@ using OpenAI.Chat;
 using Microsoft.Teams.AI.Application;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Options;
 
 [assembly: InternalsVisibleTo("Microsoft.Teams.AI.Tests")]
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
@@ -223,6 +224,7 @@ namespace Microsoft.Teams.AI.AI.Models
 
             if (isO1Model)
             {
+                chatCompletionOptions.MaxOutputTokenCount = completion.MaxTokens;
                 chatCompletionOptions.Temperature = 1;
                 chatCompletionOptions.TopP = 1;
                 chatCompletionOptions.PresencePenalty = 0;
