@@ -99,8 +99,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             LLMClientOptions<object> options = new(promptCompletionModel, promptTemplate) { MaxHistoryMessages = 1 };
             LLMClient<object> client = new(options, null);
             TestMemory memory = new();
+            ChatMessage message = new ChatMessage("Hi there");
             promptCompletionModel.Results.Enqueue(new()
             {
+                Input = new List<ChatMessage>() { message },
                 Status = PromptResponseStatus.Error,
                 Error = new TeamsAIException("test")
             });
@@ -113,7 +115,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal(PromptResponseStatus.Error, response.Status);
             Assert.NotNull(response.Error);
             Assert.Equal("test", response.Error.Message);
-            Assert.Empty(memory.Values);
+            Assert.Single(memory.Values);
+
+            IList<ChatMessage> conversation_history = (IList<ChatMessage>)memory.GetValue("conversation.history")!;
+            Assert.True(conversation_history[0].Content  ==  message.Content);
         }
 
         [Fact]
