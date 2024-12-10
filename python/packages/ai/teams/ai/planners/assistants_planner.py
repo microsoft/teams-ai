@@ -272,16 +272,17 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
 
         # Map the action outputs to tool outputs
         action_outputs = state.temp.action_outputs
-        tool_map = state.get(SUBMIT_TOOL_OUTPUTS_MAP)
+        tool_map : dict[str,list] = state.get(SUBMIT_TOOL_OUTPUTS_MAP)
         tool_outputs: List[ToolOutput] = []
 
-        for action in action_outputs:
-            output = action_outputs[action]
-            if tool_map:
-                tool_call_id = tool_map[action] if action in tool_map else None
-                if tool_call_id is not None:
-                    # Add required output only
-                    tool_outputs.append(ToolOutput(tool_call_id=tool_call_id, output=output))
+        if tool_map:
+            for action in action_outputs:
+                if action in tool_map:
+                    for tool_call_id in tool_map[action]:
+                        output = action_outputs[action][tool_call_id] if tool_call_id in action_outputs[action] else None
+                        if output is not None:
+                            # Add required output only
+                            tool_outputs.append(ToolOutput(tool_call_id=tool_call_id, output=output))
 
         # Submit the tool outputs
         if assistants_state.thread_id and assistants_state.run_id:
@@ -337,12 +338,14 @@ class AssistantsPlanner(Generic[StateT], _UserAgent, Planner[StateT]):
 
     def _generate_plan_from_tools(self, state: TurnState, required_action: RequiredAction) -> Plan:
         plan = Plan()
-        tool_map: Dict = {}
+        tool_map: dict[str,list] = {}
         for tool_call in required_action.submit_tool_outputs.tool_calls:
-            tool_map[tool_call.function.name] = tool_call.id
+            if not tool_call.function.name in tool_map : tool_map[tool_call.function.name] = []
+            tool_map[tool_call.function.name].append(tool_call.id)
             plan.commands.append(
                 PredictedDoCommand(
                     action=tool_call.function.name,
+                    action_id=tool_call.id,
                     parameters=json.loads(tool_call.function.arguments),
                 )
             )

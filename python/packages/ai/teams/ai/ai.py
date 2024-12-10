@@ -171,7 +171,8 @@ class AI(Generic[StateT]):
                     # Set output for action call
                     if command.action_id:
                         loop = True
-                        state.temp.action_outputs[command.action_id] = output or ""
+                        if not command.action in state.temp.action_outputs: state.temp.action_outputs[command.action] = {}
+                        state.temp.action_outputs[command.action][command.action_id] = output or ""
                     else:
                         loop = len(output) > 0
                         state.temp.action_outputs[command.action] = output
