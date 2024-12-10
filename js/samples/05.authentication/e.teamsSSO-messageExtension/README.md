@@ -6,9 +6,9 @@ This sample depends on Teams SSO and gives you more flexibility on how to config
 
 ## Showcase
 
--   Message Extensions are convenient ways to add functionality to Teams.
--   This sample adds a search command to the compose area of a chat.
--   This sample leverages Teams SSO to acquire a token to call Microsoft Graph APIs.
+- Message Extensions are convenient ways to add functionality to Teams.
+- This sample adds a search command to the compose area of a chat.
+- This sample leverages Teams SSO to acquire a token to call Microsoft Graph APIs.
 
 > Note: this is not a chat bot and therefore the bot does not respond if you talk to it. Once it is installed in Teams, you can interact with it by selecting it's app icon in the chat compose area.
 
@@ -53,7 +53,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
 1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
-1. Ensure that you have set up the sample from the previous step.
+1. Verify that the Teams Toolkit extension is connected to your Teams account from the above step.
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
 1. In the browser that launches, select the **Add** button to install the app to Teams.
 
