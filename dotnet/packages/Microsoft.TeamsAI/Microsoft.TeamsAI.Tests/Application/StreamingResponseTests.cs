@@ -220,7 +220,8 @@ namespace Microsoft.Teams.AI.Tests.Application
             StreamingResponse streamer = new(turnContext);
             List<Citation> citations = new List<Citation>();
             citations.Add(new Citation(content: "test-content", title: "test", url: "https://example.com"));
-            streamer.QueueTextChunk("first", citations);
+            streamer.SetCitations(citations);
+            streamer.QueueTextChunk("first");
             await streamer.WaitForQueue();
             streamer.QueueTextChunk("second");
             await streamer.WaitForQueue();
@@ -229,6 +230,10 @@ namespace Microsoft.Teams.AI.Tests.Application
             streamer.SensitivityLabel = new SensitivityUsageInfo() { Name= "Sensitivity"};
             await streamer.EndStream();
             Assert.Equal(2, streamer.UpdatesSent());
+            if (streamer.Citations != null)
+            {
+                Assert.Single(streamer.Citations);
+            }
         }
 
         [Fact]
