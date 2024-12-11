@@ -3,11 +3,11 @@ using System.Buffers;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
-    public class StreamingChatToolCallsBuilder
+    internal class StreamingChatToolCallsBuilder
     {
-        private readonly Dictionary<int, string> _indexToToolCallId = [];
-        private readonly Dictionary<int, string> _indexToFunctionName = [];
-        private readonly Dictionary<int, SequenceBuilder<byte>> _indexToFunctionArguments = [];
+        private readonly Dictionary<int, string> _indexToToolCallId = new();
+        private readonly Dictionary<int, string> _indexToFunctionName = new();
+        private readonly Dictionary<int, SequenceBuilder<byte>> _indexToFunctionArguments = new();
 
         public void Append(StreamingChatToolCallUpdate toolCallUpdate)
         {
@@ -39,7 +39,7 @@ namespace Microsoft.Teams.AI.AI.Models
 
         public IReadOnlyList<ChatToolCall> Build()
         {
-            List<ChatToolCall> toolCalls = [];
+            List<ChatToolCall> toolCalls = new();
 
             foreach (KeyValuePair<int, string> indexToToolCallIdPair in _indexToToolCallId)
             {

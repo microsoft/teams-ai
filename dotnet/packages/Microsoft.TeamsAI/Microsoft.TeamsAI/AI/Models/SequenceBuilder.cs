@@ -3,10 +3,10 @@ using System.Diagnostics;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
-    public class SequenceBuilder<T>
+    internal class SequenceBuilder<T>
     {
-        private Segment _first;
-        private Segment _last;
+        private Segment? _first;
+        private Segment? _last;
 
         public void Append(ReadOnlyMemory<T> data)
         {
