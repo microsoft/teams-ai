@@ -3,7 +3,7 @@ using System.Buffers;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
-    public class StreamingChatToolCallsBuilder
+    internal class StreamingChatToolCallsBuilder
     {
         private readonly Dictionary<int, string> _indexToToolCallId = new();
         private readonly Dictionary<int, string> _indexToFunctionName = new();
