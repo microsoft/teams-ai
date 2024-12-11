@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Google.Protobuf.WellKnownTypes;
+using Microsoft.Bot.Builder;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Teams.AI.AI.Models;
@@ -155,7 +156,6 @@ namespace Microsoft.Teams.AI.AI.Clients
         )
         {
             // Define event handlers
-            bool isStreaming = false;
             StreamingResponse? streamer = null;
 
             BeforeCompletionHandler handleBeforeCompletion = new((object sender, BeforeCompletionEventArgs args) =>
@@ -168,22 +168,26 @@ namespace Microsoft.Teams.AI.AI.Clients
 
                 if (args.Streaming)
                 {
-                    isStreaming = true;
-
-                    // Create streamer and send initial message
-                    streamer = new StreamingResponse(context);
-                    memory.SetValue("temp.streamer", streamer);
-
-                    if (this._enableFeedbackLoop != null)
+                    // Attach to any existing streamer
+                    // - see tool call note below to understand.
+                    streamer = (StreamingResponse?)memory.GetValue("temp.streamer");
+                    if (streamer == null)
                     {
-                        streamer.EnableFeedbackLoop = this._enableFeedbackLoop;
-                    }
+                        // Create streamer and send initial message
+                        streamer = new StreamingResponse(context);
+                        memory.SetValue("temp.streamer", streamer);
 
-                    streamer.EnableGeneratedByAILabel = true;
+                        if (this._enableFeedbackLoop != null)
+                        {
+                            streamer.EnableFeedbackLoop = this._enableFeedbackLoop;
+                        }
 
-                    if (!string.IsNullOrEmpty(this._startStreamingMessage))
-                    {
-                        streamer.QueueInformativeUpdate(this._startStreamingMessage!);
+                        streamer.EnableGeneratedByAILabel = true;
+
+                        if (!string.IsNullOrEmpty(this._startStreamingMessage))
+                        {
+                            streamer.QueueInformativeUpdate(this._startStreamingMessage!);
+                        }
                     }
                 }
             });
@@ -191,6 +195,15 @@ namespace Microsoft.Teams.AI.AI.Clients
             ChunkReceivedHandler handleChunkReceived = new((object sender, ChunkReceivedEventArgs args) =>
             {
                 if (args.TurnContext != context || streamer == null)
+                {
+                    return;
+                }
+
+
+                // Ignore content without text
+                // - The chunk is likely for a Tool Call.
+                // - See the tool call note below to understand why we're ignoring them.
+                if (args.Chunk.delta?.GetContent<string>() == null)
                 {
                     return;
                 }
@@ -234,23 +247,32 @@ namespace Microsoft.Teams.AI.AI.Clients
                     cancellationToken
                 );
 
-                if (response.Status != PromptResponseStatus.Success)
-                {
-                    return response;
-                }
-                else
-                {
-                    if (isStreaming)
-                    {
-                        // Delete the message from the response to avoid sending it twice.
-                        response.Message = null;
-                    }
-                }
-
-                // End the stream
+                // Handle streaming responses
                 if (streamer != null)
                 {
-                    await streamer.EndStream();
+                    // Tool call handling
+                    // - We need to keep the streamer around during tool calls so we're just letting them return as normal
+                    //   messages minus the message content. The text content is being streamed to the client in chunks.
+                    // - When the tool call completes we'll call back into ActionPlanner and end up re-attaching to the
+                    //   streamer. This will result in us continuing to stream the response to the client. 
+                    if (response.Message?.ActionCalls != null && response.Message.ActionCalls.Count > 0)
+                    {
+                        // Ensure content is empty for tool calls
+                        response.Message.Content = "";
+                    }
+                    else
+                    {
+                        if (response.Status == PromptResponseStatus.Success)
+                        {
+                            // Delete message from response to avoid sending it twice
+                            response.Message = null;
+                        }
+
+                        // End the stream and remove pointer from memory
+                        // - We're not listening for the response received event because we can't await the completion of events.
+                        await streamer.EndStream();
+                        memory.DeleteValue("temp.streamer");
+                    }
                 }
 
                 // Get input message/s
