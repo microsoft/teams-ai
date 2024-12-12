@@ -112,10 +112,10 @@ namespace Microsoft.Teams.AI.AI.Action
         public string Abstract { get; set; } = string.Empty;
 
         /// <summary>
-        /// The encoding format used for the icon.
+        /// Optional. Encoding format of the `citation.appearance.text` field.
         /// </summary>
         [JsonProperty(PropertyName = "encodingFormat")]
-        public string EncodingFormat { get; set; } = "text/html";
+        public string? EncodingFormat { get; set; }
 
         /// <summary>
         /// The icon provided in the citation ui.
