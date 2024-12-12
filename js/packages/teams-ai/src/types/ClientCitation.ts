@@ -73,7 +73,7 @@ export interface ClientCitation {
         abstract: string;
 
         /**
-         * Encoding format of the ` citation.appearance.text` field. 
+         * Encoding format of the `citation.appearance.text` field.
          */
         encodingFormat?: 'application/vnd.microsoft.card.adaptive';
 
