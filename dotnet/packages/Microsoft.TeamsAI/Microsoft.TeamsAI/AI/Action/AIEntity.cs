@@ -94,7 +94,7 @@ namespace Microsoft.Teams.AI.AI.Action
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// Optional. The citation appreance text. It is ignored in Teams.
+        /// Optional. The citation appearance text.
         /// </summary>
         [JsonProperty(PropertyName = "text")]
         public string? Text { get; set; }
