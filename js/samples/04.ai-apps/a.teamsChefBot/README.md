@@ -60,8 +60,8 @@ If you are using Azure OpenAI then follow these steps:
         AZURE_OPENAI_ENDPOINT: ${{SECRET_AZURE_OPENAI_ENDPOINT}}
 ```
 
-- Open `./infra/azure.bicep` and comment out lines 72-75 and uncomment lines 76-83.
-- Open `./infra/azure.parameters.json` and replace lines 20-22 with:
+- Open `./infra/azure.bicep` and comment out lines of 'OPENAI_KEY' section and uncomment lines of 'AZURE_OPENAI_KEY' and 'AZURE_OPENAI_ENDPOINT' sections.
+- Open `./infra/azure.parameters.json` and replace lines of "openAIKey" section with:
 
 ```json
       "azureOpenAIKey": {
