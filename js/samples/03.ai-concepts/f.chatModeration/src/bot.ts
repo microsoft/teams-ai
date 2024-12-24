@@ -9,7 +9,7 @@ import {
     OpenAIModerator,
     Moderator
 } from '@microsoft/teams-ai';
-import { MemoryStorage, TurnContext } from 'botbuilder';
+import { ActivityTypes, CardFactory, MemoryStorage, TaskModuleTaskInfo, TurnContext } from 'botbuilder';
 import * as path from 'path';
 
 if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
@@ -90,7 +90,8 @@ const app = new Application({
     storage,
     ai: {
         planner,
-        moderator
+        moderator,
+        enable_feedback_loop: true
     }
 });
 
@@ -104,7 +105,11 @@ app.conversationUpdate('membersAdded', async (context, state) => {
         // Ignore the bot joining the conversation
         if (membersAdded[member].id !== context.activity.recipient.id) {
             await context.sendActivity(
-                `Hello and welcome! With this sample you can see the functionality of the Content Safety Moderator of Azure Open AI services.`
+                `Hello and welcome! With this sample, you can see the functionality of the Content Safety Moderator of Azure Open AI services.
+        Additionally, you can explore the feedback functionality by using the following commands:
+
+- **Default Feedback:** Test the default feedback feature.
+- **Custom Feedback:** Try out the custom feedback option.`
             );
         }
     }
@@ -113,6 +118,77 @@ app.conversationUpdate('membersAdded', async (context, state) => {
 app.message('/reset', async (context, state) => {
     state.deleteConversationState();
     await context.sendActivity(`Ok lets start this over.`);
+});
+
+app.message('default feedback', async (context, state) => {
+
+    await context.sendActivity({
+        type: ActivityTypes.Message,
+        text: "We'd love to hear your thoughts! Please click below to provide feedback.",
+        channelData: {
+          feedbackLoop: {
+            type: "default"
+          }
+        },
+      });
+});
+
+app.message('custom feedback', async (context, state) => {
+
+    await context.sendActivity({
+        type: ActivityTypes.Message,
+        text: "We'd love to hear your thoughts! Please click below to provide feedback.",
+        channelData: {
+          feedbackLoop: {
+            type: "custom"
+          }
+        },
+      });
+});
+
+app.messages.fetch(async (context, state, data) => {
+    var taskInfo = {} as any; // TaskModuleTaskInfo
+    const createAdaptiveCardAttachment = () =>
+         CardFactory.adaptiveCard({
+            version: '1.0.0',
+            type: 'AdaptiveCard',
+            body: [
+                {
+                    type: 'TextBlock',
+                    text: 'Enter Text Here'
+                },
+                {
+                    type: 'Input.Text',
+                    id: 'usertext',
+                    placeholder: 'This is a custom feedback form built with Adaptive Card.',
+                    IsMultiline: true
+                }
+            ],
+            actions: [
+                {
+                    type: 'Action.Submit',
+                    title: 'Submit'
+                }
+            ]
+        });
+
+    const setTaskInfo = (taskInfo: any, uiSettings: any) => {
+        taskInfo.height = uiSettings.height;
+        taskInfo.width = uiSettings.width;
+        taskInfo.title = uiSettings.title;
+    }
+
+    taskInfo.card = createAdaptiveCardAttachment();
+
+    setTaskInfo(taskInfo, {
+      width: 400,
+      height: 200,
+      title: 'Custom Feedback Form',
+      id: path,
+      buttonTitle: 'Custom Feedback Form'
+    });
+
+    return Promise.resolve(taskInfo as string | TaskModuleTaskInfo);
 });
 
 app.ai.action(AI.FlaggedInputActionName, async (context, state, data) => {
@@ -133,6 +209,7 @@ app.ai.action(AI.FlaggedInputActionName, async (context, state, data) => {
     await context.sendActivity(
         `I'm sorry your message was flagged due to triggering Azure OpenAI’s content management policy. Reason: ${message}`
     );
+    
     return AI.StopCommandName;
 });
 
@@ -144,4 +221,10 @@ app.ai.action(AI.FlaggedOutputActionName, async (context, state, data) => {
 app.ai.action(AI.HttpErrorActionName, async (context, state, data) => {
     await context.sendActivity('An AI request failed. Please try again later.');
     return AI.StopCommandName;
+});
+
+app.feedbackLoop(async (context, state, data) => {
+    await context.sendActivity('Thank you for your feedback!');
+    const Feedback = typeof data.actionValue.feedback === 'string' ? JSON.parse(data.actionValue.feedback) : data.actionValue.feedback;
+    await context.sendActivity('Provided reaction: '+ data.actionValue.reaction + '<br>Feedback: ' + (Feedback.usertext != undefined ? Feedback.usertext : Feedback.feedbackText));
 });
