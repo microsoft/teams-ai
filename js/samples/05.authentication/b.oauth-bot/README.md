@@ -6,17 +6,17 @@ This sample requires creating an OAuth Connection in Azure Bot Service, which pr
 
 Note that this bot will only work in tenants where the following graph scopes are permitted:
 
--   `User.Read`
+- `User.Read`
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
--   [OAuth Bot](#oauth-bot)
-    -   [Interacting with the bot](#interacting-with-the-bot)
-    -   [Setting up the sample](#setting-up-the-sample)
-    -   [Testing the sample](#testing-the-sample)
-        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+- [OAuth Bot](#oauth-bot)
+    - [Interacting with the bot](#interacting-with-the-bot)
+    - [Setting up the sample](#setting-up-the-sample)
+    - [Testing the sample](#testing-the-sample)
+        - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
@@ -78,7 +78,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 1. Copy this sample into a new folder outside of teams-ai
 1. Select File > Open Folder in VS Code and choose this sample's directory
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
-1. Ensure that you have set up the sample from the previous step.
+1. Verify that the Teams Toolkit extension is connected to your Teams account from the above step.
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
 1. In the browser that launches, select the **Add** button to install the app to Teams.
 

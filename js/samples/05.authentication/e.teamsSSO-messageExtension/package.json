@@ -20,7 +20,7 @@
     },
     "dependencies": {
         "@microsoft/microsoft-graph-client": "^3.0.7",
-        "@microsoft/teams-ai": "~1.6.1",
+        "@microsoft/teams-ai": "~1.7.1",
         "botbuilder": "^4.23.1",
         "botbuilder-azure-blobs": "^4.23.1",
         "dotenv": "^16.4.5",
