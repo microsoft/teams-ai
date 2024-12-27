@@ -337,6 +337,12 @@ export class LLMClient<TContent = any> {
                 return;
             }
 
+            const citations = chunk.delta?.context?.citations ?? undefined;
+
+            if (citations) {
+                streamer.setCitations(citations);
+            }
+
             // Ignore calls without content
             // - This is typically because the chunk represents a tool call.
             // - See the note below for why we're handling tool calls this way.
@@ -346,11 +352,6 @@ export class LLMClient<TContent = any> {
 
             // Send text chunk to client
             const text = chunk.delta?.content;
-            const citations = chunk.delta?.context?.citations ?? undefined;
-
-            if (citations) {
-                streamer.setCitations(citations);
-            }
 
             if (text.length > 0) {
                 streamer.queueTextChunk(text);
