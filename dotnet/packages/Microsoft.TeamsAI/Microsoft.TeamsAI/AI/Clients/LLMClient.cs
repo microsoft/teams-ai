@@ -199,6 +199,12 @@ namespace Microsoft.Teams.AI.AI.Clients
                     return;
                 }
 
+                IList<Citation>? citations = args.Chunk.delta?.Context?.Citations ?? null;
+
+                if (citations != null)
+                {
+                    streamer.SetCitations(citations);
+                }
 
                 // Ignore content without text
                 // - The chunk is likely for a Tool Call.
@@ -210,13 +216,6 @@ namespace Microsoft.Teams.AI.AI.Clients
 
                 // Send chunk to client
                 string text = args.Chunk.delta?.GetContent<string>() ?? "";
-                IList<Citation>? citations = args.Chunk.delta?.Context?.Citations ?? null;
-
-                if (citations != null)
-                {
-                    streamer.SetCitations(citations);
-                }
-
 
                 if (text.Length > 0)
                 {
