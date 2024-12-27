@@ -8,6 +8,29 @@
 
 import { SensitivityUsageInfo } from './SensitivityUsageInfo';
 
+export type ClientCitationIconName =
+    | 'Microsoft Word'
+    | 'Microsoft Excel'
+    | 'Microsoft PowerPoint'
+    | 'Microsoft OneNote'
+    | 'Microsoft SharePoint'
+    | 'Microsoft Visio'
+    | 'Microsoft Loop'
+    | 'Microsoft Whiteboard'
+    | 'Adobe Illustrator'
+    | 'Adobe Photoshop'
+    | 'Adobe InDesign'
+    | 'Adobe Flash'
+    | 'Sketch'
+    | 'Source Code'
+    | 'Image'
+    | 'GIF'
+    | 'Video'
+    | 'Sound'
+    | 'ZIP'
+    | 'Text'
+    | 'PDF';
+
 /**
  * Represents a Teams client citation to be included in a message. See Bot messages with AI-generated content for more details.
  * https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/bot-messages-ai-generated-content?tabs=before%2Cbotmessage
@@ -21,7 +44,7 @@ export interface ClientCitation {
     /**
      * Required. Number and position of the citation.
      */
-    position: string;
+    position: number;
     appearance: {
         /**
          * Required; Must be 'DigitalDocument'
@@ -29,12 +52,13 @@ export interface ClientCitation {
         '@type': 'DigitalDocument';
 
         /**
-         * Name of the document.
+         * Name of the document. (max length 80)
          */
         name: string;
 
         /**
-         * Optional; ignored in Teams
+         * Stringified adaptive card with additional information about the citation.
+         * It is rendered within the modal.
          */
         text?: string;
 
@@ -44,22 +68,29 @@ export interface ClientCitation {
         url?: string;
 
         /**
-         * Content of the citation. Must be clipped if longer than 480 characters.
+         * Extract of the referenced content. (max length 160)
          */
         abstract: string;
 
         /**
-         * Used for icon; for now it is ignored.
+         * Encoding format of the `citation.appearance.text` field.
          */
-        encodingFormat?: 'text/html';
+        encodingFormat?: 'application/vnd.microsoft.card.adaptive';
 
         /**
-         * For now ignored, later used for icon
+         * Information about the citation’s icon.
          */
-        image?: string;
+        image?: {
+            '@type': 'ImageObject';
+
+            /**
+             * The image/icon name
+             */
+            name: ClientCitationIconName;
+        };
 
         /**
-         * Optional; set by developer
+         * Optional; set by developer. (max length 3) (max keyword length 28)
          */
         keywords?: string[];
 

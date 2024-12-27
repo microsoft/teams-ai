@@ -1,571 +1,321 @@
-import {
-    Assistant,
-    AssistantThread,
-    AssistantThreadCreationOptions,
-    AssistantsClient,
-    CreateMessageOptions,
-    CreateRunOptions,
-    CreateRunRequestOptions,
-    CreateThreadOptions,
-    GetRunOptions,
-    ListMessagesOptions,
-    ListResponseOf,
-    ListRunsOptions,
-    MessageRole,
-    OpenAIKeyCredential,
-    RequiredAction,
-    RequiredFunctionToolCall,
-    SubmitToolOutputsToRunOptions,
-    ThreadMessage,
-    ThreadRun,
-    ToolOutput
-} from '@azure/openai-assistants';
-import { TestAdapter, TurnContext } from 'botbuilder-core';
-import { Activity } from 'botframework-schema';
+/// <reference types="mocha" />
+
+import assert from 'assert';
+import OpenAI from 'openai';
+import { TurnContext, TestAdapter } from 'botbuilder-core';
+import sinon from 'sinon';
+
 import { TurnState } from '../TurnState';
 import { AssistantsPlanner, AssistantsPlannerOptions } from './AssistantsPlanner';
-import { AI, AIOptions } from '../AI';
-import assert from 'assert';
+import { AI } from '../AI';
 import { PredictedDoCommand, PredictedSayCommand } from './Planner';
 
 describe('AssistantsPlanner', () => {
-    const createTurnContextAndState = async (activity: Partial<Activity>): Promise<[TurnContext, TurnState]> => {
+    let planner: AssistantsPlanner<TurnState>;
+    let openAIStub: sinon.SinonStubbedInstance<OpenAI>;
+    let context: TurnContext;
+    let state: TurnState;
+    let ai: AI<TurnState>;
+
+    beforeEach(async () => {
+        openAIStub = sinon.createStubInstance(OpenAI);
+        openAIStub.beta = {
+            threads: {
+                create: sinon.stub().resolves({ id: 'test-thread-id' }),
+                runs: {
+                    create: sinon.stub().resolves({ id: 'test-run-id', status: 'completed' }),
+                    createAndPoll: sinon.stub().resolves({ id: 'test-run-id', status: 'completed' }),
+                    retrieve: sinon.stub().resolves({ id: 'test-run-id', status: 'completed' }),
+                    submitToolOutputs: sinon.stub().resolves({ id: 'test-run-id', status: 'completed' }),
+                    submitToolOutputsAndPoll: sinon.stub().resolves({ id: 'test-run-id', status: 'completed' }),
+                    list: sinon.stub().resolves({
+                        data: [
+                            {
+                                id: 'test-run-id',
+                                status: 'completed'
+                            }
+                        ]
+                    })
+                },
+                messages: {
+                    create: sinon.stub().resolves({ id: 'test-message-id' }),
+                    list: sinon.stub().resolves({
+                        data: [
+                            {
+                                id: 'test-message-id',
+                                content: [{ type: 'text', text: { value: 'Test response' } }]
+                            }
+                        ]
+                    })
+                }
+            }
+        } as unknown as OpenAI['beta'];
+
+        const options: AssistantsPlannerOptions = {
+            apiKey: 'test-key',
+            assistant_id: 'test-assistant-id',
+            api_version: '2024-02-15'
+        };
+
+        planner = new AssistantsPlanner<TurnState>(options);
+        (planner as any)._client = openAIStub;
+
         const testAdapter = new TestAdapter();
-        const context = new TurnContext(testAdapter, {
-            channelId: 'msteams',
-            recipient: {
-                id: 'bot',
-                name: 'bot'
-            },
-            from: {
-                id: 'user',
-                name: 'user'
-            },
-            conversation: {
-                id: 'convo',
-                isGroup: false,
-                conversationType: 'personal',
-                name: 'convo'
-            },
-            ...activity
+        context = new TurnContext(testAdapter, {
+            type: 'message',
+            text: 'test input',
+            channelId: 'test',
+            from: { id: 'user', name: 'User' },
+            recipient: { id: 'bot', name: 'Bot' },
+            conversation: { id: 'conversation', isGroup: false, conversationType: 'personal', name: 'Conversation' },
+            channelData: {}
         });
-        const state: TurnState = new TurnState();
+
+        state = new TurnState();
         await state.load(context);
         state.temp = {
-            input: '',
+            input: 'test input',
             inputFiles: [],
             lastOutput: '',
             actionOutputs: {},
             authTokens: {}
         };
 
-        return [context, state];
-    };
+        ai = new AI<TurnState>({ planner });
+    });
 
-    describe('beginTask', async () => {
-        it('expects a single reply', async () => {
-            const testClient = new TestAssistantsClient();
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
+    afterEach(() => {
+        sinon.restore();
+    });
 
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
-
-            testClient.remainingRunStatus.push('completed');
-            testClient.remainingMessages.push('welcome');
-
-            const plan = await planner.beginTask(context, state, ai);
-
-            assert(plan);
-            assert(plan.commands);
-            assert.equal(plan.commands.length, 1);
-            assert.equal(plan.commands[0].type, 'SAY');
-            assert.equal('welcome', (plan.commands[0] as PredictedSayCommand).response.content);
-        });
-
-        it('waits for current run', async () => {
-            const testClient = new TestAssistantsClient();
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
-
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
-
-            testClient.remainingRunStatus.push('in_progress');
-            testClient.remainingRunStatus.push('completed');
-            testClient.remainingMessages.push('welcome');
+    describe('beginTask', () => {
+        it('should create a thread and run, then return a plan', async () => {
+            (openAIStub.beta.threads.messages.list as sinon.SinonStub).resolves({
+                data: [
+                    {
+                        id: 'test-message-id-2',
+                        content: [{ type: 'text', text: { value: 'New response' } }]
+                    },
+                    {
+                        id: 'test-message-id',
+                        content: [{ type: 'text', text: { value: 'Test response' } }]
+                    }
+                ]
+            });
 
             const plan = await planner.beginTask(context, state, ai);
 
-            assert(plan);
-            assert(plan.commands);
-            assert.equal(plan.commands.length, 1);
-            assert.equal(plan.commands[0].type, 'SAY');
-            assert.equal('welcome', (plan.commands[0] as PredictedSayCommand).response.content);
+            sinon.assert.calledOnce(openAIStub.beta.threads.create as sinon.SinonStub);
+            sinon.assert.calledWith(openAIStub.beta.threads.messages.create as sinon.SinonStub, 'test-thread-id', {
+                role: 'user',
+                content: 'test input'
+            });
+            sinon.assert.calledWith(openAIStub.beta.threads.runs.createAndPoll as sinon.SinonStub, 'test-thread-id', {
+                assistant_id: 'test-assistant-id'
+            });
+
+            assert.strictEqual(plan.type, 'plan');
+            assert.strictEqual(plan.commands.length, 1);
+            assert.strictEqual(plan.commands[0].type, 'SAY');
+            assert.strictEqual((plan.commands[0] as PredictedSayCommand).response.content, 'New response');
         });
 
-        it('waits for previous run', async () => {
-            const testClient = new TestAssistantsClient();
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
-
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
-
-            testClient.remainingRunStatus.push('failed');
-            testClient.remainingRunStatus.push('completed');
-            testClient.remainingMessages.push('welcome');
-
-            const thread = await testClient.createThread({});
-            await testClient.createRun(thread.id, { assistantId: 'assistant_id' });
-            state.setValue('conversation.assistants_state', { threadId: thread.id });
+        it('should handle run cancellation', async () => {
+            (openAIStub.beta.threads.runs.retrieve as sinon.SinonStub).resolves({
+                id: 'test-run-id',
+                status: 'cancelled'
+            });
 
             const plan = await planner.beginTask(context, state, ai);
 
-            assert(plan);
-            assert(plan.commands);
-            assert.equal(plan.commands.length, 1);
-            assert.equal(plan.commands[0].type, 'SAY');
-            assert.equal('welcome', (plan.commands[0] as PredictedSayCommand).response.content);
+            assert.strictEqual(plan.type, 'plan');
+            assert.strictEqual(plan.commands.length, 0);
         });
 
-        it('run cancelled', async () => {
-            const testClient = new TestAssistantsClient();
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
-
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
-
-            testClient.remainingRunStatus.push('cancelled');
-            testClient.remainingMessages.push('welcome');
+        it('should handle run expiration', async () => {
+            (openAIStub.beta.threads.runs.retrieve as sinon.SinonStub).resolves({
+                id: 'test-run-id',
+                status: 'expired'
+            });
 
             const plan = await planner.beginTask(context, state, ai);
 
-            assert(plan);
-            assert(plan.commands);
-            assert.equal(plan.commands.length, 0);
+            assert.strictEqual(plan.type, 'plan');
+            assert.strictEqual(plan.commands.length, 1);
+            assert.strictEqual(plan.commands[0].type, 'DO');
+            assert.strictEqual((plan.commands[0] as PredictedDoCommand).action, AI.TooManyStepsActionName);
         });
 
-        it('run expired', async () => {
-            const testClient = new TestAssistantsClient();
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
+        it('should throw an error on run failure', async () => {
+            (openAIStub.beta.threads.runs.retrieve as sinon.SinonStub).resolves({
+                id: 'test-run-id',
+                status: 'failed',
+                last_error: { code: 'test_error', message: 'Test error message' }
+            });
+
+            await assert.rejects(
+                () => planner.beginTask(context, state, ai),
+                /Run failed failed. ErrorCode: test_error. ErrorMessage: Test error message/
             );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
-
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
-
-            testClient.remainingRunStatus.push('expired');
-            testClient.remainingMessages.push('welcome');
-
-            const plan = await planner.beginTask(context, state, ai);
-
-            assert(plan);
-            assert(plan.commands);
-            assert.equal(plan.commands.length, 1);
-            assert.equal(plan.commands[0].type, 'DO');
-            assert.equal((plan.commands[0] as PredictedDoCommand).action, AI.TooManyStepsActionName);
-        });
-
-        it('run failed', async () => {
-            const testClient = new TestAssistantsClient();
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
-
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
-
-            testClient.remainingRunStatus.push('failed');
-            testClient.remainingMessages.push('welcome');
-
-            try {
-                await planner.beginTask(context, state, ai);
-            } catch (e) {
-                assert((e as Error).message.indexOf('Run failed') >= 0);
-                return;
-            }
-
-            assert.fail();
         });
     });
 
-    describe('continueTask()', () => {
-        it('requires action', async () => {
-            const testClient = new TestAssistantsClient();
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
+    describe('continueTask', () => {
+        it('should continue an existing thread and run', async () => {
+            // Setup the initial state
+            state.setValue('conversation.assistants_state', {
+                thread_id: 'existing-thread-id',
+                run_id: 'existing-run-id',
+                last_message_id: 'existing-message-id'
+            });
 
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
+            // Setup action outputs
+            state.temp.actionOutputs = { test_function: 'test output' };
+            state.setValue('temp.submitToolMap', { test_function: 'test-tool-call-id' });
+            state.setValue('temp.submitToolOutputs', true);
 
-            const functionToolCall: RequiredFunctionToolCall = {
-                type: 'function',
-                id: 'test-tool-id',
-                function: {
-                    name: 'test-action',
-                    arguments: '{}',
-                    output: null
-                }
-            };
-            const requiredAction: RequiredAction = {
-                type: 'submit_tool_outputs',
-                submitToolOutputs: {
-                    toolCalls: [functionToolCall]
-                }
-            };
-
-            testClient.remainingActions.push(requiredAction);
-            testClient.remainingRunStatus.push('requires_action');
-            testClient.remainingRunStatus.push('in_progress');
-            testClient.remainingRunStatus.push('completed');
-            testClient.remainingMessages.push('welcome');
-
-            const plan1 = await planner.continueTask(context, state, ai);
-            state.temp.actionOutputs['test-action'] = 'test-output';
-            const plan2 = await planner.continueTask(context, state, ai);
-
-            assert(plan1);
-            assert(plan1.commands);
-            assert.equal(plan1.commands.length, 1);
-            assert.equal(plan1.commands[0].type, 'DO');
-            assert.equal((plan1.commands[0] as PredictedDoCommand).action, 'test-action');
-            assert(plan2);
-            assert(plan2.commands);
-            assert.equal(plan2.commands[0].type, 'SAY');
-            assert.equal((plan2.commands[0] as PredictedSayCommand).response.content, 'welcome');
-
-            const toolMap: { [key: string]: string } = state.getValue('temp.submitToolMap');
-            assert(toolMap);
-            assert.equal(Object.keys(toolMap).length, 1);
-            assert('test-action' in toolMap);
-            assert(toolMap['test-action'], 'test-tool_id');
-        });
-
-        it('ignores redundant action', async () => {
-            const testClient = new TestAssistantsClient();
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
-            state.temp.actionOutputs['other-action'] = 'should not be used';
-
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
-
-            const functionToolCall: RequiredFunctionToolCall = {
-                type: 'function',
-                id: 'test-tool-id',
-                function: {
-                    name: 'test-action',
-                    arguments: '{}',
-                    output: null
-                }
-            };
-            const requiredAction: RequiredAction = {
-                type: 'submit_tool_outputs',
-                submitToolOutputs: {
-                    toolCalls: [functionToolCall]
-                }
-            };
-
-            testClient.remainingActions.push(requiredAction);
-            testClient.remainingRunStatus.push('requires_action');
-            testClient.remainingRunStatus.push('in_progress');
-            testClient.remainingRunStatus.push('completed');
-            testClient.remainingMessages.push('welcome');
-
-            const plan1 = await planner.continueTask(context, state, ai);
-            state.temp.actionOutputs['test-action'] = 'test-output';
-            const plan2 = await planner.continueTask(context, state, ai);
-
-            assert(plan1);
-            assert(plan1.commands);
-            assert.equal(plan1.commands.length, 1);
-            assert.equal(plan1.commands[0].type, 'DO');
-            assert.equal((plan1.commands[0] as PredictedDoCommand).action, 'test-action');
-            assert(plan2);
-            assert(plan2.commands);
-            assert.equal(plan2.commands[0].type, 'SAY');
-            assert.equal((plan2.commands[0] as PredictedSayCommand).response.content, 'welcome');
-
-            const toolMap: { [key: string]: string } = state.getValue('temp.submitToolMap');
-            assert(toolMap);
-            assert.equal(Object.keys(toolMap).length, 1);
-            assert('test-action' in toolMap);
-            assert(toolMap['test-action'], 'test-tool_id');
-        });
-
-        it('handles multiple messages', async () => {
-            const testClient = new TestAssistantsClient();
-            const planner = new TestAssistantsPlanner<TurnState>(
-                { apiKey: 'test-key', assistant_id: 'test-assistant-id' },
-                testClient
-            );
-            const [context, state] = await createTurnContextAndState({});
-            state.temp.input = 'hello';
-            state.temp.actionOutputs['other-action'] = 'should not be used';
-
-            const aiOptions: AIOptions<TurnState> = {
-                planner: planner
-            };
-            const ai = new AI<TurnState>(aiOptions);
-
-            testClient.remainingRunStatus.push('completed');
-            testClient.remainingMessages.push('message 2');
-            testClient.remainingMessages.push('message 1');
-            testClient.remainingMessages.push('welcome');
+            // Mock messages list response
+            (openAIStub.beta.threads.messages.list as sinon.SinonStub).resolves({
+                data: [
+                    {
+                        id: 'new-message-id',
+                        content: [{ type: 'text', text: { value: 'New response' } }]
+                    },
+                    {
+                        id: 'existing-message-id',
+                        content: [{ type: 'text', text: { value: 'Old response' } }]
+                    }
+                ]
+            });
 
             const plan = await planner.continueTask(context, state, ai);
 
-            assert(plan);
-            assert(plan.commands);
-            assert.equal(plan.commands.length, 3);
-            assert.equal(plan.commands[0].type, 'SAY');
-            assert.equal((plan.commands[0] as PredictedSayCommand).response.content, 'message 2');
-            assert.equal((plan.commands[1] as PredictedSayCommand).response.content, 'message 1');
-            assert.equal((plan.commands[2] as PredictedSayCommand).response.content, 'welcome');
+            // Verify submitToolOutputsAndPoll was called with correct arguments
+            sinon.assert.calledWith(
+                openAIStub.beta.threads.runs.submitToolOutputsAndPoll as sinon.SinonStub,
+                'existing-thread-id',
+                'existing-run-id',
+                {
+                    tool_outputs: [
+                        {
+                            tool_call_id: 'test-tool-call-id',
+                            output: 'test output'
+                        }
+                    ]
+                }
+            );
+
+            // Verify the plan structure
+            assert.strictEqual(plan.type, 'plan');
+            assert.strictEqual(plan.commands.length, 1);
+            assert.strictEqual(plan.commands[0].type, 'SAY');
+            assert.strictEqual((plan.commands[0] as PredictedSayCommand).response.content, 'New response');
+        });
+
+        it('should handle required actions', async () => {
+            (openAIStub.beta.threads.runs.retrieve as sinon.SinonStub).resolves({
+                id: 'test-run-id',
+                status: 'requires_action',
+                required_action: {
+                    type: 'submit_tool_outputs',
+                    submit_tool_outputs: {
+                        tool_calls: [
+                            {
+                                id: 'test-tool-call-id',
+                                type: 'function',
+                                function: {
+                                    name: 'test_function',
+                                    arguments: '{"arg1": "value1"}'
+                                }
+                            }
+                        ]
+                    }
+                }
+            });
+
+            const plan = await planner.continueTask(context, state, ai);
+
+            assert.strictEqual(plan.type, 'plan');
+            assert.strictEqual(plan.commands.length, 1);
+            assert.strictEqual(plan.commands[0].type, 'DO');
+            assert.strictEqual((plan.commands[0] as PredictedDoCommand).action, 'test_function');
+            assert.deepStrictEqual((plan.commands[0] as PredictedDoCommand).parameters, { arg1: 'value1' });
+        });
+    });
+
+    describe('submitActionResults', () => {
+        it('should submit action results and return a plan', async () => {
+            // Setup the initial state
+            state.setValue('conversation.assistants_state', {
+                thread_id: 'test-thread-id',
+                run_id: 'test-run-id',
+                last_message_id: 'test-message-id'
+            });
+
+            // Setup action outputs
+            state.temp.actionOutputs = { test_function: 'test output' };
+            state.setValue('temp.submitToolMap', { test_function: 'test-tool-call-id' });
+
+            // Mock messages list response with messages before last_message_id
+            (openAIStub.beta.threads.messages.list as sinon.SinonStub).resolves({
+                data: [
+                    {
+                        id: 'new-message-id',
+                        content: [{ type: 'text', text: { value: 'New response' } }]
+                    },
+                    {
+                        id: 'test-message-id',
+                        content: [{ type: 'text', text: { value: 'Old response' } }]
+                    }
+                ]
+            });
+
+            // Mock the run completion
+            (openAIStub.beta.threads.runs.submitToolOutputsAndPoll as sinon.SinonStub).resolves({
+                id: 'test-run-id',
+                status: 'completed'
+            });
+
+            const plan = await (planner as any).submitActionResults(context, state, ai);
+
+            // Verify submitToolOutputsAndPoll was called with correct arguments
+            sinon.assert.calledWith(
+                openAIStub.beta.threads.runs.submitToolOutputsAndPoll as sinon.SinonStub,
+                'test-thread-id',
+                'test-run-id',
+                {
+                    tool_outputs: [
+                        {
+                            tool_call_id: 'test-tool-call-id',
+                            output: 'test output'
+                        }
+                    ]
+                }
+            );
+
+            // Verify the plan structure
+            assert.strictEqual(plan.type, 'plan');
+            assert.strictEqual(plan.commands.length, 1);
+            assert.strictEqual(plan.commands[0].type, 'SAY');
+            assert.strictEqual((plan.commands[0] as PredictedSayCommand).response.content, 'New response');
+        });
+    });
+
+    describe('blockOnInProgressRuns', () => {
+        it('should wait for in-progress runs to complete', async () => {
+            (openAIStub.beta.threads.runs.list as sinon.SinonStub)
+                .onFirstCall()
+                .resolves({
+                    data: [{ id: 'run-1', status: 'in_progress' }]
+                })
+                .onSecondCall()
+                .resolves({
+                    data: [{ id: 'run-1', status: 'completed' }]
+                });
+
+            await (planner as any).blockOnInProgressRuns('test-thread-id');
+
+            sinon.assert.calledWith(openAIStub.beta.threads.runs.list as sinon.SinonStub, 'test-thread-id');
         });
     });
 });
-
-class TestAssistantsPlanner<TState extends TurnState = TurnState> extends AssistantsPlanner<TState> {
-    public constructor(options: AssistantsPlannerOptions, client: AssistantsClient) {
-        options.polling_interval = 2;
-        super(options);
-        this._client = client;
-    }
-}
-
-class TestAssistantsClient extends AssistantsClient {
-    private _threads: AssistantThread[];
-    private _messages: { [key: string]: ThreadMessage[] };
-    private _runs: { [key: string]: ThreadRun[] };
-    public remainingActions: RequiredAction[];
-    public remainingRunStatus: string[];
-    public remainingMessages: string[];
-
-    private _assistant: Assistant;
-
-    public constructor() {
-        super(new OpenAIKeyCredential('api-key'));
-        this._threads = [];
-        this._messages = {};
-        this._runs = {};
-        this.remainingActions = [];
-        this.remainingRunStatus = [];
-        this.remainingMessages = [];
-        this._assistant = {
-            id: 'assistant_id',
-            createdAt: new Date(),
-            name: 'test assistant',
-            description: 'test assistant description',
-            model: 'test model',
-            instructions: 'test instructions',
-            tools: [],
-            fileIds: [],
-            metadata: null
-        };
-    }
-
-    public override async createMessage(
-        threadId: string,
-        role: MessageRole,
-        content: string,
-        options?: CreateMessageOptions
-    ): Promise<ThreadMessage> {
-        const newMessage: ThreadMessage = {
-            id: Date.now().toString(),
-            createdAt: new Date(),
-            threadId: threadId,
-            role: role,
-            content: [{ type: 'text', text: { value: content, annotations: [] } }],
-            assistantId: this._assistant?.id,
-            runId: '',
-            fileIds: options?.fileIds,
-            metadata: null
-        };
-
-        if (threadId in this._messages) {
-            this._messages[threadId].push(newMessage);
-        } else {
-            this._messages[threadId] = [newMessage];
-        }
-
-        return newMessage;
-    }
-
-    public override async createThread(
-        body?: AssistantThreadCreationOptions,
-        options?: CreateThreadOptions
-    ): Promise<AssistantThread> {
-        const newThread: AssistantThread = {
-            id: Date.now().toString(),
-            createdAt: new Date(),
-            metadata: body!.metadata ?? null
-        };
-
-        const newMessages: ThreadMessage[] = [];
-        const len = body?.messages?.length ?? 0;
-        for (let i = 0; i < len; i++) {
-            const m = body!.messages![i];
-            const newMessage: ThreadMessage = {
-                role: m.role,
-                id: Date.now.toString(),
-                createdAt: new Date(),
-                threadId: newThread.id,
-                content: [{ type: 'text', text: { value: m.content, annotations: [] } }],
-                assistantId: this._assistant?.id,
-                runId: '',
-                fileIds: [],
-                metadata: null
-            };
-            newMessages.push(newMessage);
-        }
-
-        this._messages[newThread.id] = newMessages;
-        this._threads.push(newThread);
-        return Promise.resolve(newThread);
-    }
-
-    public override async listMessages(
-        thread_id: string,
-        options?: ListMessagesOptions
-    ): Promise<ListResponseOf<ThreadMessage>> {
-        while (this.remainingMessages.length > 0) {
-            const nextMessage = this.remainingMessages.shift(); // Removes the first element from the list
-            this.createMessage(thread_id, 'user', nextMessage!);
-        }
-
-        const lastMessageId = options?.before;
-        const i = this._messages[thread_id].findIndex((m) => m.id == lastMessageId);
-        const filteredMessages = this._messages[thread_id].slice(i + 1);
-
-        // the elements are in ascending order of the creation timestamp
-        filteredMessages.reverse();
-
-        return Promise.resolve({
-            data: filteredMessages,
-            firstId: '',
-            lastId: '',
-            hasMore: false
-        });
-    }
-
-    public async createRun(
-        thread_id: string,
-        createRunOptions: CreateRunOptions,
-        options?: CreateRunRequestOptions
-    ): Promise<ThreadRun> {
-        let remainingActions: RequiredAction;
-
-        if (this.remainingActions.length > 0) {
-            remainingActions = this.remainingActions.shift()!;
-        }
-
-        const newRun: ThreadRun = {
-            id: Date.now().toString(),
-            threadId: thread_id,
-            assistantId: this._assistant!.id,
-            status: 'in_progress',
-            requiredAction: remainingActions!,
-            model: this._assistant?.model ?? 'test-model',
-            instructions: this._assistant?.instructions ?? 'instructions',
-            tools: this._assistant?.tools ?? [],
-            fileIds: [],
-            createdAt: new Date(),
-            expiresAt: new Date(),
-            startedAt: new Date(),
-            completedAt: new Date(),
-            cancelledAt: new Date(),
-            failedAt: new Date(),
-            metadata: null
-        };
-
-        if (thread_id in this._runs) {
-            this._runs[thread_id].push(newRun);
-        } else {
-            this._runs[thread_id] = [newRun];
-        }
-
-        return Promise.resolve(newRun);
-    }
-
-    public override async getRun(threadId: string, runId: string, options?: GetRunOptions): Promise<ThreadRun> {
-        if (this._runs[threadId].length == 0) {
-            return Promise.reject();
-        }
-
-        const runStatus = this.remainingRunStatus.shift(); // dequeue
-        const i = this._runs[threadId].findIndex((r) => r.id == runId);
-
-        const run = this._runs[threadId][i];
-        run.status = runStatus!;
-
-        return Promise.resolve(run);
-    }
-
-    public override async listRuns(threadId: string, options?: ListRunsOptions): Promise<ListResponseOf<ThreadRun>> {
-        const runs = this._runs[threadId] ?? [];
-        return {
-            data: runs,
-            firstId: '',
-            lastId: '',
-            hasMore: false
-        };
-    }
-
-    public override async submitToolOutputsToRun(
-        threadId: string,
-        runId: string,
-        toolOutputs: ToolOutput[],
-        options?: SubmitToolOutputsToRunOptions
-    ): Promise<ThreadRun> {
-        return Promise.resolve(this.getRun(threadId, runId));
-    }
-}

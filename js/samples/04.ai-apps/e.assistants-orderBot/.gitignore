@@ -112,3 +112,6 @@ env/.env.*.user
 env/.env.local
 appPackage/build
 .deployment
+.localConfigs.testTool
+.testTool.installInfo.json
+teamsapptesttool.log

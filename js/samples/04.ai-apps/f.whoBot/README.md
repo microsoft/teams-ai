@@ -4,11 +4,11 @@ This bot can tell you about your personal work-related information, who your man
 
 Note that this bot will only work in tenants where the following graph scopes are permitted:
 
--   `User.Read`
--   `User.ReadBasic.All`
--   `People.Read`
--   `Mail.Read`
--   `Calendar.Read.Shared`
+- `User.Read`
+- `User.ReadBasic.All`
+- `People.Read`
+- `Mail.Read`
+- `Calendar.Read.Shared`
 
 _Table of contents_
 
@@ -16,11 +16,11 @@ _Table of contents_
 
 <!-- code_chunk_output -->
 
--   [Who Bot](#who-bot)
-    -   [Interacting with the bot](#interacting-with-the-bot)
-    -   [Setting up the sample](#setting-up-the-sample)
-    -   [Testing the sample](#testing-the-sample)
-        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+- [Who Bot](#who-bot)
+    - [Interacting with the bot](#interacting-with-the-bot)
+    - [Setting up the sample](#setting-up-the-sample)
+    - [Testing the sample](#testing-the-sample)
+        - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
@@ -86,9 +86,9 @@ To use Teams Toolkit, continue following the directions below.
 
 If you are using Azure OpenAI then follow these steps:
 
--   Comment the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
--   Add your Azure OpenAI key and endpoint values to the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables
--   Open the `teamsapp.local.yml` file and modify the last step to use Azure OpenAI variables instead:
+- Comment the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
+- Add your Azure OpenAI key and endpoint values to the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables
+- Open the `teamsapp.local.yml` file and modify the last step to use Azure OpenAI variables instead:
 
 ```yml
 - uses: file/createOrUpdateEnvironmentFile
@@ -102,8 +102,8 @@ If you are using Azure OpenAI then follow these steps:
         AZURE_OPENAI_ENDPOINT: ${{SECRET_AZURE_OPENAI_ENDPOINT}}
 ```
 
--   Open `./infra/azure.bicep` and comment out lines 72-75 and uncomment lines 76-83.
--   Open `./infra/azure.parameters.json` and replace lines 20-22 with:
+- Open `./infra/azure.bicep` and comment out lines 72-75 and uncomment lines 76-83.
+- Open `./infra/azure.parameters.json` and replace lines 20-22 with:
 
 ```json
       "azureOpenAIKey": {
@@ -119,7 +119,7 @@ If you are using Azure OpenAI then follow these steps:
 1. Copy this sample into a new folder outside of teams-ai
 1. Select File > Open Folder in VS Code and choose this sample's directory
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
-1. Ensure that you have set up the sample from the previous step.
+1. Verify that the Teams Toolkit extension is connected to your Teams account from the above step.
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
 1. In the browser that launches, select the **Add** button to install the app to Teams.
 

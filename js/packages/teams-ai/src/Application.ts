@@ -10,11 +10,15 @@ import {
     Activity,
     ActivityTypes,
     BotAdapter,
+    ChannelInfo,
     ConversationReference,
     FileConsentCardResponse,
     O365ConnectorCardActionQuery,
     ResourceResponse,
     Storage,
+    TeamDetails,
+    TeamsInfo,
+    TeamsPagedMembersResult,
     TurnContext
 } from 'botbuilder';
 
@@ -23,6 +27,7 @@ import { ReadReceiptInfo } from 'botframework-connector';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { AI, AIOptions } from './AI';
 import { Meetings } from './Meetings';
+import { Messages } from './Messages';
 import { MessageExtensions } from './MessageExtensions';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
 import { AuthenticationManager, AuthenticationOptions } from './authentication/Authentication';
@@ -149,12 +154,14 @@ export interface FeedbackLoopData {
         /**
          * 'like' or 'dislike'
          */
-        reaction: string;
+        reaction: 'like' | 'dislike';
+
         /**
          * The response the user provides when prompted with "What did you like/dislike?" after pressing one of the feedback buttons.
          */
-        feedback: string;
+        feedback: string | Record<string, any>;
     };
+
     /**
      * The activity ID that the feedback was provided on.
      */
@@ -241,6 +248,7 @@ export class Application<TState extends TurnState = TurnState> {
     private readonly _invokeRoutes: AppRoute<TState>[] = [];
     private readonly _adaptiveCards: AdaptiveCards<TState>;
     private readonly _meetings: Meetings<TState>;
+    private readonly _messages: Messages<TState>;
     private readonly _messageExtensions: MessageExtensions<TState>;
     private readonly _taskModules: TaskModules<TState>;
     private readonly _ai?: AI<TState>;
@@ -283,6 +291,7 @@ export class Application<TState extends TurnState = TurnState> {
         }
 
         this._adaptiveCards = new AdaptiveCards<TState>(this);
+        this._messages = new Messages<TState>(this);
         this._messageExtensions = new MessageExtensions<TState>(this);
         this._meetings = new Meetings<TState>(this);
         this._taskModules = new TaskModules<TState>(this);
@@ -348,6 +357,14 @@ export class Application<TState extends TurnState = TurnState> {
         }
 
         return this._authentication;
+    }
+
+    /**
+     * Fluent interface for accessing Messages specific features.
+     * @returns {Messages<TState>} The Messages instance.
+     */
+    public get messages(): Messages<TState> {
+        return this._messages;
     }
 
     /**
@@ -514,14 +531,7 @@ export class Application<TState extends TurnState = TurnState> {
         }
 
         // Identify conversation reference
-        let reference: Partial<ConversationReference>;
-        if (typeof (context as TurnContext).activity == 'object') {
-            reference = TurnContext.getConversationReference((context as TurnContext).activity);
-        } else if (typeof (context as Partial<Activity>).type == 'string') {
-            reference = TurnContext.getConversationReference(context as Partial<Activity>);
-        } else {
-            reference = context as Partial<ConversationReference>;
-        }
+        const reference: Partial<ConversationReference> = getConversationReference(context);
 
         await this.adapter.continueConversationAsync(this._options.botAppId ?? '', reference, logic);
     }
@@ -897,6 +907,106 @@ export class Application<TState extends TurnState = TurnState> {
         });
 
         return response;
+    }
+
+    /**
+     * Retrieves the list of team channels for a given context.
+     * @param context - The context of the conversation, which can be a TurnContext,
+     *                  Partial<ConversationReference>, or Partial<Activity>.
+     * @returns A promise that resolves to an array of ChannelInfo objects if the bot is installed into a team, otherwise returns an empty array.
+     */
+    public async getTeamChannels(context: TurnContext): Promise<ChannelInfo[]>;
+    public async getTeamChannels(conversationReference: Partial<ConversationReference>): Promise<ChannelInfo[]>;
+    public async getTeamChannels(activity: Partial<Activity>): Promise<ChannelInfo[]>;
+    public async getTeamChannels(
+        context: TurnContext | Partial<ConversationReference> | Partial<Activity>
+    ): Promise<ChannelInfo[]> {
+        let teamsChannels: ChannelInfo[] = [];
+
+        // Identify conversation reference
+        const reference: Partial<ConversationReference> = getConversationReference(context);
+
+        if (reference.conversation?.conversationType === 'channel') {
+            await this.continueConversationAsync(reference, async (ctx) => {
+                const teamId =
+                    ctx.activity?.channelData?.team?.id ??
+                    (ctx.activity?.conversation?.name === undefined ? ctx.activity?.conversation?.id : undefined);
+                if (teamId) {
+                    teamsChannels = await TeamsInfo.getTeamChannels(ctx, teamId);
+                }
+            });
+        }
+
+        return teamsChannels;
+    }
+
+    /**
+     * Retrieves the team details for a given context.
+     * @param context - The context of the conversation, which can be a TurnContext,
+     *                  Partial<ConversationReference>, or Partial<Activity>.
+     * @returns A promise that resolves to an array of ChannelInfo objects if the bot is installed into a team, otherwise returns an empty array.
+     */
+    public async getTeamDetails(context: TurnContext): Promise<TeamDetails | undefined>;
+    public async getTeamDetails(
+        conversationReference: Partial<ConversationReference>
+    ): Promise<TeamDetails | undefined>;
+    public async getTeamDetails(activity: Partial<Activity>): Promise<TeamDetails | undefined>;
+    public async getTeamDetails(
+        context: TurnContext | Partial<ConversationReference> | Partial<Activity>
+    ): Promise<TeamDetails | undefined> {
+        let teamDetails: TeamDetails | undefined = undefined;
+
+        // Identify conversation reference
+        const reference: Partial<ConversationReference> = getConversationReference(context);
+
+        if (reference.conversation?.conversationType === 'channel') {
+            await this.continueConversationAsync(reference, async (ctx) => {
+                const teamId =
+                    ctx.activity?.channelData?.team?.id ??
+                    (ctx.activity?.conversation?.name === undefined ? ctx.activity?.conversation?.id : undefined);
+                if (teamId) {
+                    teamDetails = await TeamsInfo.getTeamDetails(ctx, teamId);
+                }
+            });
+        }
+
+        return teamDetails;
+    }
+
+    /**
+     * Gets a paginated list of members of one-on-one, group, or team conversation.
+     * @param context - The context for the current turn with the user.
+     * @param {number} pageSize - Suggested number of entries on a page. Page sizes with less than 50 are treated as 50, and greater than 500, are capped at 500.
+     * @param {string} continuationToken - A continuation token.
+     * @returns The TeamsPagedMembersResult with the list of members.
+     */
+    public async getPagedMembers(
+        context: TurnContext,
+        pageSize?: number,
+        continuationToken?: string
+    ): Promise<TeamsPagedMembersResult>;
+    public async getPagedMembers(
+        reference: Partial<ConversationReference>,
+        pageSize?: number,
+        continuationToken?: string
+    ): Promise<TeamsPagedMembersResult>;
+    public async getPagedMembers(
+        activity: Partial<Activity>,
+        pageSize?: number,
+        continuationToken?: string
+    ): Promise<TeamsPagedMembersResult>;
+    public async getPagedMembers(
+        context: TurnContext | Partial<ConversationReference> | Partial<Activity>,
+        pageSize?: number,
+        continuationToken?: string
+    ): Promise<TeamsPagedMembersResult> {
+        let pagedMembers: TeamsPagedMembersResult = { members: [], continuationToken: '' };
+        await this.continueConversationAsync(context, async (ctx) => {
+            // Page sizes with less than 50 are treated as 50, and greater than 500, are capped at 500.
+            pagedMembers = await TeamsInfo.getPagedMembers(ctx, pageSize, continuationToken);
+        });
+
+        return pagedMembers;
     }
 
     /**
@@ -1365,6 +1475,47 @@ function createSignInSelector(startSignIn?: boolean | Selector): Selector {
             return Promise.resolve(true);
         }
     };
+}
+
+/**
+ * Retrieves a conversation reference from the given TurnContext.
+ * @param {TurnContext} context - The context to extract the conversation reference from.
+ * @returns {Partial<ConversationReference>} The extracted conversation reference.
+ */
+function getConversationReference(context: TurnContext): Partial<ConversationReference>;
+/**
+ * Retrieves a conversation reference from the given activity.
+ * @param {Partial<Activity>} activity - The activity to extract the conversation reference from.
+ * @returns {Partial<ConversationReference>} The extracted conversation reference.
+ */
+function getConversationReference(activity: Partial<Activity>): Partial<ConversationReference>;
+/**
+ * Retrieves a conversation reference from the given reference.
+ * @param {Partial<ConversationReference>} reference - The reference to extract the conversation reference from.
+ * @returns {Partial<ConversationReference>} The extracted conversation reference.
+ */
+function getConversationReference(reference: Partial<ConversationReference>): Partial<ConversationReference>;
+/**
+ * Retrieves a conversation reference from the given context, activity, or reference.
+ * Overloaded function signatures:
+ * - getConversationReference(context: TurnContext): Partial<ConversationReference>
+ * - getConversationReference(activity: Partial<Activity>): Partial<ConversationReference>
+ * - getConversationReference(reference: Partial<ConversationReference>): Partial<ConversationReference>
+ * @param {TurnContext | Partial<Activity> | Partial<ConversationReference>} context - The context, activity, or reference to extract the conversation reference from.
+ * @returns {Partial<ConversationReference>} The extracted conversation reference.
+ */
+function getConversationReference(
+    context: TurnContext | Partial<Activity> | Partial<ConversationReference>
+): Partial<ConversationReference> {
+    let reference: Partial<ConversationReference>;
+    if (typeof (context as TurnContext).activity == 'object') {
+        reference = TurnContext.getConversationReference((context as TurnContext).activity);
+    } else if (typeof (context as Partial<Activity>).type == 'string') {
+        reference = TurnContext.getConversationReference(context as Partial<Activity>);
+    } else {
+        reference = context as Partial<ConversationReference>;
+    }
+    return reference;
 }
 
 /**

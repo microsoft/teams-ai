@@ -158,5 +158,47 @@ describe('ToolsAugmentation', () => {
                 assert(plan.commands.length === 0);
             });
         });
+
+        it('should handle empty arguments gracefully', async () => {
+            await adapter.sendTextToBot('test', async (context) => {
+                const actionCalls: ActionCall[] = [
+                    {
+                        type: 'function',
+                        id: '123',
+                        function: {
+                            name: 'LightsOn',
+                            arguments: ''
+                        }
+                    },
+                    {
+                        type: 'function',
+                        id: '124',
+                        function: {
+                            name: 'Pause',
+                            arguments: '{ "time": 10 }'
+                        }
+                    }
+                ];
+                const response: PromptResponse<string | ActionCall[]> = {
+                    status: 'success',
+                    input: {
+                        role: 'user',
+                        content: 'Perform actions'
+                    },
+                    message: { role: 'assistant', content: '', action_calls: actionCalls }
+                };
+                const state = await TestTurnState.create(context);
+                const plan = await toolsAugmentation.createPlanFromResponse(context, state, response);
+
+                assert(plan.type === 'plan');
+                assert(plan.commands.length === 2);
+                assert(plan.commands[0].type === 'DO');
+                assert((plan.commands[0] as PredictedDoCommand).action === 'LightsOn');
+                assert.deepEqual((plan.commands[0] as PredictedDoCommand).parameters, {});
+                assert(plan.commands[1].type === 'DO');
+                assert((plan.commands[1] as PredictedDoCommand).action === 'Pause');
+                assert.deepEqual((plan.commands[1] as PredictedDoCommand).parameters, { time: 10 });
+            });
+        });
     });
 });

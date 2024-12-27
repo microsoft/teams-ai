@@ -58,6 +58,29 @@ namespace Microsoft.Teams.AI
             CredentialsFactory = new ConfigurationServiceClientCredentialFactory(configuration);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TeamsAdapter"/> class.
+        /// </summary>
+        /// <param name="configuration">The <see cref="IConfiguration"/> instance.</param>
+        /// <param name="credentialsFactory">The <see cref="ServiceClientCredentialsFactory"/> instance.</param>
+        /// <param name="httpClientFactory">The <see cref="IHttpClientFactory"/> this adapter should use.</param>
+        /// <param name="logger">The <see cref="ILogger"/> implementation this adapter should use.</param>
+        public TeamsAdapter(
+            IConfiguration configuration,
+            ServiceClientCredentialsFactory credentialsFactory,
+            IHttpClientFactory? httpClientFactory = null,
+            ILogger? logger = null) : base(
+                new ConfigurationBotFrameworkAuthentication(configuration,
+                    credentialsFactory: credentialsFactory,
+                    httpClientFactory: new TeamsHttpClientFactory(httpClientFactory),
+                    logger: logger),
+                logger)
+        {
+            HttpClientFactory = new TeamsHttpClientFactory(httpClientFactory);
+            Configuration = configuration;
+            CredentialsFactory = credentialsFactory;
+        }
+
         /// <inheritdoc />
         public new async Task ProcessAsync(HttpRequest httpRequest, HttpResponse httpResponse, IBot bot, CancellationToken cancellationToken = default)
         {
