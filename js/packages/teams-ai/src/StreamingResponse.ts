@@ -119,7 +119,7 @@ export class StreamingResponse {
             for (const citation of citations) {
                 const clientCitation: ClientCitation = {
                     '@type': 'Claim',
-                    position: `${currPos + 1}`,
+                    position: currPos + 1,
                     appearance: {
                         '@type': 'DigitalDocument',
                         name: citation.title || `Document #${currPos + 1}`,

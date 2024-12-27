@@ -1,4 +1,4 @@
-import { Application, preview, AI } from '@microsoft/teams-ai';
+import { Application, preview, AI, TurnState } from '@microsoft/teams-ai';
 import { CardFactory, MemoryStorage, MessageFactory, TurnContext } from 'botbuilder';
 import { Order } from './foodOrderViewSchema';
 import { generateCardForOrder } from './foodOrderCard';
@@ -19,6 +19,7 @@ if (process.env.AZURE_OPENAI_KEY) {
 }
 
 const { AssistantsPlanner } = preview;
+let assistantId = '';
 
 // Create Assistant if no ID is provided, this will require you to restart the program and fill in the process.env.ASSISTANT_ID afterwards.
 if (!process.env.ASSISTANT_ID) {
@@ -43,13 +44,16 @@ if (!process.env.ASSISTANT_ID) {
                         }
                     }
                 ],
-                model: 'gpt-4'
+                model: 'gpt-4o-mini'
             },
-            endpoint
+            endpoint ?? undefined,
+            endpoint ? { apiVersion: process.env.OPENAI_API_VERSION } : undefined
         );
 
         console.log(`Created a new assistant with an ID of: ${assistant.id}`);
-        process.exit();
+        console.log('Be sure to add this ID to your environment variables as ASSISTANT_ID before your next restart.');
+        assistantId = assistant.id;
+        process.env.ASSISTANT_ID = assistantId;
     })();
 }
 
@@ -57,7 +61,8 @@ if (!process.env.ASSISTANT_ID) {
 const planner = new AssistantsPlanner({
     apiKey: apiKey,
     endpoint: endpoint,
-    assistant_id: process.env.ASSISTANT_ID!
+    assistant_id: process.env.ASSISTANT_ID ?? assistantId,
+    api_version: '2024-02-15-preview'
 });
 
 // Define storage and application
@@ -72,18 +77,18 @@ const app = new Application({
 // Export bots run() function
 export const run = (context: TurnContext) => app.run(context);
 
-app.message('/reset', async (context, state) => {
+app.message('/reset', async (context: TurnContext, state: TurnState) => {
     state.deleteConversationState();
     await context.sendActivity(`Ok lets start this over.`);
 });
 
-app.ai.action<Order>('place_order', async (context, state, order) => {
+app.ai.action<Order>('place_order', async (context: TurnContext, state: TurnState, order: Order) => {
     const card = generateCardForOrder(order);
     await context.sendActivity(MessageFactory.attachment(CardFactory.adaptiveCard(card)));
     return `order placed`;
 });
 
-app.ai.action(AI.HttpErrorActionName, async (context, state, data) => {
+app.ai.action(AI.HttpErrorActionName, async (context: TurnContext, state: TurnState, _data: unknown) => {
     await context.sendActivity('An AI request failed. Please try again later.');
     return AI.StopCommandName;
 });

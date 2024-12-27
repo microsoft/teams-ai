@@ -1,9 +1,10 @@
 ## Teams Autogen Bot
 
 This is a simple project that demonstrates the use of [autogen](https://github.com/microsoft/autogen) in the context of a Microsoft Teams AI bot.
-This bot models a product-spec critiquing team. 
+This bot models a product-spec critiquing team.
 
 The team consists of:
+
 1. A questioner agent - the role of this agent is to ask questions based on some criteria for product specs at a company.
 2. An answerer agent - the role of this agent is to answer the questions asked by the questioner agent based on a product spec
 3. An evaluator agent - the role of this agent is to evaluate the answers given by the answerer agent based on the criteria given by the questioner agent.
@@ -32,11 +33,11 @@ You can interact with the bot by messaging it.
 
 1. Clone the repository
 
-    ```bash
-    git clone https://github.com/Microsoft/teams-ai.git
-    ```
+   ```bash
+   git clone https://github.com/Microsoft/teams-ai.git
+   ```
 
-2. Duplicate the `sample.env` in the `teams-ai/python/samples/04.ai.g.autogen.product-spec-critique` folder. Rename the file to `.env`. 
+2. Duplicate the `sample.env` in the `teams-ai/python/samples/04.ai.g.autogen.product-spec-critique` folder. Rename the file to `.env`.
 
 3. Update .env. Make sure it includes either `OPENAI_KEY` or `AZURE_OPENAI_API_KEY` with `AZURE_OPENAI_ENDPOINT`. If you look for `build_llm_config` in the code, you will see how it builds the config for the model. You may need to modify it to suit your needs.
 
@@ -47,7 +48,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [Bot Framework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 
@@ -57,8 +58,8 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 4. Install [Poetry](https://python-poetry.org/docs/#installation)
 5. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
 6. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
-7. Ensure that you have set up the sample from the previous step.
-8. Trigger **Python: Create Environment** from command palette and create a virtual environment
+7. Verify that the Teams Toolkit extension is connected to your Teams account from the above step.
+8. In the debugger, play the Debug (Edge) script
 9. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
 10. In the browser that launches, select the **Add** button to install the app to Teams.
 

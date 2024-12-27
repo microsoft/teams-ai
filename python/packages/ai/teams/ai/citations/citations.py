@@ -64,11 +64,11 @@ class Appearance(Model):
     Attributes:
         @type (str): Required; must be 'DigitalDocument'
         name (str): The name of the document
-        text (str): Optional; ignored in Teams
+        text (str): Optional; the appearance text of the citation.
         url (str): The url of the document
         abstract (str): Content of the citation. Must be clipped if longer than 480 characters
-        encodingFormat (str): The encoding format of the citation
-        image (str): Used for icon; for not it is ignored
+        encodingFormat (str): Encoding format of the `citation.appearance.text` field.
+        image (str): Used for icon; for now it is ignored
         keywords (list[str]): The optional keywords to the citation
         usageInfo (SensitivityUsageInfo): The optional sensitivity content information
     """

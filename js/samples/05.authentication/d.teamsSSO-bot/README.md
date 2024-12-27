@@ -6,10 +6,10 @@ This sample depends on Teams SSO and gives you more flexibility on how to config
 
 ## Showcase
 
--   The bot echos back any message it receives. That's it!
--   This app is the bot-equivalent of 'Hello world'.
--   The minimum setup shows how to set up a bot with the Teams AI SDK.
--   This sample leverages Teams SSO to acquire a token for app user.
+- The bot echos back any message it receives. That's it!
+- This app is the bot-equivalent of 'Hello world'.
+- The minimum setup shows how to set up a bot with the Teams AI SDK.
+- This sample leverages Teams SSO to acquire a token for app user.
 
 ## Setting up the sample
 
@@ -70,7 +70,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 1. Copy this sample into a new folder outside of teams-ai
 1. Select File > Open Folder in VS Code and choose this sample's directory
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
-1. Ensure that you have set up the sample from the previous step.
+1. Verify that the Teams Toolkit extension is connected to your Teams account from the above step.
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
 1. In the browser that launches, select the **Add** button to install the app to Teams.
 
@@ -86,13 +86,13 @@ This sample is configured to work only in the tenant in which the Azure app regi
     ```
 1. Navigate to the `teamsapp.local.yml` file and set
     ```yml
-    signInAudience: "AzureADMultipleOrgs" # Authenticate users with a Microsoft work or school account in your organization's Azure AD tenant (for example, single tenant).
+    signInAudience: 'AzureADMultipleOrgs' # Authenticate users with a Microsoft work or school account in your organization's Azure AD tenant (for example, single tenant).
     ```
 1. Navigate to the `src/auth-start.html` page and set
     ```js
     let authorizeEndpoint = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${toQueryString(queryParams)}`;
     ```
-2. Navigate to the `src/index.ts` file and on line 81 set 
+1. Navigate to the `src/index.ts` file and on line 81 set
     ```js
-    authority: `${process.env.AAD_APP_OAUTH_AUTHORITY_HOST}/common`
-    ``` 
+    authority: `${process.env.AAD_APP_OAUTH_AUTHORITY_HOST}/common`;
+    ```

@@ -20,7 +20,7 @@
     },
     "dependencies": {
         "botbuilder": "^4.23.1",
-        "@microsoft/teams-ai": "~1.6.1",
+        "@microsoft/teams-ai": "~1.7.1",
         "dotenv": "^16.4.5",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
