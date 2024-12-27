@@ -102,6 +102,11 @@ export interface LLMClientOptions<TContent = any> {
      * If true, the feedback loop will be enabled for streaming responses.
      */
     enableFeedbackLoop?: boolean;
+
+    /**
+     * The type of the feedback loop.
+     */
+    feedbackLoopType?: 'default' | 'custom';
 }
 
 /**
@@ -206,6 +211,7 @@ export class LLMClient<TContent = any> {
     private readonly _startStreamingMessage: string | undefined;
     private readonly _endStreamHandler: PromptCompletionModelResponseReceivedEvent | undefined;
     private readonly _enableFeedbackLoop: boolean | undefined;
+    private readonly _feedbackLoopType: 'default' | 'custom' | undefined;
 
     /**
      * Configured options for this LLMClient instance.
@@ -241,6 +247,7 @@ export class LLMClient<TContent = any> {
         this._startStreamingMessage = options.startStreamingMessage;
         this._endStreamHandler = options.endStreamHandler;
         this._enableFeedbackLoop = options.enableFeedbackLoop;
+        this._feedbackLoopType = options.feedbackLoopType;
     }
 
     /**
@@ -310,6 +317,9 @@ export class LLMClient<TContent = any> {
 
                     if (this._enableFeedbackLoop != null) {
                         streamer.setFeedbackLoop(this._enableFeedbackLoop);
+                        if (this._feedbackLoopType) {
+                            streamer.setFeedbackLoopType(this._feedbackLoopType);
+                        }
                     }
 
                     streamer.setGeneratedByAILabel(true);

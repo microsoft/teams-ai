@@ -269,6 +269,13 @@ export class AI<TState extends TurnState = TurnState> {
     }
 
     /**
+     * @returns {boolean} Returns the feedback loop type.
+     */
+     public get feedbackLoopType(): "default" | "custom" | undefined {
+        return this._options.feedback_loop_type;
+    }
+
+    /**
      * Registers a handler for a named action.
      * @remarks
      * The AI systems planner returns plans that are made up of a series of commands or actions

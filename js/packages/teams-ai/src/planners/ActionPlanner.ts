@@ -95,6 +95,11 @@ export interface ActionPlannerOptions<TState extends TurnState = TurnState> {
      * If true, the feedback loop will be enabled for streaming responses.
      */
     enableFeedbackLoop?: boolean;
+
+    /**
+     * The feedback loop type.
+     */
+    feedbackLoopType?: 'default' | 'custom';
 }
 
 /**
@@ -122,6 +127,7 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
     private readonly _promptFactory: ActionPlannerPromptFactory<TState>;
     private readonly _defaultPrompt?: string;
     private _enableFeedbackLoop: boolean | undefined;
+    private _feedbackLoopType?: 'default' | 'custom';
 
     /**
      * Creates a new `ActionPlanner` instance.
@@ -195,6 +201,10 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
 
         if (ai.enableFeedbackLoop != null) {
             this._enableFeedbackLoop = ai.enableFeedbackLoop;
+
+            if (ai.feedbackLoopType) {
+                this._feedbackLoopType = ai.feedbackLoopType;
+            }
         }
 
         // Complete prompt
@@ -276,7 +286,8 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
             logRepairs: this._options.logRepairs,
             startStreamingMessage: this._options.startStreamingMessage,
             endStreamHandler: this._options.endStreamHandler,
-            enableFeedbackLoop: this._enableFeedbackLoop
+            enableFeedbackLoop: this._enableFeedbackLoop,
+            feedbackLoopType: this._feedbackLoopType
         });
 
         // Complete prompt
