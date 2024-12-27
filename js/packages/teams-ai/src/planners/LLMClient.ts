@@ -378,7 +378,7 @@ export class LLMClient<TContent = any> {
                 // - We need to keep the streamer around during tool calls so we're just letting them return as normal
                 //   messages minus the message content. The text content is being streamed to the client in chunks.
                 // - When the tool call completes we'll call back into ActionPlanner and end up re-attaching to the
-                //   streamer. This will result in us continuing to stream the response to the client. 
+                //   streamer. This will result in us continuing to stream the response to the client.
                 if (Array.isArray(response.message?.action_calls)) {
                     // Ensure content is empty for tool calls
                     response.message!.content = '' as TContent;
