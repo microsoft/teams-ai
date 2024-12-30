@@ -1,6 +1,7 @@
 ﻿using Microsoft.Teams.AI.Utilities;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Builder;
+using Microsoft.Identity.Client;
 
 namespace Microsoft.Teams.AI
 {
@@ -19,6 +20,11 @@ namespace Microsoft.Teams.AI
         /// To detect redundant calls
         /// </summary>
         private bool _disposedValue = false;
+
+        /// <summary>
+        /// The send "typing" activity task
+        /// </summary>
+        private Task _lastSend = Task.CompletedTask;
 
         /// <summary>
         /// Constructs a new instance of the <see cref="TypingTimer"/> class.
@@ -100,7 +106,8 @@ namespace Microsoft.Teams.AI
 
             try
             {
-                await turnContext.SendActivityAsync(new Activity { Type = ActivityTypes.Typing });
+                _lastSend = turnContext.SendActivityAsync(new Activity { Type = ActivityTypes.Typing });
+                await _lastSend;
                 if (IsRunning())
                 {
                     _timer?.Change(_interval, Timeout.Infinite);
@@ -115,7 +122,7 @@ namespace Microsoft.Teams.AI
             }
         }
 
-        private Task<ResourceResponse[]> StopTimerWhenSendMessageActivityHandlerAsync(ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
+        private async Task<ResourceResponse[]> StopTimerWhenSendMessageActivityHandlerAsync(ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
         {
             if (_timer != null)
             {
@@ -123,13 +130,14 @@ namespace Microsoft.Teams.AI
                 {
                     if (activity.Type == ActivityTypes.Message)
                     {
+                        await _lastSend;
                         Dispose();
                         break;
                     }
                 }
             }
 
-            return next();
+            return await next();
         }
     }
 }
