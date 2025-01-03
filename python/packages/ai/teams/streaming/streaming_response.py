@@ -19,6 +19,7 @@ from ..ai.citations import AIEntity, ClientCitation
 from ..ai.prompts.message import Citation
 from ..app_error import ApplicationError
 from .streaming_channel_data import StreamingChannelData
+from .streaming_entity import StreamingEntity
 
 
 class StreamingResponse:
@@ -120,9 +121,9 @@ class StreamingResponse:
             for citation in citations:
                 self._citations.append(
                     ClientCitation(
-                        position=f"{curr_pos}",
+                        position=f"{curr_pos + 1}",
                         appearance=Appearance(
-                            name=citation.title or f"Document {curr_pos}",
+                            name=citation.title or f"Document {curr_pos + 1}",
                             abstract=snippet(citation.content, 477),
                         ),
                     )
@@ -273,14 +274,13 @@ class StreamingResponse:
             channel_data.stream_id = self._stream_id
             activity.channel_data = StreamingChannelData.to_dict(channel_data)
 
-        entity_args = {
-            "stream_id": channel_data.stream_id,
-            "stream_sequence": channel_data.stream_sequence,
-            "stream_type": channel_data.stream_type,
-        }
-        activity.entities = [
-            Entity(type="streaminfo", **entity_args),
-        ]
+        entity = StreamingEntity(
+            stream_id=channel_data.stream_id,
+            stream_sequence=channel_data.stream_sequence,
+            stream_type=channel_data.stream_type
+        )
+        entities: List[Entity] = [entity]
+        activity.entities = entities
 
         # If there are citations, filter out the citations unused in content.
         if self._citations and len(self._citations) > 0 and self._ended is False:
