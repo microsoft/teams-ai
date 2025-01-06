@@ -1025,7 +1025,7 @@ export class Application<TState extends TurnState = TurnState> {
                 // Listen for any messages to be sent from the bot
                 if (timerRunning) {
                     for (let i = 0; i < activities.length; i++) {
-                        if (activities[i].type == ActivityTypes.Message) {
+                        if (activities[i].type == ActivityTypes.Message || activities[i].channelData?.streamType) {
                             // Stop the timer
                             this.stopTypingTimer();
                             timerRunning = false;
