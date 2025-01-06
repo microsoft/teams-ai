@@ -61,7 +61,8 @@ if (!process.env.ASSISTANT_ID) {
 const planner = new AssistantsPlanner({
     apiKey: apiKey,
     endpoint: endpoint,
-    assistant_id: process.env.ASSISTANT_ID ?? assistantId
+    assistant_id: process.env.ASSISTANT_ID ?? assistantId,
+    api_version: '2024-02-15-preview'
 });
 
 // Define storage and application
