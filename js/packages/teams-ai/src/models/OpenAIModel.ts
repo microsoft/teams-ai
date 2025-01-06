@@ -356,7 +356,7 @@ export class OpenAIModel implements PromptCompletionModel {
 
             // Check for tools augmentation
             const isToolsAugmentation =
-            template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
+                template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
 
             // Call chat completion API
             let message: Message<string>;
@@ -392,7 +392,11 @@ export class OpenAIModel implements PromptCompletionModel {
                             // - Note that a single tool call can span multiple chunks.
                             const index = toolCall.index;
                             if (index >= message.action_calls.length) {
-                                message.action_calls.push({ id: '', function: { name: '', arguments: '' }, type: '' } as any);
+                                message.action_calls.push({
+                                    id: '',
+                                    function: { name: '', arguments: '' },
+                                    type: ''
+                                } as any);
                             }
 
                             // Set ID if provided
@@ -412,7 +416,7 @@ export class OpenAIModel implements PromptCompletionModel {
 
                             // Append function arguments if provided
                             if (toolCall.function?.arguments) {
-                               message.action_calls[index].function.arguments += toolCall.function.arguments;
+                                message.action_calls[index].function.arguments += toolCall.function.arguments;
                             }
                         }
                     }
