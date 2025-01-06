@@ -72,7 +72,7 @@ export interface AssistantsPlannerOptions {
     /**
      * Optional. Version of the API being called. Default is '2024-02-15-preview'.
      */
-    api_version?: string;
+    apiVersion?: string;
 }
 
 /**
@@ -97,7 +97,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         this._options = {
             polling_interval: DEFAULT_POLLING_INTERVAL,
             assistants_state_variable: DEFAULT_ASSISTANTS_STATE_VARIABLE,
-            api_version: '2024-02-15-preview',
+            apiVersion: '2024-02-15-preview',
             ...options
         };
 
