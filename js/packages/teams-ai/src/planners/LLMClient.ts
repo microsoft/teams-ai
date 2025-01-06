@@ -102,6 +102,11 @@ export interface LLMClientOptions<TContent = any> {
      * If true, the feedback loop will be enabled for streaming responses.
      */
     enableFeedbackLoop?: boolean;
+
+    /**
+     * The type of the feedback loop.
+     */
+    feedbackLoopType?: 'default' | 'custom';
 }
 
 /**
@@ -206,6 +211,7 @@ export class LLMClient<TContent = any> {
     private readonly _startStreamingMessage: string | undefined;
     private readonly _endStreamHandler: PromptCompletionModelResponseReceivedEvent | undefined;
     private readonly _enableFeedbackLoop: boolean | undefined;
+    private readonly _feedbackLoopType: 'default' | 'custom' | undefined;
 
     /**
      * Configured options for this LLMClient instance.
@@ -241,6 +247,7 @@ export class LLMClient<TContent = any> {
         this._startStreamingMessage = options.startStreamingMessage;
         this._endStreamHandler = options.endStreamHandler;
         this._enableFeedbackLoop = options.enableFeedbackLoop;
+        this._feedbackLoopType = options.feedbackLoopType;
     }
 
     /**
@@ -310,6 +317,9 @@ export class LLMClient<TContent = any> {
 
                     if (this._enableFeedbackLoop != null) {
                         streamer.setFeedbackLoop(this._enableFeedbackLoop);
+                        if (this._feedbackLoopType) {
+                            streamer.setFeedbackLoopType(this._feedbackLoopType);
+                        }
                     }
 
                     streamer.setGeneratedByAILabel(true);
@@ -327,6 +337,12 @@ export class LLMClient<TContent = any> {
                 return;
             }
 
+            const citations = chunk.delta?.context?.citations ?? undefined;
+
+            if (citations) {
+                streamer.setCitations(citations);
+            }
+
             // Ignore calls without content
             // - This is typically because the chunk represents a tool call.
             // - See the note below for why we're handling tool calls this way.
@@ -336,10 +352,9 @@ export class LLMClient<TContent = any> {
 
             // Send text chunk to client
             const text = chunk.delta?.content;
-            const citations = chunk.delta?.context?.citations ?? undefined;
 
             if (text.length > 0) {
-                streamer.queueTextChunk(text, citations);
+                streamer.queueTextChunk(text);
             }
         };
 
@@ -363,7 +378,7 @@ export class LLMClient<TContent = any> {
                 // - We need to keep the streamer around during tool calls so we're just letting them return as normal
                 //   messages minus the message content. The text content is being streamed to the client in chunks.
                 // - When the tool call completes we'll call back into ActionPlanner and end up re-attaching to the
-                //   streamer. This will result in us continuing to stream the response to the client. 
+                //   streamer. This will result in us continuing to stream the response to the client.
                 if (Array.isArray(response.message?.action_calls)) {
                     // Ensure content is empty for tool calls
                     response.message!.content = '' as TContent;

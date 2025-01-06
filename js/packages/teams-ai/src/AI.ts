@@ -238,10 +238,10 @@ export class AI<TState extends TurnState = TurnState> {
         this.defaultAction(AI.PlanReadyActionName, actions.planReady());
         this.defaultAction(AI.DoCommandActionName, actions.doCommand());
         this.defaultAction(AI.TooManyStepsActionName, actions.tooManySteps());
-        this.defaultAction(AI.SayCommandActionName, actions.sayCommand(
-            this._options.enable_feedback_loop,
-            this._options.feedback_loop_type || 'default'
-        ));
+        this.defaultAction(
+            AI.SayCommandActionName,
+            actions.sayCommand(this._options.enable_feedback_loop, this._options.feedback_loop_type || 'default')
+        );
     }
 
     /**
@@ -266,6 +266,13 @@ export class AI<TState extends TurnState = TurnState> {
      */
     public get enableFeedbackLoop(): boolean {
         return this._options.enable_feedback_loop;
+    }
+
+    /**
+     * @returns {boolean} Returns the feedback loop type.
+     */
+    public get feedbackLoopType(): 'default' | 'custom' | undefined {
+        return this._options.feedback_loop_type;
     }
 
     /**
