@@ -1,12 +1,14 @@
-[tool.poetry]
+[project]
 name = "teams-ai"
-version = "1.5.0"
 description = "SDK focused on building AI based applications for Microsoft Teams."
 authors = ["Microsoft <teams@microsoft.com>"]
-readme = "README.md"
-repository = "https://github.com/microsoft/teams-ai"
-documentation = "https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/teams%20conversational%20ai/teams-conversation-ai-overview"
 keywords = ["microsoft", "teams", "ai", "bot"]
+readme = "README.md"
+urls = ["https://github.com/microsoft/teams-ai", "https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/teams%20conversational%20ai/teams-conversation-ai-overview"]
+dynamic = ["version"]
+
+[tool.poetry]
+version = "1.5.0"
 packages = [
     { include = "teams" },
     { include = "tests" }
@@ -38,7 +40,7 @@ isort = "^5.12.0"
 mypy = "^1.5.0"
 httpx = "^0.26.0"
 
-[tool.poetry.scripts]
+[project.scripts]
 lint = "scripts:lint"
 fmt = "scripts:fmt"
 test = "scripts:test"
