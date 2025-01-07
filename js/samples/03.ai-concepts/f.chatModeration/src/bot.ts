@@ -91,7 +91,8 @@ const app = new Application({
     ai: {
         planner,
         moderator,
-        enable_feedback_loop: true
+        enable_feedback_loop: true,
+        feedback_loop_type: 'custom'
     }
 });
 
