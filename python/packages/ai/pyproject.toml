@@ -22,7 +22,6 @@ dependencies = [
     "botbuilder-dialogs (>=4.14.8,<5.0.0)",
     "openai==v1.52.0"
 ]
-requires-python = ">=3.8,<4.0"
 
 [tool.poetry]
 name = "teams-ai"
