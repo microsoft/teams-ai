@@ -8,10 +8,7 @@ urls = {"GitHub"= "https://github.com/microsoft/teams-ai", "Microsoft Learn"= "h
 dynamic = ["version", "dependencies", "requires-python"]
 
 [tool.poetry]
-name = "teams-ai"
 version = "1.5.0"
-description = "SDK focused on building AI based applications for Microsoft Teams."
-authors = ["Microsoft <teams@microsoft.com>"]
 packages = [
     { include = "teams" },
     { include = "tests" }
