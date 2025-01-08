@@ -21,7 +21,7 @@
     },
     "dependencies": {
         "botbuilder": "^4.23.1",
-        "openai": "4.68.2"
+        "openai": "4.77.4"
     },
     "devDependencies": {
         "@azure/logger": "^1.1.4",
@@ -29,7 +29,7 @@
         "@microsoft/api-extractor": "^7.48.1",
         "@standardlabs/is-private": "^1.0.1",
         "@types/jsonwebtoken": "9.0.4",
-        "@types/lodash": "^4.17.13",
+        "@types/lodash": "^4.17.14",
         "@types/mocha": "^10.0.9",
         "@types/node": "^20.16.1",
         "@types/sinon": "^17.0.3",
@@ -47,7 +47,6 @@
         "eslint-plugin-prettier": "^5.2.1",
         "exorcist": "^2.0.0",
         "express": "^4.21.1",
-        "mocha": "^10.7.3",
         "mocha-junit-reporter": "^2.0.0",
         "mocha": "^10.8.2",
         "ms-rest-azure": "^3.0.2",

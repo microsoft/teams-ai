@@ -713,10 +713,10 @@
   resolved "https://registry.yarnpkg.com/@microsoft/recognizers-text/-/recognizers-text-1.3.1.tgz#eda98a9148101ecdb04ed1424082d472b04aabd9"
   integrity sha512-HikLoRUgSzM4OKP3JVBzUUp3Q7L4wgI17p/3rERF01HVmopcujY3i6wgx8PenCwbenyTNxjr1AwSDSVuFlYedQ==
 
-"@microsoft/teams-js@^2.31.0":
-  version "2.31.1"
-  resolved "https://registry.yarnpkg.com/@microsoft/teams-js/-/teams-js-2.31.1.tgz#6f3989613ccf8b81efb983c48dda3ffc1ae15431"
-  integrity sha512-HzUYELJxukST2lG3dlTOjSZNg9G+6JeWcXF6gEJU6OEFpdWN2EKlUBw2q4VLQFwwHV2I9+eCOALOEHFhGtEQxQ==
+"@microsoft/teams-js@^2.32.0":
+  version "2.32.0"
+  resolved "https://registry.yarnpkg.com/@microsoft/teams-js/-/teams-js-2.32.0.tgz#18300d63d66f8aac18d0be81518dce7ab1d9c09a"
+  integrity sha512-ZKfQtbGRZisvdUdxt8iiX7uRlrB14fIQiB3+zV76CJoLDSMD1WqB4qlP8pgrKHyG2HjCI1TC3/wuKXGLjrOT2g==
   dependencies:
     base64-js "^1.3.1"
     debug "^4.3.3"
@@ -1066,10 +1066,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/lodash@^4.17.13":
-  version "4.17.13"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.13.tgz#786e2d67cfd95e32862143abe7463a7f90c300eb"
-  integrity sha512-lfx+dftrEZcdBPczf9d0Qv0x+j/rfNCMuC6OcfXmO8gkfeNAY88PgKUbvG56whcN23gc27yenwF6oJZXGFpYxg==
+"@types/lodash@^4.17.14":
+  version "4.17.14"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.14.tgz#bafc053533f4cdc5fcc9635af46a963c1f3deaff"
+  integrity sha512-jsxagdikDiDBeIRaPYtArcT8my4tN1og7MtMRquFT3XNA6axxyHDRUemqDz/taRDdOUn0GnGHRCuff4q48sW9A==
 
 "@types/mime@^1":
   version "1.3.5"
@@ -6818,10 +6818,10 @@ openai@4.41.1:
     node-fetch "^2.6.7"
     web-streams-polyfill "^3.2.1"
 
-openai@4.68.2:
-  version "4.68.2"
-  resolved "https://registry.yarnpkg.com/openai/-/openai-4.68.2.tgz#2443d23127c61dcc9a9356ff8ea5b21acf0ba60d"
-  integrity sha512-Ys3Jl9vkBUFtrFj4pgrF7rMte4JNekZoMgI6dWkkpOIwNUKGkc4I8jTqv86LB+TcoqkTPzV6DS269dPR9ILWsQ==
+openai@4.77.4:
+  version "4.77.4"
+  resolved "https://registry.yarnpkg.com/openai/-/openai-4.77.4.tgz#1093d165efb3e13e763faf42fa62e34313e293e9"
+  integrity sha512-rShjKsZ/HXm1cSxXt6iFeZxiCohrVShawt0aRRQmbb+z/EXcH4OouyQZP1ShyZMb63LJajpl8aGw3DzEi8Wh9Q==
   dependencies:
     "@types/node" "^18.11.18"
     "@types/node-fetch" "^2.6.4"
@@ -9532,10 +9532,10 @@ yaml@^1.10.0:
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.10.2.tgz#2301c5ffbf12b467de8da2333a459e29e7920e4b"
   integrity sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==
 
-yaml@^2.6.0:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.6.1.tgz#42f2b1ba89203f374609572d5349fb8686500773"
-  integrity sha512-7r0XPzioN/Q9kXBro/XPnA6kznR73DHq+GXh5ON7ZozRO6aMjbmiBuKste2wslTFkC5d1dw0GooOCepZXJ2SAg==
+yaml@^2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.7.0.tgz#aef9bb617a64c937a9a748803786ad8d3ffe1e98"
+  integrity sha512-+hSoy/QHluxmC9kCIJyL/uyFmLmc+e5CFR5Wa+bpIhIj85LVb9ZH2nVnqrHoSvKogwODv0ClqZkmiSSaIH5LTA==
 
 yargs-parser@^13.1.2:
   version "13.1.2"
