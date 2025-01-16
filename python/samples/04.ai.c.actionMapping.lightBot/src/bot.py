@@ -40,7 +40,9 @@ model: OpenAIModel
 
 if config.OPENAI_KEY:
     model = OpenAIModel(
-        OpenAIModelOptions(api_key=config.OPENAI_KEY, default_model="gpt-4o")
+        OpenAIModelOptions(api_key=config.OPENAI_KEY, default_model="gpt-4o", 
+            logger=logger,
+            stream=True)
     )
 elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
     model = OpenAIModel(
