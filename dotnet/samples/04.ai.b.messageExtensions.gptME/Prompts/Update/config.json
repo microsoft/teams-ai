@@ -3,7 +3,6 @@
   "description": "Updates a post being created for Teams",
   "type": "completion",
   "completion": {
-    "model": "gpt-3.5-turbo",
     "include_history": false,
     "include_input": false,
     "max_input_tokens": 1000,

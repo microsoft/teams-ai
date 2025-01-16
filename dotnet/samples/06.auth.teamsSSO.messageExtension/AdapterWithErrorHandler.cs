@@ -3,9 +3,10 @@ using Microsoft.Teams.AI;
 
 namespace MessageExtensionAuth
 {
+using Microsoft.Bot.Connector.Authentication; 
     public class AdapterWithErrorHandler : TeamsAdapter
     {
-        public AdapterWithErrorHandler(IConfiguration configuration, ILogger<TeamsAdapter> logger)
+        public AdapterWithErrorHandler(IConfiguration configuration, ILogger<TeamsAdapter> logger, ServiceClientCredentialsFactory serviceClientCredentialsFactory)
             : base(configuration, null, logger)
         {
             OnTurnError = async (turnContext, exception) =>

@@ -4,7 +4,7 @@
 		"Microsoft Teams (browser)": {
 			"commandName": "Project",
 			"dotnetRunMessages": true,
-			"launchBrowser": true,
+			"launchBrowser": false,
 			"launchUrl": "https://teams.microsoft.com/l/app/b31fb066-2d67-4b19-aa5a-8656e90dea38?installAppPackage=true&webjoin=true&appTenantId=d247b24d-59a3-4042-8253-90aa371a6eb4&login_hint=lilydu_microsoft.com",
 			"applicationUrl": "http://localhost:5130",
 			"environmentVariables": {

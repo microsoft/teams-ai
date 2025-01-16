@@ -44,9 +44,6 @@
             "supportsFiles": false
         }
     ],
-    "validDomains": [
-        "${{BOT_DOMAIN}}"
-    ],
     "composeExtensions": [
         {
             "botId": "${{BOT_ID}}",
@@ -67,5 +64,8 @@
                 }
             ]
         }
+    ],
+    "validDomains": [
+        "${{BOT_DOMAIN}}"
     ]
 }

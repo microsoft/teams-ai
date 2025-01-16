@@ -1,6 +1,10 @@
 ﻿using ListBot;
 using ListBot.Model;
 using Microsoft.Bot.Builder;
+using System.Security.Cryptography.X509Certificates;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Teams.AI;
@@ -16,9 +20,32 @@ builder.Services.AddHttpContextAccessor();
 
 // Prepare Configuration for ConfigurationBotFrameworkAuthentication
 var config = builder.Configuration.Get<ConfigOptions>()!;
-builder.Configuration["MicrosoftAppType"] = "MultiTenant";
-builder.Configuration["MicrosoftAppId"] = config.BOT_ID;
-builder.Configuration["MicrosoftAppPassword"] = config.BOT_PASSWORD;
+// builder.Configuration["MicrosoftAppType"] = "MultiTenant";
+// builder.Configuration["MicrosoftAppId"] = config.BOT_ID;
+// builder.Configuration["MicrosoftAppPassword"] = config.BOT_PASSWORD;
+
+builder.Services.AddSingleton<ServiceClientCredentialsFactory, CertificateServiceClientCredentialsFactory>(
+    sp =>
+    {
+        async Task<X509Certificate2> GetCertificateByNameAsync(string certName)
+        {
+            var vaultTokenCredential = new DefaultAzureCredential();
+            var vaultUrl = $"https://AdsCopilotKV-dridev.vault.azure.net/";
+            var vaultClient = new SecretClient(new Uri(vaultUrl), vaultTokenCredential);
+
+            var secretValue = (await vaultClient.GetSecretAsync(certName)).Value.Value;
+            var certificate = new X509Certificate2(Convert.FromBase64String(secretValue), string.Empty);
+
+            if (certificate == null) { throw new Exception($"[GetCertificateByNameAsync] Unable to load {certName} certificate"); }
+
+            return certificate;
+        }
+
+        var cert = GetCertificateByNameAsync("cert-devaccess-dricopilot-si-ads-corp-redmond-corp-microsoft-com").Result;
+        return new CertificateServiceClientCredentialsFactory(cert, config.BOT_ID, config.BOT_TENANT, sendX5c: true);
+    });
+
+
 
 // Create the Bot Framework Authentication to be used with the Bot Adapter.
 builder.Services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFrameworkAuthentication>();
@@ -32,22 +59,24 @@ builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<TeamsAdapter>()!);
 
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
+var tokenCredential = new DefaultAzureCredential();
+
 // Create AI Model
-if (!string.IsNullOrEmpty(config.OpenAI?.ApiKey))
-{
-    builder.Services.AddSingleton<OpenAIModel>(sp => new(
-        new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-4o")
-        {
-            LogRequests = true
-        },
-        sp.GetService<ILoggerFactory>()
-    ));
-}
-else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
+//if (!string.IsNullOrEmpty(config.OpenAI?.ApiKey))
+//{
+//    builder.Services.AddSingleton<OpenAIModel>(sp => new(
+//        new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-4o")
+//        {
+//            LogRequests = true
+//        },
+//        sp.GetService<ILoggerFactory>()
+//    ));
+//}
+//else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
 {
     builder.Services.AddSingleton<OpenAIModel>(sp => new(
         new AzureOpenAIModelOptions(
-            config.Azure.OpenAIApiKey,
+            tokenCredential,
             "gpt-4o",
             config.Azure.OpenAIEndpoint
         )
@@ -57,10 +86,10 @@ else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEm
         sp.GetService<ILoggerFactory>()
     ));
 }
-else
-{
-    throw new Exception("please configure settings for either OpenAI or Azure");
-}
+//else
+//{
+//    throw new Exception("please configure settings for either OpenAI or Azure");
+//}
 
 // Create the Application.
 builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
@@ -98,6 +127,8 @@ builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
 });
 
 var app = builder.Build();
+
+var _ = app.Services.GetRequiredService<ServiceClientCredentialsFactory>();
 
 if (app.Environment.IsDevelopment())
 {

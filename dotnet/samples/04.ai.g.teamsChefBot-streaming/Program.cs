@@ -1,4 +1,8 @@
 ﻿using Microsoft.Bot.Builder;
+using System.Security.Cryptography.X509Certificates;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Teams.AI.AI.Models;
@@ -23,9 +27,32 @@ builder.Services.AddHttpContextAccessor();
 
 // Prepare Configuration for ConfigurationBotFrameworkAuthentication
 var config = builder.Configuration.Get<ConfigOptions>()!;
-builder.Configuration["MicrosoftAppType"] = "MultiTenant";
-builder.Configuration["MicrosoftAppId"] = config.BOT_ID;
-builder.Configuration["MicrosoftAppPassword"] = config.BOT_PASSWORD;
+// builder.Configuration["MicrosoftAppType"] = "MultiTenant";
+// builder.Configuration["MicrosoftAppId"] = config.BOT_ID;
+// builder.Configuration["MicrosoftAppPassword"] = config.BOT_PASSWORD;
+
+builder.Services.AddSingleton<ServiceClientCredentialsFactory, CertificateServiceClientCredentialsFactory>(
+    sp =>
+    {
+        X509Certificate2 GetCertificateByName(string certName)
+        {
+            var vaultTokenCredential = new DefaultAzureCredential();
+            var vaultUrl = $"https://AdsCopilotKV-dridev.vault.azure.net/";
+            var vaultClient = new SecretClient(new Uri(vaultUrl), vaultTokenCredential);
+
+            var secretValue = vaultClient.GetSecret(certName).Value.Value;
+            var certificate = new X509Certificate2(Convert.FromBase64String(secretValue), string.Empty);
+
+            if (certificate == null) { throw new Exception($"[GetCertificateByNameAsync] Unable to load {certName} certificate"); }
+
+            return certificate;
+        }
+
+        var cert = GetCertificateByName("cert-devaccess-dricopilot-si-ads-corp-redmond-corp-microsoft-com");
+        return new CertificateServiceClientCredentialsFactory(cert, config.BOT_ID, config.BOT_TENANT, sendX5c: true);
+    });
+
+
 
 // Create the Bot Framework Authentication to be used with the Bot Adapter.
 builder.Services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFrameworkAuthentication>();
@@ -39,34 +66,40 @@ builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<TeamsAdapter>()!);
 
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
-// Create AI Model
-if (!string.IsNullOrEmpty(config.OpenAI?.ApiKey))
-{
-    // Create OpenAI Model
-    builder.Services.AddSingleton<OpenAIModel > (sp => new(
-        new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-4o")
-        {
-            LogRequests = true,
-            Stream = true,
-        },
-        sp.GetService<ILoggerFactory>()
-    ));
+var tokenCredential = new DefaultAzureCredential();
 
-    // Create Kernel Memory Serverless instance using OpenAI embeddings API
-    builder.Services.AddSingleton<IKernelMemory>((sp) =>
-    {
-        return new KernelMemoryBuilder()
-            .WithOpenAIDefaults(config.OpenAI.ApiKey)
-            .WithSimpleFileStorage()
-            .Build<MemoryServerless>();
-    });
-}
-else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
+// Create AI Model
+//if (!string.IsNullOrEmpty(config.OpenAI?.ApiKey))
+//{
+//    // Create OpenAI Model
+//    builder.Services.AddSingleton<OpenAIModel > (sp => new(
+//        new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-4o")
+//        {
+//            LogRequests = true,
+//            Stream = true,
+//        },
+//        sp.GetService<ILoggerFactory>()
+//    ));
+
+//    // Create Kernel Memory Serverless instance using OpenAI embeddings API
+//    builder.Services.AddSingleton<IKernelMemory>((sp) =>
+//    {
+//        return new KernelMemoryBuilder()
+//            .WithOpenAIDefaults(config.OpenAI.ApiKey)
+//            .WithSimpleFileStorage()
+//            .Build<MemoryServerless>();
+//    });
+//}
+//else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
+
+var endpoint = config.Azure.OpenAIEndpoint;
+
 {
+
     // Create Azure OpenAI Model
     builder.Services.AddSingleton<OpenAIModel>(sp => new(
         new AzureOpenAIModelOptions(
-            config.Azure.OpenAIApiKey,
+            tokenCredential,
             "gpt-4o",
             config.Azure.OpenAIEndpoint
         )
@@ -81,12 +114,13 @@ else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEm
     {
         AzureOpenAIConfig azureConfig = new()
         {
-            Auth = AzureOpenAIConfig.AuthTypes.APIKey,
-            APIKey = config.Azure.OpenAIApiKey,
+            Auth = AzureOpenAIConfig.AuthTypes.ManualTokenCredential,
+            //APIKey = config.Azure.OpenAIApiKey,
             Endpoint = config.Azure.OpenAIEndpoint,
             APIType = AzureOpenAIConfig.APITypes.EmbeddingGeneration,
             Deployment = "text-embedding-ada-002" // Update this to the deployment you want to use
         };
+        azureConfig.SetCredential(tokenCredential);
 
         return new KernelMemoryBuilder()
             .WithAzureOpenAITextEmbeddingGeneration(azureConfig)
@@ -95,10 +129,10 @@ else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEm
             .Build<MemoryServerless>();
     });
 }
-else
-{
-    throw new Exception("please configure settings for either OpenAI or Azure");
-}
+//else
+//{
+//    throw new Exception("please configure settings for either OpenAI or Azure");
+//}
 
 builder.Services.AddSingleton<IDataSource>((sp) =>
 {
@@ -180,6 +214,8 @@ builder.Services.AddTransient<IBot>(sp =>
 });
 
 var app = builder.Build();
+
+var _ = app.Services.GetRequiredService<ServiceClientCredentialsFactory>();
 
 if (app.Environment.IsDevelopment())
 {

@@ -49,5 +49,5 @@
     "configurableTabs": [],
     "staticTabs": [],
     "permissions": [],
-    "validDomains": []
+    "validDomains": [ "${{DOMAIN}}" ]
 }

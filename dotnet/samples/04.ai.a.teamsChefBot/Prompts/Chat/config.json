@@ -3,7 +3,6 @@
   "description": "A bot that help developers build Teams apps",
   "type": "completion",
   "completion": {
-    "model": "gpt-3.5-turbo",
     "completion_type": "chat",
     "include_history": true,
     "include_input": true,

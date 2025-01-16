@@ -3,7 +3,6 @@
   "description": "A bot that can manage lists of items",
   "type": "completion",
   "completion": {
-    "model": "gpt-4o",
     "completion_type": "chat",
     "include_history": true,
     "include_input": true,

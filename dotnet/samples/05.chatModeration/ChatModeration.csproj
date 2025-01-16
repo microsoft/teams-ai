@@ -17,6 +17,8 @@
     <PackageReference Include="Microsoft.KernelMemory.AI.OpenAI" Version="0.73.240906.1" />
     <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.73.240906.1" />
     <PackageReference Include="Microsoft.Teams.AI" Version="1.9.*" />
+    <PackageReference Include="Azure.Identity" Version="1.13.1" /> 
+    <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.7.0" />
   </ItemGroup>
 
   <!-- Exclude Teams Toolkit files from build output, but can still be viewed from Solution Explorer -->

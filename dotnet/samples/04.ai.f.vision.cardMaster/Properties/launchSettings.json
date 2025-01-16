@@ -2,7 +2,7 @@
   "profiles": {
     "Microsoft Teams (browser)": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "https://teams.microsoft.com/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
@@ -13,7 +13,7 @@
     },
     "WSL": {
       "commandName": "WSL2",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "https://teams.microsoft.com/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",

@@ -1,12 +1,13 @@
 ﻿using Microsoft.Bot.Builder.TraceExtensions;
+using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Teams.AI;
 
 namespace EchoBot
 {
     public class AdapterWithErrorHandler : TeamsAdapter
     {
-        public AdapterWithErrorHandler(IConfiguration configuration, ILogger<TeamsAdapter> logger)
-            : base(configuration, null, logger)
+        public AdapterWithErrorHandler(IConfiguration configuration, ILogger<TeamsAdapter> logger, ServiceClientCredentialsFactory serviceClientCredentialsFactory)
+            : base(configuration, serviceClientCredentialsFactory, null, logger)
         {
             OnTurnError = async (turnContext, exception) =>
             {

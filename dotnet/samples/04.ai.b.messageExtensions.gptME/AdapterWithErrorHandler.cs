@@ -4,10 +4,11 @@ using Microsoft.Teams.AI;
 
 namespace GPT
 {
+    using Microsoft.Bot.Connector.Authentication;
     public class AdapterWithErrorHandler : TeamsAdapter
     {
-        public AdapterWithErrorHandler(IConfiguration configuration, ILogger<CloudAdapter> logger)
-            : base(configuration, null, logger)
+        public AdapterWithErrorHandler(IConfiguration configuration, ILogger<CloudAdapter> logger, ServiceClientCredentialsFactory serviceClientCredentialsFactory)
+            : base(configuration, serviceClientCredentialsFactory, null, logger)
         {
             OnTurnError = async (turnContext, exception) =>
             {
