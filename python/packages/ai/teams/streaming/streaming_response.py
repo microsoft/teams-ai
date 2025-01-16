@@ -19,6 +19,7 @@ from ..ai.citations import AIEntity, ClientCitation
 from ..ai.prompts.message import Citation
 from ..app_error import ApplicationError
 from .streaming_channel_data import StreamingChannelData
+from .streaming_entity import StreamingEntity
 
 
 class StreamingResponse:
@@ -111,6 +112,24 @@ class StreamingResponse:
         """
         return self._next_sequence - 1
 
+    def set_citations(self, citations: List[Citation]) -> None:
+        if len(citations) > 0:
+            if not self._citations:
+                self._citations = []
+            curr_pos = len(self._citations)
+
+            for citation in citations:
+                self._citations.append(
+                    ClientCitation(
+                        position=f"{curr_pos + 1}",
+                        appearance=Appearance(
+                            name=citation.title or f"Document {curr_pos + 1}",
+                            abstract=snippet(citation.content, 477),
+                        ),
+                    )
+                )
+                curr_pos += 1
+
     def queue_informative_update(self, text: str) -> None:
         """
         Queue an informative update to be sent to the client.
@@ -131,6 +150,7 @@ class StreamingResponse:
         self._next_sequence += 1
 
     def queue_text_chunk(self, text: str, citations: Optional[List[Citation]] = None) -> None:
+        # pylint: disable=unused-argument
         """
         Queues a chunk of partial message text to be sent to the client.
         The text we be sent as quickly as possible to the client. Chunks may be combined before
@@ -142,33 +162,9 @@ class StreamingResponse:
 
         self._message += text
 
-        if citations and len(citations) > 0:
-            if not self._citations:
-                self._citations = []
-            curr_pos = len(self._citations)
-
-            for citation in citations:
-                self._citations.append(
-                    ClientCitation(
-                        position=f"{curr_pos}",
-                        appearance=Appearance(
-                            name=citation.title or f"Document {curr_pos}",
-                            abstract=snippet(citation.content, 477),
-                        ),
-                    )
-                )
-                curr_pos += 1
-
-            # If there are citations, modify the content so that the sources are numbers
-            # instead of [doc1], [doc2], etc.
-            self._message = (
-                self._message
-                if len(self._citations) == 0
-                else format_citations_response(self._message)
-            )
-
-            # If there are citations, filter out the citations unused in content.
-            self._citations = get_used_citations(self._message, self._citations)
+        # If there are citations, modify the content so that the sources are numbers
+        # instead of [doc1], [doc2], etc.
+        self._message = format_citations_response(self._message)
 
         # Queue the next chunk
         self.queue_next_chunk()
@@ -278,14 +274,23 @@ class StreamingResponse:
             channel_data.stream_id = self._stream_id
             activity.channel_data = StreamingChannelData.to_dict(channel_data)
 
-        entity_args = {
-            "stream_id": channel_data.stream_id,
-            "stream_sequence": channel_data.stream_sequence,
-            "stream_type": channel_data.stream_type,
-        }
-        activity.entities = [
-            Entity(type="streaminfo", **entity_args),
-        ]
+        entity = StreamingEntity(
+            stream_id=channel_data.stream_id,
+            stream_sequence=channel_data.stream_sequence,
+            stream_type=channel_data.stream_type
+        )
+        entities: List[Entity] = [entity]
+        activity.entities = entities
+
+        # If there are citations, filter out the citations unused in content.
+        if self._citations and len(self._citations) > 0 and self._ended is False:
+            curr_citations = get_used_citations(self._message, self._citations)
+            activity.entities.append(
+                    AIEntity(
+                        additional_type=[],
+                        citation=curr_citations if curr_citations else [],
+                    )
+            )
 
         # Add in Powered by AI feature flags
         if self._ended:

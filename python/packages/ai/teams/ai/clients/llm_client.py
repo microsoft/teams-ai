@@ -194,8 +194,11 @@ class LLMClient:
                 chunk.delta.context.citations if (chunk.delta and chunk.delta.context) else None
             )
 
+            if citations:
+                streamer.set_citations(citations)
+
             if len(text) > 0:
-                streamer.queue_text_chunk(text, citations)
+                streamer.queue_text_chunk(text)
 
         # Subscribe to model events
         if self._options.model.events is not None:

@@ -8,10 +8,12 @@ from .stream_handler_types import StreamHandlerTypes
 from .streaming_channel_data import StreamingChannelData
 from .streaming_handlers import *
 from .streaming_response import StreamingResponse
+from .streaming_entity import StreamingEntity
 
 __all__ = [
     "StreamingResponse",
     "StreamingChannelData",
     "PromptChunk",
     "StreamHandlerTypes",
+    "StreamingEntity",
 ]

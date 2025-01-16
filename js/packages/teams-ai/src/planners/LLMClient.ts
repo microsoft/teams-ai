@@ -102,6 +102,11 @@ export interface LLMClientOptions<TContent = any> {
      * If true, the feedback loop will be enabled for streaming responses.
      */
     enableFeedbackLoop?: boolean;
+
+    /**
+     * The type of the feedback loop.
+     */
+    feedbackLoopType?: 'default' | 'custom';
 }
 
 /**
@@ -206,6 +211,7 @@ export class LLMClient<TContent = any> {
     private readonly _startStreamingMessage: string | undefined;
     private readonly _endStreamHandler: PromptCompletionModelResponseReceivedEvent | undefined;
     private readonly _enableFeedbackLoop: boolean | undefined;
+    private readonly _feedbackLoopType: 'default' | 'custom' | undefined;
 
     /**
      * Configured options for this LLMClient instance.
@@ -241,6 +247,7 @@ export class LLMClient<TContent = any> {
         this._startStreamingMessage = options.startStreamingMessage;
         this._endStreamHandler = options.endStreamHandler;
         this._enableFeedbackLoop = options.enableFeedbackLoop;
+        this._feedbackLoopType = options.feedbackLoopType;
     }
 
     /**
@@ -284,7 +291,6 @@ export class LLMClient<TContent = any> {
         functions: PromptFunctions
     ): Promise<PromptResponse<TContent>> {
         // Define event handlers
-        let isStreaming = false;
         let streamer: StreamingResponse | undefined;
         const beforeCompletion: PromptCompletionModelBeforeCompletionEvent = (
             ctx,
@@ -301,20 +307,26 @@ export class LLMClient<TContent = any> {
 
             // Check for a streaming response
             if (streaming) {
-                isStreaming = true;
+                // Attach to any existing streamer
+                // - see tool call note below to understand.
+                streamer = memory.getValue('temp.streamer');
+                if (!streamer) {
+                    // Create streamer and send initial message
+                    streamer = new StreamingResponse(context);
+                    memory.setValue('temp.streamer', streamer);
 
-                // Create streamer and send initial message
-                streamer = new StreamingResponse(context);
-                memory.setValue('temp.streamer', streamer);
+                    if (this._enableFeedbackLoop != null) {
+                        streamer.setFeedbackLoop(this._enableFeedbackLoop);
+                        if (this._feedbackLoopType) {
+                            streamer.setFeedbackLoopType(this._feedbackLoopType);
+                        }
+                    }
 
-                if (this._enableFeedbackLoop != null) {
-                    streamer.setFeedbackLoop(this._enableFeedbackLoop);
-                }
+                    streamer.setGeneratedByAILabel(true);
 
-                streamer.setGeneratedByAILabel(true);
-
-                if (this._startStreamingMessage) {
-                    streamer.queueInformativeUpdate(this._startStreamingMessage);
+                    if (this._startStreamingMessage) {
+                        streamer.queueInformativeUpdate(this._startStreamingMessage);
+                    }
                 }
             }
         };
@@ -325,12 +337,24 @@ export class LLMClient<TContent = any> {
                 return;
             }
 
-            // Send chunk to client
-            const text = chunk.delta?.content ?? '';
             const citations = chunk.delta?.context?.citations ?? undefined;
 
+            if (citations) {
+                streamer.setCitations(citations);
+            }
+
+            // Ignore calls without content
+            // - This is typically because the chunk represents a tool call.
+            // - See the note below for why we're handling tool calls this way.
+            if (!chunk.delta?.content) {
+                return;
+            }
+
+            // Send text chunk to client
+            const text = chunk.delta?.content;
+
             if (text.length > 0) {
-                streamer.queueTextChunk(text, citations);
+                streamer.queueTextChunk(text);
             }
         };
 
@@ -347,15 +371,28 @@ export class LLMClient<TContent = any> {
         try {
             // Complete the prompt
             const response = await this.callCompletePrompt(context, memory, functions);
-            if (response.status == 'success' && isStreaming) {
-                // Delete message from response to avoid sending it twice
-                delete response.message;
-            }
 
-            // End the stream if streaming
-            // - We're not listening for the response received event because we can't await the completion of events.
+            // Handle streaming responses
             if (streamer) {
-                await streamer.endStream();
+                // Tool call handling
+                // - We need to keep the streamer around during tool calls so we're just letting them return as normal
+                //   messages minus the message content. The text content is being streamed to the client in chunks.
+                // - When the tool call completes we'll call back into ActionPlanner and end up re-attaching to the
+                //   streamer. This will result in us continuing to stream the response to the client.
+                if (Array.isArray(response.message?.action_calls)) {
+                    // Ensure content is empty for tool calls
+                    response.message!.content = '' as TContent;
+                } else {
+                    if (response.status == 'success') {
+                        // Delete message from response to avoid sending it twice
+                        delete response.message;
+                    }
+
+                    // End the stream and remove pointer from memory
+                    // - We're not listening for the response received event because we can't await the completion of events.
+                    await streamer.endStream();
+                    memory.deleteValue('temp.streamer');
+                }
             }
 
             return response;

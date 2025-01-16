@@ -58,7 +58,7 @@ The Azure OpenAI OYD configuration can be added to the prompt templates `config.
                   "authentication": {
                       "type": 'system_assigned_managed_identity'
                   }
-              }  
+              }
           }
       ]
   },
@@ -94,7 +94,7 @@ async def get_default_prompt(context: TurnContext, state: AppTurnState, planner:
                     "authentication": {
                         "type": 'system_assigned_managed_identity'
                     }
-                }  
+                }
             }
         ]
 
@@ -118,16 +118,15 @@ ActionPlannerOptions(model=model, prompts=prompts, default_prompt=get_default_pr
 
 1. Clone the repository
 
-    ```bash
-    git clone https://github.com/Microsoft/teams-ai.git
-    ```
+   ```bash
+   git clone https://github.com/Microsoft/teams-ai.git
+   ```
 
-2. Duplicate the `sample.env` in the `teams-ai/python/samples/04.ai.f.dataSource.azureOpenAI` folder. Rename the file to `.env`. 
+2. Duplicate the `sample.env` in the `teams-ai/python/samples/04.ai.f.dataSource.azureOpenAI` folder. Rename the file to `.env`.
 
 3. Fill the `AZURE_OPENAI_ENDPOINT`, `AZURE_SEARCH_ENDPOINT`, and `AZURE_SEARCH_INDEX` variables appropriately.
 
 4. Follow the [use your data quickstart instructions](https://learn.microsoft.com/en-us/azure/ai-services/openai/use-your-data-quickstart?tabs=command-line%2Cpython-new&pivots=programming-language-studio#add-your-data-using-azure-openai-studio) to add your data using Azure OpenAI Studio. Select `Upload files` as the data source. You can upload the `nba.pdf` file. Take note of the index name.
-
 
 ## Testing the sample
 
@@ -136,7 +135,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 
@@ -147,8 +146,8 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 1. Install [Poetry](https://python-poetry.org/docs/#installation)
 1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
-1. Ensure that you have set up the sample from the previous step.
-1. Trigger **Python: Create Environment** from command palette and create a virtual environment
+1. Verify that the Teams Toolkit extension is connected to your Teams account from the above step.
+1. In the debugger, play the Debug (Edge) script
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
 1. In the browser that launches, select the **Add** button to install the app to Teams.
 

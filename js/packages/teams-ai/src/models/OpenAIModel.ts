@@ -354,6 +354,10 @@ export class OpenAIModel implements PromptCompletionModel {
                 params.presence_penalty = 0;
             }
 
+            // Check for tools augmentation
+            const isToolsAugmentation =
+                template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
+
             // Call chat completion API
             let message: Message<string>;
             const completion = await this._client.chat.completions.create(params);
@@ -373,20 +377,48 @@ export class OpenAIModel implements PromptCompletionModel {
                     if (delta.content) {
                         message.content += delta.content;
                     }
+
                     // Handle tool calls
-                    if (delta.tool_calls) {
-                        message.action_calls = delta.tool_calls.map(
-                            (toolCall: OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall) => {
-                                return {
-                                    id: toolCall.id,
-                                    function: {
-                                        name: toolCall.function!.name,
-                                        arguments: toolCall.function!.arguments
-                                    },
-                                    type: toolCall.type
-                                } as ActionCall;
+                    // - We don't know how many tool calls there will be so we need to add them one-by-one.
+                    if (isToolsAugmentation && delta.tool_calls) {
+                        // Create action calls array if it doesn't exist
+                        if (!Array.isArray(message.action_calls)) {
+                            message.action_calls = [];
+                        }
+
+                        // Add tool calls to action calls
+                        for (const toolCall of delta.tool_calls) {
+                            // Add empty tool call to message if new index
+                            // - Note that a single tool call can span multiple chunks.
+                            const index = toolCall.index;
+                            if (index >= message.action_calls.length) {
+                                message.action_calls.push({
+                                    id: '',
+                                    function: { name: '', arguments: '' },
+                                    type: ''
+                                } as any);
                             }
-                        );
+
+                            // Set ID if provided
+                            if (toolCall.id) {
+                                message.action_calls[index].id = toolCall.id;
+                            }
+
+                            // Set type if provided
+                            if (toolCall.type) {
+                                message.action_calls[index].type = toolCall.type;
+                            }
+
+                            // Append function name if provided
+                            if (toolCall.function?.name) {
+                                message.action_calls[index].function.name += toolCall.function.name;
+                            }
+
+                            // Append function arguments if provided
+                            if (toolCall.function?.arguments) {
+                                message.action_calls[index].function.arguments += toolCall.function.arguments;
+                            }
+                        }
                     }
 
                     // Signal chunk received
@@ -415,8 +447,6 @@ export class OpenAIModel implements PromptCompletionModel {
                     message.context = messageWithContext.context;
                 }
                 const actionCalls: ActionCall[] = [];
-                const isToolsAugmentation =
-                    template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
 
                 // Log tool calls to be added to message of type Message<string> as action_calls
                 if (isToolsAugmentation && responseMessage?.tool_calls) {

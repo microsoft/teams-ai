@@ -28,7 +28,8 @@ if (!process.env.ASSISTANT_ID) {
                 tools: [{ type: 'code_interpreter' }],
                 model: 'gpt-4'
             },
-            endpoint
+            endpoint ?? undefined,
+            endpoint ? { apiVersion: process.env.OPENAI_API_VERSION } : undefined
         );
 
         console.log(`Created a new assistant with an ID of: ${assistant.id}`);
@@ -40,7 +41,8 @@ if (!process.env.ASSISTANT_ID) {
 const planner = new AssistantsPlanner({
     apiKey: apiKey,
     endpoint: endpoint,
-    assistant_id: process.env.ASSISTANT_ID!
+    assistant_id: process.env.ASSISTANT_ID!,
+    apiVersion: process.env.OPENAI_API_VERSION
 });
 
 // Define storage and application
@@ -58,9 +60,4 @@ export const run = (context: TurnContext) => app.run(context);
 app.message('/reset', async (context, state) => {
     state.deleteConversationState();
     await context.sendActivity(`Ok lets start this over.`);
-});
-
-app.ai.action(AI.HttpErrorActionName, async (context, state, data) => {
-    await context.sendActivity('An AI request failed. Please try again later.');
-    return AI.StopCommandName;
 });

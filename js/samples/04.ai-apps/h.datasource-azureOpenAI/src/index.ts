@@ -8,7 +8,7 @@ import debug from 'debug';
 import * as restify from 'restify';
 import { app } from './app';
 import { TeamsAdapter } from '@microsoft/teams-ai';
-import { Request, Response, TurnContext } from 'botbuilder';
+import { TurnContext } from 'botbuilder';
 
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
