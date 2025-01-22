@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import Awaitable, Callable, Generic, List, TypeVar, Union, cast
 
 from botbuilder.core import InvokeResponse, TurnContext
-from botbuilder.core.serializer_helper import deserializer_helper, serializer_helper
+from botbuilder.core.serializer_helper import serializer_helper
 from botbuilder.schema import Activity, ActivityTypes
 from botbuilder.schema.teams import (
     TaskModuleContinueResponse,
