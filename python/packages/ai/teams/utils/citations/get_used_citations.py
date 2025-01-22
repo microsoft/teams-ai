@@ -35,7 +35,7 @@ def get_used_citations(
         processed_matches.append(match)
 
         for citation in citations:
-            if citation.position == match:
+            if str(citation.position) == match:
                 used_citations.append(citation)
                 break
     return used_citations

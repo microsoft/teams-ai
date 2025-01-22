@@ -121,7 +121,7 @@ class StreamingResponse:
             for citation in citations:
                 self._citations.append(
                     ClientCitation(
-                        position=f"{curr_pos + 1}",
+                        position=curr_pos + 1,
                         appearance=Appearance(
                             name=citation.title or f"Document {curr_pos + 1}",
                             abstract=snippet(citation.content, 477),
@@ -277,7 +277,7 @@ class StreamingResponse:
         entity = StreamingEntity(
             stream_id=channel_data.stream_id,
             stream_sequence=channel_data.stream_sequence,
-            stream_type=channel_data.stream_type
+            stream_type=channel_data.stream_type,
         )
         entities: List[Entity] = [entity]
         activity.entities = entities
@@ -286,10 +286,10 @@ class StreamingResponse:
         if self._citations and len(self._citations) > 0 and self._ended is False:
             curr_citations = get_used_citations(self._message, self._citations)
             activity.entities.append(
-                    AIEntity(
-                        additional_type=[],
-                        citation=curr_citations if curr_citations else [],
-                    )
+                AIEntity(
+                    additional_type=[],
+                    citation=curr_citations if curr_citations else [],
+                )
             )
 
         # Add in Powered by AI feature flags

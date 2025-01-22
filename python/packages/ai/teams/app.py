@@ -41,6 +41,7 @@ from .auth import AuthManager, OAuth, OAuthOptions
 from .feedback_loop_data import FeedbackLoopData
 from .meetings.meetings import Meetings
 from .message_extensions.message_extensions import MessageExtensions
+from .messages.messages import Messages
 from .route import Route, RouteHandler
 from .state import TurnState
 from .task_modules import TaskModules
@@ -79,6 +80,7 @@ class Application(Bot, Generic[StateT]):
     _message_extensions: MessageExtensions[StateT]
     _task_modules: TaskModules[StateT]
     _meetings: Meetings[StateT]
+    _messages: Messages[StateT]
 
     def __init__(self, options: ApplicationOptions = ApplicationOptions()) -> None:
         """
@@ -96,6 +98,7 @@ class Application(Bot, Generic[StateT]):
             self._routes, options.task_modules.task_data_filter
         )
         self._meetings = Meetings[StateT](self._routes)
+        self._messages = Messages[StateT](self._routes)
 
         if options.long_running_messages and (not options.adapter or not options.bot_app_id):
             raise ApplicationError("""
@@ -188,6 +191,13 @@ class Application(Bot, Generic[StateT]):
         Access the application's meetings functionalities.
         """
         return self._meetings
+
+    @property
+    def messages(self) -> Messages[StateT]:
+        """
+        Access the application's messages functionalities.
+        """
+        return self._messages
 
     def activity(
         self, type: ActivityType
