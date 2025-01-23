@@ -41,5 +41,11 @@ namespace Microsoft.Teams.AI.Application
         /// </summary>
         [JsonProperty(PropertyName = "feedbackLoopEnabled")]
         public bool? feedbackLoopEnabled { get; set; }
+
+        /// <summary>
+        /// Represents the type of feedback loop. Set to "default" by default. It can be set to one of "default" or "custom".
+        /// </summary>
+        [JsonProperty(PropertyName = "feedbackLoopType")]
+        public string? feedbackLoopType { get; set; }
     }
 }

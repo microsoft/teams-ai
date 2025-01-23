@@ -66,7 +66,7 @@ namespace Microsoft.Teams.AI.AI.Action
         /// Required. Number and position of the citation.
         /// </summary>
         [JsonProperty(PropertyName = "position")]
-        public string Position { get; set; } = string.Empty;
+        public int Position { get; set; }
 
         /// <summary>
         /// The citation's appearance.
@@ -88,7 +88,7 @@ namespace Microsoft.Teams.AI.AI.Action
         public string AtType = "DigitalDocument";
 
         /// <summary>
-        /// Name of the document.
+        /// Name of the document (max length 80).
         /// </summary>
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; } = string.Empty;
@@ -106,13 +106,14 @@ namespace Microsoft.Teams.AI.AI.Action
         public string? Url { get; set; }
 
         /// <summary>
-        /// Content of the citation. Must be clipped if longer than 480 characters.
+        /// Extract of the referenced content (max length 160).
         /// </summary>
         [JsonProperty(PropertyName = "abstract")]
         public string Abstract { get; set; } = string.Empty;
 
         /// <summary>
-        /// Optional. Encoding format of the `citation.appearance.text` field.
+        /// Optional. Encoding format of the `citation.appearance.text` field. 
+        /// It should be one of "text/html" or "application/vnd.microsoft.card.adaptive".
         /// </summary>
         [JsonProperty(PropertyName = "encodingFormat")]
         public string? EncodingFormat { get; set; }
@@ -121,7 +122,7 @@ namespace Microsoft.Teams.AI.AI.Action
         /// The icon provided in the citation ui.
         /// </summary>
         [JsonProperty(PropertyName = "image")]
-        public string? Image { get; set; }
+        public AppearanceImage? Image { get; set; }
 
         /// <summary>
         /// Optional. Set the keywords.
@@ -206,5 +207,124 @@ namespace Microsoft.Teams.AI.AI.Action
         /// </summary>
         [JsonProperty(PropertyName = "termCode")]
         public string? TermCode { get; set; }
+    }
+
+    /// <summary>
+    /// Represents how the citation will be rendered.
+    /// </summary>
+    public class AppearanceImage
+    {
+        /// <summary>
+        /// Required. Must be "ImageObject".
+        /// </summary>
+        [JsonProperty(PropertyName = "@type")]
+        public string Type { get; set; } = "ImageObject";
+
+        /// <summary>
+        /// The image/icon name. It should be one of <see cref="ClientCitationIconName"/>
+        /// </summary>
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// Represents the different possible values for the client citation icon name.
+    /// </summary>
+    public static class ClientCitationIconName
+    {
+        /// <summary>
+        /// Represents the Microsoft Word icon name.
+        /// </summary>
+        public static readonly string MicrosoftWord = "Microsoft Word";
+
+        /// <summary>
+        /// Represents the Microsoft Excel icon name.
+        /// </summary>
+        public static readonly string MicrosoftExcel = "Microsoft Excel";
+
+        /// <summary>
+        /// Represents the Microsoft PowerPoint icon name.
+        /// </summary>
+        public static readonly string MicrosoftPowerPoint = "Microsoft PowerPoint";
+
+        /// <summary>
+        /// Represents the Microsoft Visio icon name.
+        /// </summary>
+        public static readonly string MicrosoftVisio = "Microsoft Visio";
+
+        /// <summary>
+        /// Represents the Microsoft Loop icon name.
+        /// </summary>
+        public static readonly string MicrosoftLoop = "Microsoft Loop";
+
+        /// <summary>
+        /// Represents the Microsoft Whiteboard icon name.
+        /// </summary>
+        public static readonly string MicrosoftWhiteboard = "Microsoft Whiteboard";
+
+        /// <summary>
+        /// Represents the Adobe Illustrator icon name.
+        /// </summary>
+        public static readonly string AdobeIllustrator = "Adobe Illustrator";
+
+        /// <summary>
+        /// Represents the Adobe Photoshop icon name.
+        /// </summary>
+        public static readonly string AdobePhotoshop = "Adobe Photoshop";
+
+        /// <summary>
+        /// Represents the Adobe InDesign icon name.
+        /// </summary>
+        public static readonly string AdobeInDesign = "Adobe InDesign";
+
+        /// <summary>
+        /// Represents the Adobe Flash icon name.
+        /// </summary>
+        public static readonly string AdobeFlash = "Adobe Flash";
+
+        /// <summary>
+        /// Represents the Sketch icon name.
+        /// </summary>
+        public static readonly string Sketch = "Sketch";
+
+        /// <summary>
+        /// Represents the Source Code icon name.
+        /// </summary>
+        public static readonly string SourceCode = "Source Code";
+
+        /// <summary>
+        /// Represents the Image icon name.
+        /// </summary>
+        public static readonly string Image = "Image";
+
+        /// <summary>
+        /// Represents the GIF icon name.
+        /// </summary>
+        public static readonly string GIF = "GIF";
+
+        /// <summary>
+        /// Represents the Video icon name.
+        /// </summary>
+        public static readonly string Video = "Video";
+
+        /// <summary>
+        /// Represents the Sound icon name.
+        /// </summary>
+        public static readonly string Sound = "Sound";
+
+        /// <summary>
+        /// Represents the ZIP icon name.
+        /// </summary>
+        public static readonly string ZIP = "ZIP";
+
+        /// <summary>
+        /// Represents the Text icon name.
+        /// </summary>
+        public static readonly string Text = "Text";
+
+        /// <summary>
+        /// Represents the PDF icon name.
+        /// </summary>
+        public static readonly string PDF = "PDF";
     }
 }
