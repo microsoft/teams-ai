@@ -20,7 +20,7 @@ import { AIEntity, ClientCitation } from '../types';
  */
 export function sayCommand<TState extends TurnState = TurnState>(
     feedbackLoopEnabled: boolean = false,
-    feedbackLoopType: 'default' | 'custom' = 'default',
+    feedbackLoopType: 'default' | 'custom' = 'default'
 ) {
     return async (context: TurnContext, _state: TState, data: PredictedSayCommand) => {
         if (!data.response?.content) {
@@ -58,11 +58,14 @@ export function sayCommand<TState extends TurnState = TurnState>(
 
         // If there are citations, filter out the citations unused in content.
         const referencedCitations = citations ? Utilities.getUsedCitations(contentText, citations) : undefined;
-        const channelData = feedbackLoopEnabled && feedbackLoopType ? {
-            feedbackLoop: {
-                type: feedbackLoopType
-            }
-        } : { feedbackLoopEnabled };
+        const channelData =
+            feedbackLoopEnabled && feedbackLoopType
+                ? {
+                      feedbackLoop: {
+                          type: feedbackLoopType
+                      }
+                  }
+                : { feedbackLoopEnabled };
 
         const entities: AIEntity[] = [
             {
