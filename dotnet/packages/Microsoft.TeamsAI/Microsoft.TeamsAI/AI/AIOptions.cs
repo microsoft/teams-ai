@@ -63,6 +63,11 @@ namespace Microsoft.Teams.AI.AI
         public bool EnableFeedbackLoop { get; set; } = false;
 
         /// <summary>
+        /// Represents the type of feedback loop. Set to "default" by default. It can be set to one of "default" or "custom".
+        /// </summary>
+        public string FeedbackLoopType { get; set; } = "default";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AIOptions{TState}"/> class.
         /// </summary>
         /// <param name="planner">The planner to use for generating plans.</param>

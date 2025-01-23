@@ -79,6 +79,11 @@ namespace Microsoft.Teams.AI.AI.Clients
         public bool? EnableFeedbackLoop { get; set; }
 
         /// <summary>
+        /// Optional. Represents the type of feedback loop. It can be set to one of "default" or "custom".
+        /// </summary>
+        public string? FeedbackLoopType { get; set; }
+
+        /// <summary>
         /// Creates an instance of `LLMClientOptions`
         /// </summary>
         /// <param name="model">AI model to use for completing prompts.</param>
