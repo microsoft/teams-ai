@@ -180,14 +180,14 @@ class LLMClient:
             nonlocal streamer
             if (context != ctx) or (streamer is None):
                 return
-            
+
             citations = (
                 chunk.delta.context.citations if (chunk.delta and chunk.delta.context) else None
             )
 
             if citations:
                 streamer.set_citations(citations)
-            
+
             if not chunk.delta or not chunk.delta.content:
                 return
 
@@ -287,7 +287,7 @@ class LLMClient:
             curr_streamer: Optional[StreamingResponse] = memory.get("temp.streamer")
 
             if curr_streamer is not None:
-                # We need to keep the streamer around during tool calls so we're just letting 
+                # We need to keep the streamer around during tool calls so we're just letting
                 # them return as normal messages minus the message content. The text content
                 # is being streamed to the client in chunks. When the tool call completes,
                 # we'll call back into ActionPlanner and end up reattaching to the streamer.
@@ -298,7 +298,7 @@ class LLMClient:
                     if res.status == "success":
                         # Delete message from response to avoid sending it twice
                         res.message = None
-                    
+
                     # End the stream and remove pointer from memory
                     await curr_streamer.end_stream()
                     memory.delete("temp.streamer")

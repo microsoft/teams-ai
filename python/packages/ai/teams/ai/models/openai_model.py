@@ -274,7 +274,7 @@ class OpenAIModel(PromptCompletionModel):
                     if is_tools_aug and delta.tool_calls:
                         if not hasattr(message, "action_calls") or message.action_calls is None:
                             message.action_calls = []
-                        
+
                         for tool_call in delta.tool_calls:
                             # Add empty tool call to message if new index
                             # Note that a single tool call can span multiple chunks
@@ -283,26 +283,31 @@ class OpenAIModel(PromptCompletionModel):
                             if index >= len(message.action_calls):
                                 message.action_calls.append(
                                     ActionCall(
-                                        id='',
-                                        type='function',
+                                        id="",
+                                        type="function",
                                         function=ActionFunction(
-                                            name='',
-                                            arguments='',
+                                            name="",
+                                            arguments="",
                                         ),
                                     )
                                 )
 
                             if tool_call.id:
-                                 message.action_calls[index].id = tool_call.id
-                            
+                                message.action_calls[index].id = tool_call.id
+
                             if tool_call.type:
                                 message.action_calls[index].type = tool_call.type
-                            
-                            if tool_call.function.name:
-                                message.action_calls[index].function.name += tool_call.function.name
-                            
-                            if tool_call.function.arguments:
-                                message.action_calls[index].function.arguments += tool_call.function.arguments
+
+                            if tool_call.function:
+                                if tool_call.function.name:
+                                    message.action_calls[
+                                        index
+                                    ].function.name += tool_call.function.name
+
+                                if tool_call.function.arguments:
+                                    message.action_calls[
+                                        index
+                                    ].function.arguments += tool_call.function.arguments
 
                     if self._options.logger is not None:
                         self._options.logger.debug(f"CHUNK ${delta}")
