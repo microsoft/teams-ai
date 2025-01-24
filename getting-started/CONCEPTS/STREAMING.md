@@ -35,9 +35,11 @@ There are three parts to streaming:
 
 ## Sample Bots
 - [C# Streaming ChefBot](https://github.com/microsoft/teams-ai/tree/main/dotnet/samples/04.ai.g.teamsChefBot-streaming)
+- [C# Streaming+Tools LightBot](https://github.com/microsoft/teams-ai/blob/main/dotnet/samples/04.ai.c.actionMapping.lightBot)
 - [JS Streaming ChefBot](https://github.com/microsoft/teams-ai/tree/main/js/samples/04.ai-apps/i.teamsChefBot-streaming)
 - [JS Streaming+Tools LightBot](https://github.com/microsoft/teams-ai/tree/main/js/samples/03.ai-concepts/c.actionMapping-lightBot)
 - [Python Streaming ListBot](https://github.com/microsoft/teams-ai/tree/main/python/samples/04.ai.h.chainedActions.listBot-streaming)
+- [Python Streaming+Tools LightBot](https://github.com/microsoft/teams-ai/tree/main/python/samples/04.ai.c.actionMapping.lightBot)
 
 ## Streaming Response Class
 The `StreamingResponse` class is the helper class for streaming responses to the client. The class is used to send a series of updates to the client in a single response. If you are using your own custom model, you can directly instantiate and manage this class to stream responses.
