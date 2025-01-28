@@ -35,7 +35,7 @@ There are three parts to streaming:
 
 ## Sample Bots
 - [C# Streaming ChefBot](https://github.com/microsoft/teams-ai/tree/main/dotnet/samples/04.ai.g.teamsChefBot-streaming)
-- [C# Streaming+Tools LightBot](https://github.com/microsoft/teams-ai/blob/main/dotnet/samples/04.ai.c.actionMapping.lightBot)
+- [C# Streaming + Tools LightBot](https://github.com/microsoft/teams-ai/blob/main/dotnet/samples/04.ai.c.actionMapping.lightBot)
 - [JS Streaming ChefBot](https://github.com/microsoft/teams-ai/tree/main/js/samples/04.ai-apps/i.teamsChefBot-streaming)
 - [JS Streaming+Tools LightBot](https://github.com/microsoft/teams-ai/tree/main/js/samples/03.ai-concepts/c.actionMapping-lightBot)
 - [Python Streaming ListBot](https://github.com/microsoft/teams-ai/tree/main/python/samples/04.ai.h.chainedActions.listBot-streaming)
