@@ -1021,7 +1021,7 @@ export class Application<TState extends TurnState = TurnState> {
     public startTypingTimer(context: TurnContext): void {
         if (context.activity.type == ActivityTypes.Message && !this._typingTimer) {
             // Listen for outgoing activities
-            context.onSendActivities((context, activities, next) => {
+            context.onSendActivities(async (context, activities, next) => {
                 // Listen for any messages to be sent from the bot
                 if (timerRunning) {
                     for (let i = 0; i < activities.length; i++) {
@@ -1029,6 +1029,10 @@ export class Application<TState extends TurnState = TurnState> {
                             // Stop the timer
                             this.stopTypingTimer();
                             timerRunning = false;
+
+                            // Wait for the last "typing" activity to finish sending
+                            // - This prevents a race condition that results in the typing indicator being stuck on.
+                            await lastSend;
                             break;
                         }
                     }
@@ -1038,10 +1042,12 @@ export class Application<TState extends TurnState = TurnState> {
             });
 
             let timerRunning = true;
+            let lastSend: Promise<any> = Promise.resolve();
             const onTimeout = async () => {
                 try {
                     // Send typing activity
-                    await context.sendActivity({ type: ActivityTypes.Typing });
+                    lastSend = context.sendActivity({ type: ActivityTypes.Typing });
+                    await lastSend;
                 } catch (err) {
                     // Seeing a random proxy violation error from the context object. This is because
                     // we're in the middle of sending an activity on a background thread when the turn ends.
@@ -1049,6 +1055,7 @@ export class Application<TState extends TurnState = TurnState> {
                     // eat the error but lets make sure our states cleaned up a bit.
                     this._typingTimer = undefined;
                     timerRunning = false;
+                    lastSend = Promise.resolve();
                 }
 
                 // Restart timer
