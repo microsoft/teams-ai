@@ -31,9 +31,9 @@ def to_string(tokenizer: Tokenizer, value: Any, as_json: bool = False) -> str:
     """
     if value is None:
         return ""
-    
+
     if isinstance(value, str):
-        return value 
+        return value
 
     if hasattr(value, "isoformat") and callable(value.isoformat):
         # Used when the value is a datetime object
