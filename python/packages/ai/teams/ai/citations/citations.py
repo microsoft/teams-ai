@@ -67,7 +67,7 @@ class Appearance(Model):
         text (str): Optional; the appearance text of the citation.
         url (str): The url of the document
         abstract (str): Extract of the referenced content. (max length 160)
-        encodingFormat (str): Encoding format of the ` citation.appearance.text` field.
+        encodingFormat (str): Encoding format of the `citation.appearance.text` field.
         image (AppearanceImage): Information about the citation’s icon.
         keywords (list[str]): Optional; set by developer. (max length 3) (max keyword length 28)
         usageInfo (SensitivityUsageInfo): The optional sensitivity content information
