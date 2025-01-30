@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Generic, Literal, TypeVar, Union
+from typing import Generic, Literal, Optional, TypeVar
 
 from ..state import TurnState
 from .moderators.default_moderator import DefaultModerator
@@ -41,4 +41,4 @@ class AIOptions(Generic[StateT]):
     allows a user to give thumbs up or down to a response.
     """
 
-    feedback_loop_type: Union[Literal["default"], Literal["custom"]] = "default"
+    feedback_loop_type: Optional[Literal["default", "custom"]] = None

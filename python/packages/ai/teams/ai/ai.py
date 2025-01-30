@@ -318,9 +318,10 @@ class AI(Generic[StateT]):
         channel_data: Dict[str, Any] = {}
 
         if is_teams_channel:
-            channel_data["feedbackLoopEnabled"] = self._options.enable_feedback_loop
+            if self._options.enable_feedback_loop and not self._options.feedback_loop_type:
+                channel_data["feedbackLoopEnabled"] = self._options.enable_feedback_loop
 
-            if self._options.enable_feedback_loop:
+            if self._options.feedback_loop_type:
                 channel_data["feedbackLoop"] = {"type": self._options.feedback_loop_type}
 
         await context.send_activity(
