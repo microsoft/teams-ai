@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 import asyncio
-from typing import Callable, List, Optional
+from typing import Callable, List, Literal, Optional
 
 from botbuilder.core import TurnContext
 from botbuilder.schema import Activity, Attachment, Entity
@@ -42,6 +42,7 @@ class StreamingResponse:
     _citations: Optional[List[ClientCitation]] = []
     _sensitivity_label: Optional[SensitivityUsageInfo] = None
     _enable_feedback_loop: Optional[bool] = False
+    _feedback_loop_type: Optional[Literal["default", "custom"]] = None
     _enable_generated_by_ai_label: Optional[bool] = False
 
     _queue: List[Callable[[], Activity]] = []
@@ -90,6 +91,13 @@ class StreamingResponse:
             or disable feedback loop.
         """
         self._enable_feedback_loop = enable_feedback_loop
+
+    def set_feedback_loop_type(self, feedback_loop_type: Literal["default", "custom"]) -> None:
+        """
+        Sets the feedback loop to enable or disable.
+        :param feedback_loop_type: The type of feedback loop ux to use
+        """
+        self._feedback_loop_type = feedback_loop_type
 
     def set_sensitivity_label(self, sensitivity_label: SensitivityUsageInfo) -> None:
         """
@@ -295,7 +303,13 @@ class StreamingResponse:
         # Add in Powered by AI feature flags
         if self._ended:
             channel_data = StreamingChannelData.from_dict(activity.channel_data)
-            channel_data.feedback_loop_enabled = self._enable_feedback_loop
+
+            if self._enable_feedback_loop:
+                channel_data.feedback_loop_enabled = self._enable_feedback_loop
+
+            if not self._enable_feedback_loop and self._feedback_loop_type:
+                channel_data.feedback_loop_type = self._feedback_loop_type
+
             activity.channel_data = StreamingChannelData.to_dict(channel_data)
 
             if self._enable_generated_by_ai_label:
