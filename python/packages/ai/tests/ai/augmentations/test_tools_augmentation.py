@@ -44,7 +44,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
             status="success",
             input=Message(
                 role="user",
-                content='"Why is the sky blue?"',
+                content="Why is the sky blue?",
                 context=None,
                 function_call=None,
                 name=None,
@@ -84,7 +84,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 status="success",
                 input=Message(
                     role="user",
-                    content='"hi, can you turn on the lights"',
+                    content="hi, can you turn on the lights",
                     context=None,
                     function_call=None,
                     name=None,
@@ -107,7 +107,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 status="success",
                 input=Message(
                     role="user",
-                    content='"hi, can you turn on the lights"',
+                    content="hi, can you turn on the lights",
                     context=None,
                     function_call=None,
                     name=None,
@@ -138,7 +138,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 status="success",
                 input=Message(
                     role="user",
-                    content='"hi, can you turn on the lights"',
+                    content="hi, can you turn on the lights",
                     context=None,
                     function_call=None,
                     name=None,
@@ -172,7 +172,7 @@ class TestToolsAugmentation(IsolatedAsyncioTestCase):
                 status="success",
                 input=Message(
                     role="user",
-                    content='"hi, can you turn on the lights"',
+                    content="hi, can you turn on the lights",
                     context=None,
                     function_call=None,
                     name=None,

@@ -2,6 +2,7 @@
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
+using Microsoft.Teams.AI.Application;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
@@ -1940,6 +1941,58 @@ namespace Microsoft.Teams.AI.Tests.Application
             // Assert
             Assert.Single(names);
             Assert.Equal("config/fetch", names[0]);
+            Assert.NotNull(activitiesToSend);
+            Assert.Single(activitiesToSend);
+            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
+            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
+        }
+
+        [Fact]
+        public async Task Test_OnMessageFetchTask()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "message/fetchTask",
+                ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+            };
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var messageFetchTaskResponse = new Mock<MessageFetchTaskResponse>();
+            var expectedInvokeResponse = new InvokeResponse()
+            {
+                Status = 200,
+                Body = messageFetchTaskResponse.Object
+            };
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
+            });
+            var names = new List<string>();
+            app.OnMessageFetchTask((turnContext, _, _, _) =>
+            {
+                names.Add(turnContext.Activity.Name);
+                return Task.FromResult(messageFetchTaskResponse.Object);
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+
+            // Assert
+            Assert.Single(names);
+            Assert.Equal("message/fetchTask", names[0]);
             Assert.NotNull(activitiesToSend);
             Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);

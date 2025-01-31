@@ -6,9 +6,19 @@ Licensed under the MIT License.
 from .citations import (
     AIEntity,
     Appearance,
+    AppearanceImage,
     ClientCitation,
+    ClientCitationIconName,
     Pattern,
     SensitivityUsageInfo,
 )
 
-__all__ = ["ClientCitation", "Appearance", "SensitivityUsageInfo", "Pattern", "AIEntity"]
+__all__ = [
+    "ClientCitation",
+    "ClientCitationIconName",
+    "Appearance",
+    "AppearanceImage",
+    "SensitivityUsageInfo",
+    "Pattern",
+    "AIEntity",
+]

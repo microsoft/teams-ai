@@ -40,6 +40,8 @@ namespace Microsoft.Teams.AI.AI.Planners
 
         private bool _enableFeedbackLoop;
 
+        private string? _feedbackLoopType;
+
         /// <summary>
         /// Creates a new `ActionPlanner` instance.
         /// </summary>
@@ -108,6 +110,10 @@ namespace Microsoft.Teams.AI.AI.Planners
             PromptTemplate template = await this.Options.DefaultPrompt(context, state, this);
 
             this._enableFeedbackLoop = ai.Options.EnableFeedbackLoop;
+            if (this._enableFeedbackLoop)
+            {
+                this._feedbackLoopType = ai.Options.FeedbackLoopType;
+            }
 
             PromptResponse response = await this.CompletePromptAsync(context, state, template, template.Augmentation, cancellationToken);
 
@@ -182,6 +188,7 @@ namespace Microsoft.Teams.AI.AI.Planners
                 StartStreamingMessage = this.Options.StartStreamingMessage,
                 EndStreamHandler = this.Options.EndStreamHandler,
                 EnableFeedbackLoop = this._enableFeedbackLoop,
+                FeedbackLoopType = this._feedbackLoopType
             }, this._logger);
 
             return await client.CompletePromptAsync(context, memory, this.Prompts, cancellationToken);

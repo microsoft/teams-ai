@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Literal, Optional
 
 from dataclasses_json import DataClassJsonMixin, config, dataclass_json
 
@@ -28,6 +28,8 @@ class StreamingChannelData(DataClassJsonMixin):
         stream_id (Optional[str]): The ID of the stream.
             Assigned after the initial update is sent.
         feedback_loop_enabled (Optional[bool]): Whether the feedback loop is enabled.
+        feedback_loop_type (Optional[Literal["default", "custom"]]): the type of
+            feedback loop ux to use
     """
 
     stream_type: str = field(metadata=config(field_name="streamType"))
@@ -37,4 +39,7 @@ class StreamingChannelData(DataClassJsonMixin):
     stream_id: Optional[str] = field(default=None, metadata=config(field_name="streamId"))
     feedback_loop_enabled: Optional[bool] = field(
         default=None, metadata=config(field_name="feedbackLoopEnabled")
+    )
+    feedback_loop_type: Optional[Literal["default", "custom"]] = field(
+        default=None, metadata=config(field_name="feedbackLoopType")
     )
