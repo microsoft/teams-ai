@@ -12,7 +12,7 @@ packages = [
 python = "<3.13,>=3.9"
 teams-ai = "^1.5.0"
 python-dotenv = "^1.0.1"
-pyautogen = "0.2.28"
+autogen-agentchat = "~=0.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
