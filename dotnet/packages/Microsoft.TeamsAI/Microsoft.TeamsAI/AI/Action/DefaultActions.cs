@@ -139,8 +139,10 @@ namespace Microsoft.Teams.AI.AI.Action
                 {
                     channelData = new
                     {
-                        feedbackLoopEnabled = true,
-                        feedbackLoopType = _feedbackLoopType
+                        feedbackLoop = new
+                        {
+                            type = _feedbackLoopType
+                        }
                     };
                 } 
                 else

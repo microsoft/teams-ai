@@ -64,6 +64,7 @@ namespace Microsoft.Teams.AI.AI
 
         /// <summary>
         /// Represents the type of feedback loop. Set to "default" by default. It can be set to one of "default" or "custom".
+        /// The <see cref="AIOptions{TState}.EnableFeedbackLoop"/> property should be set to true to use this property.
         /// </summary>
         public string FeedbackLoopType { get; set; } = "default";
 
