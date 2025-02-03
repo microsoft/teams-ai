@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 import asyncio
-from typing import Callable, List, Optional
+from typing import Callable, List, Literal, Optional
 
 from botbuilder.core import TurnContext
 from botbuilder.schema import Activity, Attachment, Entity
@@ -42,6 +42,7 @@ class StreamingResponse:
     _citations: Optional[List[ClientCitation]] = []
     _sensitivity_label: Optional[SensitivityUsageInfo] = None
     _enable_feedback_loop: Optional[bool] = False
+    _feedback_loop_type: Optional[Literal["default", "custom"]] = None
     _enable_generated_by_ai_label: Optional[bool] = False
 
     _queue: List[Callable[[], Activity]] = []
@@ -91,6 +92,13 @@ class StreamingResponse:
         """
         self._enable_feedback_loop = enable_feedback_loop
 
+    def set_feedback_loop_type(self, feedback_loop_type: Literal["default", "custom"]) -> None:
+        """
+        Sets the feedback loop to enable or disable.
+        :param feedback_loop_type: The type of feedback loop ux to use
+        """
+        self._feedback_loop_type = feedback_loop_type
+
     def set_sensitivity_label(self, sensitivity_label: SensitivityUsageInfo) -> None:
         """
         Sets the sensitivity label to attach to the final chunk.
@@ -121,7 +129,7 @@ class StreamingResponse:
             for citation in citations:
                 self._citations.append(
                     ClientCitation(
-                        position=f"{curr_pos + 1}",
+                        position=curr_pos + 1,
                         appearance=Appearance(
                             name=citation.title or f"Document {curr_pos + 1}",
                             abstract=snippet(citation.content, 477),
@@ -277,7 +285,7 @@ class StreamingResponse:
         entity = StreamingEntity(
             stream_id=channel_data.stream_id,
             stream_sequence=channel_data.stream_sequence,
-            stream_type=channel_data.stream_type
+            stream_type=channel_data.stream_type,
         )
         entities: List[Entity] = [entity]
         activity.entities = entities
@@ -286,16 +294,22 @@ class StreamingResponse:
         if self._citations and len(self._citations) > 0 and self._ended is False:
             curr_citations = get_used_citations(self._message, self._citations)
             activity.entities.append(
-                    AIEntity(
-                        additional_type=[],
-                        citation=curr_citations if curr_citations else [],
-                    )
+                AIEntity(
+                    additional_type=[],
+                    citation=curr_citations if curr_citations else [],
+                )
             )
 
         # Add in Powered by AI feature flags
         if self._ended:
             channel_data = StreamingChannelData.from_dict(activity.channel_data)
-            channel_data.feedback_loop_enabled = self._enable_feedback_loop
+
+            if self._enable_feedback_loop:
+                channel_data.feedback_loop_enabled = self._enable_feedback_loop
+
+            if not self._enable_feedback_loop and self._feedback_loop_type:
+                channel_data.feedback_loop_type = self._feedback_loop_type
+
             activity.channel_data = StreamingChannelData.to_dict(channel_data)
 
             if self._enable_generated_by_ai_label:

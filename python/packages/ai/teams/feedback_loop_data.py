@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Literal
+from typing import Any, Dict, Literal, Union
 
 from dataclasses_json import DataClassJsonMixin, config, dataclass_json
 
@@ -25,7 +25,7 @@ class FeedbackLoopData(DataClassJsonMixin):
     reply_to_id: str
     "The activity ID that the feedback was provided on."
 
-    action_name: str = "feedback"
+    action_name: Literal["feedback"] = "feedback"
 
 
 @dataclass_json
@@ -38,5 +38,5 @@ class FeedbackLoopActionValue(DataClassJsonMixin):
     reaction: Literal["like", "dislike"]
     "The reaction"
 
-    feedback: str
+    feedback: Union[str, Dict[str, Any]]
     "The response the user provides after pressing one of the feedback buttons."
