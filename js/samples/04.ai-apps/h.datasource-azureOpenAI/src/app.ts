@@ -34,7 +34,7 @@ const model = new OpenAIModel({
     // Azure OpenAI Support
     azureDefaultDeployment: process.env.AZURE_OPENAI_DEPLOYMENT!,
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
-    azureApiVersion: '2024-02-15-preview',
+    azureApiVersion: '2024-05-01-preview',
     azureADTokenProvider: getBearerTokenProvider(
         new DefaultAzureCredential(),
         'https://cognitiveservices.azure.com/.default'
