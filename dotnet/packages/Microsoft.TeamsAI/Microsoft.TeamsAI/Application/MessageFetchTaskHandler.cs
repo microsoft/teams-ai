@@ -18,7 +18,7 @@ namespace Microsoft.Teams.AI.Application
     /// <summary>
     /// Response for the "message/taskFetch" route handler. Only set one or the other, but not both.
     /// </summary>
-    public class MessageFetchTaskResponse()
+    public class MessageFetchTaskResponse
     {
         /// <summary>
         /// The task module metadata.
