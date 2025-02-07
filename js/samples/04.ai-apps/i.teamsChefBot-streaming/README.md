@@ -2,18 +2,20 @@
 
 This is a conversational streaming bot for Microsoft Teams that thinks it's a Chef to help you cook apps using the Teams AI Library. The bot uses the `gpt-4o` model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
 
+> **PLEASE NOTE**, while you can use Teams Toolkit to help provision your bot, streaming is not currently available in Teams in the browser. To test, you will need to use the Teams client.
+
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [Microsoft Teams Conversational Streaming Bot with AI: Teams Chef](#microsoft-teams-conversational-streaming-bot-with-ai-teams-chef)
-  - [Summary](#summary)
-  - [Streaming](#streaming)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Setting up AI keys](#setting-up-ai-keys)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
-    - [Using Teams App test tool](#using-teams-app-test-tool)
+-   [Microsoft Teams Conversational Streaming Bot with AI: Teams Chef](#microsoft-teams-conversational-streaming-bot-with-ai-teams-chef)
+    -   [Summary](#summary)
+    -   [Streaming](#streaming)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Setting up AI keys](#setting-up-ai-keys)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+        -   [Using Teams App test tool](#using-teams-app-test-tool)
 
 <!-- /code_chunk_output -->
 
