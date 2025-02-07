@@ -82,7 +82,7 @@ export class VectraDataSource implements DataSource {
 
             // Azure OpenAI Support
             azureApiKey: options.azureApiKey,
-            azureDeployment: 'embedding',
+            azureDeployment: 'text-embedding-ada-002',
             azureEndpoint: options.azureEndpoint
         });
 
