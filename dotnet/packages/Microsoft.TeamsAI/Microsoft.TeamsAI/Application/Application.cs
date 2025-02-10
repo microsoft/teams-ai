@@ -31,6 +31,7 @@ namespace Microsoft.Teams.AI
     {
         private static readonly string CONFIG_FETCH_INVOKE_NAME = "config/fetch";
         private static readonly string CONFIG_SUBMIT_INVOKE_NAME = "config/submit";
+        private static readonly string MESSAGE_FETCH_TASK_INVOKE_NAME = "message/fetchTask";
 
         private readonly AI<TState>? _ai;
         private readonly BotAdapter? _adapter;
@@ -647,6 +648,50 @@ namespace Microsoft.Teams.AI
         }
 
         /// <summary>
+        /// Handles message fetch task events.
+        /// </summary>
+        /// <param name="handler">Function to call when the event is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState> OnMessageFetchTask(MessageFetchTaskHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            RouteSelectorAsync routeSelector = (turnContext, cancellationToken) => Task.FromResult(
+                string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(turnContext.Activity.Name, MESSAGE_FETCH_TASK_INVOKE_NAME));
+            RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
+            {
+                MessageFetchTaskResponse response = await handler(turnContext, turnState, turnContext.Activity.Value, cancellationToken);
+
+                // Check to see if an invoke response has already been added
+                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) != null)
+                {
+                    return;
+                }
+
+                TaskModuleResponse result = new TaskModuleResponse();
+                if (response.TaskInfo != null)
+                {
+                    result.Task = new TaskModuleContinueResponse()
+                    {
+                        Value = response.TaskInfo
+                    };
+                } else
+                {
+                    result.Task = new TaskModuleMessageResponse()
+                    {
+                        Value = response.Message ?? string.Empty
+                    };
+                }
+                
+
+                Activity activity = ActivityUtilities.CreateInvokeResponseActivity(response);
+                await turnContext.SendActivityAsync(activity, cancellationToken);
+            };
+            AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
+            return this;
+        }
+
+        /// <summary>
         /// Handles config submit events for Microsoft Teams.
         /// </summary>
         /// <param name="handler">Function to call when the event is triggered.</param>
@@ -879,7 +924,6 @@ namespace Microsoft.Teams.AI
             await _StartLongRunningCall(turnContext, _OnTurnAsync, cancellationToken);
         }
 
-        // TODO: Make TypingTimer thread-safe and work for each turn
         /// <summary>
         /// Manually start a timer to periodically send "typing" activities.
         /// </summary>

@@ -8,15 +8,13 @@ import { Prompt, PromptTemplate, PromptTemplateConfig, UserMessage } from '../pr
 import { JSONResponseValidator } from '../validators';
 import { TestTurnState } from '../internals/testing/TestTurnState';
 
-describe('LLMClient', function() {
+describe('LLMClient', function () {
     const functions = new TestPromptManager();
     const tokenizer = new GPTTokenizer();
     const validator = new JSONResponseValidator();
     const template: PromptTemplate = {
         name: 'test',
-        prompt: new Prompt([
-            new UserMessage('hello')
-        ]),
+        prompt: new Prompt([new UserMessage('hello')]),
         config: {} as PromptTemplateConfig
     };
     const model = TestModel.returnContent('hi! how are you?');
@@ -44,7 +42,7 @@ describe('LLMClient', function() {
                 max_repair_attempts: 11,
                 tokenizer,
                 validator,
-                logRepairs: true,
+                logRepairs: true
             });
             assert(client, 'client should not be null');
             assert.equal(client.options.model, model, 'model should match');
@@ -92,9 +90,10 @@ describe('LLMClient', function() {
                 assert.equal(response.error.message, 'some error occurred!', 'response error message should match');
             });
         });
-        
-        it('should successfully complete a streaming prompt', async () => {
+
+        it('should successfully complete a streaming prompt', async function () {
             const adapter = new TestAdapter();
+            this.timeout(5000);
             await adapter.sendTextToBot('hello', async (context) => {
                 const state = await TestTurnState.create(context);
                 const client = new LLMClient({
@@ -102,24 +101,26 @@ describe('LLMClient', function() {
                     template
                 });
                 const response = await client.completePrompt(context, state, functions);
-                assert.equal(adapter.activeQueue.length, 3, 'adapter should have 3 messages in the queue');
+                assert.equal(adapter.activeQueue.length, 2, 'adapter should have 2 messages in the queue');
                 assert(response, 'response should not be null');
                 assert.equal(response.status, 'success', 'response status should be success');
                 assert(response.message == undefined, 'response message should be null');
             });
         });
 
-        it('should send a startStreamingMessage', async () => {
+        it('should send a startStreamingMessage', async function () {
             const adapter = new TestAdapter();
+            this.timeout(5000);
             await adapter.sendTextToBot('hello', async (context) => {
                 const state = await TestTurnState.create(context);
                 const client = new LLMClient({
                     model: streamingModel,
                     template,
-                    startStreamingMessage: 'start'
+                    startStreamingMessage: 'start',
+                    enableFeedbackLoop: true
                 });
                 const response = await client.completePrompt(context, state, functions);
-                assert.equal(adapter.activeQueue.length, 4, 'adapter should have 4 messages in the queue');
+                assert.equal(adapter.activeQueue.length, 2, 'adapter should have 2 messages in the queue');
                 assert.equal(adapter.activeQueue[0].text, 'start', 'adapter should have a start message in the queue');
                 assert(response, 'response should not be null');
                 assert.equal(response.status, 'success', 'response status should be success');

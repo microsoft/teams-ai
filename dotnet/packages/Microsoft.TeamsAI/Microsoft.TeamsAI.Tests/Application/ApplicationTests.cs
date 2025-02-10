@@ -23,18 +23,18 @@ namespace Microsoft.Teams.AI.Tests.Application
             Application<TurnState> app = new(applicationOptions);
 
             // Assert
-            Assert.NotEqual(null, app.Options);
+            Assert.NotNull(app.Options);
             Assert.Null(app.Options.Adapter);
             Assert.Null(app.Options.BotAppId);
             Assert.Null(app.Options.Storage);
             Assert.Null(app.Options.AI);
-            Assert.NotEqual(null, app.Options.TurnStateFactory);
+            Assert.NotNull(app.Options.TurnStateFactory);
             Assert.Null(app.Options.AdaptiveCards);
             Assert.Null(app.Options.TaskModules);
             Assert.Null(app.Options.LoggerFactory);
-            Assert.Equal(true, app.Options.RemoveRecipientMention);
-            Assert.Equal(true, app.Options.StartTypingTimer);
-            Assert.Equal(false, app.Options.LongRunningMessages);
+            Assert.True(app.Options.RemoveRecipientMention);
+            Assert.True(app.Options.StartTypingTimer);
+            Assert.False(app.Options.LongRunningMessages);
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 AutoSignIn = (context, cancellationToken) => Task.FromResult(false)
             };
-            authenticationOptions.AddAuthentication("graph", new OAuthSettings());
+            authenticationOptions.AddAuthentication("graph", new OAuthSettings() { ConnectionName = "graph-connection" });
             ApplicationOptions<TurnState> applicationOptions = new()
             {
                 RemoveRecipientMention = removeRecipientMention,
@@ -154,7 +154,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var timer = app.GetType().GetField("_typingTimer", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(app);
 
             Assert.NotNull(timer);
-            Assert.Equal(timer.GetType(), typeof(TypingTimer));
+            Assert.Equal(typeof(TypingTimer), timer.GetType());
         }
 
         [Fact]
@@ -172,7 +172,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var timer1 = app.GetType().GetField("_typingTimer", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(app);
 
             Assert.NotNull(timer1);
-            Assert.Equal(timer1.GetType(), typeof(TypingTimer));
+            Assert.Equal(typeof(TypingTimer), timer1.GetType());
 
             // Act 2
             app.StartTypingTimer(turnContext);
@@ -181,7 +181,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var timer2 = app.GetType().GetField("_typingTimer", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(app);
 
             Assert.NotNull(timer2);
-            Assert.Equal(timer2.GetType(), typeof(TypingTimer));
+            Assert.Equal(typeof(TypingTimer), timer2.GetType());
             Assert.Equal(timer2, timer2);
         }
 
@@ -487,7 +487,7 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(authException);
-            Assert.True(authException.Message.StartsWith("Error occured while trying to authenticate user:"));
+            Assert.StartsWith("Error occured while trying to authenticate user:", authException.Message);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Microsoft.Teams.AI.AI.Tokenizers
         /// <summary>
         /// Creates an instance of `GPTTokenizer` using "gpt-4" model name by default which is using the `cl100k_base` encoding
         /// </summary>
-        public GPTTokenizer() => _encoding = Tokenizer.CreateTiktokenForModel("gpt-4");
+        public GPTTokenizer() => _encoding = TiktokenTokenizer.CreateForModel("gpt-4");
 
         /// <summary>
         /// Creates an instance of `GPTTokenizer`
@@ -24,7 +24,7 @@ namespace Microsoft.Teams.AI.AI.Tokenizers
         /// Creates an instance of `GPTTokenizer`
         /// </summary>
         /// <param name="model">model to encode/decode for</param>
-        public GPTTokenizer(string model) => this._encoding = Tokenizer.CreateTiktokenForModel(model);
+        public GPTTokenizer(string model) => this._encoding = TiktokenTokenizer.CreateForModel(model);
 
         /// <summary>
         /// Encode

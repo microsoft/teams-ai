@@ -154,6 +154,11 @@ export class ConversationHistory extends PromptSectionBase {
             messages.unshift(message);
         }
 
+        // Remove completed partial action outputs
+        while (messages.length > 0 && messages[0].role === 'tool') {
+            messages.shift();
+        }
+
         return { output: messages, length: tokens, tooLong: tokens > maxTokens };
     }
 }

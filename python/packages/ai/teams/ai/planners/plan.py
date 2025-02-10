@@ -29,6 +29,9 @@ class PredictedDoCommand(DataClassJsonMixin):
     parameters: Dict[str, Any] = field(default_factory=dict)
     "Any parameters that the AI system should use to perform the action."
 
+    action_id: Optional[str] = None
+    "The id mapped to the named action that the AI system should perform."
+
 
 @dataclass_json
 @dataclass

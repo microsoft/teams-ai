@@ -6,14 +6,13 @@ using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using Newtonsoft.Json.Linq;
-using Record = Microsoft.Teams.AI.State.Record;
 
 namespace Microsoft.Teams.AI.Tests.Application
 {
     public class TaskModulesTests
     {
         [Fact]
-        public async void Test_OnFetch_Verb()
+        public async Task Test_OnFetch_Verb()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -65,13 +64,13 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
 
         [Fact]
-        public async void Test_OnFetch_Verb_NotHit()
+        public async Task Test_OnFetch_Verb_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -121,7 +120,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnFetch_RouteSelector_ActivityNotMatched()
+        public async Task Test_OnFetch_RouteSelector_ActivityNotMatched()
         {
             var adapter = new SimpleAdapter();
             var turnContext = new TurnContext(adapter, new Activity()
@@ -158,7 +157,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnSubmit_Verb()
+        public async Task Test_OnSubmit_Verb()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -210,13 +209,13 @@ namespace Microsoft.Teams.AI.Tests.Application
 
             // Assert
             Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Single(activitiesToSend);
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
 
         [Fact]
-        public async void Test_OnSubmit_Verb_NotHit()
+        public async Task Test_OnSubmit_Verb_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -267,7 +266,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnSubmit_RouteSelector_ActivityNotMatched()
+        public async Task Test_OnSubmit_RouteSelector_ActivityNotMatched()
         {
             var adapter = new SimpleAdapter();
             var turnContext = new TurnContext(adapter, new Activity()

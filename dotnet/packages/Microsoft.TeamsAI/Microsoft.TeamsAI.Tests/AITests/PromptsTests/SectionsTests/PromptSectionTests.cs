@@ -32,7 +32,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
     public class PromptSectionTests
     {
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldRender()
+        public async Task Test_RenderAsTextAsync_ShouldRender()
         {
             TestSection section = new();
             Mock<ITurnContext> context = new();
@@ -46,7 +46,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         }
 
         [Fact]
-        public async void Test_RenderAsTextAsync_ShouldTruncate()
+        public async Task Test_RenderAsTextAsync_ShouldTruncate()
         {
             TestSection section = new(8);
             Mock<ITurnContext> context = new();

@@ -41,6 +41,7 @@ from .auth import AuthManager, OAuth, OAuthOptions, SsoAuth, SsoOptions
 from .feedback_loop_data import FeedbackLoopData
 from .meetings.meetings import Meetings
 from .message_extensions.message_extensions import MessageExtensions
+from .messages.messages import Messages
 from .route import Route, RouteHandler
 from .state import TurnState
 from .task_modules import TaskModules
@@ -79,6 +80,7 @@ class Application(Bot, Generic[StateT]):
     _message_extensions: MessageExtensions[StateT]
     _task_modules: TaskModules[StateT]
     _meetings: Meetings[StateT]
+    _messages: Messages[StateT]
 
     def __init__(self, options: ApplicationOptions = ApplicationOptions()) -> None:
         """
@@ -96,6 +98,7 @@ class Application(Bot, Generic[StateT]):
             self._routes, options.task_modules.task_data_filter
         )
         self._meetings = Meetings[StateT](self._routes)
+        self._messages = Messages[StateT](self._routes)
 
         if options.long_running_messages and (not options.adapter or not options.bot_app_id):
             raise ApplicationError("""
@@ -190,6 +193,13 @@ class Application(Bot, Generic[StateT]):
         Access the application's meetings functionalities.
         """
         return self._meetings
+
+    @property
+    def messages(self) -> Messages[StateT]:
+        """
+        Access the application's messages functionalities.
+        """
+        return self._messages
 
     async def get_token_or_sign_in_user(
         self, context: TurnContext, state: StateT, setting_name: str
@@ -469,6 +479,12 @@ class Application(Bot, Generic[StateT]):
                 if not context.activity.value:
                     return False
                 await func(context, state, context.activity.value)
+                await context.send_activity(
+                    Activity(
+                        type=ActivityTypes.invoke_response,
+                        value=InvokeResponse(status=200, body={}),
+                    )
+                )
                 return True
 
             self._routes.append(Route[StateT](__selector__, __handler__, True))
@@ -511,6 +527,12 @@ class Application(Bot, Generic[StateT]):
                 if not context.activity.value:
                     return False
                 await func(context, state, context.activity.value)
+                await context.send_activity(
+                    Activity(
+                        type=ActivityTypes.invoke_response,
+                        value=InvokeResponse(status=200, body={}),
+                    )
+                )
                 return True
 
             self._routes.append(Route[StateT](__selector__, __handler__, True))
@@ -627,7 +649,8 @@ class Application(Bot, Generic[StateT]):
             return (
                 context.activity.type == ActivityTypes.invoke
                 and context.activity.name == "message/submitAction"
-                and context.activity.value.action_name == "feedback"
+                and isinstance(context.activity.value, dict)
+                and context.activity.value.get("actionName") == "feedback"
             )
 
         def __call__(
@@ -637,12 +660,20 @@ class Application(Bot, Generic[StateT]):
                 if not context.activity.value:
                     return False
 
-                feedback = context.activity.value
-                feedback.reply_to_id = context.activity.reply_to_id
+                activity_value: dict = context.activity.value
+                feedback = FeedbackLoopData.from_dict(
+                    {
+                        **activity_value,
+                        "reply_to_id": context.activity.reply_to_id,
+                    }
+                )
 
                 await func(context, state, feedback)
                 await context.send_activity(
-                    Activity(type=ActivityTypes.invoke_response, value=InvokeResponse(status=200))
+                    Activity(
+                        type=ActivityTypes.invoke_response,
+                        value=InvokeResponse(status=200, body={}),
+                    )
                 )
                 return True
 

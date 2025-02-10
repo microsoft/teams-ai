@@ -35,7 +35,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         private const string SETTING_NAME = "settingName";
 
         [Fact]
-        public async void Test_CreateOAuthCard_WithSSOEnabled()
+        public async Task Test_CreateOAuthCard_WithSSOEnabled()
         {
             // Arrange
             IActivity sentActivity;
@@ -44,7 +44,8 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
 
             var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var authSettings = new OAuthSettings() {
+            var authSettings = new OAuthSettings()
+            {
                 ConnectionName = "connectionName",
                 Title = "title",
                 Text = "text",
@@ -63,17 +64,17 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             Assert.Equal(card.ConnectionName, authSettings.ConnectionName);
             Assert.Equal(card.Buttons[0].Title, authSettings.Title);
             Assert.Equal(card.Buttons[0].Text, authSettings.Text);
-            Assert.Equal(card.Buttons[0].Type, "signin");
-            Assert.Equal(card.Buttons[0].Value, "signInLink");
+            Assert.Equal("signin", card.Buttons[0].Type);
+            Assert.Equal("signInLink", card.Buttons[0].Value);
             Assert.NotNull(card.TokenExchangeResource);
-            Assert.Equal(card.TokenExchangeResource.Id, "id");
-            Assert.Equal(card.TokenExchangeResource.Uri, "uri");
+            Assert.Equal("id", card.TokenExchangeResource.Id);
+            Assert.Equal("uri", card.TokenExchangeResource.Uri);
             Assert.NotNull(card.TokenPostResource);
-            Assert.Equal(card.TokenPostResource.SasUrl, "sasUrl");
+            Assert.Equal("sasUrl", card.TokenPostResource.SasUrl);
         }
 
         [Fact]
-        public async void Test_CreateOAuthCard_WithoutSSO()
+        public async Task Test_CreateOAuthCard_WithoutSSO()
         {
             // Arrange
             IActivity sentActivity;
@@ -102,15 +103,15 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             Assert.Equal(card.ConnectionName, authSettings.ConnectionName);
             Assert.Equal(card.Buttons[0].Title, authSettings.Title);
             Assert.Equal(card.Buttons[0].Text, authSettings.Text);
-            Assert.Equal(card.Buttons[0].Type, "signin");
+            Assert.Equal("signin", card.Buttons[0].Type);
             Assert.Equal(card.Buttons[0].Value, "signInLink");
             Assert.Null(card.TokenExchangeResource);
             Assert.NotNull(card.TokenPostResource);
-            Assert.Equal(card.TokenPostResource.SasUrl, "sasUrl");
+            Assert.Equal("sasUrl", card.TokenPostResource.SasUrl);
         }
 
         [Fact]
-        public async void Test_VerifyStateRouteSelector_ReturnsTrue()
+        public async Task Test_VerifyStateRouteSelector_ReturnsTrue()
         {
             // Arrange
             var testAdapter = new SimpleAdapter();
@@ -121,7 +122,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
 
             // Act
             var result = await botAuth.VerifyStateRouteSelector(turnContext, default);
@@ -131,7 +132,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_VerifyStateRouteSelector_IncorrectActivity_ReturnsFalse ()
+        public async Task Test_VerifyStateRouteSelector_IncorrectActivity_ReturnsFalse()
         {
             // Arrange
             var testAdapter = new SimpleAdapter();
@@ -142,7 +143,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
 
             // Act
             var result = await botAuth.VerifyStateRouteSelector(turnContext, default);
@@ -152,7 +153,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_VerifyStateRouteSelector_IncorrectInvokeName_ReturnsFalse()
+        public async Task Test_VerifyStateRouteSelector_IncorrectInvokeName_ReturnsFalse()
         {
             // Arrange
             var testAdapter = new SimpleAdapter();
@@ -163,7 +164,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
 
             // Act
             var result = await botAuth.VerifyStateRouteSelector(turnContext, default);
@@ -173,7 +174,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_VerifyStateRouteSelector_IncorrectSettingName_ReturnsFalse()
+        public async Task Test_VerifyStateRouteSelector_IncorrectSettingName_ReturnsFalse()
         {
             // Arrange
             var testAdapter = new SimpleAdapter();
@@ -184,7 +185,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", "NOT SETTING_NAME");
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
 
             // Act
             var result = await botAuth.VerifyStateRouteSelector(turnContext, default);
@@ -194,7 +195,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_TokenExchangeRouteSelector_ReturnsTrue()
+        public async Task Test_TokenExchangeRouteSelector_ReturnsTrue()
         {
             // Arrange
             var testAdapter = new SimpleAdapter();
@@ -205,7 +206,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
 
             // Act
             var result = await botAuth.TokenExchangeRouteSelector(turnContext, default);
@@ -215,7 +216,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_TokenExchangeRouteSelector_IncorrectActivity_ReturnsFalse()
+        public async Task Test_TokenExchangeRouteSelector_IncorrectActivity_ReturnsFalse()
         {
             // Arrange
             var testAdapter = new SimpleAdapter();
@@ -226,7 +227,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
 
             // Act
             var result = await botAuth.TokenExchangeRouteSelector(turnContext, default);
@@ -236,7 +237,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_TokenExchangeRouteSelector_IncorrectInvokeName_ReturnsFalse()
+        public async Task Test_TokenExchangeRouteSelector_IncorrectInvokeName_ReturnsFalse()
         {
             // Arrange
             var testAdapter = new SimpleAdapter();
@@ -247,7 +248,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", SETTING_NAME);
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
 
             // Act
             var result = await botAuth.TokenExchangeRouteSelector(turnContext, default);
@@ -257,7 +258,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         }
 
         [Fact]
-        public async void Test_TokenExchangeRouteSelector_IncorrectSettingName_ReturnsFalse()
+        public async Task Test_TokenExchangeRouteSelector_IncorrectSettingName_ReturnsFalse()
         {
             // Arrange
             var testAdapter = new SimpleAdapter();
@@ -268,7 +269,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             ((JObject)turnContext.Activity.Value).Add("settingName", "NOT SETTING_NAME");
 
             var app = new TestApplication(new() { Adapter = testAdapter });
-            var botAuth = new TestOAuthBotAuthentication(app, new(), SETTING_NAME);
+            var botAuth = new TestOAuthBotAuthentication(app, new() { ConnectionName = "connectionName" }, SETTING_NAME);
 
             // Act
             var result = await botAuth.TokenExchangeRouteSelector(turnContext, default);

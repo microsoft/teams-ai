@@ -1,13 +1,21 @@
-﻿using Azure.AI.OpenAI.Assistants;
+﻿using Azure.AI.OpenAI;
+using Azure.Core;
 using Microsoft.Bot.Builder;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Teams.AI.AI.Models;
+using Microsoft.Teams.AI.Application;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
+using OAI = OpenAI;
+using OpenAI.Assistants;
+using OpenAI.Files;
+using System.ClientModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
+#pragma warning disable OPENAI001
 // Assistants API is currently in beta and is subject to change.
 #pragma warning disable IDE0130 // Namespace does not match folder structure
 [assembly: InternalsVisibleTo("Microsoft.Teams.AI.Tests")]
@@ -23,8 +31,13 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
         private static readonly TimeSpan DEFAULT_POLLING_INTERVAL = TimeSpan.FromSeconds(1);
 
         private readonly AssistantsPlannerOptions _options;
-        private readonly AssistantsClient _client;
+        private readonly AssistantClient _client;
+        private readonly OpenAIFileClient _fileClient;
+
+        // TODO: Write trace logs
+#pragma warning disable IDE0052 // Remove unread private members
         private readonly ILogger _logger;
+#pragma warning restore IDE0052 // Remove unread private members
 
         /// <summary>
         /// Create new AssistantsPlanner.
@@ -34,36 +47,71 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
         public AssistantsPlanner(AssistantsPlannerOptions options, ILoggerFactory? loggerFactory = null)
         {
             Verify.ParamNotNull(options);
-            Verify.ParamNotNull(options.ApiKey, "AssistantsPlannerOptions.ApiKey");
             Verify.ParamNotNull(options.AssistantId, "AssistantsPlannerOptions.AssistantId");
 
-            _options = new AssistantsPlannerOptions(options.ApiKey, options.AssistantId)
-            {
-                Organization = options.Organization,
-                PollingInterval = options.PollingInterval ?? DEFAULT_POLLING_INTERVAL
-            };
-            _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<AssistantsPlanner<TState>>();
-            _client = _CreateClient(options.ApiKey, options.Endpoint);
+            options.PollingInterval = options.PollingInterval ?? DEFAULT_POLLING_INTERVAL;
 
+            _options = options;
+            _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<AssistantsPlanner<TState>>();
+
+            if (options.TokenCredential != null)
+            {
+                Verify.ParamNotNull(options.Endpoint, "AssistantsPlannerOptions.Endpoint");
+                _client = _CreateClient(options.TokenCredential, options.Endpoint!);
+                _fileClient = _CreateFileClient(options.TokenCredential, options.Endpoint!);
+            }
+            else if (options.ApiKey != null)
+            {
+                _client = _CreateClient(options.ApiKey, options.Endpoint);
+                _fileClient = _CreateFileClient(options.ApiKey, options.Endpoint);
+            }
+            else
+            {
+                throw new ArgumentException("Either `AssistantsPlannerOptions.ApiKey` or `AssistantsPlannerOptions.TokenCredential` should be set.");
+            }
         }
 
         /// <summary>
-        /// Static helper method for programmatically creating an assistant.
+        /// Static helper method for programatically creating an assistant.
         /// </summary>
         /// <param name="apiKey">OpenAI or Azure OpenAI API key.</param>
         /// <param name="request">Definition of the assistant to create.</param>
+        /// <param name="model">The underlying LLM model.</param>
         /// <param name="endpoint">Azure OpenAI API Endpoint.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>The created assistant.</returns>
-        public static async Task<Assistant> CreateAssistantAsync(string apiKey, AssistantCreationOptions request, string? endpoint = null, CancellationToken cancellationToken = default)
+        public static async Task<Assistant> CreateAssistantAsync(string apiKey, AssistantCreationOptions request, string model, string? endpoint = null, CancellationToken cancellationToken = default)
         {
             Verify.ParamNotNull(apiKey);
             Verify.ParamNotNull(request);
+            Verify.ParamNotNull(model);
 
-            AssistantsClient client = _CreateClient(apiKey, endpoint);
+            AssistantClient client = _CreateClient(apiKey, endpoint);
 
-            return await client.CreateAssistantAsync(request, cancellationToken);
+            return await client.CreateAssistantAsync(model, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Static helper method for programatically creating an assistant.
+        /// </summary>
+        /// <param name="tokenCredential">Azure token credential to authenticate requests</param>
+        /// <param name="request">Definition of the assistant to create.</param>
+        /// <param name="model">The underlying LLM model.</param>
+        /// <param name="endpoint">Azure OpenAI API Endpoint.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>The created assistant.</returns>
+        public static async Task<Assistant> CreateAssistantAsync(TokenCredential tokenCredential, AssistantCreationOptions request, string model, string endpoint, CancellationToken cancellationToken = default)
+        {
+            Verify.ParamNotNull(tokenCredential);
+            Verify.ParamNotNull(request);
+            Verify.ParamNotNull(model);
+            Verify.ParamNotNull(endpoint);
+
+            AssistantClient client = _CreateClient(tokenCredential, endpoint);
+
+            return await client.CreateAssistantAsync(model, request, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -141,14 +189,14 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             // Loop until the last run is completed
             while (true)
             {
-                PageableList<ThreadRun>? runs = await _client.GetRunsAsync(threadId, null, null, null, null, cancellationToken);
+                AsyncCollectionResult<ThreadRun>? runs = _client.GetRunsAsync(threadId, new() { Order = RunCollectionOrder.Descending }, cancellationToken);
 
-                if (runs == null || runs.Count() == 0)
+                if (runs == null)
                 {
                     return;
                 }
 
-                ThreadRun? run = runs.ElementAt(0);
+                ThreadRun? run = runs.GetAsyncEnumerator().Current;
                 if (run == null || _IsRunCompleted(run))
                 {
                     return;
@@ -162,9 +210,9 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
         private async Task<Plan> _GeneratePlanFromMessagesAsync(string threadId, string lastMessageId, CancellationToken cancellationToken)
         {
             // Find the new messages
-            PageableList<ThreadMessage> messages = await _client.GetMessagesAsync(threadId, null, null, null, lastMessageId, cancellationToken);
+            AsyncCollectionResult<ThreadMessage> messages = _client.GetMessagesAsync(threadId, new() { Order = MessageCollectionOrder.Descending }, cancellationToken);
             List<ThreadMessage> newMessages = new();
-            foreach (ThreadMessage message in messages)
+            await foreach (ThreadMessage message in messages)
             {
                 if (string.Equals(message.Id, lastMessageId))
                 {
@@ -183,35 +231,28 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             Plan plan = new();
             foreach (ThreadMessage message in newMessages)
             {
-                foreach (MessageContent content in message.ContentItems)
+                foreach (MessageContent content in message.Content)
                 {
-                    if (content is MessageTextContent textMessage)
-                    {
-                        plan.Commands.Add(new PredictedSayCommand(textMessage.Text ?? string.Empty));
-                    }
+                    ChatMessage chatMessage = new AssistantsMessage(content, _fileClient);
+                    plan.Commands.Add(new PredictedSayCommand(chatMessage));
                 }
             }
             return plan;
         }
 
-        private Plan _GeneratePlanFromTools(TState state, SubmitToolOutputsAction submitToolOutputsAction)
+        private Plan _GeneratePlanFromTools(TState state, IReadOnlyList<RequiredAction> requiredActions)
         {
             Plan plan = new();
             Dictionary<string, string> toolMap = new();
-            foreach (RequiredToolCall toolCall in submitToolOutputsAction.ToolCalls)
+            foreach (RequiredAction requiredAction in requiredActions)
             {
-                RequiredFunctionToolCall? functionToolCall = toolCall as RequiredFunctionToolCall;
-                if (functionToolCall == null)
-                {
-                    return plan;
-                }
-
+                // Currently `RequiredAction` is only for a function tool call
                 // TODO: Potential bug if assistant predicts same tool twice.
-                toolMap[functionToolCall!.Name] = toolCall.Id;
+                toolMap[requiredAction.FunctionName] = requiredAction.ToolCallId;
                 plan.Commands.Add(new PredictedDoCommand
                 (
-                    functionToolCall.Name,
-                    JsonSerializer.Deserialize<Dictionary<string, object?>>(functionToolCall.Arguments)
+                    requiredAction.FunctionName,
+                    JsonSerializer.Deserialize<Dictionary<string, object?>>(requiredAction.FunctionArguments)
                     ?? new Dictionary<string, object?>()
                 ));
             }
@@ -226,11 +267,8 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             Dictionary<string, string> toolMap = state.SubmitToolMap;
             foreach (KeyValuePair<string, string> requiredAction in toolMap)
             {
-                toolOutputs.Add(new()
-                {
-                    ToolCallId = requiredAction.Value,
-                    Output = state.Temp!.ActionOutputs.ContainsKey(requiredAction.Key) ? state.Temp!.ActionOutputs[requiredAction.Key] : string.Empty
-                });
+                ToolOutput toolOutput = new(requiredAction.Value, state.Temp!.ActionOutputs.ContainsKey(requiredAction.Key) ? state.Temp!.ActionOutputs[requiredAction.Key] : string.Empty);
+                toolOutputs.Add(toolOutput);
             }
 
             // Submit the tool outputs
@@ -241,16 +279,14 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
 
             if (result.Status == RunStatus.RequiresAction)
             {
-                SubmitToolOutputsAction? submitToolOutputs = result.RequiredAction as SubmitToolOutputsAction;
-
-                if (submitToolOutputs == null)
+                if (result.RequiredActions.Count == 0)
                 {
                     return new Plan();
                 }
 
                 state.SubmitToolOutputs = true;
 
-                return _GeneratePlanFromTools(state, submitToolOutputs);
+                return _GeneratePlanFromTools(state, result.RequiredActions);
             }
             else if (result.Status == RunStatus.Completed)
             {
@@ -277,10 +313,10 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             string threadId = await _EnsureThreadCreatedAsync(state, cancellationToken);
 
             // Add the users input to the thread
-            ThreadMessage message = await _client.CreateMessageAsync(threadId, "user", state.Temp?.Input ?? string.Empty, null, null, cancellationToken);
+            ThreadMessage message = await _CreateUserThreadMessageAsync(threadId, state, cancellationToken);
 
             // Create a new run
-            ThreadRun run = await _client.CreateRunAsync(threadId, new(_options.AssistantId), cancellationToken);
+            ThreadRun run = await _client.CreateRunAsync(threadId, _options.AssistantId, null, cancellationToken);
 
             // Update state and wait for the run to complete
             state.ThreadId = threadId;
@@ -290,16 +326,14 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
 
             if (result.Status == RunStatus.RequiresAction)
             {
-                SubmitToolOutputsAction? submitToolOutputs = result.RequiredAction as SubmitToolOutputsAction;
-
-                if (submitToolOutputs == null)
+                if (result.RequiredActions.Count == 0)
                 {
                     return new Plan();
                 }
 
                 state.SubmitToolOutputs = true;
 
-                return _GeneratePlanFromTools(state, submitToolOutputs);
+                return _GeneratePlanFromTools(state, result.RequiredActions);
             }
             else if (result.Status == RunStatus.Completed)
             {
@@ -320,20 +354,93 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             }
         }
 
-        internal static AssistantsClient _CreateClient(string apiKey, string? endpoint = null)
+        internal static AssistantClient _CreateClient(string apiKey, string? endpoint = null)
         {
             Verify.ParamNotNull(apiKey);
 
             if (endpoint != null)
             {
                 // Azure OpenAI
-                return new AssistantsClient(new Uri(endpoint), new Azure.AzureKeyCredential(apiKey));
+                AzureOpenAIClient azureOpenAI = new(new Uri(endpoint), new ApiKeyCredential(apiKey));
+                return azureOpenAI.GetAssistantClient();
             }
             else
             {
                 // OpenAI
-                return new AssistantsClient(apiKey);
+                return new AssistantClient(apiKey);
             }
+        }
+
+        internal static AssistantClient _CreateClient(TokenCredential tokenCredential, string endpoint)
+        {
+            Verify.ParamNotNull(tokenCredential);
+            Verify.ParamNotNull(endpoint);
+
+            AzureOpenAIClient azureOpenAI = new(new Uri(endpoint), tokenCredential);
+            return azureOpenAI.GetAssistantClient();
+        }
+
+        internal OpenAIFileClient _CreateFileClient(string apiKey, string? endpoint = null)
+        {
+            Verify.ParamNotNull(apiKey);
+
+            if (endpoint != null)
+            {
+                // Azure OpenAI
+                AzureOpenAIClient azureOpenAI = new(new Uri(endpoint), new ApiKeyCredential(apiKey));
+                return azureOpenAI.GetOpenAIFileClient();
+            }
+            else
+            {
+                // OpenAI
+                return new OpenAIFileClient(apiKey);
+            }
+        }
+
+        internal OpenAIFileClient _CreateFileClient(TokenCredential tokenCredential, string endpoint)
+        {
+            Verify.ParamNotNull(tokenCredential);
+            Verify.ParamNotNull(endpoint);
+
+            AzureOpenAIClient azureOpenAI = new(new Uri(endpoint), tokenCredential);
+            return azureOpenAI.GetOpenAIFileClient();
+        }
+
+        private async Task<ThreadMessage> _CreateUserThreadMessageAsync(string threadId, TState state, CancellationToken cancellationToken)
+        {
+            MessageCreationOptions options = new();
+
+            List<MessageContent> messages = new();
+            messages.Add(MessageContent.FromText(state.Temp?.Input ?? ""));
+
+            // Filter out files that don't have a filename
+            IList<InputFile>? inputFiles = state.Temp?.InputFiles.Where((file) => file.Filename != null && file.Filename != string.Empty).ToList();
+            if (inputFiles != null && inputFiles.Count > 0)
+            {
+                List<Task<ClientResult<OAI.Files.OpenAIFile>>> fileUploadTasks = new();
+                foreach (InputFile file in inputFiles)
+                {
+                    fileUploadTasks.Add(_fileClient.UploadFileAsync(file.Content, file.Filename!, FileUploadPurpose.Assistants));
+                }
+
+                ClientResult<OAI.Files.OpenAIFile>[] uploadedFiles = await Task.WhenAll(fileUploadTasks);
+                for (int i = 0; i < uploadedFiles.Count(); i++)
+                {
+                    OAI.Files.OpenAIFile file = uploadedFiles[i];
+                    if (inputFiles[i].ContentType.StartsWith("image/"))
+                    {
+                        messages.Add(MessageContent.FromImageFileId(file.Id, MessageImageDetail.Auto));
+                    }
+                    else
+                    {
+                        options.Attachments.Add(new MessageCreationAttachment(file.Id, new List<ToolDefinition>() { new FileSearchToolDefinition() }));
+                    }
+                }
+            }
+
+
+            return await _client.CreateMessageAsync(threadId, MessageRole.User, messages, options, cancellationToken);
         }
     }
 }
+#pragma warning restore OPENAI001

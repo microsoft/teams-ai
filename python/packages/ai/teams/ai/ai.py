@@ -167,8 +167,14 @@ class AI(Generic[StateT]):
                     output = await self._actions[ActionTypes.DO_COMMAND].invoke(
                         context, state, command, command.action
                     )
-                    loop = len(output) > 0
-                    state.temp.action_outputs[command.action] = output
+
+                    # Set output for action call
+                    if command.action_id:
+                        loop = True
+                        state.temp.action_outputs[command.action_id] = output or ""
+                    else:
+                        loop = len(output) > 0
+                        state.temp.action_outputs[command.action] = output
                 else:
                     output = await self._actions[ActionTypes.UNKNOWN_ACTION].invoke(
                         context, state, plan, command.action
@@ -185,7 +191,12 @@ class AI(Generic[StateT]):
                 return False
 
             state.temp.last_output = output
-            state.temp.input = output
+
+            if isinstance(command, PredictedDoCommand) and command.action_id:
+                state.delete("temp.input")
+            else:
+                state.temp.input = output
+
             state.temp.input_files = []
 
         if loop and self._options.allow_looping:
@@ -290,10 +301,10 @@ class AI(Generic[StateT]):
             for i, citation in enumerate(msg_context.citations):
                 citations.append(
                     ClientCitation(
-                        position=f"{i + 1}",
+                        position=i + 1,
                         appearance=Appearance(
                             name=citation.title or f"Document {i + 1}",
-                            abstract=snippet(citation.content, 500),
+                            abstract=snippet(citation.content, 477),
                         ),
                     )
                 )
@@ -304,10 +315,14 @@ class AI(Generic[StateT]):
 
         # If there are citations, filter out the citations unused in content.
         referenced_citations = get_used_citations(content_text, citations)
-        channel_data = {}
+        channel_data: Dict[str, Any] = {}
 
         if is_teams_channel:
-            channel_data["feedbackLoopEnabled"] = self._options.enable_feedback_loop
+            if self._options.enable_feedback_loop and not self._options.feedback_loop_type:
+                channel_data["feedbackLoopEnabled"] = self._options.enable_feedback_loop
+
+            if self._options.feedback_loop_type:
+                channel_data["feedbackLoop"] = {"type": self._options.feedback_loop_type}
 
         await context.send_activity(
             Activity(

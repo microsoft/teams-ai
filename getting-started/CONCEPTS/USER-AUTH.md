@@ -9,10 +9,12 @@
 - [Application class](./APPLICATION.md)
 - [Augmentations](./AUGMENTATIONS.md)
 - [Data Sources](./DATA-SOURCES.md)
+- [Function Calls](./FUNCTION-CALLS.md)
 - [Moderator](./MODERATOR.md)
 - [Planner](./PLANNER.md)
 - [Powered by AI](./POWERED-BY-AI.md)
 - [Prompts](./PROMPTS.md)
+- [Streaming](./STREAMING.md)
 - [Turns](./TURNS.md)
 - [**User Authentication**](./USER-AUTH.md)
 
@@ -142,7 +144,7 @@ auth=AuthOptions(
     settings={})
 ```
 
-The `autoSignIn` property takes a callback that triggers the sign in flow if it returns true. It depends on the turn context from which the incomming activity details can be extracted. In the above example, the library will not attempt to sign the user in if the incoming activity `commandId` is _"signOutCommand"_.
+The `autoSignIn` property takes a callback that triggers the sign in flow if it returns true. It depends on the turn context from which the incoming activity details can be extracted. In the above example, the library will not attempt to sign the user in if the incoming activity `commandId` is _"signOutCommand"_.
 
 This is useful if the user should be signed in by default before attempting to interacting with the bot in general.
 

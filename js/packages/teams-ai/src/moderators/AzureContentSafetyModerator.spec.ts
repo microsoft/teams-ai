@@ -119,10 +119,12 @@ describe('AzureContentSafetyModerator', () => {
                     status: '200',
                     statusText: 'OK',
                     data: {
-                        hateResult: {
-                            category: 'Hate',
-                            severity: 1
-                        }
+                        categoriesAnalysis: [
+                            {
+                                category: 'Hate',
+                                severity: 1
+                            }
+                        ]
                     }
                 })
             );
@@ -170,10 +172,12 @@ describe('AzureContentSafetyModerator', () => {
                     status: '200',
                     statusText: 'OK',
                     data: {
-                        hateResult: {
-                            category: 'Hate',
-                            severity: 7
-                        }
+                        categoriesAnalysis: [
+                            {
+                                category: 'Hate',
+                                severity: 7
+                            }
+                        ]
                     }
                 })
             );
@@ -221,18 +225,20 @@ describe('AzureContentSafetyModerator', () => {
                     status: '200',
                     statusText: 'OK',
                     data: {
-                        selfHarmResult: {
-                            category: 'SelfHarm',
-                            severity: 1
-                        },
-                        violenceResult: {
-                            category: 'Violence',
-                            severity: 1
-                        },
-                        sexualResult: {
-                            category: 'Sexual',
-                            severity: 1
-                        }
+                        categoriesAnalysis: [
+                            {
+                                category: 'SelfHarm',
+                                severity: 1
+                            },
+                            {
+                                category: 'Violence',
+                                severity: 1
+                            },
+                            {
+                                category: 'Sexual',
+                                severity: 1
+                            }
+                        ]
                     }
                 })
             );
@@ -292,18 +298,20 @@ describe('AzureContentSafetyModerator', () => {
                     status: '200',
                     statusText: 'OK',
                     data: {
-                        selfHarmResult: {
-                            category: 'SelfHarm',
-                            severity: 7
-                        },
-                        violenceResult: {
-                            category: 'Violence',
-                            severity: 7
-                        },
-                        sexualResult: {
-                            category: 'Sexual',
-                            severity: 7
-                        }
+                        categoriesAnalysis: [
+                            {
+                                category: 'SelfHarm',
+                                severity: 7
+                            },
+                            {
+                                category: 'Violence',
+                                severity: 7
+                            },
+                            {
+                                category: 'Sexual',
+                                severity: 7
+                            }
+                        ]
                     }
                 })
             );
@@ -373,18 +381,20 @@ describe('AzureContentSafetyModerator', () => {
                     status: '200',
                     statusText: 'OK',
                     data: {
-                        selfHarmResult: {
-                            category: 'SelfHarm',
-                            severity: 1
-                        },
-                        violenceResult: {
-                            category: 'Violence',
-                            severity: 1
-                        },
-                        sexualResult: {
-                            category: 'Sexual',
-                            severity: 1
-                        }
+                        categoriesAnalysis: [
+                            {
+                                category: 'SelfHarm',
+                                severity: 1
+                            },
+                            {
+                                category: 'Violence',
+                                severity: 1
+                            },
+                            {
+                                category: 'Sexual',
+                                severity: 1
+                            }
+                        ]
                     }
                 })
             );

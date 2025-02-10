@@ -10,8 +10,9 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
-teams-ai = "^1.2.2"
+teams-ai = "^1.6.0"
 python-dotenv = "^1.0.1"
+azure-identity = "^1.19.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"

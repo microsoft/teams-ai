@@ -110,9 +110,9 @@ class TestTemplateSection(IsolatedAsyncioTestCase):
             self.context, self.memory, self.functions, self.tokenizer, 100
         )
         self.assertEqual(
-            result.output, 'Hello "user_test_value" "conversation_test_value" "temp_input"'
+            result.output, 'Hello user_test_value conversation_test_value temp_input'
         )
-        self.assertEqual(result.length, 15)
+        self.assertEqual(result.length, 9)
         self.assertFalse(result.too_long)
 
     async def test_render_variable_with_whitespace(self):
@@ -124,9 +124,9 @@ class TestTemplateSection(IsolatedAsyncioTestCase):
             self.context, self.memory, self.functions, self.tokenizer, 100
         )
         self.assertEqual(
-            result.output, 'Hello "user_test_value" "conversation_test_value" "temp_input"'
+            result.output, 'Hello user_test_value conversation_test_value temp_input'
         )
-        self.assertEqual(result.length, 15)
+        self.assertEqual(result.length, 9)
         self.assertFalse(result.too_long)
 
     async def test_render_non_exist_variable(self):
@@ -146,10 +146,10 @@ class TestTemplateSection(IsolatedAsyncioTestCase):
         args, _kwargs = self.functions.invoke_function.call_args
         name_param_value = args[0]
         args_parama_value = args[4]
-        self.assertEqual(result.output, 'Hello "test_func"')
+        self.assertEqual(result.output, 'Hello test_func')
         self.assertEqual(name_param_value, "test_func")
         self.assertEqual(args_parama_value, [])
-        self.assertEqual(result.length, 5)
+        self.assertEqual(result.length, 3)
         self.assertFalse(result.too_long)
 
     async def test_render_function_with_args(self):
@@ -160,10 +160,10 @@ class TestTemplateSection(IsolatedAsyncioTestCase):
         args, _kwargs = self.functions.invoke_function.call_args
         name_param_value = args[0]
         args_parama_value = args[4]
-        self.assertEqual(result.output, 'Hello "test_func"')
+        self.assertEqual(result.output, 'Hello test_func')
         self.assertEqual(name_param_value, "test_func")
         self.assertEqual(args_parama_value, ["arg1", "arg2"])
-        self.assertEqual(result.length, 5)
+        self.assertEqual(result.length, 3)
         self.assertFalse(result.too_long)
 
     async def test_render_function_with_args_and_whitespaces(self):
@@ -174,10 +174,10 @@ class TestTemplateSection(IsolatedAsyncioTestCase):
         args, _kwargs = self.functions.invoke_function.call_args
         name_param_value = args[0]
         args_parama_value = args[4]
-        self.assertEqual(result.output, 'Hello "test_func"')
+        self.assertEqual(result.output, 'Hello test_func')
         self.assertEqual(name_param_value, "test_func")
         self.assertEqual(args_parama_value, ["arg1", "arg2"])
-        self.assertEqual(result.length, 5)
+        self.assertEqual(result.length, 3)
         self.assertFalse(result.too_long)
 
     async def test_render_function_with_quoted_args(self):
@@ -188,10 +188,10 @@ class TestTemplateSection(IsolatedAsyncioTestCase):
         args, _kwargs = self.functions.invoke_function.call_args
         name_param_value = args[0]
         args_parama_value = args[4]
-        self.assertEqual(result.output, 'Hello "test_func"')
+        self.assertEqual(result.output, 'Hello test_func')
         self.assertEqual(name_param_value, "test_func")
         self.assertEqual(args_parama_value, ["arg1", "arg2", "arg3"])
-        self.assertEqual(result.length, 5)
+        self.assertEqual(result.length, 3)
         self.assertFalse(result.too_long)
 
     async def test_render_empty_block(self):

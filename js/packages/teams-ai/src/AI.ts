@@ -8,10 +8,12 @@
 
 import { TurnContext } from 'botbuilder';
 
+import { TooManyStepsParameters } from './types';
+
 import * as actions from './actions';
 import { DefaultModerator } from './moderators';
 import { Moderator } from './moderators/Moderator';
-import { PredictedDoCommand, Planner, Plan } from './planners';
+import { Plan, Planner, PredictedDoCommand } from './planners';
 import { TurnState } from './TurnState';
 
 /**
@@ -66,6 +68,12 @@ export interface AIOptions<TState extends TurnState> {
      * https://github.com/microsoft/teams-ai/blob/main/getting-started/CONCEPTS/POWERED-BY-AI.md
      */
     enable_feedback_loop?: boolean;
+
+    /**
+     * Optional. Only used when `enable_feedback_loop` == `true`. When set to `custom` the user will be presented with a text input
+     * to provide feedback.
+     */
+    feedback_loop_type?: 'default' | 'custom';
 }
 
 /**
@@ -102,6 +110,12 @@ export interface ConfiguredAIOptions<TState extends TurnState> {
      * If true, the AI system will enable the feedback loop in Teams that allows a user to give thumbs up or down to a response.
      */
     enable_feedback_loop: boolean;
+
+    /**
+     * Optional. Only used when `enable_feedback_loop` == `true`. When set to `custom` the user will be presented with a text input
+     * to provide feedback.
+     */
+    feedback_loop_type?: 'default' | 'custom';
 }
 
 /**
@@ -118,6 +132,8 @@ export class AI<TState extends TurnState = TurnState> {
     /**
      * A text string that can be returned from an action to stop the AI system from continuing
      * to execute the current plan.
+     * @remarks
+     * This command is incompatible and should not be used with `tools` augmentation
      */
     public static readonly StopCommandName = actions.StopCommandName;
 
@@ -221,8 +237,11 @@ export class AI<TState extends TurnState = TurnState> {
         this.defaultAction(AI.HttpErrorActionName, actions.httpError());
         this.defaultAction(AI.PlanReadyActionName, actions.planReady());
         this.defaultAction(AI.DoCommandActionName, actions.doCommand());
-        this.defaultAction(AI.SayCommandActionName, actions.sayCommand(this._options.enable_feedback_loop));
         this.defaultAction(AI.TooManyStepsActionName, actions.tooManySteps());
+        this.defaultAction(
+            AI.SayCommandActionName,
+            actions.sayCommand(this._options.enable_feedback_loop, this._options.feedback_loop_type || 'default')
+        );
     }
 
     /**
@@ -240,6 +259,20 @@ export class AI<TState extends TurnState = TurnState> {
      */
     public get planner(): Planner<TState> {
         return this._options.planner;
+    }
+
+    /**
+     * @returns {boolean} Returns the feedback loop flag.
+     */
+    public get enableFeedbackLoop(): boolean {
+        return this._options.enable_feedback_loop;
+    }
+
+    /**
+     * @returns {boolean} Returns the feedback loop type.
+     */
+    public get feedbackLoopType(): 'default' | 'custom' | undefined {
+        return this._options.feedback_loop_type;
     }
 
     /**
@@ -393,7 +426,7 @@ export class AI<TState extends TurnState = TurnState> {
                 // Check for timeout
                 if (Date.now() - start_time! > max_time || ++step_count! > max_steps) {
                     completed = false;
-                    const parameters: actions.TooManyStepsParameters = {
+                    const parameters: TooManyStepsParameters = {
                         max_steps,
                         max_time,
                         start_time: start_time!,
@@ -409,15 +442,22 @@ export class AI<TState extends TurnState = TurnState> {
                 const cmd = plan.commands[i];
                 switch (cmd.type) {
                     case 'DO': {
-                        const { action } = cmd as PredictedDoCommand;
+                        const { action, actionId } = cmd as PredictedDoCommand;
                         if (this._actions.has(action)) {
                             // Call action handler
                             const handler = this._actions.get(action)!.handler;
                             output = await this._actions
                                 .get(AI.DoCommandActionName)!
                                 .handler(context, state, { handler, ...(cmd as PredictedDoCommand) }, action);
-                            should_loop = output.length > 0;
-                            state.temp.actionOutputs[action] = output;
+
+                            // Set output for action call
+                            if (actionId) {
+                                should_loop = true;
+                                state.temp.actionOutputs[actionId] = output ?? '';
+                            } else {
+                                should_loop = output.length > 0;
+                                state.temp.actionOutputs[action] = output;
+                            }
                         } else {
                             // Redirect to UnknownAction handler
                             output = await this._actions
@@ -444,8 +484,13 @@ export class AI<TState extends TurnState = TurnState> {
 
                 // Copy the actions output to the input
                 state.temp.lastOutput = output;
-                state.temp.input = output;
                 state.temp.inputFiles = [];
+
+                if (cmd.type === 'DO' && (cmd as PredictedDoCommand).actionId) {
+                    state.deleteValue('temp.input');
+                } else {
+                    state.temp.input = output;
+                }
             }
 
             // Check for looping

@@ -9,14 +9,18 @@
 - [Application class](./APPLICATION.md)
 - [Augmentations](./AUGMENTATIONS.md)
 - [Data Sources](./DATA-SOURCES.md)
+- [Function Calls](./FUNCTION-CALLS.md)
 - [Moderator](./MODERATOR.md)
 - [Planner](./PLANNER.md)
 - [Powered by AI](./POWERED-BY-AI.md)
 - [Prompts](./PROMPTS.md)
+- [Streaming](./STREAMING.md)
 - [Turns](./TURNS.md)
 - [User Authentication](./USER-AUTH.md)
 
 ---
+
+*NOTE: If you are adding custom actions to your AI system, please use [Function Calls](./FUNCTION-CALLS.md) instead.* 
 
 An action is an atomic function that is registered to the AI System. It is a fundamental building block of a plan. Actions are used to perform tasks such as creating a list, adding items to a list, or sending a message to the user. Actions are executed in the order they are defined in the plan.
 
@@ -103,6 +107,7 @@ An action handler is a callback function that is called when an action is trigge
 
 - If the result is a non-empty string, that string is included as the output of the action to the plan. The last output can be accessed in the next triggered action via the state object: `state.temp.lastOutput`.
 - If the action handler returns `AI.StopCommandName`, the `run` method will terminate execution.
+  > **Note:** `AI.StopCommandName` does not work with `tools` augmentation!
 - If the result is an empty string and there is a list of predicted commands, the next command in the plan is executed.
 - In sequence augmentation, the returned string is appended to the prompt at runtime (see Sequence [Augmentations](./AUGMENTATIONS.md)). This is then used to generate the plan object using defined actions.
 - In monologue augmentation, the returned string is used as inner monologue to perform chain-of-thought reasoning by appending instructions to the prompt during runtime (see Monologue [Augmentation](./AUGMENTATIONS.md)). This is for predicing the next action to execute.

@@ -98,6 +98,15 @@ describe('PromptManager', () => {
             const prompts = new TestPromptManager();
             assert(!prompts.hasDataSource('test'));
         });
+
+        it(`throws an error if augmentation data_source is not found`, async () => {
+            const prompts = new PromptManager({
+                promptsFolder: path.join(__dirname, '..', 'internals', 'testing', 'assets', 'test')
+            });
+            await assert.rejects(async () => {
+                await prompts.getPrompt('chat');
+            }, new Error(`DataSource 'azure-ai-search' not found for prompt 'chat'.`));
+        });
     });
 
     describe('addFunction', () => {
@@ -198,6 +207,36 @@ describe('PromptManager', () => {
             assert.notEqual(prompt, null);
         });
 
+        it(`return correct augmentation type if none and add augmentation datasource`, async () => {
+            const prompts = new PromptManager({
+                promptsFolder: path.join(__dirname, '..', 'internals', 'testing', 'assets', 'test')
+            });
+            prompts.addDataSource({
+                name: 'azure-ai-search',
+                renderData: async (context, memory, tokenizer, maxTokens): Promise<RenderedPromptSection<string>> => {
+                    return Promise.resolve({ text: 'test', output: 'test', length: 1, tokens: 1, tooLong: false });
+                }
+            });
+            const prompt = await prompts.getPrompt('chat');
+            assert.equal(prompt.config.augmentation!.augmentation_type, 'none');
+        });
+
+        it(`return correct augmentation type if tools`, async () => {
+            const prompts = new PromptManager({
+                promptsFolder: path.join(__dirname, '..', 'internals', 'testing', 'assets', 'test')
+            });
+            const prompt = await prompts.getPrompt('tools');
+            assert.equal(prompt.config.augmentation!.augmentation_type, 'tools');
+        });
+
+        it(`return correct augmentation type if sequence`, async () => {
+            const prompts = new PromptManager({
+                promptsFolder: path.join(__dirname, '..', 'internals', 'testing', 'assets', 'test')
+            });
+            const prompt = await prompts.getPrompt('sequence');
+            assert.equal(prompt.config.augmentation!.augmentation_type, 'sequence');
+        });
+
         it(`should throw an error if config.json is missing when using getPrompt`, async () => {
             const prompts = new PromptManager({
                 promptsFolder: path.join(__dirname, '..', 'internals', 'testing', 'assets', 'test')
@@ -226,12 +265,31 @@ describe('PromptManager', () => {
             });
         });
 
-        it(`should resolve the prompt template files if the prompt name doesn't exist`, async () => {
+        it(`should throw error if augmentation data source doesn't exist`, async () => {
             const prompts = new PromptManager({
                 promptsFolder: path.join(__dirname, '..', 'internals', 'testing', 'assets', 'test')
             });
-            const result = await prompts.hasPrompt('unknown');
-            assert.equal(result, true);
+            await assert.rejects(async () => {
+                await prompts.getPrompt('noAugDataSource');
+            }, new Error(`DataSource '0' not found for prompt 'noAugDataSource'.`));
+        });
+
+        it(`should return false if the prompt does not exist`, async () => {
+            const prompts = new PromptManager({
+                promptsFolder: path.join(__dirname, '..', 'internals', 'testing', 'assets', 'test')
+            });
+            // NOTE: ../internals/testing/assets/test should NOT have folder called notFound
+            const result = await prompts.hasPrompt('notFound');
+            assert.equal(result, false);
+        });
+
+        it(`should migrate schema if schema is 1`, async () => {
+            const prompts = new PromptManager({
+                promptsFolder: path.join(__dirname, '..', 'internals', 'testing', 'assets', 'test')
+            });
+            const updatedPrompt = await prompts.getPrompt('updateSchema');
+            assert.equal(updatedPrompt.config.schema, 1.1);
+            assert.equal(updatedPrompt.config.completion.model, 'defaultBackends');
         });
     });
 });

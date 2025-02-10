@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from typing import TypeVar, Union
+from typing import Optional, TypeVar
 
 from botbuilder.core import TurnContext
 
@@ -28,7 +28,7 @@ class DefaultAugmentation(Augmentation[str]):
     returns a `Plan` with a single `SAY` command containing the models response.
     """
 
-    def create_prompt_section(self) -> Union[PromptSection, None]:
+    def create_prompt_section(self) -> Optional[PromptSection]:
         """
         Creates an optional prompt section for the augmentation.
         """

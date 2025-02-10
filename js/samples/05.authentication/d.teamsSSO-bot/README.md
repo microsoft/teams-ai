@@ -6,10 +6,10 @@ This sample depends on Teams SSO and gives you more flexibility on how to config
 
 ## Showcase
 
--   The bot echos back any message it receives. That's it!
--   This app is the bot-equivalent of 'Hello world'.
--   The minimum setup shows how to set up a bot with the Teams AI SDK.
--   This sample leverages Teams SSO to acquire a token for app user.
+- The bot echos back any message it receives. That's it!
+- This app is the bot-equivalent of 'Hello world'.
+- The minimum setup shows how to set up a bot with the Teams AI SDK.
+- This sample leverages Teams SSO to acquire a token for app user.
 
 ## Setting up the sample
 
@@ -58,8 +58,8 @@ This sample depends on Teams SSO and gives you more flexibility on how to config
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
 
-Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
-For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
+Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](https://github.com/microsoft/teams-ai/blob/main/getting-started/OTHER/BOTFRAMEWORK-EMULATOR.md) section.
+For different ways to test a sample see: [Multiple ways to test](https://github.com/microsoft/teams-ai/tree/main/getting-started/OTHER)
 
 ### Using Teams Toolkit for Visual Studio Code
 
@@ -70,7 +70,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 1. Copy this sample into a new folder outside of teams-ai
 1. Select File > Open Folder in VS Code and choose this sample's directory
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
-1. Ensure that you have set up the sample from the previous step.
+1. Verify that the Teams Toolkit extension is connected to your Teams account from the above step.
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
 1. In the browser that launches, select the **Add** button to install the app to Teams.
 
@@ -86,13 +86,13 @@ This sample is configured to work only in the tenant in which the Azure app regi
     ```
 1. Navigate to the `teamsapp.local.yml` file and set
     ```yml
-    signInAudience: "AzureADMultipleOrgs" # Authenticate users with a Microsoft work or school account in your organization's Azure AD tenant (for example, single tenant).
+    signInAudience: 'AzureADMultipleOrgs' # Authenticate users with a Microsoft work or school account in your organization's Azure AD tenant (for example, single tenant).
     ```
 1. Navigate to the `src/auth-start.html` page and set
     ```js
     let authorizeEndpoint = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${toQueryString(queryParams)}`;
     ```
-2. Navigate to the `src/index.ts` file and on line 81 set 
+1. Navigate to the `src/index.ts` file and on line 81 set
     ```js
-    authority: `${process.env.AAD_APP_OAUTH_AUTHORITY_HOST}/common`
-    ``` 
+    authority: `${process.env.AAD_APP_OAUTH_AUTHORITY_HOST}/common`;
+    ```

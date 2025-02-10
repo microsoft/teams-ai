@@ -1,0 +1,7 @@
+﻿[*.cs]
+
+# CS0618: Type or member is obsolete
+dotnet_diagnostic.CS0618.severity = silent
+
+# IDE0028: Simplify collection initialization
+dotnet_diagnostic.IDE0028.severity = silent

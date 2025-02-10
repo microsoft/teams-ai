@@ -6,21 +6,21 @@ import { GPTTokenizer } from '../tokenizers';
 import { TestTurnState } from '../internals/testing/TestTurnState';
 import { Prompt, PromptTemplate, PromptTemplateConfig, UserMessage } from '../prompts';
 
-describe('TestModel', function() {
+describe('TestModel', function () {
     const adapter = new TestAdapter();
     const functions = new TestPromptManager();
     const tokenizer = new GPTTokenizer();
     const prompt: PromptTemplate = {
         name: 'test',
-        prompt: new Prompt([
-            new UserMessage('hello')
-        ]),
+        prompt: new Prompt([new UserMessage('hello')]),
         config: {} as PromptTemplateConfig
     };
-        
+
     describe('factories', () => {
         it('should factory a TestModel instance using a handler', async () => {
-            const model = TestModel.createTestModel(_ => Promise.resolve({ status: 'success', message: { role: 'assistant', content: 'hello world' } }));
+            const model = TestModel.createTestModel((_) =>
+                Promise.resolve({ status: 'success', message: { role: 'assistant', content: 'hello world' } })
+            );
             assert(model, 'model should not be null');
             assert(model.events, 'model.events should not be null');
         });
@@ -66,7 +66,11 @@ describe('TestModel', function() {
                 assert.equal(response.status, 'success', 'response.status should be "success"');
                 assert(response.message, 'response.message should not be null');
                 assert.equal(response.message.role, 'assistant', 'response.message.role should be "assistant"');
-                assert.equal(response.message.content, 'hi! how are you?', 'response.message.content should be "hi! how are you?"');
+                assert.equal(
+                    response.message.content,
+                    'hi! how are you?',
+                    'response.message.content should be "hi! how are you?"'
+                );
             });
         });
 
@@ -92,7 +96,7 @@ describe('TestModel', function() {
                 assert(response.error, 'response.error should not be null');
                 assert.equal(response.error.message, 'test error', 'response.error.message should be "test error"');
             });
-        }); 
+        });
 
         it('should fire events when completing a prompt', async () => {
             await adapter.sendTextToBot('test', async (context) => {
@@ -138,7 +142,11 @@ describe('TestModel', function() {
                     assert(memory, 'memory should not be null');
                     assert(chunk, 'chunk should not be null');
                     assert(chunk.delta, 'chunk.delta should not be null');
-                    assert.equal(chunk.delta.role, chunksReceived == 0 ? 'assistant' : undefined, 'chunk.delta.role should be "assistant"');
+                    assert.equal(
+                        chunk.delta.role,
+                        chunksReceived == 0 ? 'assistant' : undefined,
+                        'chunk.delta.role should be "assistant"'
+                    );
                     assert.equal(chunk.delta.content, chunks[chunksReceived], 'chunk.delta.content should match');
                     chunksReceived++;
                 });

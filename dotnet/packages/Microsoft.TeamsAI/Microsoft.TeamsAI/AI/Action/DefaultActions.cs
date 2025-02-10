@@ -15,9 +15,11 @@ namespace Microsoft.Teams.AI.AI.Action
     {
         private readonly ILogger _logger;
         private readonly bool _enableFeedbackLoop;
+        private readonly string _feedbackLoopType;
 
-        public DefaultActions(bool enableFeedbackLoop = false, ILoggerFactory? loggerFactory = null)
+        public DefaultActions(bool enableFeedbackLoop = false, string feedbackLoopType = "default", ILoggerFactory? loggerFactory = null)
         {
+            _feedbackLoopType = feedbackLoopType;
             _enableFeedbackLoop = enableFeedbackLoop;
             _logger = loggerFactory is null ? NullLogger.Instance : loggerFactory.CreateLogger(typeof(DefaultActions<TState>));
         }
@@ -105,7 +107,7 @@ namespace Microsoft.Teams.AI.AI.Action
                 int i = 0;
                 foreach (Citation citation in command.Response.Context.Citations)
                 {
-                    string abs = CitationUtils.Snippet(citation.Content, 500);
+                    string abs = CitationUtils.Snippet(citation.Content, 477);
                     if (isTeamsChannel)
                     {
                         content.Replace("\n", "<br>");
@@ -113,7 +115,7 @@ namespace Microsoft.Teams.AI.AI.Action
 
                     citations.Add(new ClientCitation()
                     {
-                        Position = $"{i + 1}",
+                        Position = i + 1,
                         Appearance = new ClientCitationAppearance()
                         {
                             Name = citation.Title,
@@ -130,10 +132,28 @@ namespace Microsoft.Teams.AI.AI.Action
             // If there are citations, filter out the citations unused in content.
             List<ClientCitation>? referencedCitations = citations.Count > 0 ? CitationUtils.GetUsedCitations(contentText, citations) : new List<ClientCitation>();
 
-            object? channelData = isTeamsChannel ? new
+            object? channelData = null;
+            if (isTeamsChannel)
             {
-                feedbackLoopEnabled = _enableFeedbackLoop
-            } : null;
+                if (_enableFeedbackLoop)
+                {
+                    channelData = new
+                    {
+                        feedbackLoop = new
+                        {
+                            type = _feedbackLoopType
+                        }
+                    };
+                } 
+                else
+                {
+                    channelData = new
+                    {
+                        feedbackLoopEnabled = false
+
+                    };
+                }
+            }
 
             AIEntity entity = new();
             if (referencedCitations != null)
@@ -141,12 +161,19 @@ namespace Microsoft.Teams.AI.AI.Action
                 entity.Citation = referencedCitations;
             }
 
+            List<Attachment>? attachments = new();
+            if (command.Response.Attachments != null)
+            {
+                attachments = command.Response.Attachments;
+            }
+
             await turnContext.SendActivityAsync(new Activity()
             {
                 Type = ActivityTypes.Message,
                 Text = contentText,
                 ChannelData = channelData,
-                Entities = new List<Entity>() { entity }
+                Entities = new List<Entity>() { entity },
+                Attachments = attachments
             }, cancellationToken);
 
             return string.Empty;

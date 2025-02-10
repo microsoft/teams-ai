@@ -3,6 +3,7 @@ using Microsoft.Teams.AI.AI.Models;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using OAI = OpenAI;
 
 namespace Microsoft.Teams.AI.AI.Prompts
 {
@@ -125,6 +126,8 @@ namespace Microsoft.Teams.AI.AI.Prompts
         [Obsolete("Use `completion.model` instead.")]
         public List<string> DefaultBackends { get; set; } = new();
 
+        private static readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true };
+
         /// <summary>
         /// Creates a prompt template configuration from JSON.
         /// </summary>
@@ -132,10 +135,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <returns>Prompt template configuration.</returns>
         internal static PromptTemplateConfiguration FromJson(string json)
         {
-            PromptTemplateConfiguration? result = JsonSerializer.Deserialize<PromptTemplateConfiguration>(json, new JsonSerializerOptions()
-            {
-                WriteIndented = true
-            });
+            PromptTemplateConfiguration? result = JsonSerializer.Deserialize<PromptTemplateConfiguration>(json, _serializerOptions);
 
             if (result == null)
             {
@@ -253,6 +253,21 @@ namespace Microsoft.Teams.AI.AI.Prompts
         public bool IncludeImages { get; set; } = false;
 
         /// <summary>
+        /// Defines function calling behavior. Defaults to "auto".
+        /// </summary>
+        [JsonPropertyName("tool_choice")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonPropertyOrder(13)]
+        public ChatToolChoice ToolChoice { get; set; } = ChatToolChoice.Auto;
+
+        /// <summary>
+        /// Configures parallel function calling. Defaults to "true".
+        /// </summary>
+        [JsonPropertyName("parallel_tool_calls")]
+        [JsonPropertyOrder(14)]
+        public bool ParallelToolCalls { get; set; } = true;
+
+        /// <summary>
         /// Additional data provided in the completion configuration.
         /// </summary>
         [JsonExtensionData]
@@ -272,6 +287,38 @@ namespace Microsoft.Teams.AI.AI.Prompts
             /// Text
             /// </summary>
             Text
+        }
+
+        /// <summary>
+        /// ChatToolChoice
+        /// </summary>
+        public enum ChatToolChoice
+        {
+            /// <summary>
+            /// None
+            /// </summary>
+            None,
+
+            /// <summary>
+            /// Auto
+            /// </summary>
+            Auto,
+
+            /// <summary>
+            /// Required
+            /// </summary>
+            Required
+        }
+
+        internal OAI.Chat.ChatToolChoice GetOpenAIChatToolChoice()
+        {
+            return ToolChoice switch
+            {
+                ChatToolChoice.Auto => OAI.Chat.ChatToolChoice.CreateAutoChoice(),
+                ChatToolChoice.Required => OAI.Chat.ChatToolChoice.CreateRequiredChoice(),
+                ChatToolChoice.None => OAI.Chat.ChatToolChoice.CreateNoneChoice(),
+                _ => throw new InvalidOperationException($"Unknown ChatToolChoice: {ToolChoice}"),
+            };
         }
     }
 

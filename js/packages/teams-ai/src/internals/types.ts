@@ -380,7 +380,7 @@ export interface ContentSafetyOptions {
      * When set to false, all analyses of harmful content will be performed, whether or not blocklists are hit.
      * Default value is false.
      */
-    breakByBlocklists?: boolean;
+    haltOnBlocklistHit?: boolean;
 }
 
 export interface CreateContentSafetyRequest extends ContentSafetyOptions {
@@ -399,9 +399,10 @@ export interface ContentSafetyHarmCategory {
 }
 
 export interface CreateContentSafetyResponse {
-    blocklistsMatchResults: Array<string>;
-    hateResult: ContentSafetyHarmCategory;
-    selfHarmResult: ContentSafetyHarmCategory;
-    sexualResult: ContentSafetyHarmCategory;
-    violenceResult: ContentSafetyHarmCategory;
+    blocklistsMatch: Array<{
+        blockListName: string;
+        blockListItemId: string;
+        blockListItemText: string;
+    }>;
+    categoriesAnalysis: Array<ContentSafetyHarmCategory>;
 }

@@ -11,12 +11,12 @@ import * as restify from 'restify';
 import { ActivityTypes, ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
 
 import {
-    ApplicationBuilder,
     ActionPlanner,
+    ApplicationBuilder,
     OpenAIModel,
     PromptManager,
-    TurnState,
-    TeamsAdapter
+    TeamsAdapter,
+    TurnState
 } from '@microsoft/teams-ai';
 
 import * as responses from './responses';
@@ -110,7 +110,7 @@ const prompts = new PromptManager({
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'monologue'
+    defaultPrompt: 'hint'
 });
 
 // Define storage and application

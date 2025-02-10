@@ -10,7 +10,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests
     public class PromptManagerTests
     {
         [Fact]
-        public async void Test_Functions()
+        public async Task Test_Functions()
         {
             PromptManager manager = new();
             Mock<ITurnContext> context = new();

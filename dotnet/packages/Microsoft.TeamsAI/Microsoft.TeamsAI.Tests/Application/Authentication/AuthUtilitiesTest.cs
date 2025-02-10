@@ -7,7 +7,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
     public class AuthUtilitiesTest
     {
         [Fact]
-        public async void Test_SetTokenInState()
+        public async Task Test_SetTokenInState()
         {
             // Arrange
             TurnContext context = TurnStateConfig.CreateConfiguredTurnContext();
@@ -23,7 +23,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
         }
 
         [Fact]
-        public async void Test_DeleteTokenFromState()
+        public async Task Test_DeleteTokenFromState()
         {
             // Arrange
             TurnContext context = TurnStateConfig.CreateConfiguredTurnContext();
@@ -40,7 +40,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
         }
 
         [Fact]
-        public async void Test_UserInSignInFlow()
+        public async Task Test_UserInSignInFlow()
         {
             // Arrange
             TurnContext context = TurnStateConfig.CreateConfiguredTurnContext();
@@ -57,7 +57,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
         }
 
         [Fact]
-        public async void Test_SetUserInSignInFlow()
+        public async Task Test_SetUserInSignInFlow()
         {
             // Arrange
             TurnContext context = TurnStateConfig.CreateConfiguredTurnContext();
@@ -72,7 +72,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
         }
 
         [Fact]
-        public async void Test_DeleteUserInSignInFlow()
+        public async Task Test_DeleteUserInSignInFlow()
         {
             // Arrange
             TurnContext context = TurnStateConfig.CreateConfiguredTurnContext();

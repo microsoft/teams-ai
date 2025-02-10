@@ -48,7 +48,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
                                 ""citations"": [
                                     {{
                                         ""title"": ""test-title"",
-                                        ""url"": ""test-url"",
+                                        ""url"": ""https://www.test-uri.com/"",
                                         ""content"": ""test-content""
                                     }}
                                 ]
@@ -67,10 +67,37 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             var context = message.Context;
             Assert.NotNull(context);
-            Assert.Equal(1, context.Citations.Count);
+            Assert.Single(context.Citations);
             Assert.Equal("test-title", context.Citations[0].Title);
-            Assert.Equal("test-url", context.Citations[0].Url);
+            Assert.Equal("https://www.test-uri.com/", context.Citations[0].Url);
             Assert.Equal("test-content", context.Citations[0].Content);
+        }
+
+        [Fact]
+        public void Test_Initialization_From_OpenAISdk_StreamingChatCompletionUpdate()
+        {
+            // Arrange
+            var chatCompletion = ModelReaderWriter.Read<StreamingChatCompletionUpdate>(BinaryData.FromString(@$"{{
+                ""choices"": [
+                    {{
+                        ""finish_reason"": null,
+                        ""delta"": {{
+                            ""role"": ""assistant"",
+                            ""content"": ""hello""
+                        }}
+                    }}
+                ]
+            }}"));
+
+            // Act
+            var message = new ChatMessage(chatCompletion!);
+
+            // Assert
+            Assert.Equal("hello", message.Content);
+            Assert.Equal(ChatRole.Assistant, message.Role);
+
+            var context = message.Context;
+            Assert.Null(context);
         }
 
         [Fact]
@@ -152,24 +179,24 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             var assistantMessage = result as AssistantChatMessage;
             Assert.NotNull(assistantMessage);
-            Assert.Equal("test-content", assistantMessage.Content[0].Text);
+            Assert.Empty(assistantMessage.Content);
             // TODO: Uncomment when participant name issue is resolved.
             //Assert.Equal("test-name", assistantMessage.ParticipantName);
-            Assert.Equal("test-arg1", assistantMessage.FunctionCall.FunctionArguments);
+            Assert.Equal("test-arg1", assistantMessage.FunctionCall.FunctionArguments.ToString());
             Assert.Equal("test-name", assistantMessage.FunctionCall.FunctionName);
         }
 
         [Fact]
-        public void Test_AssistantRole_ToOpenAISdkChatMessage_ToolCall()
+        public void Test_AssistantRole_ToOpenAISdkChatMessage_ActionCall()
         {
             // Arrange
             var chatMessage = new ChatMessage(ChatRole.Assistant)
             {
                 Content = "test-content",
                 Name = "test-name",
-                ToolCalls = new List<ChatCompletionsToolCall>()
+                ActionCalls = new List<ActionCall>()
                 {
-                    new ChatCompletionsFunctionToolCall("test-id", "test-tool-name", "test-tool-arg1")
+                    new ActionCall("test-id", new ActionFunction("test-tool-name", "test-tool-arg1"))
                 }
             };
 
@@ -179,16 +206,16 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             var assistantMessage = result as AssistantChatMessage;
             Assert.NotNull(assistantMessage);
-            Assert.Equal("test-content", assistantMessage.Content[0].Text);
+            Assert.Empty(assistantMessage.Content);
             // TODO: Uncomment when participant name issue is resolved.
             //Assert.Equal("test-name", assistantMessage.ParticipantName);
 
-            Assert.Equal(1, assistantMessage.ToolCalls.Count);
+            Assert.Single(assistantMessage.ToolCalls);
             ChatToolCall toolCall = assistantMessage.ToolCalls[0];
             Assert.NotNull(toolCall);
             Assert.Equal("test-id", toolCall.Id);
             Assert.Equal("test-tool-name", toolCall.FunctionName);
-            Assert.Equal("test-tool-arg1", toolCall.FunctionArguments);
+            Assert.Equal("test-tool-arg1", toolCall.FunctionArguments.ToString());
         }
 
         [Fact]
@@ -239,7 +266,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 Content = "test-content",
                 Name = "tool-name",
-                ToolCallId = "tool-call-id"
+                ActionCallId = "action-call-id"
             };
 
             // Act
@@ -249,7 +276,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var toolMessage = result as ToolChatMessage;
             Assert.NotNull(toolMessage);
             Assert.Equal("test-content", toolMessage.Content[0].Text);
-            Assert.Equal("tool-call-id", toolMessage.ToolCallId);
+            Assert.Equal("action-call-id", toolMessage.ToolCallId);
         }
     }
 }

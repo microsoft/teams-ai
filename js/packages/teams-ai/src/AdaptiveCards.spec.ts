@@ -1,8 +1,15 @@
-import assert from 'assert';
-import { ActivityTypes, InvokeResponse, TestAdapter, TurnContext } from 'botbuilder';
+import assert, { deepEqual } from 'assert';
+import { ActivityTypes, CardFactory, InvokeResponse, MessageFactory, TestAdapter, TurnContext } from 'botbuilder';
 import * as sinon from 'sinon';
 
-import { AdaptiveCard, AdaptiveCardSearchResult, AdaptiveCards, AdaptiveCardsSearchParams, TurnState } from '.';
+import {
+    AdaptiveCard,
+    AdaptiveCardActionExecuteResponseType,
+    AdaptiveCardSearchResult,
+    AdaptiveCards,
+    AdaptiveCardsSearchParams,
+    TurnState
+} from '.';
 import { Application, Query, RouteSelector } from './Application';
 import { createTestTurnContextAndState } from './internals/testing/TestUtilities';
 
@@ -72,7 +79,7 @@ describe('AdaptiveCards', () => {
                     assert((await selector(context)) == true);
                 });
 
-                it('incomming activity is invalid', async () => {
+                it('incoming activity is invalid', async () => {
                     const activity = {
                         type: 'NotInvoke'
                     };
@@ -126,7 +133,7 @@ describe('AdaptiveCards', () => {
                 assert(typeof handler === 'function');
             });
 
-            it('should throw error if incomming activity is not valid', async () => {
+            it('should throw error if incoming activity is not valid', async () => {
                 adaptiveCards.actionExecute(testVerb, testHandler);
 
                 const activity = {
@@ -169,57 +176,321 @@ describe('AdaptiveCards', () => {
                 assert(testHandlerStub.calledWith(context, state, activity.value.action.data));
             });
 
-            it('should send an invoke response value adaptive card if handler returns adaptive card.', async () => {
-                const returnedAdaptiveCard = {
-                    type: 'AdaptiveCard',
-                    body: [
-                        {
-                            type: 'TextBlock',
-                            text: 'test'
+            describe('should send an invoke response value adaptive card if handler returns adaptive card.', async () => {
+                it('undefined actionExecuteResponseType with refresh undefined', async () => {
+                    const returnedAdaptiveCard = {
+                        type: 'AdaptiveCard',
+                        body: [
+                            {
+                                type: 'TextBlock',
+                                text: 'test'
+                            }
+                        ]
+                    };
+
+                    const testHandler = (
+                        context: TurnContext,
+                        state: TurnState,
+                        data: Record<string, any>
+                    ): Promise<AdaptiveCard | string> => {
+                        return Promise.resolve(returnedAdaptiveCard) as any;
+                    };
+
+                    adaptiveCards.actionExecute(testVerb, testHandler);
+
+                    const activity = {
+                        type: 'invoke',
+                        name: 'adaptiveCard/action',
+                        value: {
+                            action: {
+                                type: 'Action.Execute',
+                                verb: 'verb'
+                            }
                         }
-                    ]
-                };
+                    };
 
-                const testHandler = (
-                    context: TurnContext,
-                    state: TurnState,
-                    data: Record<string, any>
-                ): Promise<AdaptiveCard | string> => {
-                    return Promise.resolve(returnedAdaptiveCard) as any;
-                };
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
+                    const contextSendActivityStub = sinon.stub(context, 'sendActivity');
+                    const state = new TurnState();
 
-                adaptiveCards.actionExecute(testVerb, testHandler);
+                    // this is the handler that is registered as an app route.
+                    await handler(context, state);
 
-                const activity = {
-                    type: 'invoke',
-                    name: 'adaptiveCard/action',
-                    value: {
-                        action: {
-                            type: 'Action.Execute',
-                            verb: 'verb'
+                    const response = {
+                        statusCode: 200,
+                        type: 'application/vnd.microsoft.card.adaptive',
+                        value: returnedAdaptiveCard
+                    };
+
+                    assert(
+                        contextSendActivityStub.calledOnceWith({
+                            value: { body: response, status: 200 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        })
+                    );
+                });
+
+                it('actionExecuteResponseType set to `REPLACE_FOR_INTERACTOR` with refresh undefined', async () => {
+                    app.options.adaptiveCards = {
+                        actionExecuteResponseType: AdaptiveCardActionExecuteResponseType.REPLACE_FOR_INTERACTOR
+                    };
+                    adaptiveCards = new AdaptiveCards(app);
+
+                    const returnedAdaptiveCard = {
+                        type: 'AdaptiveCard',
+                        body: [
+                            {
+                                type: 'TextBlock',
+                                text: 'test'
+                            }
+                        ]
+                    };
+
+                    const testHandler = (
+                        context: TurnContext,
+                        state: TurnState,
+                        data: Record<string, any>
+                    ): Promise<AdaptiveCard | string> => {
+                        return Promise.resolve(returnedAdaptiveCard) as any;
+                    };
+
+                    adaptiveCards.actionExecute(testVerb, testHandler);
+
+                    const activity = {
+                        type: 'invoke',
+                        name: 'adaptiveCard/action',
+                        value: {
+                            action: {
+                                type: 'Action.Execute',
+                                verb: 'verb'
+                            }
                         }
-                    }
-                };
+                    };
 
-                const [context, _] = await createTestTurnContextAndState(adapter, activity);
-                const contextSendActivityStub = sinon.stub(context, 'sendActivity');
-                const state = new TurnState();
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
+                    const contextSendActivityStub = sinon.stub(context, 'sendActivity');
+                    const state = new TurnState();
 
-                // this is the handler that is registered as an app route.
-                await handler(context, state);
+                    // this is the handler that is registered as an app route.
+                    await handler(context, state);
 
-                const response = {
-                    statusCode: 200,
-                    type: 'application/vnd.microsoft.card.adaptive',
-                    value: returnedAdaptiveCard
-                };
+                    const response = {
+                        statusCode: 200,
+                        type: 'application/vnd.microsoft.card.adaptive',
+                        value: returnedAdaptiveCard
+                    };
 
-                assert(
-                    contextSendActivityStub.calledOnceWith({
-                        value: { body: response, status: 200 } as InvokeResponse,
+                    assert(
+                        contextSendActivityStub.calledOnceWith({
+                            value: { body: response, status: 200 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        })
+                    );
+                });
+
+                it('actionExecuteResponseType set to `REPLACE_FOR_INTERACTOR` with refresh enabled', async () => {
+                    const testHandlerWithRefreshEnabled = (
+                        context: TurnContext,
+                        state: TurnState,
+                        data: Record<string, any>
+                    ) =>
+                        Promise.resolve({
+                            type: 'AdaptiveCard',
+                            body: [
+                                {
+                                    type: 'TextBlock',
+                                    text: 'test'
+                                }
+                            ],
+                            refresh: true
+                        } as AdaptiveCard);
+
+                    app.options.adaptiveCards = {
+                        actionExecuteResponseType: AdaptiveCardActionExecuteResponseType.REPLACE_FOR_INTERACTOR
+                    };
+                    adaptiveCards = new AdaptiveCards(app);
+
+                    const returnedAdaptiveCard = {
+                        type: 'AdaptiveCard',
+                        body: [
+                            {
+                                type: 'TextBlock',
+                                text: 'test'
+                            }
+                        ],
+                        refresh: true
+                    };
+
+                    adaptiveCards.actionExecute(testVerb, testHandlerWithRefreshEnabled);
+
+                    const activity = {
+                        type: 'invoke',
+                        name: 'adaptiveCard/action',
+                        value: {
+                            action: {
+                                type: 'Action.Execute',
+                                verb: 'verb'
+                            }
+                        }
+                    };
+
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
+                    const contextSendActivityStub = sinon.stub(context, 'sendActivity');
+                    const contextUpdateActivityStub = sinon.stub(context, 'updateActivity');
+                    const state = new TurnState();
+
+                    // this is the handler that is registered as an app route.
+                    await handler(context, state);
+
+                    const response = {
+                        statusCode: 200,
+                        type: 'application/vnd.microsoft.card.adaptive',
+                        value: returnedAdaptiveCard
+                    };
+
+                    const cardActivity = MessageFactory.attachment(CardFactory.adaptiveCard(returnedAdaptiveCard));
+                    cardActivity.id = context.activity.replyToId;
+
+                    assert(contextUpdateActivityStub.calledOnceWith(cardActivity));
+                    assert(
+                        contextSendActivityStub.calledOnceWith({
+                            value: { body: response, status: 200 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        })
+                    );
+                });
+
+                it('actionExecuteResponseType set to `REPLACE_FOR_ALL` with refresh undefined', async () => {
+                    app.options.adaptiveCards = {
+                        actionExecuteResponseType: AdaptiveCardActionExecuteResponseType.REPLACE_FOR_ALL
+                    };
+                    adaptiveCards = new AdaptiveCards(app);
+
+                    const returnedAdaptiveCard = {
+                        type: 'AdaptiveCard',
+                        body: [
+                            {
+                                type: 'TextBlock',
+                                text: 'test'
+                            }
+                        ]
+                    };
+
+                    const testHandler = (
+                        context: TurnContext,
+                        state: TurnState,
+                        data: Record<string, any>
+                    ): Promise<AdaptiveCard | string> => {
+                        return Promise.resolve(returnedAdaptiveCard) as any;
+                    };
+
+                    adaptiveCards.actionExecute(testVerb, testHandler);
+
+                    const activity = {
+                        type: 'invoke',
+                        name: 'adaptiveCard/action',
+                        value: {
+                            action: {
+                                type: 'Action.Execute',
+                                verb: 'verb'
+                            }
+                        }
+                    };
+
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
+                    const contextSendActivityStub = sinon.stub(context, 'sendActivity');
+                    const contextUpdateActivityStub = sinon.stub(context, 'updateActivity');
+                    const state = new TurnState();
+
+                    // this is the handler that is registered as an app route.
+                    await handler(context, state);
+
+                    const response = {
+                        statusCode: 200,
+                        type: 'application/vnd.microsoft.card.adaptive',
+                        value: returnedAdaptiveCard
+                    };
+
+                    const cardActivity = MessageFactory.attachment(CardFactory.adaptiveCard(returnedAdaptiveCard));
+                    cardActivity.id = context.activity.replyToId;
+
+                    assert(contextUpdateActivityStub.calledOnceWith(cardActivity));
+                    assert(
+                        contextSendActivityStub.calledOnceWith({
+                            value: { body: response, status: 200 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        })
+                    );
+                });
+
+                it('actionExecuteResponseType set to `NEW_MESSAGE_FOR_ALL` with refresh enabled', async () => {
+                    const testHandlerWithRefreshEnabled = (
+                        context: TurnContext,
+                        state: TurnState,
+                        data: Record<string, any>
+                    ) =>
+                        Promise.resolve({
+                            type: 'AdaptiveCard',
+                            body: [
+                                {
+                                    type: 'TextBlock',
+                                    text: 'test'
+                                }
+                            ],
+                            refresh: true
+                        } as AdaptiveCard);
+
+                    app.options.adaptiveCards = {
+                        actionExecuteResponseType: AdaptiveCardActionExecuteResponseType.NEW_MESSAGE_FOR_ALL
+                    };
+                    adaptiveCards = new AdaptiveCards(app);
+
+                    const returnedAdaptiveCard = {
+                        type: 'AdaptiveCard',
+                        body: [
+                            {
+                                type: 'TextBlock',
+                                text: 'test'
+                            }
+                        ],
+                        refresh: true
+                    };
+
+                    adaptiveCards.actionExecute(testVerb, testHandlerWithRefreshEnabled);
+
+                    const activity = {
+                        type: 'invoke',
+                        name: 'adaptiveCard/action',
+                        value: {
+                            action: {
+                                type: 'Action.Execute',
+                                verb: 'verb'
+                            }
+                        }
+                    };
+
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
+                    const contextSendActivityStub = sinon.stub(context, 'sendActivity');
+                    const state = new TurnState();
+
+                    // this is the handler that is registered as an app route.
+                    await handler(context, state);
+
+                    const messageResponse = {
+                        statusCode: 200,
+                        type: 'application/vnd.microsoft.activity.message',
+                        value: 'Your response was sent to the app' as any
+                    };
+
+                    const cardActivity = MessageFactory.attachment(CardFactory.adaptiveCard(returnedAdaptiveCard));
+
+                    assert(contextSendActivityStub.calledTwice);
+                    deepEqual(contextSendActivityStub.getCall(0).args[0], {
+                        value: { body: messageResponse, status: 200 } as InvokeResponse,
                         type: ActivityTypes.InvokeResponse
-                    })
-                );
+                    });
+                    deepEqual(contextSendActivityStub.getCall(1).args[0], cardActivity);
+                });
             });
 
             it('should send an invoke response value as message if handler returns string.', async () => {
@@ -295,7 +566,7 @@ describe('AdaptiveCards', () => {
                     adaptiveCards.actionSubmit(verbRegex, testHandler);
                 });
 
-                it('incomming activity is valid action submit type and should match regex', async () => {
+                it('incoming activity is valid action submit type and should match regex', async () => {
                     // a valid action submit type is a message activity with a value property.
                     const activity = {
                         type: 'message',
@@ -310,7 +581,7 @@ describe('AdaptiveCards', () => {
                     assert((await selector(context)) == true);
                 });
 
-                it('incomming activity is valid action submit type and should not match regex ', async () => {
+                it('incoming activity is valid action submit type and should not match regex ', async () => {
                     // a valid action submit type is a message activity with a value property.
                     const activity = {
                         type: 'message',
@@ -325,7 +596,7 @@ describe('AdaptiveCards', () => {
                     assert((await selector(context)) == false);
                 });
 
-                it('incomming activity is invalid', async () => {
+                it('incoming activity is invalid', async () => {
                     const activity = {
                         type: 'notActionSubmit'
                     };
@@ -392,7 +663,7 @@ describe('AdaptiveCards', () => {
                 assert(typeof handler === 'function');
             });
 
-            it('should throw error if incomming activity is not valid', async () => {
+            it('should throw error if incoming activity is not valid', async () => {
                 adaptiveCards.actionSubmit(testVerb, testHandler);
 
                 const activity = {
@@ -467,7 +738,7 @@ describe('AdaptiveCards', () => {
                     adaptiveCards.search(datasetRegex, testHandler);
                 });
 
-                it('incomming activity is valid application/search type and should match regex', async () => {
+                it('incoming activity is valid application/search type and should match regex', async () => {
                     const activity = {
                         type: 'invoke',
                         name: 'application/search',
@@ -481,7 +752,7 @@ describe('AdaptiveCards', () => {
                     assert((await selector(context)) == true);
                 });
 
-                it('incomming activity is valid application/search type and should not match regex ', async () => {
+                it('incoming activity is valid application/search type and should not match regex ', async () => {
                     const activity = {
                         type: 'invoke',
                         name: 'application/search',
@@ -495,7 +766,7 @@ describe('AdaptiveCards', () => {
                     assert((await selector(context)) == false);
                 });
 
-                it('incomming activity is invalid', async () => {
+                it('incoming activity is invalid', async () => {
                     const activity = {
                         type: 'NotInvoke'
                     };
@@ -558,7 +829,7 @@ describe('AdaptiveCards', () => {
                 assert(typeof handler === 'function');
             });
 
-            it('should throw error if incomming activity is not valid', async () => {
+            it('should throw error if incoming activity is not valid', async () => {
                 adaptiveCards.search(testDataset, testHandler);
 
                 const activity = {

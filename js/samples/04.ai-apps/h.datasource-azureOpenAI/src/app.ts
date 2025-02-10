@@ -1,4 +1,12 @@
-import { OpenAIModel, PromptManager, ActionPlanner, Application, TurnState, TeamsAdapter, FeedbackLoopData } from '@microsoft/teams-ai';
+import {
+    OpenAIModel,
+    PromptManager,
+    ActionPlanner,
+    Application,
+    TurnState,
+    TeamsAdapter,
+    FeedbackLoopData
+} from '@microsoft/teams-ai';
 import { DefaultAzureCredential, getBearerTokenProvider } from '@azure/identity';
 import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
 import axios from 'axios';
@@ -26,7 +34,7 @@ const model = new OpenAIModel({
     // Azure OpenAI Support
     azureDefaultDeployment: process.env.AZURE_OPENAI_DEPLOYMENT!,
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
-    azureApiVersion: '2024-02-15-preview',
+    azureApiVersion: '2024-05-01-preview',
     azureADTokenProvider: getBearerTokenProvider(
         new DefaultAzureCredential(),
         'https://cognitiveservices.azure.com/.default'
@@ -86,7 +94,7 @@ app.error(async (context: TurnContext, err: any) => {
     } else {
         error(err);
     }
-    
+
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
@@ -100,7 +108,7 @@ app.error(async (context: TurnContext, err: any) => {
     await context.sendActivity('To continue to run this bot, please fix the bot source code.');
 });
 
-app.feedbackLoop(async (_context: TurnContext, _state: TurnState, feedbackLoopData: FeedbackLoopData ) => {
+app.feedbackLoop(async (_context: TurnContext, _state: TurnState, feedbackLoopData: FeedbackLoopData) => {
     if (feedbackLoopData.actionValue.reaction === 'like') {
         console.log('👍');
     } else {

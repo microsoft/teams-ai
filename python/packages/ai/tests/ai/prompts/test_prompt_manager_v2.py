@@ -20,6 +20,7 @@ from teams.ai.prompts import (
     UserInputMessage,
     UserMessage,
 )
+from teams.ai.prompts.action_output_message import ActionOutputMessage
 from teams.ai.prompts.sections import ActionAugmentationSection
 from teams.ai.prompts.sections.data_source_section import DataSourceSection
 from teams.app_error import ApplicationError
@@ -191,3 +192,32 @@ class TestPromptManager(IsolatedAsyncioTestCase):
 
         self.assertEqual(prompt.config.schema, 1.1)
         self.assertEqual(prompt.config.completion.model, "gpt-3.5-turbo")
+
+    async def test_get_prompt_from_file_tools(self):
+        prompt = await self.prompt_manager.get_prompt("tools")
+
+        self.assertEqual(prompt.name, "tools")
+        assert isinstance(prompt.prompt, Prompt)
+        self.assertEqual(len(prompt.prompt.sections), 4)
+
+        assert isinstance(prompt.prompt.sections[0], GroupSection)
+        assert isinstance(prompt.prompt.sections[1], ConversationHistorySection)
+        assert isinstance(prompt.prompt.sections[2], UserMessage)
+        assert isinstance(prompt.prompt.sections[3], ActionOutputMessage)
+
+        self.assertEqual(prompt.config.schema, 1.1)
+        self.assertEqual(prompt.config.description, "test config")
+        self.assertEqual(prompt.config.type, "completion")
+        self.assertEqual(prompt.config.completion.model, "gpt-3.5-turbo")
+        self.assertEqual(prompt.config.completion.completion_type, "chat")
+        self.assertEqual(prompt.config.completion.include_history, True)
+        self.assertEqual(prompt.config.completion.include_input, True)
+        self.assertEqual(prompt.config.completion.max_input_tokens, 2800)
+        self.assertEqual(prompt.config.completion.max_tokens, 1000)
+        self.assertEqual(prompt.config.completion.temperature, 0.9)
+        self.assertEqual(prompt.config.completion.top_p, 0.0)
+        self.assertEqual(prompt.config.completion.presence_penalty, 0.6)
+        self.assertEqual(prompt.config.completion.frequency_penalty, 0.0)
+        self.assertEqual(prompt.config.completion.stop_sequences, [])
+        augmentation = prompt.config.augmentation
+        self.assertEqual(augmentation.augmentation_type, "tools")  # type: ignore[union-attr]

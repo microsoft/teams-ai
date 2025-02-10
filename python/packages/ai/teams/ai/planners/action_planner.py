@@ -15,6 +15,7 @@ from ...app_error import ApplicationError
 from ...state import MemoryBase, TurnState
 from ..augmentations.default_augmentation import DefaultAugmentation
 from ..clients import LLMClient, LLMClientOptions
+from ..models import ResponseReceivedHandler
 from ..models.prompt_completion_model import PromptCompletionModel
 from ..models.prompt_response import PromptResponse
 from ..prompts.prompt_functions import PromptFunctions
@@ -56,6 +57,15 @@ class ActionPlannerOptions:
     logger: Optional[Logger] = None
     "Optional. When set the model will log requests"
 
+    start_streaming_message: Optional[str] = ""
+    "Optional message to send at the start of a streaming response."
+
+    end_stream_handler: Optional[ResponseReceivedHandler] = None
+    "Optional handler to run when a stream is about to conclude."
+
+    enable_feedback_loop: Optional[bool] = False
+    "Optional. Enables the Teams thumbs up or down buttons."
+
 
 class ActionPlanner(Planner[StateT]):
     """
@@ -64,6 +74,7 @@ class ActionPlanner(Planner[StateT]):
 
     _options: ActionPlannerOptions
     _prompt_factory: ActionPlannerPromptFactory
+    _enable_feedback_loop: Optional[bool] = False
 
     @property
     def options(self) -> ActionPlannerOptions:
@@ -78,6 +89,7 @@ class ActionPlanner(Planner[StateT]):
         """
 
         self._options = options
+        self._enable_feedback_loop = options.enable_feedback_loop
 
         if isinstance(self._options.default_prompt, str):
             self._prompt_factory = self._default_prompt_factory(self._options.default_prompt)
@@ -90,6 +102,7 @@ class ActionPlanner(Planner[StateT]):
     async def continue_task(self, context: TurnContext, state: TurnState) -> Plan:
         template = await self._prompt_factory(context, state, self)
         augmentation = template.augmentation or DefaultAugmentation()
+
         res = await self.complete_prompt(
             context=context, memory=state, prompt=template, validator=augmentation
         )
@@ -97,7 +110,11 @@ class ActionPlanner(Planner[StateT]):
         if res.status != "success":
             raise ApplicationError(res.error or "[ActionPlanner]: failed task")
 
-        return await augmentation.create_plan_from_response(context, state, res)
+        # Check to see if we have a response
+        # When a streaming response is used, the response message will be undefined.
+        if res.message is not None:
+            return await augmentation.create_plan_from_response(context, state, res)
+        return Plan()
 
     async def complete_prompt(
         self,
@@ -129,15 +146,18 @@ class ActionPlanner(Planner[StateT]):
 
         template = await self._options.prompts.get_prompt(name)
         include_history = template.config.completion.include_history
+        history_var = f"conversation.{name}_history" if include_history else f"temp.{name}_history"
+
         client = LLMClient(
             LLMClientOptions(
                 model=self._options.model,
-                history_variable=(
-                    f"conversation.{name}_history" if include_history else f"temp.{name}_history"
-                ),
+                history_variable=history_var,
                 input_variable="temp.input",
                 validator=validator,
                 logger=self._options.logger,
+                start_streaming_message=self._options.start_streaming_message,
+                end_stream_handler=self._options.end_stream_handler,
+                enable_feedback_loop=self._enable_feedback_loop,
             )
         )
 

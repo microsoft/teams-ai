@@ -10,7 +10,7 @@ namespace Microsoft.Teams.AI.Tests.UtilitiesTests
         {
             var obj = ResponseJsonParsers.ParseJSON("{ \"foo\": \"bar\" }");
             Assert.NotNull(obj);
-            Assert.Equal(1, obj.Count());
+            Assert.Single(obj);
             Assert.Equal("foo", obj.First().Key);
             Assert.Equal("bar", obj.First().Value.ToString());
         }
@@ -20,7 +20,7 @@ namespace Microsoft.Teams.AI.Tests.UtilitiesTests
         {
             var obj = ResponseJsonParsers.ParseJSON("{ \n\"foo\": \"bar\"\n }");
             Assert.NotNull(obj);
-            Assert.Equal(1, obj.Count());
+            Assert.Single(obj);
             Assert.Equal("foo", obj.First().Key);
             Assert.Equal("bar", obj.First().Value.ToString());
         }
@@ -30,7 +30,7 @@ namespace Microsoft.Teams.AI.Tests.UtilitiesTests
         {
             var obj = ResponseJsonParsers.ParseJSON("{ \"foo\": \"bar\\\"baz\" }");
             Assert.NotNull(obj);
-            Assert.Equal(1, obj.Count());
+            Assert.Single(obj);
             Assert.Equal("foo", obj.First().Key);
             Assert.Equal("bar\"baz", obj.First().Value.ToString());
         }
@@ -40,7 +40,7 @@ namespace Microsoft.Teams.AI.Tests.UtilitiesTests
         {
             var obj = ResponseJsonParsers.ParseJSON("{ \"foo\": \"bar\\\\\"baz\" }");
             Assert.NotNull(obj);
-            Assert.Equal(1, obj.Count());
+            Assert.Single(obj);
             Assert.Equal("foo", obj.First().Key);
             Assert.Equal("bar\"baz", obj.First().Value.ToString());
         }
@@ -50,7 +50,7 @@ namespace Microsoft.Teams.AI.Tests.UtilitiesTests
         {
             var obj = ResponseJsonParsers.ParseJSON("{ \"foo\": \"bar\\/baz\" }");
             Assert.NotNull(obj);
-            Assert.Equal(1, obj.Count());
+            Assert.Single(obj);
             Assert.Equal("foo", obj.First().Key);
             Assert.Equal("bar/baz", obj.First().Value.ToString());
         }
@@ -60,7 +60,7 @@ namespace Microsoft.Teams.AI.Tests.UtilitiesTests
         {
             var obj = ResponseJsonParsers.ParseJSON("Hello { \"foo\": \"bar\" } World!");
             Assert.NotNull(obj);
-            Assert.Equal(1, obj.Count());
+            Assert.Single(obj);
             Assert.Equal("foo", obj.First().Key);
             Assert.Equal("bar", obj.First().Value.ToString());
         }

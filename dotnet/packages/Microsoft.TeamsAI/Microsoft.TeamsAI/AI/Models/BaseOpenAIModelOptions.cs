@@ -42,5 +42,10 @@ namespace Microsoft.Teams.AI.AI.Models
         /// prompt to be sent as `user` messages instead.
         /// </remarks>
         public bool? UseSystemMessages { get; set; }
+
+        /// <summary>
+        ///  Optional. Whether the model's responses should be streamed back using Server Sent Events (SSE).
+        /// </summary>
+        public bool? Stream { get; set; } = false;
     }
 }

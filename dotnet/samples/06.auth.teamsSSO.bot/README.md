@@ -29,3 +29,24 @@ You can reset the message count by sending the bot the message `/reset`.
 You can use Teams Toolkit for Visual Studio or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure.
 
 You can find deployment instructions [here](../README.md#deploy-to-azure).
+
+## Instructions to enable multi-tenant support
+
+This sample is configured to work only in the tenant in which the Azure app registration is created. To enable multi-tenant support a few configurations have to be updated:
+
+1. Navigate to `aad.manifest.json` and set
+    ```json
+    "signInAudience": "AzureADMultipleOrgs"
+    ```
+2. Navigate to the `teamsapp.local.yml` file and set
+    ```yml
+    signInAudience: "AzureADMultipleOrgs" # Authenticate users with a Microsoft work or school account in your organization's Azure AD tenant (for example, single tenant).
+    ```
+3. Navigate to the `wwwroot/auth-start.html` page and set
+    ```js
+    let authorizeEndpoint = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${toQueryString(queryParams)}`;
+    ```
+4. Navigate to the `Program.cs` file and on line 40 set 
+    ```
+    .WithTenantId("common")
+    ```

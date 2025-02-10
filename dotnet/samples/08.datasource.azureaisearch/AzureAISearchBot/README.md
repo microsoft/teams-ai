@@ -15,7 +15,7 @@ This sample shows how to integrate your Azure AI Search index as a data source i
 The object between the `<context></context>` tags is an entry from the restaurants index.
 
 ## Set up instructions
-All the samples in the C# .NET SDK can be set up in the same way. You can find the step by step instructions here: [Setup Instructions](../README.md).
+All the samples in the C# .NET SDK can be set up in the same way. You can find the step by step instructions here: [Setup Instructions](../AzureAISearchBot/README.md#set-up-instructions).
 
 Note that, this sample requires AI service so you need one more pre-step before Local Debug (F5).
 

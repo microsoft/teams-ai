@@ -9,10 +9,12 @@
 - [Application class](./APPLICATION.md)
 - [Augmentations](./AUGMENTATIONS.md)
 - [**Data Sources**](./DATA-SOURCES.md)
+- [Function Calls](./FUNCTION-CALLS.md)
 - [Moderator](./MODERATOR.md)
 - [Planner](./PLANNER.md)
 - [Powered by AI](./POWERED-BY-AI.md)
 - [Prompts](./PROMPTS.md)
+- [Streaming](./STREAMING.md)
 - [Turns](./TURNS.md)
 - [User Authentication](./USER-AUTH.md)
 
@@ -41,7 +43,7 @@ Our most complex C# example is the `KernelMemoryDataSource` in the Chef Bot samp
 #### Javascript
 
 Here is an example of the configuration for the
-[Chef Bot sample](https://github.com/microsoft/teams-ai/tree/main/js/samples/04.ai.a.teamsChefBot):
+[Chef Bot sample](https://github.com/microsoft/teams-ai/tree/main/js/samples/04.ai-apps/a.teamsChefBot):
 
 ```js
 // Inside VectraDataSource.ts

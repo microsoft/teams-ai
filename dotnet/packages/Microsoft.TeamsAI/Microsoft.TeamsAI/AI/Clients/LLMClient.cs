@@ -1,11 +1,14 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Google.Protobuf.WellKnownTypes;
+using Microsoft.Bot.Builder;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Validators;
+using Microsoft.Teams.AI.Application;
 using Microsoft.Teams.AI.State;
+using static Microsoft.Teams.AI.AI.Models.IPromptCompletionModelEvents;
 
 namespace Microsoft.Teams.AI.AI.Clients
 {
@@ -62,6 +65,11 @@ namespace Microsoft.Teams.AI.AI.Clients
 
         private readonly ILogger _logger;
 
+        private readonly string? _startStreamingMessage;
+        private ResponseReceivedHandler? _endStreamHandler;
+        private bool? _enableFeedbackLoop;
+        private string? _feedbackLoopType;
+
         /// <summary>
         /// Creates a new `LLMClient` instance.
         /// </summary>
@@ -76,6 +84,11 @@ namespace Microsoft.Teams.AI.AI.Clients
             {
                 throw new ArgumentException($"`{nameof(loggerFactory)}` parameter cannot be null if `LogRepairs` option is set to true");
             }
+
+            this._startStreamingMessage = Options.StartStreamingMessage;
+            this._endStreamHandler = Options.EndStreamHandler;
+            this._enableFeedbackLoop = Options.EnableFeedbackLoop;
+            this._feedbackLoopType = Options.FeedbackLoopType;
         }
 
         /// <summary>
@@ -144,6 +157,96 @@ namespace Microsoft.Teams.AI.AI.Clients
             CancellationToken cancellationToken = default
         )
         {
+            // Define event handlers
+            StreamingResponse? streamer = null;
+
+            BeforeCompletionHandler handleBeforeCompletion = new((object sender, BeforeCompletionEventArgs args) =>
+            {
+                // Ignore events for other contexts
+                if (args.TurnContext != context)
+                {
+                    return;
+                }
+
+                if (args.Streaming)
+                {
+                    // Attach to any existing streamer
+                    // - see tool call note below to understand.
+                    streamer = (StreamingResponse?)memory.GetValue("temp.streamer");
+                    if (streamer == null)
+                    {
+                        // Create streamer and send initial message
+                        streamer = new StreamingResponse(context);
+                        memory.SetValue("temp.streamer", streamer);
+
+                        if (this._enableFeedbackLoop != null)
+                        {
+                            streamer.EnableFeedbackLoop = this._enableFeedbackLoop;
+
+                            if (streamer.EnableFeedbackLoop == true && this._feedbackLoopType != null)
+                            {
+                                streamer.FeedbackLoopType = this._feedbackLoopType;
+                            }
+                        }
+
+                        streamer.EnableGeneratedByAILabel = true;
+
+                        if (!string.IsNullOrEmpty(this._startStreamingMessage))
+                        {
+                            streamer.QueueInformativeUpdate(this._startStreamingMessage!);
+                        }
+                    }
+                }
+            });
+
+            ChunkReceivedHandler handleChunkReceived = new((object sender, ChunkReceivedEventArgs args) =>
+            {
+                if (args.TurnContext != context || streamer == null)
+                {
+                    return;
+                }
+
+                IList<Citation>? citations = args.Chunk.delta?.Context?.Citations ?? null;
+
+                if (citations != null)
+                {
+                    streamer.SetCitations(citations);
+                }
+
+                // Ignore content without text
+                // - The chunk is likely for a Tool Call.
+                // - See the tool call note below to understand why we're ignoring them.
+                if (args.Chunk.delta?.GetContent<string>() == null)
+                {
+                    return;
+                }
+
+                // Send chunk to client
+                string text = args.Chunk.delta?.GetContent<string>() ?? "";
+
+                if (text.Length > 0)
+                {
+                    streamer.QueueTextChunk(text);
+                }
+            });
+
+            // Subscribe to model events
+            if (this.Options.Model is IPromptCompletionStreamingModel)
+            {
+                IPromptCompletionStreamingModel model = (IPromptCompletionStreamingModel)Options.Model;
+
+                if (model.Events != null)
+                {
+                    model.Events.BeforeCompletion += handleBeforeCompletion;
+                    model.Events.ChunkReceived += handleChunkReceived;
+
+                    if (this._endStreamHandler != null)
+                    {
+                        model.Events.ResponseReceived += this._endStreamHandler;
+                    }
+                }
+            }
+
             try
             {
                 PromptResponse response = await this.Options.Model.CompletePromptAsync(
@@ -155,19 +258,42 @@ namespace Microsoft.Teams.AI.AI.Clients
                     cancellationToken
                 );
 
-                if (response.Status != PromptResponseStatus.Success)
+                // Handle streaming responses
+                if (streamer != null)
                 {
-                    return response;
+                    // Tool call handling
+                    // - We need to keep the streamer around during tool calls so we're just letting them return as normal
+                    //   messages minus the message content. The text content is being streamed to the client in chunks.
+                    // - When the tool call completes we'll call back into ActionPlanner and end up re-attaching to the
+                    //   streamer. This will result in us continuing to stream the response to the client. 
+                    if (response.Message?.ActionCalls != null && response.Message.ActionCalls.Count > 0)
+                    {
+                        // Ensure content is empty for tool calls
+                        response.Message.Content = "";
+                    }
+                    else
+                    {
+                        if (response.Status == PromptResponseStatus.Success)
+                        {
+                            // Delete message from response to avoid sending it twice
+                            response.Message = null;
+                        }
+
+                        // End the stream and remove pointer from memory
+                        // - We're not listening for the response received event because we can't await the completion of events.
+                        await streamer.EndStream();
+                        memory.DeleteValue("temp.streamer");
+                    }
                 }
 
-                // Get input message
+                // Get input message/s
                 string inputVariable = Options.InputVariable;
-                ChatMessage? inputMsg = response.Input;
-                if (inputMsg == null)
+                IList<ChatMessage>? inputMsgs = response.Input;
+                if (inputMsgs == null)
                 {
                     object? content = memory.GetValue(inputVariable);
-                    inputMsg = new ChatMessage(ChatRole.User);
-                    inputMsg.Content = content;
+                    inputMsgs = new List<ChatMessage>() { new ChatMessage(ChatRole.User) };
+                    inputMsgs[0].Content = content;
                 }
 
                 Validation validation = await this.Options.Validator.ValidateResponseAsync(
@@ -186,11 +312,11 @@ namespace Microsoft.Teams.AI.AI.Clients
                         response.Message.Content = validation.Value.ToString();
                     }
 
-                    this.AddInputToHistory(memory, this.Options.HistoryVariable, inputMsg);
+                    this.AddMessagesToHistory(memory, this.Options.HistoryVariable, inputMsgs);
 
                     if (response.Message != null)
                     {
-                        this.AddOutputToHistory(memory, this.Options.HistoryVariable, response.Message);
+                        this.AddMessageToHistory(memory, this.Options.HistoryVariable, response.Message);
                     }
 
                     return response;
@@ -226,11 +352,11 @@ namespace Microsoft.Teams.AI.AI.Clients
 
                 if (repairResponse.Status == PromptResponseStatus.Success)
                 {
-                    this.AddInputToHistory(memory, this.Options.HistoryVariable, inputMsg);
+                    this.AddMessagesToHistory(memory, this.Options.HistoryVariable, inputMsgs);
 
                     if (repairResponse.Message != null)
                     {
-                        this.AddOutputToHistory(memory, this.Options.HistoryVariable, repairResponse.Message);
+                        this.AddMessageToHistory(memory, this.Options.HistoryVariable, repairResponse.Message);
                     }
                 }
 
@@ -244,44 +370,25 @@ namespace Microsoft.Teams.AI.AI.Clients
                     Error = new(ex.Message ?? string.Empty)
                 };
             }
-        }
-
-        private void AddInputToHistory(IMemory memory, string variable, ChatMessage input)
-        {
-            if (variable == null)
+            finally
             {
-                return;
+
+                // Unsubscribe to model events
+                if (this.Options.Model is IPromptCompletionStreamingModel)
+                {
+                    IPromptCompletionStreamingModel model = (IPromptCompletionStreamingModel)Options.Model;
+
+                    if (model.Events != null)
+                    {
+                        model.Events.BeforeCompletion -= handleBeforeCompletion;
+                        model.Events.ChunkReceived -= handleChunkReceived;
+                        if (this._endStreamHandler != null)
+                        {
+                            model.Events.ResponseReceived -= this._endStreamHandler;
+                        }
+                    }
+                }
             }
-
-            List<ChatMessage> history = (List<ChatMessage>?)memory.GetValue(variable) ?? new() { };
-
-            history.Insert(0, input);
-
-            if (history.Count > this.Options.MaxHistoryMessages)
-            {
-                history.RemoveAt(history.Count - 1);
-            }
-
-            memory.SetValue(variable, history);
-        }
-
-        private void AddOutputToHistory(IMemory memory, string variable, ChatMessage message)
-        {
-            if (variable == string.Empty)
-            {
-                return;
-            }
-
-            List<ChatMessage> history = (List<ChatMessage>?)memory.GetValue(variable) ?? new() { };
-
-            history.Insert(0, message);
-
-            if (history.Count > this.Options.MaxHistoryMessages)
-            {
-                history.RemoveAt(history.Count - 1);
-            }
-
-            memory.SetValue(variable, history);
         }
 
         private async Task<PromptResponse> RepairResponseAsync(
@@ -296,18 +403,18 @@ namespace Microsoft.Teams.AI.AI.Clients
         {
             string feedback = validation.Feedback ?? "The response was invalid. Try another strategy.";
 
-            this.AddInputToHistory(fork, $"{this.Options.HistoryVariable}-repair", new(ChatRole.User) { Content = feedback });
+            this.AddMessageToHistory(fork, $"{this.Options.HistoryVariable}-repair", new(ChatRole.User) { Content = feedback });
 
             if (response.Message != null)
             {
-                this.AddOutputToHistory(fork, $"{this.Options.HistoryVariable}-repair", response.Message);
+                this.AddMessageToHistory(fork, $"{this.Options.HistoryVariable}-repair", response.Message);
             }
 
             PromptTemplate repairTemplate = new(this.Options.Template);
             repairTemplate.Prompt = new(new()
             {
                 this.Options.Template.Prompt,
-                new ConversationHistorySection($"{this.Options.HistoryVariable}-repair")
+                new ConversationHistorySection($"{this.Options.HistoryVariable}-repair", -1)
             });
 
             if (this.Options.LogRepairs)
@@ -360,6 +467,39 @@ namespace Microsoft.Teams.AI.AI.Clients
             }
 
             return await this.RepairResponseAsync(context, fork, functions, repairResponse, repairValidation, remainingAttempts, cancellationToken);
+        }
+
+        private void AddMessagesToHistory(IMemory memory, string variable, IEnumerable<ChatMessage> messages)
+        {
+            if (variable == string.Empty || variable == null)
+            {
+                return;
+            }
+
+            List<ChatMessage> history = (List<ChatMessage>?)memory.GetValue(variable) ?? new();
+
+            history.AddRange(messages);
+
+            if (history.Count > this.Options.MaxHistoryMessages)
+            {
+                int overflow = history.Count - this.Options.MaxHistoryMessages;
+                history.RemoveRange(0, overflow);
+            }
+
+            // Remove completed partial action outputs
+            while (history.Count > 0 && history[0].Role == ChatRole.Tool)
+            {
+                history.RemoveAt(0);
+            }
+
+
+            memory.SetValue(variable, history);
+        }
+
+
+        private void AddMessageToHistory(IMemory memory, string variable, ChatMessage message)
+        {
+            AddMessagesToHistory(memory, variable, new List<ChatMessage>() { message });
         }
     }
 }

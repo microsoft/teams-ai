@@ -81,7 +81,9 @@ export class UserInputMessage extends PromptSectionBase {
         const images = inputFiles.filter((f) => f.contentType.startsWith('image/'));
         for (const image of images) {
             // Check for budget to add image
-            // TODO: This accounts for low detail images but not high detail images.
+            // This accounts for low detail images but not high detail images.
+            // https://platform.openai.com/docs/guides/vision
+            // low res mode defaults to a 512x512px image which is budgeted at 85 tokens.
             // Additional work is needed to account for high detail images.
             if (budget < 85) {
                 break;
@@ -99,7 +101,11 @@ export class UserInputMessage extends PromptSectionBase {
             budget -= 85;
         }
 
+        const output = [];
+        if (message.content!.length > 0) {
+            output.push(message);
+        }
         // Return output
-        return { output: [message], length, tooLong: false };
+        return { output, length, tooLong: false };
     }
 }

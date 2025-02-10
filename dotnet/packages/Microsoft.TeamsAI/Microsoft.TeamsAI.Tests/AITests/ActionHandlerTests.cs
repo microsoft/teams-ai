@@ -103,7 +103,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             return (IActionCollection<TState>)actionsField!.GetValue(ai)!;
         }
 
-        private static IEnumerable<object[]> ParameterAssignTestData()
+        public static IEnumerable<object[]> ParameterAssignTestData()
         {
             yield return new object[]
             {

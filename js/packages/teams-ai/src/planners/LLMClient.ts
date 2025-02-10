@@ -92,6 +92,21 @@ export interface LLMClientOptions<TContent = any> {
      * Optional message to send a client at the start of a streaming response.
      */
     startStreamingMessage?: string;
+
+    /**
+     * Optional handler to run when a stream is about to conclude.
+     */
+    endStreamHandler?: PromptCompletionModelResponseReceivedEvent;
+
+    /**
+     * If true, the feedback loop will be enabled for streaming responses.
+     */
+    enableFeedbackLoop?: boolean;
+
+    /**
+     * The type of the feedback loop.
+     */
+    feedbackLoopType?: 'default' | 'custom';
 }
 
 /**
@@ -194,6 +209,9 @@ export interface ConfiguredLLMClientOptions<TContent = any> {
  */
 export class LLMClient<TContent = any> {
     private readonly _startStreamingMessage: string | undefined;
+    private readonly _endStreamHandler: PromptCompletionModelResponseReceivedEvent | undefined;
+    private readonly _enableFeedbackLoop: boolean | undefined;
+    private readonly _feedbackLoopType: 'default' | 'custom' | undefined;
 
     /**
      * Configured options for this LLMClient instance.
@@ -227,35 +245,9 @@ export class LLMClient<TContent = any> {
         }
 
         this._startStreamingMessage = options.startStreamingMessage;
-    }
-
-    /**
-     * Adds a result from a `function_call` to the history.
-     * @param {Memory} memory - An interface for accessing state values.
-     * @param {string} name - Name of the function that was called.
-     * @param {any} results - Results returned by the function.
-     */
-    public addFunctionResultToHistory(memory: Memory, name: string, results: any): void {
-        // Convert content to string
-        let content = '';
-        if (typeof results === 'object') {
-            if (typeof results.toISOString == 'function') {
-                content = results.toISOString();
-            } else {
-                content = JSON.stringify(results);
-            }
-        } else if (results !== undefined && results !== null) {
-            content = results.toString();
-        }
-
-        // Add result to history
-        const { history_variable } = this.options;
-        const history: Message[] = memory.getValue(history_variable) ?? [];
-        history.push({ role: 'function', name, content });
-        if (history.length > this.options.max_history_messages) {
-            history.splice(0, history.length - this.options.max_history_messages);
-        }
-        memory.setValue(history_variable, history);
+        this._endStreamHandler = options.endStreamHandler;
+        this._enableFeedbackLoop = options.enableFeedbackLoop;
+        this._feedbackLoopType = options.feedbackLoopType;
     }
 
     /**
@@ -299,9 +291,8 @@ export class LLMClient<TContent = any> {
         functions: PromptFunctions
     ): Promise<PromptResponse<TContent>> {
         // Define event handlers
-        let isStreaming = false;
         let streamer: StreamingResponse | undefined;
-        const beforeCompletion: PromptCompletionModelBeforeCompletionEvent = async (
+        const beforeCompletion: PromptCompletionModelBeforeCompletionEvent = (
             ctx,
             memory,
             functions,
@@ -316,52 +307,92 @@ export class LLMClient<TContent = any> {
 
             // Check for a streaming response
             if (streaming) {
-                isStreaming = true;
+                // Attach to any existing streamer
+                // - see tool call note below to understand.
+                streamer = memory.getValue('temp.streamer');
+                if (!streamer) {
+                    // Create streamer and send initial message
+                    streamer = new StreamingResponse(context);
+                    memory.setValue('temp.streamer', streamer);
 
-                // Create streamer and send initial message
-                streamer = new StreamingResponse(context);
-                if (this._startStreamingMessage) {
-                    await streamer.sendInformativeUpdate(this._startStreamingMessage);
+                    if (this._enableFeedbackLoop != null) {
+                        streamer.setFeedbackLoop(this._enableFeedbackLoop);
+                        if (this._feedbackLoopType) {
+                            streamer.setFeedbackLoopType(this._feedbackLoopType);
+                        }
+                    }
+
+                    streamer.setGeneratedByAILabel(true);
+
+                    if (this._startStreamingMessage) {
+                        streamer.queueInformativeUpdate(this._startStreamingMessage);
+                    }
                 }
             }
         };
 
-        const chunkReceived: PromptCompletionModelChunkReceivedEvent = async (ctx, memory, chunk) => {
+        const chunkReceived: PromptCompletionModelChunkReceivedEvent = (ctx, memory, chunk) => {
             // Ignore events for other contexts
             if (context !== ctx || !streamer) {
                 return;
             }
 
-            // Send chunk to client
-            const text = chunk.delta?.content ?? '';
+            const citations = chunk.delta?.context?.citations ?? undefined;
+
+            if (citations) {
+                streamer.setCitations(citations);
+            }
+
+            // Ignore calls without content
+            // - This is typically because the chunk represents a tool call.
+            // - See the note below for why we're handling tool calls this way.
+            if (!chunk.delta?.content) {
+                return;
+            }
+
+            // Send text chunk to client
+            const text = chunk.delta?.content;
+
             if (text.length > 0) {
-                await streamer.sendTextChunk(text);
+                streamer.queueTextChunk(text);
             }
-        };
-
-        const responseReceived: PromptCompletionModelResponseReceivedEvent = async (ctx, memory, response) => {
-            // Ignore events for other contexts
-            if (context !== ctx || !streamer) {
-                return;
-            }
-
-            // End the stream
-            await streamer.endStream();
         };
 
         // Subscribe to model events
         if (this.options.model.events) {
             this.options.model.events.on('beforeCompletion', beforeCompletion);
             this.options.model.events.on('chunkReceived', chunkReceived);
-            this.options.model.events.on('responseReceived', responseReceived);
+
+            if (this._endStreamHandler) {
+                this.options.model.events.on('responseReceived', this._endStreamHandler);
+            }
         }
 
         try {
             // Complete the prompt
             const response = await this.callCompletePrompt(context, memory, functions);
-            if (response.status == 'success' && isStreaming) {
-                // Delete message from response to avoid sending it twice
-                delete response.message;
+
+            // Handle streaming responses
+            if (streamer) {
+                // Tool call handling
+                // - We need to keep the streamer around during tool calls so we're just letting them return as normal
+                //   messages minus the message content. The text content is being streamed to the client in chunks.
+                // - When the tool call completes we'll call back into ActionPlanner and end up re-attaching to the
+                //   streamer. This will result in us continuing to stream the response to the client.
+                if (Array.isArray(response.message?.action_calls)) {
+                    // Ensure content is empty for tool calls
+                    response.message!.content = '' as TContent;
+                } else {
+                    if (response.status == 'success') {
+                        // Delete message from response to avoid sending it twice
+                        delete response.message;
+                    }
+
+                    // End the stream and remove pointer from memory
+                    // - We're not listening for the response received event because we can't await the completion of events.
+                    await streamer.endStream();
+                    memory.deleteValue('temp.streamer');
+                }
             }
 
             return response;
@@ -370,7 +401,10 @@ export class LLMClient<TContent = any> {
             if (this.options.model.events) {
                 this.options.model.events.off('beforeCompletion', beforeCompletion);
                 this.options.model.events.off('chunkReceived', chunkReceived);
-                this.options.model.events.off('responseReceived', responseReceived);
+
+                if (this._endStreamHandler) {
+                    this.options.model.events.off('responseReceived', this._endStreamHandler);
+                }
             }
         }
     }
@@ -399,6 +433,7 @@ export class LLMClient<TContent = any> {
                 tokenizer,
                 template
             )) as PromptResponse<TContent>;
+
             if (response.status !== 'success') {
                 // The response isn't valid so we don't care that the messages type is potentially incorrect.
                 return response;
@@ -426,8 +461,8 @@ export class LLMClient<TContent = any> {
                 }
 
                 // Update history and return
-                this.addInputToHistory(memory, history_variable, inputMsg!);
-                this.addResponseToHistory(memory, history_variable, response.message!);
+                this.addMessageToHistory(memory, history_variable, inputMsg!);
+                this.addMessageToHistory(memory, history_variable, response.message!);
                 return response;
             }
 
@@ -469,8 +504,8 @@ export class LLMClient<TContent = any> {
             // - we never want to save an invalid response to conversation history.
             // - the caller can take further corrective action, including simply re-trying.
             if (repair.status === 'success') {
-                this.addInputToHistory(memory, history_variable, inputMsg!);
-                this.addResponseToHistory(memory, history_variable, repair.message!);
+                this.addMessageToHistory(memory, history_variable, inputMsg!);
+                this.addMessageToHistory(memory, history_variable, repair.message!);
             }
 
             return repair;
@@ -485,34 +520,28 @@ export class LLMClient<TContent = any> {
 
     /**
      * @param {Memory} memory - Current memory.
-     * @param {string} variable - Variable to fetch from memory.
-     * @param {Message<any>} input - The current input.
+     * @param {string} variable - Variable to fetch value from memory.
+     * @param {Message<any> | Message<any>[]} message - The Message to be added to history.
      * @private
      */
-    private addInputToHistory(memory: Memory, variable: string, input: Message<any>): void {
+    private addMessageToHistory(memory: Memory, variable: string, message: Message<any> | Message<any>[]): void {
         if (variable) {
             const history: Message[] = memory.getValue(variable) ?? [];
-            history.push(input);
-            if (history.length > this.options.max_history_messages) {
-                history.splice(0, history.length - this.options.max_history_messages);
-            }
-            memory.setValue(variable, history);
-        }
-    }
 
-    /**
-     * @param {Memory} memory - Current memory.
-     * @param {string} variable - Variable to fetch value from memory.
-     * @param {Message<TContent>} message - The Message to be added to history.
-     * @private
-     */
-    private addResponseToHistory(memory: Memory, variable: string, message: Message<TContent>): void {
-        if (variable) {
-            const history: Message<TContent>[] = memory.getValue(variable) ?? [];
-            history.push(message);
+            if (Array.isArray(message)) {
+                history.push(...message);
+            } else {
+                history.push(message);
+            }
+
             if (history.length > this.options.max_history_messages) {
                 history.splice(0, history.length - this.options.max_history_messages);
             }
+
+            while (history.length > 0 && history[0].role === 'tool') {
+                history.shift();
+            }
+
             memory.setValue(variable, history);
         }
     }
@@ -539,8 +568,8 @@ export class LLMClient<TContent = any> {
 
         // Add response and feedback to repair history
         const feedback = validation.feedback ?? 'The response was invalid. Try another strategy.';
-        this.addResponseToHistory(fork, `${history_variable}-repair`, response.message!);
-        this.addInputToHistory(fork, `${history_variable}-repair`, { role: 'user', content: feedback });
+        this.addMessageToHistory(fork, `${history_variable}-repair`, response.message!);
+        this.addMessageToHistory(fork, `${history_variable}-repair`, { role: 'user', content: feedback });
 
         // Append repair history to prompt
         const repairTemplate = Object.assign({}, template, {

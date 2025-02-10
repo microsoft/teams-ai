@@ -3,14 +3,13 @@ using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
-using Record = Microsoft.Teams.AI.State.Record;
 
 namespace Microsoft.Teams.AI.Tests.Application
 {
     public class MeetingsTests
     {
         [Fact]
-        public async void Test_OnStart()
+        public async Task Test_OnStart()
         {
             // Arrange
             var adapter = new NotImplementedAdapter();
@@ -42,7 +41,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnEnd()
+        public async Task Test_OnEnd()
         {
             // Arrange
             var adapter = new NotImplementedAdapter();
@@ -74,7 +73,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnParticipantsJoin()
+        public async Task Test_OnParticipantsJoin()
         {
             // Arrange
             var adapter = new NotImplementedAdapter();
@@ -106,7 +105,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnParticipantsLeave()
+        public async Task Test_OnParticipantsLeave()
         {
             // Arrange
             var adapter = new NotImplementedAdapter();

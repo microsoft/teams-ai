@@ -11,8 +11,8 @@
   </ItemGroup>
 	
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.7" />
-    <PackageReference Include="Microsoft.Teams.AI" Version="1.5.*" />
+    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.23.0" />
+<PackageReference Include="Microsoft.Teams.AI" Version="1.10.*" />
   </ItemGroup>
 
   <!-- Include prompt as content in build output -->
@@ -28,21 +28,16 @@
     <Content Remove="appPackage/**/*" />
     <None Include="appPackage/**/*" />
     <None Include="env/**/*" />
-    <Content Remove="infra/**/*" />
     <None Include="infra/**/*" />
   </ItemGroup>
 
   <!-- Exclude local settings from publish -->
   <ItemGroup>
     <Content Remove="appsettings.Development.json" />
-    <None Remove="prompts\monologue\skprompt.txt" />
     <Content Include="appsettings.Development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>None</CopyToPublishDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Prompts\Monologue\" />
   </ItemGroup>
 	
 </Project>

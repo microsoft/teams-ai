@@ -2,6 +2,7 @@
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.AI.Validators;
+using static Microsoft.Teams.AI.AI.Models.IPromptCompletionModelEvents;
 
 namespace Microsoft.Teams.AI.AI.Clients
 {
@@ -61,6 +62,26 @@ namespace Microsoft.Teams.AI.AI.Clients
         /// If true, any repair attempts will be logged to the console.
         /// </summary>
         public bool LogRepairs { get; set; } = false;
+
+        /// <summary>
+        /// Optional message to send a client at the start of a streaming response.
+        /// </summary>
+        public string? StartStreamingMessage { get; set; }
+
+        /// <summary>
+        /// Optional handler to run when a stream is about to conclude.
+        /// </summary>
+        public ResponseReceivedHandler? EndStreamHandler;
+
+        /// <summary>
+        /// Optional, controls the feedback loop for streaming responses.
+        /// </summary>
+        public bool? EnableFeedbackLoop { get; set; }
+
+        /// <summary>
+        /// Optional. Represents the type of feedback loop. It can be set to one of "default" or "custom".
+        /// </summary>
+        public string? FeedbackLoopType { get; set; }
 
         /// <summary>
         /// Creates an instance of `LLMClientOptions`

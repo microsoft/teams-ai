@@ -21,7 +21,7 @@ class TestToString(TestCase):
         self.assertEqual(to_string(self.tokenizer, None), "")
 
     def test_to_string_with_string(self):
-        self.assertEqual(to_string(self.tokenizer, "test"), '"test"')
+        self.assertEqual(to_string(self.tokenizer, "test"), "test")
 
     def test_to_string_with_number(self):
         self.assertEqual(to_string(self.tokenizer, 123), "123")
@@ -44,3 +44,6 @@ class TestToString(TestCase):
     def test_to_string_with_object_as_json(self):
         obj = {"key": "value", "key2": [1, 2, 3]}
         self.assertEqual(to_string(self.tokenizer, obj, as_json=True), json.dumps(obj))
+
+    def test_to_string_with_nonen_string(self):
+        self.assertEqual(to_string(self.tokenizer, "非英文"), "非英文")

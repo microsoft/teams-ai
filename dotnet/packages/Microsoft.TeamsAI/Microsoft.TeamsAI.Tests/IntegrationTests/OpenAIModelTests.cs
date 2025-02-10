@@ -5,11 +5,11 @@ using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using System.Reflection;
 using Xunit.Abstractions;
-using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Teams.AI.Tests.IntegrationTests
 {
@@ -17,7 +17,9 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
     {
         private readonly IConfigurationRoot _configuration;
         private readonly RedirectOutput _output;
+#pragma warning disable IDE0052 // Remove unread private members
         private readonly ILoggerFactory _loggerFactory;
+#pragma warning restore IDE0052 // Remove unread private members
 
         public OpenAIModelTests(ITestOutputHelper output)
         {

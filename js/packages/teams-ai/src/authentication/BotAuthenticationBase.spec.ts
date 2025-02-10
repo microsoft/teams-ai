@@ -115,7 +115,7 @@ describe('BotAuthenticationBase.ts utility functions', () => {
             assert(context.activity.value['settingName'] == settingName);
             assert(context.activity.value['testProperty'] == 'testValue');
         });
-    })
+    });
 
     describe('setUserInSignInFlow()', async () => {
         it('should set user in sign in flow', async () => {

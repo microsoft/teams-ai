@@ -1,13 +1,18 @@
-﻿using Microsoft.Bot.Builder;
+﻿using System.ClientModel.Primitives;
+using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Clients;
 using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.AI.Validators;
+using Microsoft.Teams.AI.Application;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
+using OpenAI.Chat;
+using static Microsoft.Teams.AI.AI.Models.IPromptCompletionModelEvents;
+using ChatMessage = Microsoft.Teams.AI.AI.Models.ChatMessage;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
@@ -52,7 +57,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(history);
             Assert.Single(history);
             Assert.Equal(history.First().Role, ChatRole.Function);
-            Assert.Equal(history.First().Name, "function");
+            Assert.Equal("function", history.First().Name);
             Assert.Equal(history.First().Content, "results");
         }
 
@@ -78,7 +83,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(history);
             Assert.Single(history);
             Assert.Equal(history.First().Role, ChatRole.Function);
-            Assert.Equal(history.First().Name, "function-1");
+            Assert.Equal("function-1", history.First().Name);
             Assert.Equal(history.First().Content, "results-1");
         }
 
@@ -94,8 +99,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             LLMClientOptions<object> options = new(promptCompletionModel, promptTemplate) { MaxHistoryMessages = 1 };
             LLMClient<object> client = new(options, null);
             TestMemory memory = new();
+            ChatMessage message = new ChatMessage("Hi there");
             promptCompletionModel.Results.Enqueue(new()
             {
+                Input = new List<ChatMessage>() { message },
                 Status = PromptResponseStatus.Error,
                 Error = new TeamsAIException("test")
             });
@@ -108,7 +115,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal(PromptResponseStatus.Error, response.Status);
             Assert.NotNull(response.Error);
             Assert.Equal("test", response.Error.Message);
-            Assert.Equal(0, memory.Values.Count);
+            Assert.Single(memory.Values);
+
+            IList<ChatMessage> conversation_history = (IList<ChatMessage>)memory.GetValue("conversation.history")!;
+            Assert.True(conversation_history[0].Content  ==  message.Content);
         }
 
         [Fact]
@@ -147,6 +157,45 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal(2, memory.Values.Count);
             Assert.Equal("hello", memory.Values[options.InputVariable]);
             Assert.Equal(2, ((List<ChatMessage>)memory.Values[options.HistoryVariable]).Count);
+        }
+
+        [Fact]
+        public async Task Test_CompletePromptAsync_Streaming_Success()
+        {
+            // Arrange
+            List<string> chunks = new();
+            chunks.Add("h");
+            chunks.Add("i");
+            var promptCompletionModel = TestPromptCompletionStreamingModel.StreamTextChunks(chunks);
+            var promptTemplate = new PromptTemplate(
+                "prompt",
+                new(new() { })
+            );
+
+            ResponseReceivedHandler handler = new((object sender, ResponseReceivedEventArgs args) =>
+            {
+                Assert.Equal("hi", args.Streamer.Message);
+            });
+
+            LLMClientOptions<object> options = new(promptCompletionModel, promptTemplate)
+            {
+                StartStreamingMessage = "Begin streaming",
+                EndStreamHandler = handler,
+                EnableFeedbackLoop = true,
+            };
+            LLMClient<object> client = new(options, null);
+            TestMemory memory = new();
+
+            // Act
+            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager());
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal(PromptResponseStatus.Success, response.Status);
+            Assert.Null(response.Error);
+            Assert.NotNull(response.Message);
+            Assert.Equal(ChatRole.Assistant, response.Message.Role);
+            Assert.Equal("hi", response.Message.Content);
         }
 
         [Fact]
@@ -291,7 +340,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal(PromptResponseStatus.Error, response.Status);
             Assert.NotNull(response.Error);
             Assert.Equal("test", response.Error.Message);
-            Assert.Equal(1, memory.Values.Count);
+            Assert.Single(memory.Values);
             Assert.Equal("hello", memory.Values[options.InputVariable]);
         }
 
@@ -360,7 +409,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal(PromptResponseStatus.InvalidResponse, response.Status);
             Assert.NotNull(response.Error);
             Assert.Equal("Reached max model response repair attempts. Last feedback given to model: \"The response was invalid. Try another strategy.\"", response.Error.Message);
-            Assert.Equal(1, memory.Values.Count);
+            Assert.Single(memory.Values);
             Assert.Equal("hello", memory.Values[options.InputVariable]);
         }
 
@@ -398,7 +447,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(response.Message);
             Assert.Equal(ChatRole.Assistant, response.Message.Role);
             Assert.Equal("welcome", response.Message.Content);
-            Assert.Equal(1, memory.Values.Count);
+            Assert.Empty(memory.Values);
         }
 
         [Fact]
@@ -444,7 +493,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(response.Message);
             Assert.Equal(ChatRole.Assistant, response.Message.Role);
             Assert.Equal("welcome", response.Message.Content);
-            Assert.Equal(1, memory.Values.Count);
+            Assert.Single(memory.Values);
             Assert.Equal("hello", memory.Values[options.InputVariable]);
         }
 
@@ -480,6 +529,105 @@ namespace Microsoft.Teams.AI.Tests.AITests
             public Task<PromptResponse> CompletePromptAsync(ITurnContext turnContext, IMemory memory, IPromptFunctions<List<string>> promptFunctions, ITokenizer tokenizer, PromptTemplate promptTemplate, CancellationToken cancellationToken)
             {
                 return Task.FromResult(Results.Dequeue());
+            }
+        }
+
+        private sealed class TestPromptCompletionStreamingModel : IPromptCompletionStreamingModel
+        {
+            public delegate Task<PromptResponse> Handler(TestPromptCompletionStreamingModel model, ITurnContext turnContext, IMemory memory, IPromptFunctions<List<string>> promptFunctions, ITokenizer tokenizer, PromptTemplate promptTemplate);
+
+            public event Handler handler;
+
+            public PromptCompletionModelEmitter? Events { get; set; } = new();
+
+            public TestPromptCompletionStreamingModel(Handler handler)
+            {
+                this.handler = handler;
+            }
+
+            public static TestPromptCompletionStreamingModel StreamTextChunks(IList<string> chunks, int delay = 0)
+            {
+                Handler handler = new(async (TestPromptCompletionStreamingModel model, ITurnContext turnContext, IMemory memory, IPromptFunctions<List<string>> promptFunctions, ITokenizer tokenizer, PromptTemplate promptTemplate) =>
+                {
+                    BeforeCompletionEventArgs args = new(turnContext, memory, promptFunctions, tokenizer, promptTemplate, true);
+
+                    model.Events = new();
+
+                    model.Events.OnBeforeCompletion(args);
+
+                    string content = "";
+
+                    for (int i = 0; i < chunks.Count; i++)
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(0));
+                        string text = chunks[i];
+                        content += text;
+                        if (i == 0)
+                        {
+                            var update = ModelReaderWriter.Read<StreamingChatCompletionUpdate>(BinaryData.FromString(@$"{{
+                                ""choices"": [
+                                    {{
+                                        ""finish_reason"": null,
+                                        ""delta"": {{
+                                            ""role"": ""assistant"",
+                                            ""content"": ""${content}""
+                                        }}
+                                    }}
+                                ]
+                            }}"));
+
+                            ChatMessage currDeltaMessage = new(update!);
+                            PromptChunk chunk = new() { delta = currDeltaMessage };
+
+                            ChunkReceivedEventArgs firstChunkArgs = new(turnContext, memory, chunk);
+
+                            model.Events.OnChunkReceived(firstChunkArgs);
+                        }
+                        else
+                        {
+                            var update = ModelReaderWriter.Read<StreamingChatCompletionUpdate>(BinaryData.FromString(@$"{{
+                                ""choices"": [
+                                    {{
+                                        ""finish_reason"": null,
+                                        ""delta"": {{
+                                            ""content"": ""${content}""
+                                        }}
+                                    }}
+                                ]
+                            }}"));
+
+                            ChatMessage currDeltaMessage = new(update!);
+                            PromptChunk chunk = new() { delta = currDeltaMessage };
+
+                            ChunkReceivedEventArgs secondChunkArgs = new(turnContext, memory, chunk);
+
+                            model.Events.OnChunkReceived(secondChunkArgs);
+                        }
+
+                    }
+
+                    await Task.Delay(TimeSpan.FromSeconds(delay));
+                    PromptResponse response = new()
+                    {
+                        Status = PromptResponseStatus.Success,
+                        Message = new(ChatRole.Assistant)
+                        {
+                            Content = content,
+                        }
+                    };
+                    StreamingResponse streamer = new(turnContext);
+                    ResponseReceivedEventArgs responseReceivedEventArgs = new(turnContext, memory, response, streamer);
+
+                    model.Events.OnResponseReceived(responseReceivedEventArgs);
+                    return response;
+                });
+
+                return new TestPromptCompletionStreamingModel(handler);
+            }
+
+            public Task<PromptResponse> CompletePromptAsync(ITurnContext turnContext, IMemory memory, IPromptFunctions<List<string>> promptFunctions, ITokenizer tokenizer, PromptTemplate promptTemplate, CancellationToken cancellationToken)
+            {
+                return this.handler(this, turnContext, memory, promptFunctions, tokenizer, promptTemplate);
             }
         }
 
