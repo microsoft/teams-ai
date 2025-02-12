@@ -18,8 +18,7 @@ import {
     PromptManager,
     TurnState,
     TeamsAdapter,
-    PromptCompletionModelResponseReceivedEvent,
-    StreamingResponse
+    PromptCompletionModelResponseReceivedEvent
 } from '@microsoft/teams-ai';
 
 import { addResponseFormatter } from './responseFormatter';

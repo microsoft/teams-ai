@@ -1,17 +1,21 @@
-# Microsoft Teams Conversational Bot with AI: Teams Chef
+# Microsoft Teams Conversational Streaming Bot with AI: Teams Chef
 
 This is a conversational streaming bot for Microsoft Teams that thinks it's a Chef to help you cook apps using the Teams AI Library. The bot uses the `gpt-4o` model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
+
+> **PLEASE NOTE**, while you can use Teams Toolkit to help provision your bot, streaming is not currently available in Teams in the browser. To test, you will need to use the Teams client.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [Microsoft Teams Conversational Bot with AI: Teams Chef](#microsoft-teams-conversational-bot-with-ai-teams-chef)
-    - [Summary](#summary)
-    - [Setting up the sample](#setting-up-the-sample)
-    - [Testing the sample](#testing-the-sample)
-        - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
-        - [Using Teams App test tool](#using-teams-app-test-tool)
+-   [Microsoft Teams Conversational Streaming Bot with AI: Teams Chef](#microsoft-teams-conversational-streaming-bot-with-ai-teams-chef)
+    -   [Summary](#summary)
+    -   [Streaming](#streaming)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Setting up AI keys](#setting-up-ai-keys)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+        -   [Using Teams App test tool](#using-teams-app-test-tool)
 
 <!-- /code_chunk_output -->
 
@@ -27,17 +31,17 @@ In addition, the sample illustrates our streaming feature.
 
 The following configurations are needed:
 
-- Use the `DefaultAugmentation` class
-- Set `stream: true` in the `OpenAIModel` declaration
+-   Use the `DefaultAugmentation` class
+-   Set `stream: true` in the `OpenAIModel` declaration
 
 Optional additions:
 
-- Set the informative message in the `ActionPlanner` declaration via the `startStreamingMessage` config.
+-   Set the informative message in the `ActionPlanner` declaration via the `startStreamingMessage` config.
 
-- Set attachments in the final chunk via the `endStreamHandler` in the `ActionPlanner` declaration.
-    - Useful methods include
-        - `streamer.setAttachments([...attachments])`
-        - `streamer.getMessage()`
+-   Set attachments in the final chunk via the `endStreamHandler` in the `ActionPlanner` declaration.
+    -   Useful methods include
+        -   `streamer.setAttachments([...attachments])`
+        -   `streamer.getMessage()`
 
 ```js
 const model = new OpenAIModel({
@@ -74,17 +78,21 @@ git clone https://github.com/Microsoft/teams-ai.git
 > If you opened this sample from the Sample Gallery in Teams Toolkit, you can skip to step 2.
 
 ```bash
-cd path/to/04.ai-apps/a.teamsChefBot
+cd path/to/04.ai-apps/i.teamsChefBot
 code .
 ```
+
+## Setting up AI keys
+
+1. Please note that you will need to update several files with your OpenAI key or Azure OpenAI key and endpoint values depending on which you plan to use.
 
 2. Add your OpenAI key to the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file and comment out lines 90-93 in `./src/index.ts` file.
 
 If you are using Azure OpenAI then follow these steps:
 
-- Comment the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
-- Add your Azure OpenAI key and endpoint values to the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables.
-- Open the `teamsapp.local.yml` file and modify the last step to use Azure OpenAI variables instead:
+-   Comment the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
+-   Add your Azure OpenAI key and endpoint values to the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables.
+-   Open the `teamsapp.local.yml` file and modify the last step to use Azure OpenAI variables instead:
 
 ```yml
 - uses: file/createOrUpdateEnvironmentFile
@@ -98,8 +106,23 @@ If you are using Azure OpenAI then follow these steps:
         AZURE_OPENAI_ENDPOINT: ${{SECRET_AZURE_OPENAI_ENDPOINT}}
 ```
 
-- Open `./infra/azure.bicep` and comment out lines 72-75 and uncomment lines 76-83.
-- Open `./infra/azure.parameters.json` and replace lines 20-22 with:
+Comment out whichever API you are not using in the `./src/VectraDataSource.ts` file.
+
+```ts
+// If you are using Azure OpenAI.
+const embeddings = new OpenAIEmbeddings({
+    // model: 'text-embedding-ada-002',
+    // apiKey: options.apiKey,
+
+    // Azure OpenAI Support
+    azureApiKey: options.azureApiKey,
+    azureDeployment: 'text-embedding-ada-002',
+    azureEndpoint: options.azureEndpoint
+});
+```
+
+-   Open `./infra/azure.bicep` and comment out lines 72-75 and uncomment lines 76-83.
+-   Open `./infra/azure.parameters.json` and replace lines 20-22 with:
 
 ```json
       "azureOpenAIKey": {
@@ -113,6 +136,8 @@ If you are using Azure OpenAI then follow these steps:
 > Please note: If you are using Azure OpenAI, you will need both a GPT model and embedding model deployment to get this sample working. See `OpenAIModel` in `index.ts` and `OpenAIEmbeddings` in `VectraDataSource.ts`.
 
 3. Update `./src/prompts/chat/config.json` and `./src/index.ts` with your model deployment name.
+
+4. Update `./src/VectraDataSource.ts` with your embedding model/deployment name.
 
 ## Testing the sample
 
@@ -140,9 +165,9 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 If you are using Azure OpenAI then follow these steps:
 
-- Comment the `SECRET_OPENAI_KEY` variable in the `./env/.env.testtool` file.
-- Add your Azure OpenAI key and endpoint values to the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables
-- Open the `teamsapp.testtool.yml` file and modify the last step to use Azure OpenAI variables instead:
+-   Comment the `SECRET_OPENAI_KEY` variable in the `./env/.env.testtool` file.
+-   Add your Azure OpenAI key and endpoint values to the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables
+-   Open the `teamsapp.testtool.yml` file and modify the last step to use Azure OpenAI variables instead:
 
 ```yml
 - uses: file/createOrUpdateEnvironmentFile
