@@ -2,6 +2,8 @@
 
 This is a sample agent demonstrating OSS DevOps capablities through GitHub and Azure Open AI. The sample is scoped to one specific GitHub repository of your choice.
 
+Note that the repository you choose must be one in which you have privileges, as settings will need to be adjusted.
+
 This sample requires creating an OAuth Connection in Azure Bot Service, which provides a token store to store the token after sign-in.
 
 ## Interacting with the Agent
@@ -52,6 +54,8 @@ Your setup should be similiar to this sceenshot. Make sure your `authorization c
 
 3. Fill in the `.env` variables with your keys. You can leave the `BOT_ID` and `BOT_PASSWORD` empty.
 
+4. Update the `skprompt.txt` file to cater to your specified repository.
+
 ## Using Teams Toolkit for Visual Studio Code
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. 
@@ -74,6 +78,7 @@ Here, we will be subscribing to pull request events.
 Follow the Github Repository Webhook guidance [here](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks#creating-a-repository-webhook).
 
 The `payload URL` is equal to your `BOT_ENDPOINT` in the `env/.env.local` file, followed by `/api/webhook`.
+(e.g., `https://f3z8srb6-3978.usw2.devtunnels.ms/api/webhook`)
 
 The final settings configured should follow a similiar format:
 
