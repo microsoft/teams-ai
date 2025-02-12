@@ -1,0 +1,20 @@
+[
+    {
+        "name": "ListPRs",
+        "description": "Lists the current pull requests."
+    },
+    {
+        "name": "GetPR",
+        "description": "Returns information about the pull request.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "pull_request_id": {
+                    "type": "string",
+                    "description": "The specified pull request (PR)."
+                }
+            },
+            "required": ["pull_request_id"]
+        }
+    }
+]
