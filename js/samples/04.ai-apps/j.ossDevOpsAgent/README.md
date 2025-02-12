@@ -8,9 +8,7 @@ This sample requires creating an OAuth Connection in Azure Bot Service, which pr
 
 ## Interacting with the Agent
 
-You can start to interact with this agent by sending it a message.
-
-Once you are ready to authenticate, send a message containing the keyword `login`. You will then be forwarded to the GitHub Oauth portal on the browser.
+You can start to interact with this agent by sending it a message. Tihs will automatically prompt the login flow, where you will be forwarded to the GitHub Oauth portal on the browser.
 
 The agent has three primary capablities (for 1 repo):
 
@@ -85,8 +83,8 @@ The `payload URL` is equal to your `BOT_ENDPOINT` in the `env/.env.local` file, 
 
 The final settings configured should follow a similiar format:
 
-![Repository Webhook Setup](/assets/webhook-settings.png)
+![Repository Webhook Setup](assets/webhook-settings.png)
 
-![Webhook Pull Request Events](/assets/oauth-webhook-events.png)
+![Webhook Pull Request Events](assets/oauth-webhook-events.png)
 
 Make sure to hit save, and that the webhook is checked off as `Active`. Now your agent is ready to go!
