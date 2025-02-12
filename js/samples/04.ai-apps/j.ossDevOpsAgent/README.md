@@ -33,7 +33,7 @@ For your agent to connect to GitHub and allow for user access, it needs to be re
 
 Follow the instructions provided by GitHub [here](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app).
 
-Mark down what the `Client ID` and `Client Secret` are, as these will need to be copied into the `.env` file later.
+Mark down what the `Client ID` and `Client Secret` are, as these will need to be copied into the `/env/.env.local.user` file later.
 
 Your setup should be similiar to this sceenshot. Make sure your `authorization callback URL` matches the below.
 
@@ -54,6 +54,8 @@ Your setup should be similiar to this sceenshot. Make sure your `authorization c
 
 3. Fill in the `.env` variables with your keys. You can leave the `BOT_ID` and `BOT_PASSWORD` empty.
 
+4. Add the `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` in the `/env/.env.local.user` file.
+
 4. Update the `skprompt.txt` file to cater to your specified repository.
 
 ## Using Teams Toolkit for Visual Studio Code
@@ -64,7 +66,8 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 2. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
 3. Verify that the Teams Toolkit extension is connected to your Teams account from the above step.
 4. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
-5. In the browser that launches, select the **Add** button to install the app to Teams.
+5. Select the appropriate resource group. This is where your resources will be deployed.
+6. In the browser that launches, select the **Add** button to install the app to Teams.
 
 > If you do not have permission to upload custom apps (sideloading), Teams Toolkit will recommend creating and using a Microsoft 365 Developer Program account - a free program to get your own dev environment sandbox that includes Teams.
 
