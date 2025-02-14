@@ -237,9 +237,10 @@ To start using the `StreamingResponse` class, you need to create an instance of 
    streamingResponse.queueInformativeUpdate('Searching for the information you requested...');
    ```
 
-### 2. Queuing Text Chunks
+#### 3. Queuing Text Chunks
 
 As your bot generates or retrieves content, you can send partial messages to the user.
+
 **Note**: It is important to include a delay between the chunks to avoid spamming the Teams Client.  
 
    ```javascript
@@ -254,17 +255,16 @@ As your bot generates or retrieves content, you can send partial messages to the
    streamingResponse.queueTextChunk(secondChunk);
    ```
 
-### 3. Ending the Stream
+#### 4. Ending the Stream
 
-Call the `endStream` method to conclude the streaming response. Since this method returns a promise, use `await` to ensure all queued activities are sent before proceeding.
+Call the `endStream` method to conclude the stream. Since this method returns a promise, use `await` to ensure all queued activities are sent before proceeding.
 
-**Note**: Always ensure you await `endStream()` to properly finalize the stream and send all queued messages.
 
    ```javascript
    await streamingResponse.endStream();
    ```
 
-## Extra Features
+### Extra Features
 
 You may also be interested in adding in the Powered by AI features.
 
