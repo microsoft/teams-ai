@@ -241,7 +241,7 @@ To start using the `StreamingResponse` class, you need to create an instance of 
 
 As your bot generates or retrieves content, you can send partial messages to the user.
 
-**Note 1**: We do not handle chunking, this class assumes you already have some form of chunking mechanism (e.g., via another LLM) prior to using this class.
+**Note 1**: As we do not handle chunking, this class assumes you already have some form of chunking mechanism (e.g., via another LLM) prior to using this class.
 The streaming behaviour is determined through the timeouts and the size of the text chunks.
 
 **Note 2**: It is important to include a delay between the chunks to avoid spamming the Teams Client.  
