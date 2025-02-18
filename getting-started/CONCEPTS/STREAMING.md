@@ -241,7 +241,10 @@ To start using the `StreamingResponse` class, you need to create an instance of 
 
 As your bot generates or retrieves content, you can send partial messages to the user.
 
-**Note**: It is important to include a delay between the chunks to avoid spamming the Teams Client.  
+**Note 1**: We do not handle chunking, this class assumes you already have some form of chunking mechanism (e.g., via another LLM) prior to using this class.
+The streaming behaviour is determined through the timeouts and the size of the text chunks.
+
+**Note 2**: It is important to include a delay between the chunks to avoid spamming the Teams Client.  
 
    ```javascript
    const firstChunk = 'Here is the first part of the information.';
@@ -266,7 +269,7 @@ Call the `endStream` method to conclude the stream. Since this method returns a 
 
 ### Extra Features
 
-You may also be interested in adding in the Powered by AI features.
+You may also be interested in adding in the [Powered by AI](./POWERED-BY-AI.md) features.
 
 To configure the Feedback Loop, use the `setFeedbackLoop` and `setFeedbackLoopType` methods. 
 
@@ -276,7 +279,7 @@ To configure the Sensitivity Label, use the `setSensitivityLabel` method.
 
 To configure citations, use the `setCitations` method. Please see the ClientCitation interface in the Teams AI library for the expected shape of the citation object.
 
-To configure attachments at the end of the stream, use the `setAttachments` method.
+To configure attachments, use the `setAttachments` method. Note that this is only currently rendered for the final chunk.
 
 ---
 
