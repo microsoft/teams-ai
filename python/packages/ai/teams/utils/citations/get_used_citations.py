@@ -20,7 +20,8 @@ def get_used_citations(
         citations: List[Union[ClientCitation, Dict[str, Any]]] The list of citations to search for.
                   Supports both ClientCitation objects and dictionary representations.
     Returns:
-        Optional[List[Union[ClientCitation, Dict[str, Any]]]]: The list of citations used in the text.
+        Optional[List[Union[ClientCitation, Dict[str, Any]]]]: The list of citations used in the 
+        text.
     """
     regex = r"\[(\d+)\]"
     matches = re.findall(regex, text)
@@ -39,8 +40,8 @@ def get_used_citations(
             if isinstance(citation, ClientCitation) and str(citation.position) == match:
                 used_citations.append(citation)
                 break
-            elif isinstance(citation, dict) and str(citation["position"]) == match:
+            if isinstance(citation, dict) and str(citation["position"]) == match:
                 used_citations.append(citation)
                 break
-                
+
     return used_citations
