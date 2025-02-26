@@ -54,3 +54,47 @@ class TestGetUsedCitations(TestCase):
         else:
             self.fail("Result is None")
         self.assertEqual(result, [citations[0], citations[2]])
+
+    def test_get_used_citations_dict(self):
+        citations = [
+            {
+                "position": 1,
+                "appearance": {
+                    "name": "the title",
+                    "abstract": "some citation text..."
+                }
+            },
+            {
+                "position": 2,
+                "appearance": {
+                    "name": "the title",
+                    "abstract": "some citation other text..."
+                }
+            },
+            {
+                "position": 3,
+                "appearance": {
+                    "name": "the title",
+                    "abstract": "third citation text..."
+                }
+            }
+        ]
+        
+        text = "hello [2] world [3]"
+        result = get_used_citations(text, citations)
+        
+        assert result is not None
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result, [citations[1], citations[2]])
+        
+        # Test with empty matches
+        text_no_citations = "hello world with no citations"
+        result_empty = get_used_citations(text_no_citations, citations)
+        self.assertIsNone(result_empty)
+        
+        # Test with duplicate citations
+        text_duplicate = "hello [1] world [1] again"
+        result_duplicate = get_used_citations(text_duplicate, citations)
+        assert result_duplicate is not None
+        self.assertEqual(len(result_duplicate), 1)
+        self.assertEqual(result_duplicate, [citations[0]])
