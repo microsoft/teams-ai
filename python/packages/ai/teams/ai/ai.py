@@ -314,7 +314,7 @@ class AI(Generic[StateT]):
         content_text = content if not citations else format_citations_response(content)
 
         # If there are citations, filter out the citations unused in content.
-        referenced_citations = get_used_citations(content_text, citations)
+        referenced_citations = get_used_citations(content_text, citations) # type: ignore
         channel_data: Dict[str, Any] = {}
 
         if is_teams_channel:
@@ -331,7 +331,9 @@ class AI(Generic[StateT]):
                 channel_data=channel_data,
                 entities=[
                     AIEntity(
-                        citation=(list(referenced_citations) if referenced_citations else []),
+                        citation=(
+                            list(referenced_citations) if referenced_citations else []# type: ignore
+                        ),
                         additional_type=["AIGeneratedContent"],
                     ),
                 ],

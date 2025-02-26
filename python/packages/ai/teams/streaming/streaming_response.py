@@ -292,11 +292,11 @@ class StreamingResponse:
 
         # If there are citations, filter out the citations unused in content.
         if self._citations and len(self._citations) > 0 and self._ended is False:
-            curr_citations = get_used_citations(self._message, self._citations)
+            curr_citations = get_used_citations(self._message, self._citations) # type: ignore
             activity.entities.append(
                 AIEntity(
                     additional_type=[],
-                    citation=curr_citations if curr_citations else [],
+                    citation=curr_citations if curr_citations else [], # type: ignore
                 )
             )
 

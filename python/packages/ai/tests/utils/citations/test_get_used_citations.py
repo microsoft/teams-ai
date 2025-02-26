@@ -22,7 +22,7 @@ class TestGetUsedCitations(TestCase):
             ),
         ]
         text = "hello [1] world"
-        result = get_used_citations(text, citations)
+        result = get_used_citations(text, citations) # type: ignore
         assert result is not None
         self.assertEqual(len(result), 1)
 
@@ -48,7 +48,7 @@ class TestGetUsedCitations(TestCase):
             ),
         ]
         text = "hello [1] world [3]"
-        result = get_used_citations(text, citations)
+        result = get_used_citations(text, citations) # type: ignore
         if result is not None:
             self.assertEqual(len(result), 2)
         else:
@@ -81,7 +81,7 @@ class TestGetUsedCitations(TestCase):
         ]
 
         text = "hello [2] world [3]"
-        result = get_used_citations(text, citations)
+        result = get_used_citations(text, citations) # type: ignore
 
         assert result is not None
         self.assertEqual(len(result), 2)
@@ -89,12 +89,12 @@ class TestGetUsedCitations(TestCase):
 
         # Test with empty matches
         text_no_citations = "hello world with no citations"
-        result_empty = get_used_citations(text_no_citations, citations)
+        result_empty = get_used_citations(text_no_citations, citations) # type: ignore
         self.assertIsNone(result_empty)
 
         # Test with duplicate citations
         text_duplicate = "hello [1] world [1] again"
-        result_duplicate = get_used_citations(text_duplicate, citations)
+        result_duplicate = get_used_citations(text_duplicate, citations) # type: ignore
         assert result_duplicate is not None
         self.assertEqual(len(result_duplicate), 1)
         self.assertEqual(result_duplicate, [citations[0]])

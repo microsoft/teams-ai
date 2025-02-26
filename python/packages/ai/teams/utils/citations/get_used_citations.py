@@ -29,7 +29,7 @@ def get_used_citations(
     if not matches:
         return None
 
-    used_citations = []
+    used_citations: List[Union[ClientCitation, Dict[str, Any]]] = []  # Explicitly type this
     processed_matches = []
     for match in matches:
         if match in processed_matches:
