@@ -36,7 +36,6 @@ def get_used_citations(
         processed_matches.append(match)
 
         for citation in citations:
-            print(type(citation))
             if isinstance(citation, ClientCitation) and str(citation.position) == match:
                 used_citations.append(citation)
                 break
