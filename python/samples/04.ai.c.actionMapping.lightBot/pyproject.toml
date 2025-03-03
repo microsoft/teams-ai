@@ -1,17 +1,19 @@
-[tool.poetry]
+[project]
 name = "light-sample"
 version = "0.0.0"
 description = "Light Sample"
-authors = ["Microsoft <teams@microsoft.com>"]
+authors = [{ name = "Microsoft", email = "teams@microsoft.com"}]
 readme = "README.md"
+requires-python = ">=3.9,<4.0"
+dependencies = [
+    "python-dotenv (>=1.0.1,<2.0.0)",
+    "teams-ai (>=1.6.0,<2.0.0)"
+]
+
+[tool.poetry]
 packages = [
     { include = "src" }
 ]
-
-[tool.poetry.dependencies]
-python = ">=3.8,<4.0"
-teams-ai = "^1.6.0"
-python-dotenv = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
@@ -22,7 +24,7 @@ black = "^24.3.0"
 isort = "^5.12.0"
 mypy = "^1.5.0"
 
-[tool.poetry.scripts]
+[project.scripts]
 lint = "scripts:lint"
 fmt = "scripts:fmt"
 test = "scripts:test"
@@ -45,7 +47,7 @@ profile = "black"
 addopts = "--cov-report html:coverage --cov=src"
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 ignore_missing_imports = true
 show_error_codes = true
 no_implicit_optional = true
