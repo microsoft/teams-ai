@@ -35,7 +35,7 @@ ci = "scripts:ci"
 start = "scripts:start"
 
 [build-system]
-requires = ["poetry-core>=2.0.0"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
