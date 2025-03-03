@@ -5,7 +5,7 @@ description = "SDK focused on building AI based applications for Microsoft Teams
 readme = "README.md"
 authors = [{ name = "Microsoft", email = "teams@microsoft.com"}]
 keywords = ["microsoft", "teams", "ai", "bot"]
-requires-python = ">=3.8,<4.0"
+requires-python = ">=3.9,<4.0"
 dependencies = [
     "botbuilder-core (>=4.15.0,<5.0.0)",
     "botbuilder-integration-aiohttp (>=4.15.0,<5.0.0)",
@@ -68,7 +68,7 @@ log_cli = true
 log_cli_level = "INFO"
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 ignore_missing_imports = true
 show_error_codes = true
 no_implicit_optional = true

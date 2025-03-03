@@ -94,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: main
     env:
-      python-version: 3.8
+      python-version: 3.9
     defaults:
       run:
         working-directory: python/packages/ai

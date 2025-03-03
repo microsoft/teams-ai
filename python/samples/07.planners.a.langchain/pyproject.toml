@@ -4,7 +4,7 @@ version = "0.0.0"
 description = "LangChain Sample"
 authors = [{ name = "Microsoft", email = "teams@microsoft.com"}]
 readme = "README.md"
-requires-python = ">=3.8.1,<4.0"
+requires-python = ">=3.9,<4.0"
 dependencies = [
     "python-dotenv (>=1.0.1,<2.0.0)",
     "teams-ai (>=1.6.0,<2.0.0)",
@@ -49,7 +49,7 @@ profile = "black"
 addopts = "--cov-report html:coverage --cov=src"
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 ignore_missing_imports = true
 show_error_codes = true
 no_implicit_optional = true
