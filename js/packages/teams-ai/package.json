@@ -30,8 +30,8 @@
     },
     "dependencies": {
         "@azure/msal-node": "^2.16.1",
-        "axios": "^1.7.5",
-        "botbuilder-dialogs": "^4.23.1",
+        "axios": "^1.8.1",
+        "botbuilder-dialogs": "^4.23.2",
         "botframework-connector": "^4.23.1",
         "botframework-schema": "^4.23.1",
         "botframework-streaming": "^4.23.1",
