@@ -78,7 +78,7 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           name: 'Azure__OpenAIApiKey'
           value: azureOpenAIApiKey
-        },
+        }
         {
           name: 'Azure__OpenAIEndpoint'
           value: azureOpenAIEndpoint
