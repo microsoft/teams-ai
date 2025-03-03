@@ -81,7 +81,7 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         }
         {
           name: 'Azure__OpenAIEndpoint'
-          value: azureOpenAIEndpoint
+          value: azureOpenAIApiEndpoint
         }
         {
           name: 'Azure__OpenAIAssistantId'
