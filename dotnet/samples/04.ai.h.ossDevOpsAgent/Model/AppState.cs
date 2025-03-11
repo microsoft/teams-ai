@@ -1,4 +1,5 @@
-﻿using Microsoft.Teams.AI.State;
+﻿using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.Teams.AI.State;
 
 namespace OSSDevOpsAgent.Model
 {
@@ -41,5 +42,12 @@ namespace OSSDevOpsAgent.Model
     // This class adds custom properties to the turn state which will be accessible in the activity handler methods.
     public class ConversationState : Record
     {
+        private const string _kernelHistoryKey = "kernelHistory";
+
+        public ChatHistory KernelHistory
+        {
+            get => Get<ChatHistory>(_kernelHistoryKey);
+            set => Set(_kernelHistoryKey, value);
+        }
     }
 }

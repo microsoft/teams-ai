@@ -12,7 +12,7 @@ namespace OSSDevOpsAgent
         private IChatCompletionService _chatCompletionService;
         private OpenAIPromptExecutionSettings _openAIPromptExecutionSettings;
         private AppState _state;
-        private const string CONVERSATION_KERNEL_HISTORY = "conversation.KernelHistory";
+        private const string CONVERSATION_KERNEL_HISTORY = "conversation.kernelHistory";
 
         public KernelOrchestrator(Kernel kernel, AppState state)
         {
