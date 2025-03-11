@@ -6,8 +6,6 @@ using Microsoft.SemanticKernel;
 using OSSDevOpsAgent.Model;
 using OSSDevOpsAgent;
 using Microsoft.Bot.Schema;
-using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,13 +61,7 @@ builder.Services.AddTransient<IBot>(sp =>
     HttpClient client = sp.GetService<HttpClient>();
     IStorage storage = sp.GetService<IStorage>();
     TeamsAdapter adapter = sp.GetService<TeamsAdapter>();
-    Kernel kernel = sp.GetService<Kernel>();
-    IChatCompletionService chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
-    OpenAIPromptExecutionSettings openAIPromptExecutionSettings = new()
-    {
-        FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
-        ChatSystemPrompt = "Assistant is a GitHub expert, with these primary capablities.\n\n- List GitHub pull requests.\n- Retrieve information regarding a specific GitHub pull request.\n- Send a notification whenever there is a new assignee on a pull request.\n\nGitHub Assistant should always greet the human, ask for their name, and then guide them regarding pull requests in a friendly manner.\n\nAll of these pull requests are for the Teams AI SDK repository.\n\nThe purpose of GitHub Assistant is to help boost the team's productivity and quality of their engineering lifecycle.",
-    };
+    AppState state = new AppState();
 
     AuthenticationOptions<AppState> options = new();
     options.AddAuthentication("github", new OAuthSettings()
@@ -83,10 +75,14 @@ builder.Services.AddTransient<IBot>(sp =>
 
     Application<AppState> app = new ApplicationBuilder<AppState>()
         .WithStorage(storage)
-        .WithTurnStateFactory(() => new AppState())
+        .WithTurnStateFactory(() => state)
         .WithAuthentication(adapter, options)
         .WithLoggerFactory(loggerFactory)
         .Build();
+
+    // Setup AOAI with SK
+    Kernel kernel = sp.GetService<Kernel>();
+    KernelOrchestrator orchestrator = new KernelOrchestrator(kernel, state);
 
     // Listen for user to say "/reset" and then delete conversation state
     app.OnMessage("/reset", async (turnContext, turnState, cancellationToken) =>
@@ -109,7 +105,7 @@ builder.Services.AddTransient<IBot>(sp =>
         await context.SendActivityAsync("You have signed out from GitHub");
     });
 
-    // Semantic Kernel for all other messages
+    // Route to Semantic Kernel for all other messages
     app.OnActivity(ActivityTypes.Message, async (turnContext, turnState, cancellationToken) =>
     {
         var token = turnState.Temp.AuthTokens["github"];
@@ -118,12 +114,8 @@ builder.Services.AddTransient<IBot>(sp =>
             await turnContext.SendActivityAsync("Please sign in to GitHub first.");
         }
 
-        var result = await chatCompletionService.GetChatMessageContentAsync(
-           turnContext.Activity.Text,
-           executionSettings: openAIPromptExecutionSettings,
-           kernel: kernel);
-
-        await turnContext.SendActivityAsync(result.Content);
+        var result = await orchestrator.GetChatMessageContentAsync(turnContext);
+        await turnContext.SendActivityAsync(result);
     });
 
     app.Authentication.Get("github").OnUserSignInSuccess(async (context, state) =>
