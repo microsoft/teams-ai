@@ -82,7 +82,7 @@ builder.Services.AddTransient<IBot>(sp =>
 
     // Setup AOAI with SK
     Kernel kernel = sp.GetService<Kernel>();
-    KernelOrchestrator orchestrator = new KernelOrchestrator(kernel, state);
+    KernelOrchestrator orchestrator = new KernelOrchestrator(kernel, storage, config);
 
     // Listen for user to say "/reset" and then delete conversation state
     app.OnMessage("/reset", async (turnContext, turnState, cancellationToken) =>

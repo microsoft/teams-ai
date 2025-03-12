@@ -1,8 +1,8 @@
 ﻿using Microsoft.Bot.Builder;
+using Microsoft.Bot.Schema;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using OSSDevOpsAgent.Model;
 
 namespace OSSDevOpsAgent
 {
@@ -11,10 +11,10 @@ namespace OSSDevOpsAgent
         private Kernel _kernel;
         private IChatCompletionService _chatCompletionService;
         private OpenAIPromptExecutionSettings _openAIPromptExecutionSettings;
-        private AppState _state;
-        private const string CONVERSATION_KERNEL_HISTORY = "conversation.kernelHistory";
+        private IStorage _storage;
+        private ConfigOptions _config;
 
-        public KernelOrchestrator(Kernel kernel, AppState state)
+        public KernelOrchestrator(Kernel kernel, IStorage storage, ConfigOptions config)
         {
             _kernel = kernel;
             _chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
@@ -22,33 +22,57 @@ namespace OSSDevOpsAgent
             {
                 FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
             };
-            _state = state;
+            _storage = storage;
+            _config = config;
         }
 
         public async Task<string> GetChatMessageContentAsync(ITurnContext turnContext)
         {
-            ChatHistory chatHistory = LoadChatHistory();
-            chatHistory.AddUserMessage(turnContext.Activity.Text);
+            IDictionary<string, object> entries = await _storage.ReadAsync(keys: new[] { "conversations" });
+
+            List<ConversationInfo> prev_convos = new List<ConversationInfo>();
+
+            if (entries.ContainsKey("conversations"))
+            {
+                prev_convos = (List<ConversationInfo>)entries["conversations"];
+            }
+
+            ConversationInfo curr_convo = prev_convos.Find(x => x.Id == turnContext.Activity.Conversation.Id);
+
+            if (curr_convo == null)
+            {
+                curr_convo = InitiateChat(turnContext.Activity);
+            }
+            else
+            {
+                prev_convos.Remove(curr_convo);
+            }
+
+            //curr_convo.ChatHistory.AddUserMessage(turnContext.Activity.Text);
 
             var result = await _chatCompletionService.GetChatMessageContentAsync(
-               chatHistory,
+               //curr_convo.ChatHistory,
+               turnContext.Activity.Text,
                executionSettings: _openAIPromptExecutionSettings,
                kernel: _kernel);
 
-            chatHistory.Add(result);
-            _state.SetValue(CONVERSATION_KERNEL_HISTORY, chatHistory);
+            //curr_convo.ChatHistory.Add(result);
+
+            // Update storage
+            prev_convos.Add(curr_convo);
+            Dictionary<string, object> updated_entries = new()
+            {
+                { "conversations", prev_convos }
+            };
+            await _storage.WriteAsync(updated_entries);
 
             return result.Content;
         }
 
-        public ChatHistory LoadChatHistory()
+        public ConversationInfo InitiateChat(Activity activity)
         {
-            ChatHistory? chatHistory = (ChatHistory?)_state.GetValue(CONVERSATION_KERNEL_HISTORY);
-
-            if (chatHistory == null)
-            {
-                chatHistory = new();
-                chatHistory.AddSystemMessage(
+            ChatHistory chatHistory = new();
+            chatHistory.AddSystemMessage(
                     "You are a GitHub Assistant. " +
                     "- You can list and filter pull requests. " +
                     "- You send an adaptive card whenever there is a new assignee on a pull request. " +
@@ -56,9 +80,17 @@ namespace OSSDevOpsAgent
                     "The assistant should always greet the human, ask for their name, and guide them in a friendly manner. " +
                     "All of the pull requests are in the Teams AI SDK repository. " +
                     "The purpose of GitHub Assistant is to help boost the team's productivity and quality of their engineering lifecycle.");
-            }
 
-            return chatHistory;
+            ConversationInfo convo = new ConversationInfo()
+            {
+                BotId = _config.BOT_ID,
+                Id = activity.Conversation.Id,
+                ServiceUrl = activity.ServiceUrl,
+                //ChatHistory = chatHistory,
+                IsGroup = (activity.Conversation.IsGroup != null) ? (bool)activity.Conversation.IsGroup : false
+            };
+
+            return convo;
         }
     }
 }
