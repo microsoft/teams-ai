@@ -22,7 +22,7 @@
         "url": "https://github.com/microsoft/teams-ai"
     },
     "dependencies": {
-        "botbuilder": "^4.23.1",
+        "botbuilder": "^4.23.2",
         "@microsoft/teams-ai": "~1.7.3",
         "openai": "4.77.4",
         "dotenv": "^16.4.1",
@@ -36,7 +36,7 @@
         "@typescript-eslint/parser": "^6.21.0",
         "eslint": "^8.57.1",
         "nodemon": "~1.19.4",
-        "prettier": "^3.3.3",
+        "prettier": "^3.5.3",
         "rimraf": "^5.0.10",
         "typescript": "~5.5.4",
         "shx": "^0.3.4",

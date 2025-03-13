@@ -1,32 +1,36 @@
-[tool.poetry]
+[project]
 name = "teams-ai"
-version = "1.6.0"
+version = "1.7.0"
 description = "SDK focused on building AI based applications for Microsoft Teams."
-authors = ["Microsoft <teams@microsoft.com>"]
 readme = "README.md"
+authors = [{ name = "Microsoft", email = "teams@microsoft.com"}]
+keywords = ["microsoft", "teams", "ai", "bot"]
+requires-python = ">=3.9,<4.0"
+dependencies = [
+    "botbuilder-core (>=4.15.0,<5.0.0)",
+    "botbuilder-integration-aiohttp (>=4.15.0,<5.0.0)",
+    "botframework-connector (>=4.15.0,<5.0.0)",
+    "tiktoken (>=0.7.0,<1.0.0)",
+    "aiohttp (>=3.9.3,<4.0.0)",
+    "jsonschema (>=4.21.1,<5.0.0)",
+    "types-pyyaml (>=6.0.12.12,<7.0.0.0)",
+    "pyyaml (>=6.0.1,<7.0.0)",
+    "dataclasses-json (>=0.6.4,<1.0.0)",
+    "azure-ai-contentsafety (>=1.0.0,<2.0.0)",
+    "msal (>=1.28.0,<2.0.0)",
+    "botbuilder-dialogs (>=4.14.8,<5.0.0)",
+    "openai (>=v1.52.0,<v2.0.0)"
+]
+
+[project.urls]
 repository = "https://github.com/microsoft/teams-ai"
 documentation = "https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/teams%20conversational%20ai/teams-conversation-ai-overview"
-keywords = ["microsoft", "teams", "ai", "bot"]
+
+[tool.poetry]
 packages = [
     { include = "teams" },
     { include = "tests" }
 ]
-
-[tool.poetry.dependencies]
-botbuilder-core = "^4.15.0"
-botbuilder-integration-aiohttp = "^4.15.0"
-botframework-connector = "^4.15.0"
-python = ">=3.8,<4.0"
-tiktoken = "^0.7.0"
-aiohttp = "^3.9.3"
-jsonschema = "^4.21.1"
-types-pyyaml = "^6.0.12.12"
-pyyaml = "^6.0.1"
-dataclasses-json = "^0.6.4"
-azure-ai-contentsafety = "^1.0.0"
-msal = "^1.28.0"
-botbuilder-dialogs = "^4.14.8"
-openai = "^v1.52.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
@@ -38,7 +42,7 @@ isort = "^5.12.0"
 mypy = "^1.5.0"
 httpx = "^0.26.0"
 
-[tool.poetry.scripts]
+[project.scripts]
 lint = "scripts:lint"
 fmt = "scripts:fmt"
 test = "scripts:test"
@@ -64,7 +68,7 @@ log_cli = true
 log_cli_level = "INFO"
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 ignore_missing_imports = true
 show_error_codes = true
 no_implicit_optional = true
