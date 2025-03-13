@@ -137,14 +137,19 @@ class State(dict, ABC):
         super().__delitem__(key)
 
     def __setattr__(self, key: str, value: Any) -> None:
-        if key.startswith("_!") or callable(value):
+        if key.startswith("_") or callable(value):
             object.__setattr__(self, key, value)
             return
 
         self[key] = value
 
     def __getattr__(self, key: str) -> Any:
-        return self[key]
+        try:
+            return self[key]
+        except KeyError as exc:
+            raise AttributeError(
+                f"'{self.__class__.__name__}' object has no attribute '{key}'"
+            ) from exc
 
     def __getattribute__(self, key: str) -> Any:
         if key in self:
