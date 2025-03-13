@@ -137,7 +137,7 @@ class State(dict, ABC):
         super().__delitem__(key)
 
     def __setattr__(self, key: str, value: Any) -> None:
-        if key.startswith("_") or callable(value):
+        if key.startswith("_!") or callable(value):
             object.__setattr__(self, key, value)
             return
 
