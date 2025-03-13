@@ -30,7 +30,7 @@ jobs:
       dotnet: ${{ steps.filter.outputs.dotnet }}
       python: ${{ steps.filter.outputs.python }}
     steps:
-    # For pull requests it's not necessary to checkout the code
+    - uses: actions/checkout@v4
     - uses: dorny/paths-filter@v3
       id: filter
       with:
