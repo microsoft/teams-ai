@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder;
+﻿using System.Text.Json;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -30,39 +31,44 @@ namespace OSSDevOpsAgent
         {
             IDictionary<string, object> entries = await _storage.ReadAsync(keys: new[] { "conversations" });
 
-            List<ConversationInfo> prev_convos = new List<ConversationInfo>();
+            List<ConversationInfo> prevConvos = new List<ConversationInfo>();
 
             if (entries.ContainsKey("conversations"))
             {
-                prev_convos = (List<ConversationInfo>)entries["conversations"];
+                prevConvos = (List<ConversationInfo>)entries["conversations"];
             }
 
-            ConversationInfo curr_convo = prev_convos.Find(x => x.Id == turnContext.Activity.Conversation.Id);
+            ConversationInfo currConvo = prevConvos.Find(x => x.Id == turnContext.Activity.Conversation.Id);
 
-            if (curr_convo == null)
+            if (currConvo == null)
             {
-                curr_convo = InitiateChat(turnContext.Activity);
+                currConvo = InitiateChat(turnContext.Activity);
             }
             else
             {
-                prev_convos.Remove(curr_convo);
+                // Remove to update
+                prevConvos.Remove(currConvo);
             }
 
-            //curr_convo.ChatHistory.AddUserMessage(turnContext.Activity.Text);
+            ChatHistory history = JsonSerializer.Deserialize<ChatHistory>(currConvo.ChatHistory);
+            history.AddUserMessage(turnContext.Activity.Text);
 
             var result = await _chatCompletionService.GetChatMessageContentAsync(
-               //curr_convo.ChatHistory,
-               turnContext.Activity.Text,
+               history,
                executionSettings: _openAIPromptExecutionSettings,
                kernel: _kernel);
 
-            //curr_convo.ChatHistory.Add(result);
+            history.Add(result);
 
-            // Update storage
-            prev_convos.Add(curr_convo);
+            // Update history
+            string serializedHistory = JsonSerializer.Serialize(history);
+            currConvo.ChatHistory = serializedHistory;
+
+            // Replace storage with recent conversation
+            prevConvos.Add(currConvo);
             Dictionary<string, object> updated_entries = new()
             {
-                { "conversations", prev_convos }
+                { "conversations", prevConvos }
             };
             await _storage.WriteAsync(updated_entries);
 
@@ -81,12 +87,15 @@ namespace OSSDevOpsAgent
                     "All of the pull requests are in the Teams AI SDK repository. " +
                     "The purpose of GitHub Assistant is to help boost the team's productivity and quality of their engineering lifecycle.");
 
+            // Update history
+            string serializedHistory = JsonSerializer.Serialize(chatHistory);
+
             ConversationInfo convo = new ConversationInfo()
             {
                 BotId = _config.BOT_ID,
                 Id = activity.Conversation.Id,
                 ServiceUrl = activity.ServiceUrl,
-                //ChatHistory = chatHistory,
+                ChatHistory = serializedHistory,
                 IsGroup = (activity.Conversation.IsGroup != null) ? (bool)activity.Conversation.IsGroup : false
             };
 

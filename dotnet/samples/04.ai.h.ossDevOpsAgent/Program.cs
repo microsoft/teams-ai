@@ -46,7 +46,7 @@ builder.Services.AddSingleton(sp =>
         endpoint: config.Azure.OpenAIEndpoint,
         httpClient: client);
 
-    OSSDevOpsAgentPlugin plugin = new(client, config);
+    PullRequestsPlugin plugin = new(client, config);
     kernelBuilder.Plugins.AddFromObject(plugin);
 
     return kernelBuilder.Build();

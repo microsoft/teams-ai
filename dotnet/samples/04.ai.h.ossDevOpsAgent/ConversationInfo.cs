@@ -6,7 +6,7 @@ namespace OSSDevOpsAgent
         public string BotId { get; set; }
         public string Id { get; set; }
         public string ServiceUrl { get; set; }
-        //public ChatHistory ChatHistory { get; set; }
+        public string ChatHistory { get; set; }
         public bool IsGroup { get; set; }
     }
 }

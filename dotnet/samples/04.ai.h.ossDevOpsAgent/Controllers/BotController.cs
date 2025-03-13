@@ -40,13 +40,12 @@ namespace OSSDevOpsAgent.Controllers
     public class WebhookController : ControllerBase
     {
         private readonly TeamsAdapter _adapter;
-        private readonly IBot _bot;
         private readonly MemoryStorage _storage;
 
-        public WebhookController(TeamsAdapter adapter, IStorage storage)
+        public WebhookController(TeamsAdapter adapter, MemoryStorage storage)
         {
             _adapter = adapter;
-            _storage = storage as MemoryStorage;
+            _storage = storage;
         }
 
         [HttpPost]
@@ -61,23 +60,23 @@ namespace OSSDevOpsAgent.Controllers
             var payload = JsonConvert.DeserializeObject<dynamic>(requestBody);
             var eventType = Request.Headers["x-github-event"].ToString();
 
-            var labels = new List<string>() { "closed", "opened", "reopened", "ready_for_review" };
+            var prLabels = new List<string>() { "closed", "opened", "reopened", "ready_for_review" };
 
             // Handle pull request assignment events
             if (eventType == "pull_request" && (payload.action == "assigned"))
             {
-                await HandlePullRequestAssignments(payload, cancellationToken);
+                await HandlePRAssignments(payload, cancellationToken);
             } // Handle pull request state changes
-            else if (eventType == "pull_request" && (labels.Contains(payload.action.ToString())))
+            else if (eventType == "pull_request" && (prLabels.Contains(payload.action.ToString())))
             {
-                await HandlePullRequestStateChanges(payload, cancellationToken);
+                await HandlePRStatusChanges(payload, cancellationToken);
             }
 
             Response.StatusCode = 200;
             await Response.WriteAsync("Event received", cancellationToken);
         }
 
-        private async Task HandlePullRequestAssignments(dynamic payload, CancellationToken cancellationToken)
+        private async Task HandlePRAssignments(dynamic payload, CancellationToken cancellationToken)
         {
             IDictionary<string, object> entries = await _storage.ReadAsync(keys: new[] { "conversations" }, cancellationToken);
 
@@ -113,7 +112,7 @@ namespace OSSDevOpsAgent.Controllers
             }
         }
 
-        private async Task HandlePullRequestStateChanges(dynamic payload, CancellationToken cancellationToken)
+        private async Task HandlePRStatusChanges(dynamic payload, CancellationToken cancellationToken)
         {
             IDictionary<string, object> entries = await _storage.ReadAsync(keys: new[] { "conversations" }, cancellationToken);
 
@@ -149,17 +148,6 @@ namespace OSSDevOpsAgent.Controllers
             }
         }
 
-        private static Attachment CreateAdaptiveCardAttachment(string filePath)
-        {
-            var adaptiveCardJson = System.IO.File.ReadAllText(filePath);
-            var adaptiveCardAttachment = new Attachment()
-            {
-                ContentType = "application/vnd.microsoft.card.adaptive",
-                Content = JsonConvert.DeserializeObject(adaptiveCardJson),
-            };
-            return adaptiveCardAttachment;
-        }
-
         public Attachment CreatePullRequestCard(JObject payload)
         {
             var pullRequest = payload["pull_request"];
@@ -174,14 +162,14 @@ namespace OSSDevOpsAgent.Controllers
                 {
                     new AdaptiveTextBlock
                     {
-                        Text = $"🔔 Assignee Update for Pull Request #{prNumber} 🔔",
+                        Text = $"✎ Assignee Requested for Pull Request #{prNumber} ✎",
                         Weight = AdaptiveTextWeight.Bolder,
                         Size = AdaptiveTextSize.Medium,
                         Color = AdaptiveTextColor.Accent
                     },
                     new AdaptiveTextBlock
                     {
-                        Text = $"**Title:** {prTitle}",
+                        Text = $"{prTitle}",
                         Wrap = true,
                         Size = AdaptiveTextSize.Medium,
                         Weight = AdaptiveTextWeight.Bolder
@@ -225,14 +213,14 @@ namespace OSSDevOpsAgent.Controllers
                 {
                     new AdaptiveTextBlock
                     {
-                        Text = $"🔔 State Update for Pull Request #{prNumber} 🔔",
+                        Text = $"🔔 Status Update for Pull Request #{prNumber} 🔔",
                         Weight = AdaptiveTextWeight.Bolder,
                         Size = AdaptiveTextSize.Medium,
                         Color = AdaptiveTextColor.Accent
                     },
                     new AdaptiveTextBlock
                     {
-                        Text = $"**Title:** {prTitle}",
+                        Text = $"{prTitle}",
                         Wrap = true,
                         Size = AdaptiveTextSize.Medium,
                         Weight = AdaptiveTextWeight.Bolder

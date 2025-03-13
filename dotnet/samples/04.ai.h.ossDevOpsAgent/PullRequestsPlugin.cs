@@ -4,12 +4,12 @@ using Microsoft.SemanticKernel;
 
 namespace OSSDevOpsAgent
 {
-    public class OSSDevOpsAgentPlugin
+    public class PullRequestsPlugin
     {
         private HttpClient _httpClient;
         private ConfigOptions _config;
 
-        public OSSDevOpsAgentPlugin(
+        public PullRequestsPlugin(
             HttpClient httpClient,
             ConfigOptions config)
         {
