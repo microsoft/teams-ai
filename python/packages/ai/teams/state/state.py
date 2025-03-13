@@ -146,8 +146,8 @@ class State(dict, ABC):
     def __getattr__(self, key: str) -> Any:
         try:
             return self[key]
-        except KeyError:
-            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{key}'")
+        except KeyError as exc:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{key}'") from exc
 
     def __getattribute__(self, key: str) -> Any:
         if key in self:
