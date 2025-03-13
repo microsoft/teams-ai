@@ -91,7 +91,7 @@ class OpenAIModel(PromptCompletionModel):
     """
     A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
 
-    The model has been updated to support calling OpenAI's new o1/o3 family of models. That currently
+    The model has been updated to support OpenAI's new o1/o3 family of models. That currently
     comes with a few constraints. These constraints are mostly handled for you but are worth noting:
 
     - The models introduce a new `max_completion_tokens` parameter and they've deprecated
