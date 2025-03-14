@@ -33,22 +33,21 @@ builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<Team
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
 // Add Semantic Kernel registration
-builder.Services.AddSingleton(sp =>
+builder.Services.AddTransient(sp =>
 {
     var kernelBuilder = Kernel.CreateBuilder();
-    kernelBuilder.Services.AddLogging(services => services.AddConsole().SetMinimumLevel(LogLevel.Trace));
+    kernelBuilder.Services.AddLogging(services => services.AddConsole().SetMinimumLevel(LogLevel.Debug));
     HttpClient client = sp.GetService<HttpClient>();
 
     kernelBuilder.AddAzureOpenAIChatCompletion(
         deploymentName: config.Azure.OpenAIDeploymentName,
-        modelId: "gpt-4o",
+        modelId: config.Azure.OpenAIModelId,
         apiKey: config.Azure.OpenAIApiKey,
         endpoint: config.Azure.OpenAIEndpoint,
         httpClient: client);
 
     PullRequestsPlugin plugin = new(client, config);
     kernelBuilder.Plugins.AddFromObject(plugin);
-
     return kernelBuilder.Build();
 });
 
@@ -80,16 +79,9 @@ builder.Services.AddTransient<IBot>(sp =>
         .WithLoggerFactory(loggerFactory)
         .Build();
 
-    // Setup AOAI with SK
+    // Setup orchestration
     Kernel kernel = sp.GetService<Kernel>();
     KernelOrchestrator orchestrator = new KernelOrchestrator(kernel, storage, config);
-
-    // Listen for user to say "/reset" and then delete conversation state
-    app.OnMessage("/reset", async (turnContext, turnState, cancellationToken) =>
-    {
-        turnState.DeleteConversationState();
-        await turnContext.SendActivityAsync("Ok I've deleted the current conversation state", cancellationToken: cancellationToken);
-    });
 
     app.OnMessage("/signin", async (context, state, cancellationToken) =>
     {
@@ -114,6 +106,7 @@ builder.Services.AddTransient<IBot>(sp =>
             await turnContext.SendActivityAsync("Please sign in to GitHub first.");
         }
 
+        config.GITHUB_AUTH_TOKEN = state.Temp.AuthTokens["github"];
         var result = await orchestrator.GetChatMessageContentAsync(turnContext);
         await turnContext.SendActivityAsync(result);
     });
@@ -122,15 +115,13 @@ builder.Services.AddTransient<IBot>(sp =>
     {
         // Successfully logged in
         config.GITHUB_AUTH_TOKEN = state.Temp.AuthTokens["github"];
-        await context.SendActivityAsync("Successfully logged in");
-        await context.SendActivityAsync($"Token string length: {state.Temp.AuthTokens["github"].Length}");
-        await context.SendActivityAsync($"This is what you said before the AuthFlow started: {context.Activity.Text}");
+        await context.SendActivityAsync("Successfully logged in!");
     });
 
     app.Authentication.Get("github").OnUserSignInFailure(async (context, state, ex) =>
     {
         // Failed to login
-        await context.SendActivityAsync("Failed to login");
+        await context.SendActivityAsync("Sorry, we failed to log you in. Please try again.");
         await context.SendActivityAsync($"Error message: {ex.Message}");
     });
 

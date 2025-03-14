@@ -8,5 +8,7 @@ namespace OSSDevOpsAgent
         public string ServiceUrl { get; set; }
         public string ChatHistory { get; set; }
         public bool IsGroup { get; set; }
+        public string TeamId { get; set; }
+        public string ChannelId { get; set; }
     }
 }

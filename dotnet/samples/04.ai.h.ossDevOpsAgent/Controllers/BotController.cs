@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Schema;
+using Microsoft.Bot.Schema.Teams;
 using Microsoft.Teams.AI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -42,10 +43,10 @@ namespace OSSDevOpsAgent.Controllers
         private readonly TeamsAdapter _adapter;
         private readonly MemoryStorage _storage;
 
-        public WebhookController(TeamsAdapter adapter, MemoryStorage storage)
+        public WebhookController(TeamsAdapter adapter, IStorage storage)
         {
             _adapter = adapter;
-            _storage = storage;
+            _storage = storage as MemoryStorage;
         }
 
         [HttpPost]
@@ -86,26 +87,60 @@ namespace OSSDevOpsAgent.Controllers
 
                 List<ConversationInfo> group_convos = convos.FindAll(x => x.IsGroup);
 
+                Attachment attachment = CreatePullRequestCard(payload);
+
                 group_convos.ForEach(async convo =>
                 {
-                    ConversationReference conversationReference = new ConversationReference
+                    if (string.IsNullOrEmpty(convo.TeamId))
                     {
-                        Conversation = new ConversationAccount()
+                        ConversationReference conversationReference = new ConversationReference
                         {
-                            Name = "Github Webhook",
-                            Id = convo.Id,
-                            ConversationType = "personal",
-                            IsGroup = true,
+                            Conversation = new ConversationAccount()
+                            {
+                                Name = "Github Webhook",
+                                Id = convo.Id,
+                                ConversationType = "personal",
+                                IsGroup = true,
 
-                        },
-                        ServiceUrl = convo.ServiceUrl
-                    };
+                            },
+                            ServiceUrl = convo.ServiceUrl
+                        };
 
-                    await _adapter.ContinueConversationAsync(convo.BotId, conversationReference, async (turnContext, token) =>
+                        await _adapter.ContinueConversationAsync(convo.BotId, conversationReference, async (turnContext, token) =>
+                        {
+                            await turnContext.SendActivityAsync(MessageFactory.Attachment(attachment), cancellationToken: token);
+                        }, cancellationToken);
+                    }
+                    else
                     {
-                        Attachment attachment = CreatePullRequestCard(payload);
-                        await turnContext.SendActivityAsync(MessageFactory.Attachment(attachment), cancellationToken: token);
-                    }, cancellationToken);
+                        var parameters = new ConversationParameters
+                        {
+                            IsGroup = true,
+                            ChannelData = new TeamsChannelData
+                            {
+                                Channel = new ChannelInfo
+                                {
+                                    Id = convo.ChannelId
+                                },
+                                Team = new TeamInfo
+                                {
+                                    Id = convo.TeamId
+                                }
+                            },
+                            Activity = (Activity)MessageFactory.Attachment(attachment)
+                        };
+                        await _adapter.CreateConversationAsync(
+                            convo.BotId,
+                            convo.ChannelId,
+                            convo.ServiceUrl,
+                            null,
+                            parameters,
+                            (turnContext, token) =>
+                            {
+                                return Task.CompletedTask;
+                            },
+                            cancellationToken);
+                    }
 
                 });
 
@@ -122,26 +157,60 @@ namespace OSSDevOpsAgent.Controllers
 
                 List<ConversationInfo> group_convos = convos.FindAll(x => x.IsGroup);
 
+                Attachment attachment = CreatePullRequestStateCard(payload);
+
                 group_convos.ForEach(async convo =>
                 {
-                    ConversationReference conversationReference = new ConversationReference
+                    if (string.IsNullOrEmpty(convo.TeamId))
                     {
-                        Conversation = new ConversationAccount()
+                        ConversationReference conversationReference = new ConversationReference
                         {
-                            Name = "Github Webhook",
-                            Id = convo.Id,
-                            ConversationType = "personal",
-                            IsGroup = true,
+                            Conversation = new ConversationAccount()
+                            {
+                                Name = "Github Webhook",
+                                Id = convo.Id,
+                                ConversationType = "personal",
+                                IsGroup = true,
 
-                        },
-                        ServiceUrl = convo.ServiceUrl
-                    };
+                            },
+                            ServiceUrl = convo.ServiceUrl
+                        };
 
-                    await _adapter.ContinueConversationAsync(convo.BotId, conversationReference, async (turnContext, token) =>
+                        await _adapter.ContinueConversationAsync(convo.BotId, conversationReference, async (turnContext, token) =>
+                        {
+                            await turnContext.SendActivityAsync(MessageFactory.Attachment(attachment), cancellationToken: token);
+                        }, cancellationToken);
+                    }
+                    else
                     {
-                        Attachment attachment = CreatePullRequestStateCard(payload);
-                        await turnContext.SendActivityAsync(MessageFactory.Attachment(attachment), cancellationToken: token);
-                    }, cancellationToken);
+                        var parameters = new ConversationParameters
+                        {
+                            IsGroup = true,
+                            ChannelData = new TeamsChannelData
+                            {
+                                Channel = new ChannelInfo
+                                {
+                                    Id = convo.ChannelId
+                                },
+                                Team = new TeamInfo
+                                {
+                                    Id = convo.TeamId
+                                }
+                            },
+                            Activity = (Activity)MessageFactory.Attachment(attachment)
+                        };
+                        await _adapter.CreateConversationAsync(
+                            convo.BotId,
+                            convo.ChannelId,
+                            convo.ServiceUrl,
+                            null,
+                            parameters,
+                            (turnContext, token) =>
+                            {
+                                return Task.CompletedTask;
+                            },
+                            cancellationToken);
+                    }
 
                 });
 

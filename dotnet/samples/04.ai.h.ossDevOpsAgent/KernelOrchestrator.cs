@@ -1,6 +1,8 @@
 ﻿using System.Text.Json;
 using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Teams;
 using Microsoft.Bot.Schema;
+using Microsoft.Bot.Schema.Teams;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
@@ -38,6 +40,7 @@ namespace OSSDevOpsAgent
                 prevConvos = (List<ConversationInfo>)entries["conversations"];
             }
 
+            // Locate existing conversation, if any
             ConversationInfo currConvo = prevConvos.Find(x => x.Id == turnContext.Activity.Conversation.Id);
 
             if (currConvo == null)
@@ -83,7 +86,6 @@ namespace OSSDevOpsAgent
                     "- You can list and filter pull requests. " +
                     "- You send an adaptive card whenever there is a new assignee on a pull request. " +
                     "- You send an adaptive card whenever there is an update on a pull request. " +
-                    "The assistant should always greet the human, ask for their name, and guide them in a friendly manner. " +
                     "All of the pull requests are in the Teams AI SDK repository. " +
                     "The purpose of GitHub Assistant is to help boost the team's productivity and quality of their engineering lifecycle.");
 
@@ -96,8 +98,16 @@ namespace OSSDevOpsAgent
                 Id = activity.Conversation.Id,
                 ServiceUrl = activity.ServiceUrl,
                 ChatHistory = serializedHistory,
-                IsGroup = (activity.Conversation.IsGroup != null) ? (bool)activity.Conversation.IsGroup : false
+                IsGroup = (activity.Conversation.IsGroup != null) ? (bool)activity.Conversation.IsGroup : false,
             };
+
+            if (string.Equals(activity.Conversation.ConversationType, "channel"))
+            {
+                TeamInfo teamInfo = activity.TeamsGetTeamInfo();
+                var channelData = activity.GetChannelData<TeamsChannelData>();
+                convo.TeamId = teamInfo.Id;
+                convo.ChannelId = channelData.Channel.Id;
+            }
 
             return convo;
         }
