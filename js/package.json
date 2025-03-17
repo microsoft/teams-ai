@@ -57,7 +57,7 @@
         "read-text-file": "^1.1.0",
         "replace-in-file": "^4.1.0",
         "rimraf": "^5.0.10",
-        "shx": "^0.3.4",
+        "shx": "^0.4.0",
         "sinon": "^19.0.2",
         "source-map-support": "^0.5.19",
         "sponge": "^0.1.0",
