@@ -29,7 +29,7 @@ namespace OSSDevOpsAgent
             _config = config;
         }
 
-        public async Task<string> GetChatMessageContentAsync(ITurnContext turnContext)
+        public async Task GetChatMessageContentAsync(ITurnContext turnContext)
         {
             IDictionary<string, object> entries = await _storage.ReadAsync(keys: new[] { "conversations" });
 
@@ -78,7 +78,8 @@ namespace OSSDevOpsAgent
             };
             await _storage.WriteAsync(updated_entries);
 
-            return result.Content;
+            // TODO: Fix regular flow
+            // -> If no plugins were invoked, then send activity.
         }
 
         public ConversationInfo InitiateChat(Activity activity)

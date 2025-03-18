@@ -6,7 +6,6 @@ using Microsoft.Bot.Schema;
 using Microsoft.SemanticKernel;
 using Newtonsoft.Json;
 using OSSDevOpsAgent.Model;
-
 namespace OSSDevOpsAgent
 {
     public class PullRequestsPlugin
@@ -87,12 +86,13 @@ namespace OSSDevOpsAgent
                             ContentType = AdaptiveCard.ContentType,
                             Content = card
                         };
+                        var activity = MessageFactory.Attachment(attachment);
 
-                        await context.SendActivityAsync(MessageFactory.Attachment(attachment));
+                        await context.SendActivityAsync(activity);
+
+                        return JsonConvert.SerializeObject(activity);
                     }
-
-                    // TODO: Add to ChatHistory
-                    return "Execution complete. Do not return any other pull requests to the user.";
+                    throw new Exception("Turn context was not provided");
                 }
                 else
                 {
@@ -106,7 +106,7 @@ namespace OSSDevOpsAgent
             }
             catch (Exception ex)
             {
-                return "Error accessing GitHub API";
+                throw new Exception("Error accessing GitHub API");
             }
         }
 
@@ -152,6 +152,7 @@ namespace OSSDevOpsAgent
                 Content = card
             };
 
+            // TODO: Add to ChatHistory
             await context.SendActivityAsync(MessageFactory.Attachment(attachment));
 
             return "Filtered pull requests displayed.";
