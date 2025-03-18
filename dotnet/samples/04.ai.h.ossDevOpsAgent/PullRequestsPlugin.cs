@@ -1,6 +1,11 @@
 ﻿using System.ComponentModel;
 using System.Net.Http.Headers;
+using AdaptiveCards;
+using Microsoft.Bot.Builder;
+using Microsoft.Bot.Schema;
 using Microsoft.SemanticKernel;
+using Newtonsoft.Json;
+using OSSDevOpsAgent.Model;
 
 namespace OSSDevOpsAgent
 {
@@ -18,7 +23,7 @@ namespace OSSDevOpsAgent
         }
 
         [KernelFunction, Description("Lists the pull requests")]
-        public async Task<string> ListPRs()
+        public async Task<string> ListPRs(Kernel kernel)
         {
             try
             {
@@ -37,7 +42,57 @@ namespace OSSDevOpsAgent
                 if (response.IsSuccessStatusCode)
                 {
                     string jsonContent = await response.Content.ReadAsStringAsync();
-                    return jsonContent;
+                    if (kernel.Data.TryGetValue("turnContext", out var turnContextObj))
+                    {
+                        TurnContext context = (TurnContext)turnContextObj;
+                        var currPullRequests = JsonConvert.DeserializeObject<List<PullRequest>>(jsonContent);
+
+                        var allLabels = new HashSet<string>();
+                        var allAssignees = new HashSet<string>();
+                        var allAuthors = new HashSet<string>();
+
+                        foreach (var pr in currPullRequests)
+                        {
+                            if (!string.IsNullOrEmpty(pr.User.Login))
+                            {
+                                allAuthors.Add(pr.User.Login);
+                            }
+
+                            if (pr.Labels != null)
+                            {
+                                foreach (var label in pr.Labels)
+                                {
+                                    if (!string.IsNullOrEmpty(label.Name))
+                                    {
+                                        allLabels.Add(label.Name);
+                                    }
+                                }
+                            }
+
+                            if (pr.Assignees != null)
+                            {
+                                foreach (var assignee in pr.Assignees)
+                                {
+                                    if (!string.IsNullOrEmpty(assignee.Login))
+                                    {
+                                        allAssignees.Add(assignee.Login);
+                                    }
+                                }
+                            }
+                        }
+
+                        var card = AdaptiveCardBuilder.CreateListPRsAdaptiveCard("Pull Requests", currPullRequests, allLabels, allAssignees, allAuthors);
+                        var attachment = new Attachment
+                        {
+                            ContentType = AdaptiveCard.ContentType,
+                            Content = card
+                        };
+
+                        await context.SendActivityAsync(MessageFactory.Attachment(attachment));
+                    }
+
+                    // TODO: Add to ChatHistory
+                    return "Execution complete. Do not return any other pull requests to the user.";
                 }
                 else
                 {
@@ -53,6 +108,53 @@ namespace OSSDevOpsAgent
             {
                 return "Error accessing GitHub API";
             }
+        }
+
+        [KernelFunction, Description("Filters the pull requests")]
+        public async Task<string> FilterPRs(
+           [Description("The labels")] string labels,
+           [Description("The assignees")] string assignees,
+           [Description("The authors")] string authors,
+           [Description("The turn context")] TurnContext context,
+           [Description("The pull requests")] IList<PullRequest> pullRequests)
+        {
+
+            // Check if there are any pull requests to filter
+            if (pullRequests == null || pullRequests.Count == 0)
+            {
+                return "No pull requests available to filter.";
+            }
+
+            // Split the comma-separated strings into arrays
+            var labelArray = string.IsNullOrEmpty(labels) ? new string[0] : labels.Split(',').Select(l => l.Trim()).ToArray();
+            var assigneeArray = string.IsNullOrEmpty(assignees) ? new string[0] : assignees.Split(',').Select(a => a.Trim()).ToArray();
+            var authorArray = string.IsNullOrEmpty(authors) ? new string[0] : authors.Split(',').Select(a => a.Trim()).ToArray();
+
+            // Filter the pull requests based on the provided criteria
+            var filteredPullRequests = pullRequests.Where(pr =>
+                (labelArray.Length == 0 || pr.Labels.Any(label => labelArray.Contains(label.Name))) &&
+                (assigneeArray.Length == 0 || pr.Assignees.Any(assignee => assigneeArray.Contains(assignee.Login))) &&
+                (authorArray.Length == 0 || authorArray.Contains(pr.User.Login))
+            ).ToList();
+
+            // Check if any pull requests match the criteria
+            if (filteredPullRequests.Count == 0)
+            {
+                return "No pull requests match the selected filters.";
+            }
+
+            // Create the adaptive card for the filtered pull requests
+            var card = AdaptiveCardBuilder.CreateFilterPRsAdaptiveCard("Filtered Pull Requests", filteredPullRequests);
+
+            var attachment = new Attachment
+            {
+                ContentType = AdaptiveCard.ContentType,
+                Content = card
+            };
+
+            await context.SendActivityAsync(MessageFactory.Attachment(attachment));
+
+            return "Filtered pull requests displayed.";
         }
 
         [KernelFunction, Description("Retrieves a specific pull request")]

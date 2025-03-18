@@ -6,6 +6,7 @@ using Microsoft.SemanticKernel;
 using OSSDevOpsAgent.Model;
 using OSSDevOpsAgent;
 using Microsoft.Bot.Schema;
+using Newtonsoft.Json.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,7 +48,7 @@ builder.Services.AddTransient(sp =>
         httpClient: client);
 
     PullRequestsPlugin plugin = new(client, config);
-    kernelBuilder.Plugins.AddFromObject(plugin);
+    kernelBuilder.Plugins.AddFromObject(plugin, "PullRequestsPlugin");
     return kernelBuilder.Build();
 });
 
@@ -97,6 +98,26 @@ builder.Services.AddTransient<IBot>(sp =>
         await context.SendActivityAsync("You have signed out from GitHub");
     });
 
+    app.AdaptiveCards.OnActionSubmit("applyFilters", async (context, state, data, cancellationToken) =>
+    {
+        PullRequestFilters filterData = (data as JObject)?.ToObject<PullRequestFilters>() ?? throw new Exception("Incorrect filter data format");
+
+        // Extract the selected filters from the data
+        var selectedLabels = filterData.LabelFilter ?? "";
+        var selectedAssignees = filterData.AssigneeFilter ?? "";
+        var selectedAuthors = filterData.AuthorFilter ?? "";
+        var pullRequests = filterData.PullRequests;
+
+        KernelArguments args = new KernelArguments();
+        args.Add("labels", selectedLabels);
+        args.Add("assignees", selectedAssignees);
+        args.Add("authors", selectedAuthors);
+        args.Add("context", context);
+        args.Add("pullRequests", pullRequests);
+
+        await kernel.InvokeAsync("PullRequestsPlugin", "FilterPRs", args, cancellationToken);
+    });
+
     // Route to Semantic Kernel for all other messages
     app.OnActivity(ActivityTypes.Message, async (turnContext, turnState, cancellationToken) =>
     {
@@ -107,8 +128,7 @@ builder.Services.AddTransient<IBot>(sp =>
         }
 
         config.GITHUB_AUTH_TOKEN = state.Temp.AuthTokens["github"];
-        var result = await orchestrator.GetChatMessageContentAsync(turnContext);
-        await turnContext.SendActivityAsync(result);
+        await orchestrator.GetChatMessageContentAsync(turnContext);
     });
 
     app.Authentication.Get("github").OnUserSignInSuccess(async (context, state) =>

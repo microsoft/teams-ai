@@ -56,10 +56,13 @@ namespace OSSDevOpsAgent
             ChatHistory history = JsonSerializer.Deserialize<ChatHistory>(currConvo.ChatHistory);
             history.AddUserMessage(turnContext.Activity.Text);
 
+            // Save the context to send the activity
+            _kernel.Data.Add("turnContext", turnContext);
+
             var result = await _chatCompletionService.GetChatMessageContentAsync(
                history,
                executionSettings: _openAIPromptExecutionSettings,
-               kernel: _kernel);
+            kernel: _kernel);
 
             history.Add(result);
 
@@ -83,7 +86,7 @@ namespace OSSDevOpsAgent
             ChatHistory chatHistory = new();
             chatHistory.AddSystemMessage(
                     "You are a GitHub Assistant. " +
-                    "- You can list and filter pull requests. " +
+                    "- You can list pull requests. " +
                     "- You send an adaptive card whenever there is a new assignee on a pull request. " +
                     "- You send an adaptive card whenever there is an update on a pull request. " +
                     "All of the pull requests are in the Teams AI SDK repository. " +
