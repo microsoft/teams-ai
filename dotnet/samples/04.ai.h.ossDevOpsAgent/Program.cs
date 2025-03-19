@@ -55,9 +55,7 @@ builder.Services.AddTransient(sp =>
 // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
 builder.Services.AddTransient<IBot>(sp =>
 {
-    // Create loggers
     ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
-
     HttpClient client = sp.GetService<HttpClient>();
     IStorage storage = sp.GetService<IStorage>();
     TeamsAdapter adapter = sp.GetService<TeamsAdapter>();
@@ -102,23 +100,29 @@ builder.Services.AddTransient<IBot>(sp =>
     {
         PullRequestFilters filterData = (data as JObject)?.ToObject<PullRequestFilters>() ?? throw new Exception("Incorrect filter data format");
 
-        // Extract the selected filters from the data
-        var selectedLabels = filterData.LabelFilter ?? "";
-        var selectedAssignees = filterData.AssigneeFilter ?? "";
-        var selectedAuthors = filterData.AuthorFilter ?? "";
+        var labels = filterData.LabelFilter ?? "";
+        var assignees = filterData.AssigneeFilter ?? "";
+        var authors = filterData.AuthorFilter ?? "";
         var pullRequests = filterData.PullRequests;
 
+        if (labels == null && assignees == null && authors == null)
+        {
+            await context.SendActivityAsync("Please select at least one filter.");
+            return;
+        }
+
         KernelArguments args = new KernelArguments();
-        args.Add("labels", selectedLabels);
-        args.Add("assignees", selectedAssignees);
-        args.Add("authors", selectedAuthors);
+        args.Add("labels", labels);
+        args.Add("assignees", assignees);
+        args.Add("authors", authors);
         args.Add("context", context);
         args.Add("pullRequests", pullRequests);
 
-        await kernel.InvokeAsync("PullRequestsPlugin", "FilterPRs", args, cancellationToken);
+        var result = await kernel.InvokeAsync("PullRequestsPlugin", "FilterPRs", args, cancellationToken);
+        string activity = result.GetValue<string>();
+        await orchestrator.SaveActivityToChatHistory(context, activity);
     });
 
-    // Route to Semantic Kernel for all other messages
     app.OnActivity(ActivityTypes.Message, async (turnContext, turnState, cancellationToken) =>
     {
         var token = turnState.Temp.AuthTokens["github"];
@@ -128,7 +132,22 @@ builder.Services.AddTransient<IBot>(sp =>
         }
 
         config.GITHUB_AUTH_TOKEN = state.Temp.AuthTokens["github"];
-        await orchestrator.GetChatMessageContentAsync(turnContext);
+
+        await orchestrator.CreateChatHistory(turnContext);
+
+        if (turnContext.Activity.Text.IndexOf("pull requests", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            KernelArguments args = new KernelArguments();
+            args.Add("context", turnContext);
+            var result = await kernel.InvokeAsync("PullRequestsPlugin", "ListPRs", args, cancellationToken);
+            string activity = result.GetValue<string>();
+            await orchestrator.SaveActivityToChatHistory(turnContext, activity);
+        }
+        else
+        {
+            var model_response = await orchestrator.GetChatMessageContentAsync(turnContext);
+            await turnContext.SendActivityAsync(model_response);
+        }
     });
 
     app.Authentication.Get("github").OnUserSignInSuccess(async (context, state) =>

@@ -23,22 +23,16 @@ namespace OSSDevOpsAgent
             _chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
             _openAIPromptExecutionSettings = new()
             {
-                FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
+                // Current plugins are invoked directly in Program.cs
+                FunctionChoiceBehavior = FunctionChoiceBehavior.None(),
             };
             _storage = storage;
             _config = config;
         }
 
-        public async Task GetChatMessageContentAsync(ITurnContext turnContext)
+        public async Task CreateChatHistory(ITurnContext turnContext)
         {
-            IDictionary<string, object> entries = await _storage.ReadAsync(keys: new[] { "conversations" });
-
-            List<ConversationInfo> prevConvos = new List<ConversationInfo>();
-
-            if (entries.ContainsKey("conversations"))
-            {
-                prevConvos = (List<ConversationInfo>)entries["conversations"];
-            }
+            List<ConversationInfo> prevConvos = await GetPreviousConvos();
 
             // Locate existing conversation, if any
             ConversationInfo currConvo = prevConvos.Find(x => x.Id == turnContext.Activity.Conversation.Id);
@@ -49,15 +43,20 @@ namespace OSSDevOpsAgent
             }
             else
             {
-                // Remove to update
                 prevConvos.Remove(currConvo);
             }
 
             ChatHistory history = JsonSerializer.Deserialize<ChatHistory>(currConvo.ChatHistory);
             history.AddUserMessage(turnContext.Activity.Text);
+            await SerializeAndSaveHistory(history, currConvo, prevConvos);
+        }
 
-            // Save the context to send the activity
-            _kernel.Data.Add("turnContext", turnContext);
+        public async Task<string> GetChatMessageContentAsync(ITurnContext turnContext)
+        {
+            List<ConversationInfo> prevConvos = await GetPreviousConvos();
+            ConversationInfo currConvo = prevConvos.Find(x => x.Id == turnContext.Activity.Conversation.Id);
+            ChatHistory history = JsonSerializer.Deserialize<ChatHistory>(currConvo.ChatHistory);
+            prevConvos.Remove(currConvo);
 
             var result = await _chatCompletionService.GetChatMessageContentAsync(
                history,
@@ -65,21 +64,26 @@ namespace OSSDevOpsAgent
             kernel: _kernel);
 
             history.Add(result);
+            await SerializeAndSaveHistory(history, currConvo, prevConvos);
+            return result.Content;
+        }
 
-            // Update history
-            string serializedHistory = JsonSerializer.Serialize(history);
-            currConvo.ChatHistory = serializedHistory;
+        public async Task SaveActivityToChatHistory(ITurnContext turnContext, string activity)
+        {
+            List<ConversationInfo> prevConvos = await GetPreviousConvos();
 
-            // Replace storage with recent conversation
-            prevConvos.Add(currConvo);
-            Dictionary<string, object> updated_entries = new()
+            ConversationInfo currConvo = prevConvos.Find(x => x.Id == turnContext.Activity.Conversation.Id);
+            ChatHistory history = JsonSerializer.Deserialize<ChatHistory>(currConvo.ChatHistory);
+            prevConvos.Remove(currConvo);
+
+            ChatMessageContent result = new ChatMessageContent()
             {
-                { "conversations", prevConvos }
+                Role = AuthorRole.Assistant,
+                Content = activity,
             };
-            await _storage.WriteAsync(updated_entries);
 
-            // TODO: Fix regular flow
-            // -> If no plugins were invoked, then send activity.
+            history.Add(result);
+            await SerializeAndSaveHistory(history, currConvo, prevConvos);
         }
 
         public ConversationInfo InitiateChat(Activity activity)
@@ -89,11 +93,10 @@ namespace OSSDevOpsAgent
                     "You are a GitHub Assistant. " +
                     "- You can list pull requests. " +
                     "- You send an adaptive card whenever there is a new assignee on a pull request. " +
-                    "- You send an adaptive card whenever there is an update on a pull request. " +
+                    "- You send an adaptive card whenever there is a status update on a pull request. " +
                     "All of the pull requests are in the Teams AI SDK repository. " +
                     "The purpose of GitHub Assistant is to help boost the team's productivity and quality of their engineering lifecycle.");
 
-            // Update history
             string serializedHistory = JsonSerializer.Serialize(chatHistory);
 
             ConversationInfo convo = new ConversationInfo()
@@ -114,6 +117,34 @@ namespace OSSDevOpsAgent
             }
 
             return convo;
+        }
+
+        private async Task SerializeAndSaveHistory(ChatHistory history, ConversationInfo currConvo, List<ConversationInfo> prevConvos)
+        {
+            string serializedHistory = JsonSerializer.Serialize(history);
+            currConvo.ChatHistory = serializedHistory;
+
+            // Replace storage with recent conversation
+            prevConvos.Add(currConvo);
+            Dictionary<string, object> updated_entries = new()
+            {
+                { "conversations", prevConvos }
+            };
+            await _storage.WriteAsync(updated_entries);
+        }
+
+        private async Task<List<ConversationInfo>> GetPreviousConvos()
+        {
+            IDictionary<string, object> entries = await _storage.ReadAsync(keys: new[] { "conversations" });
+
+            List<ConversationInfo> prevConvos = new List<ConversationInfo>();
+
+            if (entries.ContainsKey("conversations"))
+            {
+                prevConvos = (List<ConversationInfo>)entries["conversations"];
+            }
+
+            return prevConvos;
         }
     }
 }

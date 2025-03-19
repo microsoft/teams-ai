@@ -12,73 +12,11 @@ namespace OSSDevOpsAgent.Model
                 {
                     new AdaptiveTextBlock
                     {
-                        Text = title,
+                        Text = $"📄 {title} 📄",
                         Weight = AdaptiveTextWeight.Bolder,
-                        Size = AdaptiveTextSize.Large
+                        Size = AdaptiveTextSize.Large,
+                        Color = AdaptiveTextColor.Accent,
                     },
-                    new AdaptiveContainer
-                    {
-                        Items = new List<AdaptiveElement>
-                        {
-                            new AdaptiveTextBlock
-                            {
-                                Text = "Filters",
-                                Weight = AdaptiveTextWeight.Bolder
-                            },
-                            new AdaptiveChoiceSetInput
-                            {
-                                Id = "labelFilter",
-                                Style = AdaptiveChoiceInputStyle.Compact,
-                                IsMultiSelect = true,
-                                Label = "Labels",
-                                Choices = allLabels.Select(label => new AdaptiveChoice
-                                {
-                                    Title = label,
-                                    Value = label
-                                }).ToList()
-                            },
-                            new AdaptiveChoiceSetInput
-                            {
-                                Id = "assigneeFilter",
-                                Style = AdaptiveChoiceInputStyle.Compact,
-                                IsMultiSelect = true,
-                                Label = "Assignees",
-                                Choices = allAssignees.Select(assignee => new AdaptiveChoice
-                                {
-                                    Title = assignee,
-                                    Value = assignee
-                                }).ToList()
-                            },
-                            new AdaptiveChoiceSetInput
-                            {
-                                Id = "authorFilter",
-                                Style = AdaptiveChoiceInputStyle.Compact,
-                                IsMultiSelect = true,
-                                Label = "Authors",
-                                Choices = allAuthors.Select(author => new AdaptiveChoice
-                                {
-                                    Title = author,
-                                    Value = author
-                                }).ToList()
-                            },
-                            new AdaptiveActionSet
-                            {
-                                Actions = new List<AdaptiveAction>
-                                {
-                                    new AdaptiveSubmitAction
-                                    {
-                                        Title = "Apply Filters",
-                                        Data = new Dictionary<string, object>
-                                        {
-                                            { "verb", "applyFilters" },
-                                            { "action", "applyFilters" },
-                                            { "pullRequests", pullRequests }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
             };
 
@@ -92,7 +30,7 @@ namespace OSSDevOpsAgent.Model
             {
                 prListContainer.Items.Add(new AdaptiveTextBlock
                 {
-                    Text = "No pull requests found",
+                    Text = "No pull requests found 🚫",
                     Wrap = true
                 });
             }
@@ -106,10 +44,79 @@ namespace OSSDevOpsAgent.Model
             }
 
             card.Body.Add(prListContainer);
+
+            if (pullRequests!.Count > 0)
+            {
+                var filters = new AdaptiveContainer
+                {
+                    Items = new List<AdaptiveElement>
+                            {
+                                new AdaptiveTextBlock
+                                {
+                                    Text = "Pull Request Filters 🔍",
+                                    Weight = AdaptiveTextWeight.Bolder
+                                },
+                                new AdaptiveChoiceSetInput
+                                {
+                                    Id = "labelFilter",
+                                    Style = AdaptiveChoiceInputStyle.Compact,
+                                    IsMultiSelect = true,
+                                    Label = "Labels",
+                                    Choices = allLabels.Select(label => new AdaptiveChoice
+                                    {
+                                        Title = label,
+                                        Value = label
+                                    }).ToList()
+                                },
+                                new AdaptiveChoiceSetInput
+                                {
+                                    Id = "assigneeFilter",
+                                    Style = AdaptiveChoiceInputStyle.Compact,
+                                    IsMultiSelect = true,
+                                    Label = "Assignees",
+                                    Choices = allAssignees.Select(assignee => new AdaptiveChoice
+                                    {
+                                        Title = assignee,
+                                        Value = assignee
+                                    }).ToList()
+                                },
+                                new AdaptiveChoiceSetInput
+                                {
+                                    Id = "authorFilter",
+                                    Style = AdaptiveChoiceInputStyle.Compact,
+                                    IsMultiSelect = true,
+                                    Label = "Authors",
+                                    Choices = allAuthors.Select(author => new AdaptiveChoice
+                                    {
+                                        Title = author,
+                                        Value = author
+                                    }).ToList()
+                                },
+                                new AdaptiveActionSet
+                                {
+                                    Actions = new List<AdaptiveAction>
+                                    {
+                                        new AdaptiveSubmitAction
+                                        {
+                                            Title = "Apply Filters",
+                                            Data = new Dictionary<string, object>
+                                            {
+                                                { "verb", "applyFilters" },
+                                                { "action", "applyFilters" },
+                                                { "pullRequests", pullRequests }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                };
+                card.Body.Add(filters);
+            }
             return card;
         }
 
-        public static AdaptiveCard CreateFilterPRsAdaptiveCard(string title, IList<PullRequest> pullRequests)
+
+        public static AdaptiveCard CreateFilterPRsAdaptiveCard(string title, IList<PullRequest> pullRequests, string[] selectedLabels, string[] selectedAssignees, string[] selectedAuthors)
         {
             var card = new AdaptiveCard(new AdaptiveSchemaVersion(1, 5))
             {
@@ -148,6 +155,40 @@ namespace OSSDevOpsAgent.Model
             }
 
             card.Body.Add(prListContainer);
+
+            var combinedFilters = selectedLabels.Concat(selectedAssignees).Concat(selectedAuthors).ToArray();
+
+            if (combinedFilters.Length > 0)
+            {
+                var filterContainer = new AdaptiveContainer
+                {
+                    Items = new List<AdaptiveElement>
+                    {
+                        new AdaptiveTextBlock
+                        {
+                            Text = "Fiters applied:",
+                            Weight = AdaptiveTextWeight.Bolder,
+                            Size = AdaptiveTextSize.Medium,
+                        }
+                    }
+                };
+
+                foreach (var filter in combinedFilters)
+                {
+                    filterContainer.Items.Add(new AdaptiveTextBlock
+                    {
+                        Text = filter,
+                        Color = AdaptiveTextColor.Accent,
+                        Weight = AdaptiveTextWeight.Bolder,
+                        Size = AdaptiveTextSize.Small,
+                        Wrap = true,
+                        Spacing = AdaptiveSpacing.Small
+                    });
+                }
+
+                card.Body.Add(filterContainer);
+            }
+
             return card;
         }
 
@@ -155,6 +196,8 @@ namespace OSSDevOpsAgent.Model
         {
             var prItemContainer = new AdaptiveContainer
             {
+                Spacing = AdaptiveSpacing.Medium,
+                Style = AdaptiveContainerStyle.Emphasis,
                 Items = new List<AdaptiveElement>
                 {
                     new AdaptiveColumnSet
@@ -219,7 +262,7 @@ namespace OSSDevOpsAgent.Model
                                 {
                                     new AdaptiveTextBlock
                                     {
-                                        Text = $"Status: {pr.State}",
+                                        Text = $"Status: {(pr.State == "open" ? "🟢 Open" : "🔴 Closed")}",
                                         IsSubtle = true,
                                         Spacing = AdaptiveSpacing.None
                                     }
@@ -227,12 +270,31 @@ namespace OSSDevOpsAgent.Model
                             }
                         }
                     },
+                    new AdaptiveActionSet
+                    {
+                        Actions = new List<AdaptiveAction>
+                        {
+                            new AdaptiveToggleVisibilityAction
+                            {
+                                Title = "Show/Hide Description",
+                                TargetElements = new List<AdaptiveTargetElement>
+                                {
+                                    new AdaptiveTargetElement
+                                    {
+                                        ElementId = $"description-{pr.Number}"
+                                    }
+                                }
+                            }
+                        }
+                    },
                     new AdaptiveTextBlock
                     {
+                        Id = $"description-{pr.Number}",
                         Text = $"Description: {pr.Body}",
                         Wrap = true,
                         IsSubtle = true,
-                        Spacing = AdaptiveSpacing.None
+                        Spacing = AdaptiveSpacing.None,
+                        IsVisible = false
                     }
                 }
             };
@@ -248,15 +310,6 @@ namespace OSSDevOpsAgent.Model
                     Wrap = true
                 });
             }
-            else
-            {
-                prItemContainer.Items.Add(new AdaptiveTextBlock
-                {
-                    Text = "No labels",
-                    IsSubtle = true,
-                    Spacing = AdaptiveSpacing.None
-                });
-            }
 
             if (!string.IsNullOrEmpty(pr.HtmlUrl))
             {
@@ -270,15 +323,6 @@ namespace OSSDevOpsAgent.Model
                             Url = new Uri(pr.HtmlUrl)
                         }
                     }
-                });
-            }
-            else
-            {
-                prItemContainer.Items.Add(new AdaptiveTextBlock
-                {
-                    Text = "GitHub URL not available",
-                    IsSubtle = true,
-                    Spacing = AdaptiveSpacing.None
                 });
             }
 
