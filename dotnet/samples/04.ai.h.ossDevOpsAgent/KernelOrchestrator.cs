@@ -6,6 +6,7 @@ using Microsoft.Bot.Schema.Teams;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Microsoft.Teams.AI.Application;
 
 namespace OSSDevOpsAgent
 {
@@ -51,21 +52,41 @@ namespace OSSDevOpsAgent
             await SerializeAndSaveHistory(history, currConvo, prevConvos);
         }
 
-        public async Task<string> GetChatMessageContentAsync(ITurnContext turnContext)
+        public async Task GetChatMessageContentAsync(ITurnContext turnContext)
         {
+            StreamingResponse streamer = new StreamingResponse(turnContext);
+            streamer.EnableGeneratedByAILabel = true;
+            streamer.QueueInformativeUpdate("Generating response...");
+
             List<ConversationInfo> prevConvos = await GetPreviousConvos();
             ConversationInfo currConvo = prevConvos.Find(x => x.Id == turnContext.Activity.Conversation.Id);
             ChatHistory history = JsonSerializer.Deserialize<ChatHistory>(currConvo.ChatHistory);
             prevConvos.Remove(currConvo);
 
-            var result = await _chatCompletionService.GetChatMessageContentAsync(
+            var result = _chatCompletionService.GetStreamingChatMessageContentsAsync(
                history,
                executionSettings: _openAIPromptExecutionSettings,
-            kernel: _kernel);
+               kernel: _kernel);
 
-            history.Add(result);
+            ChatMessageContent complete_result = new()
+            {
+                Role = AuthorRole.Assistant,
+                Content = ""
+            };
+
+            await foreach (var chunk in result)
+            {
+                if (!string.IsNullOrEmpty(chunk.Content))
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(0.03));
+                    complete_result.Content.Concat(chunk.Content);
+                    streamer.QueueTextChunk(chunk.Content);
+                }
+            }
+
+            await streamer.EndStream();
+            history.Add(complete_result);
             await SerializeAndSaveHistory(history, currConvo, prevConvos);
-            return result.Content;
         }
 
         public async Task SaveActivityToChatHistory(ITurnContext turnContext, string activity)

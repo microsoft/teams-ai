@@ -145,8 +145,7 @@ builder.Services.AddTransient<IBot>(sp =>
         }
         else
         {
-            var model_response = await orchestrator.GetChatMessageContentAsync(turnContext);
-            await turnContext.SendActivityAsync(model_response);
+            await orchestrator.GetChatMessageContentAsync(turnContext);
         }
     });
 
