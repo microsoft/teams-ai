@@ -2,6 +2,9 @@
 
 namespace OSSDevOpsAgent.Model
 {
+    /// <summary>
+    /// Creates the adaptive cards for the PRs
+    /// </summary>
     public class AdaptiveCardBuilder
     {
         public static AdaptiveCard CreateListPRsAdaptiveCard(string title, IList<PullRequest> pullRequests, HashSet<string> allLabels, HashSet<string> allAssignees, HashSet<string> allAuthors)

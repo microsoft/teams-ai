@@ -1,5 +1,8 @@
 ﻿namespace OSSDevOpsAgent.Model
 {
+    /// <summary>
+    /// Defines a PR User
+    /// </summary>
     public struct PRUser
     {
         public string Login { get; set; }

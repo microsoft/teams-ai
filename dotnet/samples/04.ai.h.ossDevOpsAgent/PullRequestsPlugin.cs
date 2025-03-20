@@ -14,6 +14,11 @@ namespace OSSDevOpsAgent
         private HttpClient _httpClient;
         private ConfigOptions _config;
 
+        /// <summary>
+        /// Houses all the PR plugins.
+        /// </summary>
+        /// <param name="httpClient">The HTTP client used to make requests</param>
+        /// <param name="config">The configuration pairs</param>
         public PullRequestsPlugin(
             HttpClient httpClient,
             ConfigOptions config)

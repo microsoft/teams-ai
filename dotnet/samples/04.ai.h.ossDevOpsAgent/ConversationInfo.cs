@@ -1,7 +1,11 @@
 ﻿
 namespace OSSDevOpsAgent
 {
-    public class ConversationInfo
+    /// <summary>
+    /// Defines a Teams conversation,
+    /// referenced for history
+    /// </summary>
+    public struct ConversationInfo
     {
         public string BotId { get; set; }
         public string Id { get; set; }

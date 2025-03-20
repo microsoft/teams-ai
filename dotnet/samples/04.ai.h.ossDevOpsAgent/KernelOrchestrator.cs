@@ -18,6 +18,13 @@ namespace OSSDevOpsAgent
         private IStorage _storage;
         private ConfigOptions _config;
 
+        /// <summary>
+        /// Used to manage the chat history and
+        /// orchestrate the conversations
+        /// </summary>
+        /// <param name="kernel">The kernel</param>
+        /// <param name="storage">The storage</param>
+        /// <param name="config">The configuration pairs</param>
         public KernelOrchestrator(Kernel kernel, IStorage storage, ConfigOptions config)
         {
             _kernel = kernel;
@@ -31,6 +38,11 @@ namespace OSSDevOpsAgent
             _config = config;
         }
 
+        /// <summary>
+        /// Creates and adds to the chat history for the current turn
+        /// </summary>
+        /// <param name="turnContext">The turn context</param>
+        /// <returns></returns>
         public async Task CreateChatHistory(ITurnContext turnContext)
         {
             List<ConversationInfo> prevConvos = await GetPreviousConvos();
@@ -52,6 +64,11 @@ namespace OSSDevOpsAgent
             await SerializeAndSaveHistory(history, currConvo, prevConvos);
         }
 
+        /// <summary>
+        /// Used for non-plugin scenarios, calls completion with streaming
+        /// </summary>
+        /// <param name="turnContext">The turn context</param>
+        /// <returns></returns>
         public async Task GetChatMessageContentAsync(ITurnContext turnContext)
         {
             StreamingResponse streamer = new StreamingResponse(turnContext);
@@ -89,6 +106,12 @@ namespace OSSDevOpsAgent
             await SerializeAndSaveHistory(history, currConvo, prevConvos);
         }
 
+        /// <summary>
+        /// Saves the activity to the chat history
+        /// </summary>
+        /// <param name="turnContext">The turn context</param>
+        /// <param name="activity">The activity text associated to the turn</param>
+        /// <returns></returns>
         public async Task SaveActivityToChatHistory(ITurnContext turnContext, string activity)
         {
             List<ConversationInfo> prevConvos = await GetPreviousConvos();
@@ -107,6 +130,12 @@ namespace OSSDevOpsAgent
             await SerializeAndSaveHistory(history, currConvo, prevConvos);
         }
 
+        /// <summary>
+        /// Initializes the chat history for a new conversation
+        /// and sets up the system message to instruct the model
+        /// </summary>
+        /// <param name="activity">The activity</param>
+        /// <returns></returns>
         public ConversationInfo InitiateChat(Activity activity)
         {
             ChatHistory chatHistory = new();
@@ -140,6 +169,13 @@ namespace OSSDevOpsAgent
             return convo;
         }
 
+        /// <summary>
+        /// Serializes the chat history and saves it to storage
+        /// </summary>
+        /// <param name="history">The history</param>
+        /// <param name="currConvo">The current conversation</param>
+        /// <param name="prevConvos">List of previous conversations</param>
+        /// <returns></returns>
         private async Task SerializeAndSaveHistory(ChatHistory history, ConversationInfo currConvo, List<ConversationInfo> prevConvos)
         {
             string serializedHistory = JsonSerializer.Serialize(history);
@@ -154,6 +190,10 @@ namespace OSSDevOpsAgent
             await _storage.WriteAsync(updated_entries);
         }
 
+        /// <summary>
+        /// Retrieves the previous conversations from storage
+        /// </summary>
+        /// <returns>The list of previous conversations</returns>
         private async Task<List<ConversationInfo>> GetPreviousConvos()
         {
             IDictionary<string, object> entries = await _storage.ReadAsync(keys: new[] { "conversations" });

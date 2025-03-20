@@ -2,6 +2,9 @@
 
 namespace OSSDevOpsAgent.Model
 {
+    /// <summary>
+    /// Defines a PR
+    /// </summary>
     public struct PullRequest
     {
         [JsonProperty("title")]
