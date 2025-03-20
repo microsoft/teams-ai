@@ -98,7 +98,7 @@ builder.Services.AddTransient<IBot>(sp =>
 
     app.AdaptiveCards.OnActionSubmit("applyFilters", async (context, state, data, cancellationToken) =>
     {
-        PullRequestManager filterData = (data as JObject)?.ToObject<PullRequestManager>() ?? throw new Exception("Incorrect filter data format");
+        ListOfPRsSubmitActivity filterData = (data as JObject)?.ToObject<ListOfPRsSubmitActivity>() ?? throw new Exception("Incorrect filter data format");
 
         var labels = filterData.LabelFilter ?? "";
         var assignees = filterData.AssigneeFilter ?? "";

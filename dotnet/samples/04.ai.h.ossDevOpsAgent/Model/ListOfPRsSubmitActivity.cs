@@ -3,9 +3,10 @@
 namespace OSSDevOpsAgent.Model
 {
     /// <summary>
-    /// Manages the PRs and its associated filters
+    /// Manages the PRs and its associated filters for the
+    /// Action.Submit on the ListOfPRs card
     /// </summary>
-    public class PullRequestManager
+    public struct ListOfPRsSubmitActivity
     {
         /// <summary>
         /// The filter for the PR labels
