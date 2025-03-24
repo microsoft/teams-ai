@@ -14,7 +14,7 @@
         public string GITHUB_REPOSITORY { get; set; }
         public string GITHUB_CLIENT_ID { get; set; }
         public string GITHUB_CLIENT_SECRET { get; set; }
-        public string GITHUB_AUTH_TOKEN { get; set; }
+        public string AUTH_TOKEN { get; set; }
         public AzureConfigOptions Azure { get; set; }
     }
 

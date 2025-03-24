@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
 
-namespace OSSDevOpsAgent.Model
+namespace OSSDevOpsAgent.Models
 {
     /// <summary>
-    /// Manages the PRs and its associated filters for the
+    /// Manages the GitHub PRs and its associated filters for the
     /// Action.Submit on the ListOfPRs card
     /// </summary>
-    public struct ListOfPRsSubmitActivity
+    public struct GHSubmitPRsActivity
     {
         /// <summary>
         /// The filter for the PR labels
@@ -30,6 +30,6 @@ namespace OSSDevOpsAgent.Model
         /// The list of pull requests
         /// </summary>
         [JsonProperty("pullRequests")]
-        public IList<PullRequest> PullRequests { get; set; }
+        public IList<GHPullRequest> PullRequests { get; set; }
     }
 }

@@ -1,13 +1,13 @@
 ﻿using AdaptiveCards;
 
-namespace OSSDevOpsAgent.Model
+namespace OSSDevOpsAgent.Models
 {
     /// <summary>
     /// Creates the adaptive cards for the PRs
     /// </summary>
-    public class AdaptiveCardBuilder
+    public class GHAdaptiveCardBuilder
     {
-        public static AdaptiveCard CreateListPRsAdaptiveCard(string title, IList<PullRequest> pullRequests, HashSet<string> allLabels, HashSet<string> allAssignees, HashSet<string> allAuthors)
+        public static AdaptiveCard CreateListPRsAdaptiveCard(string title, IList<GHPullRequest> pullRequests, HashSet<string> allLabels, HashSet<string> allAssignees, HashSet<string> allAuthors)
         {
             var card = new AdaptiveCard(new AdaptiveSchemaVersion(1, 5))
             {
@@ -104,7 +104,7 @@ namespace OSSDevOpsAgent.Model
                                             Title = "Apply Filters",
                                             Data = new Dictionary<string, object>
                                             {
-                                                { "verb", "applyFilters" },
+                                                { "verb", "githubFilters" },
                                                 { "action", "applyFilters" },
                                                 { "pullRequests", pullRequests }
                                             }
@@ -119,7 +119,7 @@ namespace OSSDevOpsAgent.Model
         }
 
 
-        public static AdaptiveCard CreateFilterPRsAdaptiveCard(string title, IList<PullRequest> pullRequests, string[] selectedLabels, string[] selectedAssignees, string[] selectedAuthors)
+        public static AdaptiveCard CreateFilterPRsAdaptiveCard(string title, IList<GHPullRequest> pullRequests, string[] selectedLabels, string[] selectedAssignees, string[] selectedAuthors)
         {
             var card = new AdaptiveCard(new AdaptiveSchemaVersion(1, 5))
             {
@@ -195,7 +195,7 @@ namespace OSSDevOpsAgent.Model
             return card;
         }
 
-        private static AdaptiveContainer CreatePRItemContainer(PullRequest pr)
+        private static AdaptiveContainer CreatePRItemContainer(GHPullRequest pr)
         {
             var prItemContainer = new AdaptiveContainer
             {

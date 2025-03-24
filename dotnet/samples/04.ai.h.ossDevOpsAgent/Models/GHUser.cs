@@ -1,9 +1,9 @@
-﻿namespace OSSDevOpsAgent.Model
+﻿namespace OSSDevOpsAgent.Models
 {
     /// <summary>
-    /// Defines a PR User
+    /// Defines a GitHub User
     /// </summary>
-    public struct PRUser
+    public struct GHUser
     {
         public string Login { get; set; }
         public int Id { get; set; }

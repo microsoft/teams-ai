@@ -20,7 +20,7 @@ namespace OSSDevOpsAgent
 
         /// <summary>
         /// Used to manage the chat history and
-        /// orchestrate the conversations
+        /// orchestrate the text-based conversations
         /// </summary>
         /// <param name="kernel">The kernel</param>
         /// <param name="storage">The storage</param>
@@ -71,39 +71,62 @@ namespace OSSDevOpsAgent
         /// <returns></returns>
         public async Task GetChatMessageContentAsync(ITurnContext turnContext)
         {
-            StreamingResponse streamer = new StreamingResponse(turnContext);
-            streamer.EnableGeneratedByAILabel = true;
-            streamer.QueueInformativeUpdate("Generating response...");
+            bool isChannel = string.Equals(turnContext.Activity.Conversation.ConversationType, "channel");
+            bool isGroup = string.Equals(turnContext.Activity.Conversation.ConversationType, "group");
 
-            List<ConversationInfo> prevConvos = await GetPreviousConvos();
-            ConversationInfo currConvo = prevConvos.Find(x => x.Id == turnContext.Activity.Conversation.Id);
-            ChatHistory history = JsonSerializer.Deserialize<ChatHistory>(currConvo.ChatHistory);
-            prevConvos.Remove(currConvo);
-
-            var result = _chatCompletionService.GetStreamingChatMessageContentsAsync(
-               history,
-               executionSettings: _openAIPromptExecutionSettings,
-               kernel: _kernel);
-
-            ChatMessageContent complete_result = new()
+            if (isChannel || isGroup)
             {
-                Role = AuthorRole.Assistant,
-                Content = ""
-            };
+                List<ConversationInfo> prevConvos = await GetPreviousConvos();
+                ConversationInfo currConvo = prevConvos.Find(x => x.Id == turnContext.Activity.Conversation.Id);
+                ChatHistory history = JsonSerializer.Deserialize<ChatHistory>(currConvo.ChatHistory);
+                prevConvos.Remove(currConvo);
 
-            await foreach (var chunk in result)
-            {
-                if (!string.IsNullOrEmpty(chunk.Content))
-                {
-                    await Task.Delay(TimeSpan.FromSeconds(0.03));
-                    complete_result.Content.Concat(chunk.Content);
-                    streamer.QueueTextChunk(chunk.Content);
-                }
+                var result = await _chatCompletionService.GetChatMessageContentAsync(
+                   history,
+                   executionSettings: _openAIPromptExecutionSettings,
+                   kernel: _kernel);
+
+                history.Add(result);
+                await SerializeAndSaveHistory(history, currConvo, prevConvos);
+                await turnContext.SendActivityAsync(result.Content);
+                return;
             }
+            else
+            {
+                StreamingResponse streamer = new StreamingResponse(turnContext);
+                streamer.EnableGeneratedByAILabel = true;
+                streamer.QueueInformativeUpdate("Generating response...");
 
-            await streamer.EndStream();
-            history.Add(complete_result);
-            await SerializeAndSaveHistory(history, currConvo, prevConvos);
+                List<ConversationInfo> prevConvos = await GetPreviousConvos();
+                ConversationInfo currConvo = prevConvos.Find(x => x.Id == turnContext.Activity.Conversation.Id);
+                ChatHistory history = JsonSerializer.Deserialize<ChatHistory>(currConvo.ChatHistory);
+                prevConvos.Remove(currConvo);
+
+                var result = _chatCompletionService.GetStreamingChatMessageContentsAsync(
+                   history,
+                   executionSettings: _openAIPromptExecutionSettings,
+                   kernel: _kernel);
+
+                ChatMessageContent complete_result = new()
+                {
+                    Role = AuthorRole.Assistant,
+                    Content = ""
+                };
+
+                await foreach (var chunk in result)
+                {
+                    if (!string.IsNullOrEmpty(chunk.Content))
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(0.03));
+                        complete_result.Content.Concat(chunk.Content);
+                        streamer.QueueTextChunk(chunk.Content);
+                    }
+                }
+
+                await streamer.EndStream();
+                history.Add(complete_result);
+                await SerializeAndSaveHistory(history, currConvo, prevConvos);
+            }
         }
 
         /// <summary>

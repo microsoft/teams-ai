@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
 
-namespace OSSDevOpsAgent.Model
+namespace OSSDevOpsAgent.Models
 {
     /// <summary>
-    /// Defines a PR
+    /// Defines a GitHub pull request
     /// </summary>
-    public struct PullRequest
+    public struct GHPullRequest
     {
         [JsonProperty("title")]
         public string Title { get; set; }
@@ -14,15 +14,15 @@ namespace OSSDevOpsAgent.Model
         [JsonProperty("state")]
         public string State { get; set; }
         [JsonProperty("user")]
-        public PRUser User { get; set; }
+        public GHUser User { get; set; }
         [JsonProperty("created_at")]
         public DateTime CreatedAt { get; set; }
         [JsonProperty("html_url")]
         public string HtmlUrl { get; set; }
         [JsonProperty("labels")]
-        public IList<PRLabel> Labels { get; set; }
+        public IList<GHPullRequestLabel> Labels { get; set; }
         [JsonProperty("assignees")]
-        public IList<PRUser> Assignees { get; set; }
+        public IList<GHUser> Assignees { get; set; }
         [JsonProperty("body")]
         public string Body { get; set; }
     }

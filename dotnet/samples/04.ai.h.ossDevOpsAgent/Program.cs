@@ -3,10 +3,11 @@ using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Teams.AI;
 using Microsoft.SemanticKernel;
-using OSSDevOpsAgent.Model;
+using OSSDevOpsAgent.Models;
 using OSSDevOpsAgent;
 using Microsoft.Bot.Schema;
 using Newtonsoft.Json.Linq;
+using OSSDevOpsAgent.Templates;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,12 +34,25 @@ builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<Team
 // Create the storage to persist turn state
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
-// Add Semantic Kernel registration
+// Create the repository service and plugin
+builder.Services.AddTransient<IRepositoryService>(sp =>
+{
+    MemoryStorage storage = (MemoryStorage)sp.GetService<IStorage>();
+    TeamsAdapter adapter = sp.GetService<TeamsAdapter>();
+    HttpClient client = sp.GetService<HttpClient>();
+
+    GHPlugin plugin = new(client, config);
+    return new GHService(storage, adapter, plugin);
+});
+
+// Create semantic kernel 
 builder.Services.AddTransient(sp =>
 {
     var kernelBuilder = Kernel.CreateBuilder();
     kernelBuilder.Services.AddLogging(services => services.AddConsole().SetMinimumLevel(LogLevel.Debug));
+
     HttpClient client = sp.GetService<HttpClient>();
+    IRepositoryService repoService = sp.GetService<IRepositoryService>();
 
     kernelBuilder.AddAzureOpenAIChatCompletion(
         deploymentName: config.Azure.OpenAIDeploymentName,
@@ -47,8 +61,8 @@ builder.Services.AddTransient(sp =>
         endpoint: config.Azure.OpenAIEndpoint,
         httpClient: client);
 
-    PullRequestsPlugin plugin = new(client, config);
-    kernelBuilder.Plugins.AddFromObject(plugin, "PullRequestsPlugin");
+    GHPlugin plugin = (GHPlugin)repoService.RepositoryPlugin;
+    kernelBuilder.Plugins.AddFromObject(plugin, "GHPlugin");
     return kernelBuilder.Build();
 });
 
@@ -59,10 +73,10 @@ builder.Services.AddTransient<IBot>(sp =>
     HttpClient client = sp.GetService<HttpClient>();
     IStorage storage = sp.GetService<IStorage>();
     TeamsAdapter adapter = sp.GetService<TeamsAdapter>();
-    AppState state = new AppState();
 
+    AppState state = new AppState();
     AuthenticationOptions<AppState> options = new();
-    options.AddAuthentication("github", new OAuthSettings()
+    options.AddAuthentication(config.OAUTH_CONNECTION_NAME, new OAuthSettings()
     {
         ConnectionName = config.OAUTH_CONNECTION_NAME,
         Title = "Sign In",
@@ -85,29 +99,35 @@ builder.Services.AddTransient<IBot>(sp =>
     app.OnMessage("/signin", async (context, state, cancellationToken) =>
     {
         await app.Authentication.SignUserInAsync(context, state, cancellationToken: cancellationToken);
-        config.GITHUB_AUTH_TOKEN = state.Temp.AuthTokens["github"];
-        await context.SendActivityAsync("You have signed into GitHub");
+        config.AUTH_TOKEN = state.Temp.AuthTokens[config.OAUTH_CONNECTION_NAME];
+        await context.SendActivityAsync("You have signed in.");
     });
 
     // Listen for user to say "/sigout" and then delete cached token
     app.OnMessage("/signout", async (context, state, cancellationToken) =>
     {
         await app.Authentication.SignOutUserAsync(context, state, cancellationToken: cancellationToken);
-        await context.SendActivityAsync("You have signed out from GitHub");
+        await context.SendActivityAsync("You have signed out.");
     });
 
-    app.AdaptiveCards.OnActionSubmit("applyFilters", async (context, state, data, cancellationToken) =>
+    app.AdaptiveCards.OnActionSubmit("githubFilters", async (context, state, data, cancellationToken) =>
     {
-        ListOfPRsSubmitActivity filterData = (data as JObject)?.ToObject<ListOfPRsSubmitActivity>() ?? throw new Exception("Incorrect filter data format");
+        GHSubmitPRsActivity filterData = (GHSubmitPRsActivity)((data as JObject)?.ToObject<GHSubmitPRsActivity>());
 
-        var labels = filterData.LabelFilter ?? "";
-        var assignees = filterData.AssigneeFilter ?? "";
-        var authors = filterData.AuthorFilter ?? "";
+        var labels = filterData.LabelFilter;
+        var assignees = filterData.AssigneeFilter;
+        var authors = filterData.AuthorFilter;
         var pullRequests = filterData.PullRequests;
 
-        if (labels == null && assignees == null && authors == null)
+        if (string.IsNullOrEmpty(labels) && string.IsNullOrEmpty(assignees) && string.IsNullOrEmpty(authors))
         {
             await context.SendActivityAsync("Please select at least one filter.");
+            return;
+        }
+
+        if (pullRequests.Count == 0)
+        {
+            await context.SendActivityAsync("No pull requests to filter.");
             return;
         }
 
@@ -118,20 +138,21 @@ builder.Services.AddTransient<IBot>(sp =>
         args.Add("context", context);
         args.Add("pullRequests", pullRequests);
 
-        var result = await kernel.InvokeAsync("PullRequestsPlugin", "FilterPRs", args, cancellationToken);
+        var result = await kernel.InvokeAsync("GHPlugin", "FilterPRs", args, cancellationToken);
         string activity = result.GetValue<string>();
         await orchestrator.SaveActivityToChatHistory(context, activity);
     });
 
     app.OnActivity(ActivityTypes.Message, async (turnContext, turnState, cancellationToken) =>
     {
-        var token = turnState.Temp.AuthTokens["github"];
+        var token = turnState.Temp.AuthTokens[config.OAUTH_CONNECTION_NAME];
         if (string.IsNullOrEmpty(token))
         {
-            await turnContext.SendActivityAsync("Please sign in to GitHub first.");
+            await turnContext.SendActivityAsync("Please sign in first.");
         }
 
-        config.GITHUB_AUTH_TOKEN = state.Temp.AuthTokens["github"];
+        // Saved to authenticate with SK's plugins
+        config.AUTH_TOKEN = token;
 
         await orchestrator.CreateChatHistory(turnContext);
 
@@ -139,7 +160,7 @@ builder.Services.AddTransient<IBot>(sp =>
         {
             KernelArguments args = new KernelArguments();
             args.Add("context", turnContext);
-            var result = await kernel.InvokeAsync("PullRequestsPlugin", "ListPRs", args, cancellationToken);
+            var result = await kernel.InvokeAsync("GHPlugin", "ListPRs", args, cancellationToken);
             string activity = result.GetValue<string>();
             await orchestrator.SaveActivityToChatHistory(turnContext, activity);
         }
@@ -149,16 +170,15 @@ builder.Services.AddTransient<IBot>(sp =>
         }
     });
 
-    app.Authentication.Get("github").OnUserSignInSuccess(async (context, state) =>
+    app.Authentication.Get(config.OAUTH_CONNECTION_NAME).OnUserSignInSuccess(async (context, state) =>
     {
-        // Successfully logged in
-        config.GITHUB_AUTH_TOKEN = state.Temp.AuthTokens["github"];
+        // Saved to authenticate with SK's plugins
+        config.AUTH_TOKEN = state.Temp.AuthTokens[config.OAUTH_CONNECTION_NAME];
         await context.SendActivityAsync("Successfully logged in!");
     });
 
-    app.Authentication.Get("github").OnUserSignInFailure(async (context, state, ex) =>
+    app.Authentication.Get(config.OAUTH_CONNECTION_NAME).OnUserSignInFailure(async (context, state, ex) =>
     {
-        // Failed to login
         await context.SendActivityAsync("Sorry, we failed to log you in. Please try again.");
         await context.SendActivityAsync($"Error message: {ex.Message}");
     });
