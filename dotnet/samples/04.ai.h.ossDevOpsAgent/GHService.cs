@@ -8,6 +8,9 @@ using Microsoft.Teams.AI;
 
 namespace OSSDevOpsAgent
 {
+    /// <summary>
+    /// Handles GitHub webhooks and events.
+    /// </summary>
     public class GHService : IRepositoryService
     {
         public GHService(MemoryStorage storage, TeamsAdapter adapter, IRepositoryPlugin plugin) : base()

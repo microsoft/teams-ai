@@ -3,6 +3,11 @@ using Microsoft.Teams.AI;
 
 namespace OSSDevOpsAgent.Templates
 {
+    /// <summary>
+    /// Defines the interface for a repository service.
+    /// Manages all repository-related operations,
+    /// including webhooks and plugins.
+    /// </summary>
     public abstract class IRepositoryService
     {
 

@@ -13,7 +13,7 @@ namespace OSSDevOpsAgent
     public class GHPlugin : IRepositoryPlugin
     {
         /// <summary>
-        /// Houses all the PR plugins.
+        /// Houses all the GitHub plugins.
         /// </summary>
         /// <param name="httpClient">The HTTP client used to make requests</param>
         /// <param name="config">The configuration pairs</param>
@@ -104,6 +104,15 @@ namespace OSSDevOpsAgent
             }
         }
 
+        /// <summary>
+        /// Filters the pull requests based on labels, assignees, and authors.
+        /// </summary>
+        /// <param name="labels">The labels used to filter</param>
+        /// <param name="assignees">The assignees used to filter</param>
+        /// <param name="authors">The authors used to filter</param>
+        /// <param name="context">The turn context</param>
+        /// <param name="pullRequests">The list of pull requests</param>
+        /// <returns></returns>
         [KernelFunction, Description("Filters the pull requests")]
         public async Task<string> FilterPRs(
            [Description("The label filters")] string labels,

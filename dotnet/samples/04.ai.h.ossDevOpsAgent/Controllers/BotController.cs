@@ -34,6 +34,7 @@ namespace OSSDevOpsAgent.Controllers
 
     [Route("api/webhook")]
     [ApiController]
+    // This controller handles repository-related POST webhooks.
     public class WebhookController : ControllerBase
     {
         private readonly IRepositoryService _repositoryService;

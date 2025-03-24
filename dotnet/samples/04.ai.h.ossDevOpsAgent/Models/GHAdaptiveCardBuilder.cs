@@ -3,10 +3,19 @@
 namespace OSSDevOpsAgent.Models
 {
     /// <summary>
-    /// Creates the adaptive cards for the PRs
+    /// Creates the adaptive cards for the GitHub pull requests
     /// </summary>
     public class GHAdaptiveCardBuilder
     {
+        /// <summary>
+        /// Creates the adaptive card for the "ListPRs" plugin
+        /// </summary>
+        /// <param name="title">The title of the card</param>
+        /// <param name="pullRequests">The list of pull requests</param>
+        /// <param name="allLabels">All the labels for filtering</param>
+        /// <param name="allAssignees">All the assignees for filtering</param>
+        /// <param name="allAuthors">All the authors for filtering</param>
+        /// <returns></returns>
         public static AdaptiveCard CreateListPRsAdaptiveCard(string title, IList<GHPullRequest> pullRequests, HashSet<string> allLabels, HashSet<string> allAssignees, HashSet<string> allAuthors)
         {
             var card = new AdaptiveCard(new AdaptiveSchemaVersion(1, 5))
@@ -118,7 +127,15 @@ namespace OSSDevOpsAgent.Models
             return card;
         }
 
-
+        /// <summary>
+        /// Creates the adaptive card for the "FilterPRs" plugin
+        /// </summary>
+        /// <param name="title">Title of the card</param>
+        /// <param name="pullRequests">The list of pull requests</param>
+        /// <param name="selectedLabels">The labels used to filter</param>
+        /// <param name="selectedAssignees">The assignees used to filter</param>
+        /// <param name="selectedAuthors">The authors used to filter</param>
+        /// <returns></returns>
         public static AdaptiveCard CreateFilterPRsAdaptiveCard(string title, IList<GHPullRequest> pullRequests, string[] selectedLabels, string[] selectedAssignees, string[] selectedAuthors)
         {
             var card = new AdaptiveCard(new AdaptiveSchemaVersion(1, 5))
