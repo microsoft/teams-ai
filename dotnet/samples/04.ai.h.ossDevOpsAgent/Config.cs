@@ -1,5 +1,8 @@
-﻿namespace OSSDevOpsAgent
+﻿namespace DevOpsAgent
 {
+    /// <summary>
+    /// Manages the configuration keys.
+    /// </summary>
     public class ConfigOptions
     {
         public string BOT_ID { get; set; }

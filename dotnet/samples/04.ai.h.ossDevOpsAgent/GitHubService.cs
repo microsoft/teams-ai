@@ -1,19 +1,17 @@
-﻿using AdaptiveCards;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Bot.Schema;
-using Newtonsoft.Json.Linq;
-using OSSDevOpsAgent.Templates;
+using DevOpsAgent.Interfaces;
 using Microsoft.Teams.AI;
 
-namespace OSSDevOpsAgent
+namespace DevOpsAgent
 {
     /// <summary>
     /// Handles GitHub webhooks and events.
     /// </summary>
-    public class GHService : IRepositoryService
+    public class GitHubService : IRepositoryService
     {
-        public GHService(MemoryStorage storage, TeamsAdapter adapter, IRepositoryPlugin plugin) : base()
+        public GitHubService(MemoryStorage storage, TeamsAdapter adapter, IRepositoryPlugin plugin) : base()
         {
             Storage = storage;
             Adapter = adapter;
@@ -51,7 +49,7 @@ namespace OSSDevOpsAgent
 
                 List<ConversationInfo> group_convos = convos.FindAll(x => x.IsGroup);
 
-                Attachment attachment = CreatePullRequestCard(payload);
+                Attachment attachment = GitHubCards.CreatePullRequestCard(payload);
 
                 group_convos.ForEach(async convo =>
                 {
@@ -119,7 +117,7 @@ namespace OSSDevOpsAgent
 
                 List<ConversationInfo> group_convos = convos.FindAll(x => x.IsGroup);
 
-                Attachment attachment = CreatePullRequestStateCard(payload);
+                Attachment attachment = GitHubCards.CreatePullRequestStateCard(payload);
 
                 group_convos.ForEach(async convo =>
                 {
@@ -177,108 +175,6 @@ namespace OSSDevOpsAgent
                 });
 
             }
-        }
-
-        private static Attachment CreatePullRequestCard(JObject payload)
-        {
-            var pullRequest = payload["pull_request"];
-            string assignee = pullRequest["assignee"] != null ? pullRequest["assignee"]["login"].ToString() : "Unknown User";
-            string prTitle = pullRequest["title"].ToString();
-            string prUrl = pullRequest["html_url"].ToString();
-            int prNumber = pullRequest["number"].Value<int>();
-
-            var card = new AdaptiveCard(new AdaptiveSchemaVersion(1, 2))
-            {
-                Body = new List<AdaptiveElement>
-                {
-                    new AdaptiveTextBlock
-                    {
-                        Text = $"✎ Assignee Requested for Pull Request #{prNumber} ✎",
-                        Weight = AdaptiveTextWeight.Bolder,
-                        Size = AdaptiveTextSize.Medium,
-                        Color = AdaptiveTextColor.Accent
-                    },
-                    new AdaptiveTextBlock
-                    {
-                        Text = $"{prTitle}",
-                        Wrap = true,
-                        Size = AdaptiveTextSize.Medium,
-                        Weight = AdaptiveTextWeight.Bolder
-                    },
-                    new AdaptiveTextBlock
-                    {
-                        Text = $"{assignee} has been assigned to review this pull request.",
-                        Wrap = true,
-                        Size = AdaptiveTextSize.Medium,
-                        Spacing = AdaptiveSpacing.Medium
-                    }
-                },
-                Actions = new List<AdaptiveAction>
-                {
-                    new AdaptiveOpenUrlAction
-                    {
-                        Title = "View on GitHub",
-                        Url = new Uri(prUrl)
-                    }
-                }
-            };
-
-            return new Attachment
-            {
-                ContentType = AdaptiveCard.ContentType,
-                Content = card
-            };
-        }
-
-        private static Attachment CreatePullRequestStateCard(JObject payload)
-        {
-            var pullRequest = payload["pull_request"];
-            string action = payload["action"].ToString();
-            string prTitle = pullRequest["title"].ToString();
-            string prUrl = pullRequest["html_url"].ToString();
-            int prNumber = pullRequest["number"].Value<int>();
-
-            var card = new AdaptiveCard(new AdaptiveSchemaVersion(1, 2))
-            {
-                Body = new List<AdaptiveElement>
-                {
-                    new AdaptiveTextBlock
-                    {
-                        Text = $"🔔 Status Update for Pull Request #{prNumber} 🔔",
-                        Weight = AdaptiveTextWeight.Bolder,
-                        Size = AdaptiveTextSize.Medium,
-                        Color = AdaptiveTextColor.Accent
-                    },
-                    new AdaptiveTextBlock
-                    {
-                        Text = $"{prTitle}",
-                        Wrap = true,
-                        Size = AdaptiveTextSize.Medium,
-                        Weight = AdaptiveTextWeight.Bolder
-                    },
-                    new AdaptiveTextBlock
-                    {
-                        Text = $"PR is now {action}",
-                        Wrap = true,
-                        Size = AdaptiveTextSize.Medium,
-                        Spacing = AdaptiveSpacing.Medium
-                    }
-                },
-                Actions = new List<AdaptiveAction>
-                {
-                    new AdaptiveOpenUrlAction
-                    {
-                        Title = "View on GitHub",
-                        Url = new Uri(prUrl)
-                    }
-                }
-            };
-
-            return new Attachment
-            {
-                ContentType = AdaptiveCard.ContentType,
-                Content = card
-            };
         }
     }
 }

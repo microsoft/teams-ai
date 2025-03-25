@@ -4,8 +4,8 @@
     "manifestVersion": "1.15",
     "id": "${{TEAMS_APP_ID}}",
     "name": {
-        "short": "OSSDevOpsAgent${{APP_NAME_SUFFIX}}",
-        "full": "OSS DevOps Agent"
+        "short": "DevOps Agent",
+        "full": "DevOps Agent"
     },
     "developer": {
         "name": "Microsoft",
@@ -15,8 +15,8 @@
         "termsOfUseUrl": "https://microsoft.com/en-us/legal/terms-of-use"
     },
     "description": {
-        "short": "OSS devops agent.",
-        "full": "Open source devops agent."
+        "short": "An open-source devops agent.",
+        "full": "An open-source devops agent, built with Teams AI and Semantic Kernel."
     },
     "icons": {
         "outline": "outline.png",

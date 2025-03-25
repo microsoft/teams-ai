@@ -5,24 +5,30 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.SemanticKernel;
 using Newtonsoft.Json;
-using OSSDevOpsAgent.Templates;
-using OSSDevOpsAgent.Models;
+using DevOpsAgent.Interfaces;
+using DevOpsAgent.GitHubModels;
 
-namespace OSSDevOpsAgent
+namespace DevOpsAgent
 {
-    public class GHPlugin : IRepositoryPlugin
+    public class GitHubPlugin : IRepositoryPlugin
     {
         /// <summary>
         /// Houses all the GitHub plugins.
         /// </summary>
         /// <param name="httpClient">The HTTP client used to make requests</param>
         /// <param name="config">The configuration pairs</param>
-        public GHPlugin(HttpClient httpClient, ConfigOptions config) : base()
+        public GitHubPlugin(HttpClient httpClient, ConfigOptions config) : base()
         {
             HttpClient = httpClient;
             Config = config;
         }
 
+        /// <summary>
+        /// Lists the pull requests for the repository
+        /// </summary>
+        /// <param name="context">The turn context</param>
+        /// <returns>Serialized adaptive card activity</returns>
+        /// <exception cref="Exception"></exception>
         [KernelFunction, Description("Lists the pull requests")]
         public override async Task<string> ListPRs(
             [Description("The turn context")] TurnContext context)
@@ -43,7 +49,7 @@ namespace OSSDevOpsAgent
                 if (response.IsSuccessStatusCode)
                 {
                     string jsonContent = await response.Content.ReadAsStringAsync();
-                    var currPullRequests = JsonConvert.DeserializeObject<List<GHPullRequest>>(jsonContent);
+                    var currPullRequests = JsonConvert.DeserializeObject<List<GitHubPR>>(jsonContent);
 
                     var labels = new HashSet<string>();
                     var assignees = new HashSet<string>();
@@ -79,7 +85,7 @@ namespace OSSDevOpsAgent
                         }
                     }
 
-                    var card = GHAdaptiveCardBuilder.CreateListPRsAdaptiveCard("Pull Requests", currPullRequests, labels, assignees, authors);
+                    var card = GitHubCards.CreateListPRsAdaptiveCard("Pull Requests", currPullRequests, labels, assignees, authors);
                     var attachment = new Attachment
                     {
                         ContentType = AdaptiveCard.ContentType,
@@ -119,7 +125,7 @@ namespace OSSDevOpsAgent
            [Description("The assignee filters")] string assignees,
            [Description("The author filters")] string authors,
            [Description("The turn context")] TurnContext context,
-           [Description("The pull requests")] IList<GHPullRequest> pullRequests)
+           [Description("The pull requests")] IList<GitHubPR> pullRequests)
         {
             var labelsArr = string.IsNullOrEmpty(labels) ? new string[0] : labels.Split(',');
             var assigneesArr = string.IsNullOrEmpty(assignees) ? new string[0] : assignees.Split(',');
@@ -131,7 +137,7 @@ namespace OSSDevOpsAgent
                 (authorsArr.Length == 0 || authorsArr.Contains(pr.User.Login))
             ).ToList();
 
-            var card = GHAdaptiveCardBuilder.CreateFilterPRsAdaptiveCard("Filtered PRs", filteredPullRequests, labelsArr, assigneesArr, authorsArr);
+            var card = GitHubCards.CreateFilterPRsAdaptiveCard("Filtered PRs", filteredPullRequests, labelsArr, assigneesArr, authorsArr);
 
             var attachment = new Attachment
             {

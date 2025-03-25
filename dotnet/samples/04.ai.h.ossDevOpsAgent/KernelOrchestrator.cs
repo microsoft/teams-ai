@@ -8,7 +8,7 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.Teams.AI.Application;
 
-namespace OSSDevOpsAgent
+namespace DevOpsAgent
 {
     public class KernelOrchestrator
     {
@@ -71,10 +71,8 @@ namespace OSSDevOpsAgent
         /// <returns></returns>
         public async Task GetChatMessageContentAsync(ITurnContext turnContext)
         {
-            bool isChannel = string.Equals(turnContext.Activity.Conversation.ConversationType, "channel");
-            bool isGroup = string.Equals(turnContext.Activity.Conversation.ConversationType, "group");
 
-            if (isChannel || isGroup)
+            if (turnContext.Activity.Conversation.IsGroup != null && turnContext.Activity.Conversation.IsGroup == true)
             {
                 List<ConversationInfo> prevConvos = await GetPreviousConvos();
                 ConversationInfo currConvo = prevConvos.Find(x => x.Id == turnContext.Activity.Conversation.Id);

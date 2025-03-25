@@ -3,11 +3,11 @@ using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Teams.AI;
 using Microsoft.SemanticKernel;
-using OSSDevOpsAgent.Models;
-using OSSDevOpsAgent;
+using DevOpsAgent.GitHubModels;
 using Microsoft.Bot.Schema;
 using Newtonsoft.Json.Linq;
-using OSSDevOpsAgent.Templates;
+using DevOpsAgent.Interfaces;
+using DevOpsAgent;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,8 +41,8 @@ builder.Services.AddTransient<IRepositoryService>(sp =>
     TeamsAdapter adapter = sp.GetService<TeamsAdapter>();
     HttpClient client = sp.GetService<HttpClient>();
 
-    GHPlugin plugin = new(client, config);
-    return new GHService(storage, adapter, plugin);
+    GitHubPlugin plugin = new(client, config);
+    return new GitHubService(storage, adapter, plugin);
 });
 
 // Create semantic kernel 
@@ -61,8 +61,8 @@ builder.Services.AddTransient(sp =>
         endpoint: config.Azure.OpenAIEndpoint,
         httpClient: client);
 
-    GHPlugin plugin = (GHPlugin)repoService.RepositoryPlugin;
-    kernelBuilder.Plugins.AddFromObject(plugin, "GHPlugin");
+    GitHubPlugin plugin = (GitHubPlugin)repoService.RepositoryPlugin;
+    kernelBuilder.Plugins.AddFromObject(plugin, "GitHubPlugin");
     return kernelBuilder.Build();
 });
 
@@ -112,7 +112,7 @@ builder.Services.AddTransient<IBot>(sp =>
 
     app.AdaptiveCards.OnActionSubmit("githubFilters", async (context, state, data, cancellationToken) =>
     {
-        GHSubmitPRsActivity filterData = (GHSubmitPRsActivity)((data as JObject)?.ToObject<GHSubmitPRsActivity>());
+        GitHubFilterActivity filterData = (GitHubFilterActivity)((data as JObject)?.ToObject<GitHubFilterActivity>());
 
         var labels = filterData.LabelFilter;
         var assignees = filterData.AssigneeFilter;
@@ -138,7 +138,7 @@ builder.Services.AddTransient<IBot>(sp =>
         args.Add("context", context);
         args.Add("pullRequests", pullRequests);
 
-        var result = await kernel.InvokeAsync("GHPlugin", "FilterPRs", args, cancellationToken);
+        var result = await kernel.InvokeAsync("GitHubPlugin", "FilterPRs", args, cancellationToken);
         string activity = result.GetValue<string>();
         await orchestrator.SaveActivityToChatHistory(context, activity);
     });
@@ -156,11 +156,13 @@ builder.Services.AddTransient<IBot>(sp =>
 
         await orchestrator.CreateChatHistory(turnContext);
 
-        if (turnContext.Activity.Text.IndexOf("pull requests", StringComparison.OrdinalIgnoreCase) >= 0)
+        // Check for pull requests
+        if (turnContext.Activity.Text.IndexOf("pull requests", StringComparison.OrdinalIgnoreCase) >= 0 ||
+            turnContext.Activity.Text.IndexOf("PRs", StringComparison.OrdinalIgnoreCase) >= 0)
         {
             KernelArguments args = new KernelArguments();
             args.Add("context", turnContext);
-            var result = await kernel.InvokeAsync("GHPlugin", "ListPRs", args, cancellationToken);
+            var result = await kernel.InvokeAsync("GitHubPlugin", "ListPRs", args, cancellationToken);
             string activity = result.GetValue<string>();
             await orchestrator.SaveActivityToChatHistory(turnContext, activity);
         }

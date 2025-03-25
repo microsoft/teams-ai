@@ -1,6 +1,6 @@
 ﻿using Microsoft.Teams.AI.State;
 
-namespace OSSDevOpsAgent.Models
+namespace DevOpsAgent
 {
     // Extend the turn state by configuring custom strongly typed state classes.
     public class AppState : TurnState

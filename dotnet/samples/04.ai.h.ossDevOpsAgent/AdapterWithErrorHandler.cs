@@ -1,7 +1,7 @@
 ﻿using Microsoft.Bot.Builder.TraceExtensions;
 using Microsoft.Teams.AI;
 
-namespace OSSDevOpsAgent
+namespace DevOpsAgent
 {
     public class AdapterWithErrorHandler : TeamsAdapter
     {

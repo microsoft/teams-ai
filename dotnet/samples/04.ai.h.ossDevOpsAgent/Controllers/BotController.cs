@@ -2,9 +2,9 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Newtonsoft.Json;
-using OSSDevOpsAgent.Templates;
+using DevOpsAgent.Interfaces;
 
-namespace OSSDevOpsAgent.Controllers
+namespace DevOpsAgent.Controllers
 {
     [Route("api/messages")]
     [ApiController]
@@ -34,7 +34,7 @@ namespace OSSDevOpsAgent.Controllers
 
     [Route("api/webhook")]
     [ApiController]
-    // This controller handles repository-related POST webhooks.
+    // Responsible for directing repository webhooks.
     public class WebhookController : ControllerBase
     {
         private readonly IRepositoryService _repositoryService;
