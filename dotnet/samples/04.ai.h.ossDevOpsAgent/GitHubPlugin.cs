@@ -7,6 +7,7 @@ using Microsoft.SemanticKernel;
 using Newtonsoft.Json;
 using DevOpsAgent.Interfaces;
 using DevOpsAgent.GitHubModels;
+using Newtonsoft.Json.Linq;
 
 namespace DevOpsAgent
 {
@@ -92,6 +93,16 @@ namespace DevOpsAgent
                         Content = card
                     };
                     var activity = MessageFactory.Attachment(attachment);
+                    activity.Entities.Add(new Entity
+                    {
+                        Type = "https://schema.org/Message",
+                        Properties = JObject.FromObject(new Dictionary<string, object>
+                           {
+                               { "@type", "Message" },
+                               { "@context", "https://schema.org" },
+                               { "additionalType", new List<string> { "AIGeneratedContent" } }
+                           })
+                    });
                     await context.SendActivityAsync(activity);
                     return JsonConvert.SerializeObject(activity);
                 }
@@ -146,6 +157,16 @@ namespace DevOpsAgent
             };
 
             var activity = MessageFactory.Attachment(attachment);
+            activity.Entities.Add(new Entity
+            {
+                Type = "https://schema.org/Message",
+                Properties = JObject.FromObject(new Dictionary<string, object>
+                           {
+                               { "@type", "Message" },
+                               { "@context", "https://schema.org" },
+                               { "additionalType", new List<string> { "AIGeneratedContent" } }
+                           })
+            });
             await context.SendActivityAsync(activity);
             return JsonConvert.SerializeObject(activity);
         }

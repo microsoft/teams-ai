@@ -6,7 +6,7 @@ using DevOpsAgent.GitHubModels;
 namespace DevOpsAgent
 {
     /// <summary>
-    /// Creates the adaptive cards for the GitHub pull requests
+    /// Creates the adaptive cards for the GitHub pull requests.
     /// </summary>
     public class GitHubCards
     {
@@ -246,19 +246,19 @@ namespace DevOpsAgent
                     },
                     new AdaptiveTextBlock
                     {
-                        Text = $"Author: {pr.User.Login ?? "Unknown"}",
+                        Text = $"**Author**: {pr.User.Login ?? "Unknown"}",
                         IsSubtle = true,
                         Spacing = AdaptiveSpacing.None
                     },
                     new AdaptiveTextBlock
                     {
-                        Text = $"Created: {pr.CreatedAt:MMM dd, yyyy}",
+                        Text = $"**Created**: {pr.CreatedAt:MMM dd, yyyy}",
                         IsSubtle = true,
                         Spacing = AdaptiveSpacing.None
                     },
                     new AdaptiveTextBlock
                     {
-                        Text = $"Status: {(pr.State == "open" ? "🟢 Open" : "🔴 Closed")}",
+                        Text = $"**Status**: {(pr.State == "open" ? "🟢 Open" : "🔴 Closed")}",
                         IsSubtle = true,
                         Spacing = AdaptiveSpacing.None
                     }
@@ -270,7 +270,7 @@ namespace DevOpsAgent
                 var labelTexts = pr.Labels.Select(l => l.Name).ToList();
                 prItemContainer.Items.Add(new AdaptiveTextBlock
                 {
-                    Text = $"Labels: {string.Join(", ", labelTexts)}",
+                    Text = $"**Labels**: {string.Join(", ", labelTexts)}",
                     IsSubtle = true,
                     Spacing = AdaptiveSpacing.None,
                     Wrap = true,
@@ -341,7 +341,7 @@ namespace DevOpsAgent
                     {
                         Text = $"👤 Assignee Request for PR #{prNumber}",
                         Weight = AdaptiveTextWeight.Bolder,
-                        Size = AdaptiveTextSize.Medium,
+                        Size = AdaptiveTextSize.Large,
                         Color = AdaptiveTextColor.Accent
                     },
                     new AdaptiveTextBlock
@@ -349,7 +349,7 @@ namespace DevOpsAgent
                         Text = $"{prTitle}",
                         Wrap = true,
                         Size = AdaptiveTextSize.Medium,
-                        Weight = AdaptiveTextWeight.Bolder
+                        Weight = AdaptiveTextWeight.Bolder,
                     },
                     new AdaptiveTextBlock
                     {
@@ -388,27 +388,27 @@ namespace DevOpsAgent
             {
                 Body = new List<AdaptiveElement>
                 {
-                    new AdaptiveTextBlock
-                    {
-                        Text = $"🔔 Status Update for Pull Request #{prNumber}",
-                        Weight = AdaptiveTextWeight.Bolder,
-                        Size = AdaptiveTextSize.Medium,
-                        Color = AdaptiveTextColor.Accent
-                    },
-                    new AdaptiveTextBlock
-                    {
-                        Text = $"{prTitle}",
-                        Wrap = true,
-                        Size = AdaptiveTextSize.Medium,
-                        Weight = AdaptiveTextWeight.Bolder
-                    },
-                    new AdaptiveTextBlock
-                    {
-                        Text = $"PR is now {action}",
-                        Wrap = true,
-                        Size = AdaptiveTextSize.Medium,
-                        Spacing = AdaptiveSpacing.Medium
-                    }
+                     new AdaptiveTextBlock
+                            {
+                                Text = $"🔔 Status Update for PR #{prNumber}",
+                                Weight = AdaptiveTextWeight.Bolder,
+                                Size = AdaptiveTextSize.Large,
+                                Color = AdaptiveTextColor.Accent
+                            },
+                            new AdaptiveTextBlock
+                            {
+                                Text = $"{prTitle}",
+                                Wrap = true,
+                                Size = AdaptiveTextSize.Medium,
+                                Weight = AdaptiveTextWeight.Bolder,
+                            },
+                            new AdaptiveTextBlock
+                            {
+                                Text = $"PR is now {action}",
+                                Wrap = true,
+                                Size = AdaptiveTextSize.Medium,
+                                Spacing = AdaptiveSpacing.Medium
+                            }
                 },
                 Actions = new List<AdaptiveAction>
                 {

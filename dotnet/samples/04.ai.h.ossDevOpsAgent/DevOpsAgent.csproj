@@ -41,7 +41,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="appPackage\" />
     <Folder Include="assets\" />
   </ItemGroup>
 	

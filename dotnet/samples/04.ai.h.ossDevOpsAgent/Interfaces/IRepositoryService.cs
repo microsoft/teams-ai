@@ -4,18 +4,18 @@ using Microsoft.Teams.AI;
 namespace DevOpsAgent.Interfaces
 {
     /// <summary>
-    /// Defines the interface for a repository service.
+    /// The interface for a repository service.
     /// Manages all repository-related operations,
     /// including webhooks and plugins.
     /// </summary>
     public abstract class IRepositoryService
     {
         /// <summary>
-        /// Used to retrieve previous convos for proactive notifications
+        /// Used to retrieve information on previous convos.
         /// </summary>
         public MemoryStorage Storage { get; set; }
 
-        // Used to send proactive notifications
+        // Used to send proactive notifications.
         public TeamsAdapter Adapter { get; set; }
 
         /// <summary>
@@ -27,10 +27,10 @@ namespace DevOpsAgent.Interfaces
         /// Handles the webhook events from the repository.
         /// </summary>
         /// <param name="payload">The incoming payload</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <param name="request">The incoming request</param>
         /// <param name="response">The outgoing response</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns></returns>
-        public abstract Task HandleWebhook(dynamic payload, CancellationToken cancellationToken, HttpRequest request, HttpResponse response);
+        public abstract Task HandleWebhook(dynamic payload, HttpRequest request, HttpResponse response, CancellationToken cancellationToken);
     }
 }

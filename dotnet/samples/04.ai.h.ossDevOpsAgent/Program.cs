@@ -158,7 +158,7 @@ builder.Services.AddTransient<IBot>(sp =>
 
         // Check for pull requests
         if (turnContext.Activity.Text.IndexOf("pull requests", StringComparison.OrdinalIgnoreCase) >= 0 ||
-            turnContext.Activity.Text.IndexOf("PRs", StringComparison.OrdinalIgnoreCase) >= 0)
+            turnContext.Activity.Text.IndexOf("PR", StringComparison.OrdinalIgnoreCase) >= 0)
         {
             KernelArguments args = new KernelArguments();
             args.Add("context", turnContext);

@@ -34,7 +34,7 @@ namespace DevOpsAgent.Controllers
 
     [Route("api/webhook")]
     [ApiController]
-    // Responsible for directing repository webhooks.
+    // Forwards the repository-related webhooks.
     public class WebhookController : ControllerBase
     {
         private readonly IRepositoryService _repositoryService;
@@ -54,7 +54,7 @@ namespace DevOpsAgent.Controllers
             }
 
             var payload = JsonConvert.DeserializeObject<dynamic>(requestBody);
-            await this._repositoryService.HandleWebhook(payload, cancellationToken, Request, Response);
+            await this._repositoryService.HandleWebhook(payload, Request, Response, cancellationToken);
         }
     }
 }

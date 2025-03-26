@@ -18,7 +18,7 @@ namespace DevOpsAgent
             RepositoryPlugin = plugin;
         }
 
-        public override async Task HandleWebhook(dynamic payload, CancellationToken cancellationToken, HttpRequest request, HttpResponse response)
+        public override async Task HandleWebhook(dynamic payload, HttpRequest request, HttpResponse response, CancellationToken cancellationToken)
         {
 
             var eventType = request.Headers["x-github-event"].ToString();
