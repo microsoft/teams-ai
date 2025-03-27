@@ -33,21 +33,21 @@ class StreamingResponse:
     """
 
     _context: TurnContext
-    _next_sequence: int = 1
-    _stream_id: str = ""
-    _message: str = ""
-    _attachments: List[Attachment] = []
-    _ended: bool = False
+    _next_sequence: int
+    _stream_id: str
+    _message: str
+    _attachments: List[Attachment]
+    _ended: bool
 
-    _citations: Optional[List[ClientCitation]] = []
-    _sensitivity_label: Optional[SensitivityUsageInfo] = None
-    _enable_feedback_loop: Optional[bool] = False
-    _feedback_loop_type: Optional[Literal["default", "custom"]] = None
-    _enable_generated_by_ai_label: Optional[bool] = False
+    _citations: Optional[List[ClientCitation]]
+    _sensitivity_label: Optional[SensitivityUsageInfo]
+    _enable_feedback_loop: Optional[bool]
+    _feedback_loop_type: Optional[Literal["default", "custom"]]
+    _enable_generated_by_ai_label: Optional[bool]
 
-    _queue: List[Callable[[], Activity]] = []
-    _queue_sync: Optional[asyncio.Task] = None
-    _chunk_queued: bool = False
+    _queue: List[Callable[[], Activity]]
+    _queue_sync: Optional[asyncio.Task]
+    _chunk_queued: bool
 
     def __init__(self, context: TurnContext) -> None:
         """
@@ -55,6 +55,19 @@ class StreamingResponse:
         :param context: The turn context.
         """
         self._context = context
+        self._next_sequence = 1
+        self._stream_id = ""
+        self._message = ""
+        self._attachments = []
+        self._ended = False
+        self._citations = []
+        self._sensitivity_label = None
+        self._enable_feedback_loop = False
+        self._feedback_loop_type = None
+        self._enable_generated_by_ai_label = False
+        self._queue = []
+        self._queue_sync = None
+        self._chunk_queued = False
 
     @property
     def stream_id(self) -> str:

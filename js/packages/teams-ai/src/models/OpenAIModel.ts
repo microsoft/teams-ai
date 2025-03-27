@@ -323,8 +323,8 @@ export class OpenAIModel implements PromptCompletionModel {
 
         // Check for use of system messages
         // - 'user' messages tend to be followed better by the model then 'system' messages.
-        const isO1Model = model.startsWith('o1-');
-        const useSystemMessages = !isO1Model && this.options.useSystemMessages;
+        const isThinkingModel = model.startsWith('o1') || model.startsWith('o3');
+        const useSystemMessages = !isThinkingModel && this.options.useSystemMessages;
         if (!useSystemMessages && result.output.length > 0 && result.output[0].role == 'system') {
             result.output[0].role = 'user';
         }
@@ -344,7 +344,7 @@ export class OpenAIModel implements PromptCompletionModel {
         try {
             // Get the chat completion parameters
             const params = this.getChatCompletionParams(model, updatedMessages, template);
-            if (isO1Model) {
+            if (isThinkingModel) {
                 if (params.max_tokens) {
                     params.max_completion_tokens = params.max_tokens;
                     delete params.max_tokens;
