@@ -117,7 +117,6 @@ namespace DevOpsAgent
                                     Data = new Dictionary<string, object>
                                     {
                                         { "verb", "githubFilters" },
-                                        { "action", "applyFilters" },
                                         { "pullRequests", pullRequests }
                                     }
                                 }

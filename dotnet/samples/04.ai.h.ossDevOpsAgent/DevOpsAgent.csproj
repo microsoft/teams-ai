@@ -40,8 +40,5 @@
       <CopyToPublishDirectory>None</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="assets\" />
-  </ItemGroup>
 	
 </Project>
