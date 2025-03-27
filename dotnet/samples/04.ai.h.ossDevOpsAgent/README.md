@@ -97,11 +97,13 @@ The two to update for `ListPRs` are:
 
 ### 3) Webhooks
 All webhook URLs must start with `api/webhook`.
+
 Create a service class for your tool.
 Your service class must extend `IRepositoryService` (e.g., `GitHubService`). 
+
 The `BotController` will route incoming webhook POST events to this class via `HandleWebhook`.
 
-Instiate your service inside `Program.cs` in the `IRepositoryService` transient registration.
+Instantiate your service inside `Program.cs` in the `IRepositoryService` transient registration.
 
 ```csharp
 GitHubPlugin plugin = new(client, config);
@@ -110,7 +112,10 @@ return new GitHubService(storage, adapter, plugin);
 
 ### 4) Plugins
 All plugins must follow the Semantic Kernel requirements and extend `IRepositoryPlugin` (e.g., `GitHubPlugin`). 
-Note that `ListPRs` is a required plugin to implement. You may also implement `FilterPRs` depending on what filters
+
+Note that `ListPRs` is a required plugin to implement. 
+
+You may also implement `FilterPRs` depending on what filters
 your tool provides.
 
 Instantiate your plugin inside `Program.cs` in the `IRepositoryService` transient registration (see above).
@@ -123,5 +128,9 @@ Then, update the plugin provided during the Semantic Kernel registration.
 
 Both ListPRs and FilterPRs are manually invoked via the activity handlers, to allow the rendering of adaptive cards. 
 
-Please use the methods inside `KernelOrchestrator` to manage conversation history. Be sure to also update the prompt
+### Other
+
+Please use the methods inside `KernelOrchestrator` to manage conversation history. 
+
+Be sure to also update the prompt
 in `KernelOrchestrator.InitiateChat`.
