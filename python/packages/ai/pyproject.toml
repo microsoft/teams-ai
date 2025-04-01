@@ -1,6 +1,6 @@
 [project]
 name = "teams-ai"
-version = "1.7.0"
+version = "1.8.0"
 description = "SDK focused on building AI based applications for Microsoft Teams."
 readme = "README.md"
 authors = [{ name = "Microsoft", email = "teams@microsoft.com"}]
