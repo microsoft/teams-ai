@@ -4,7 +4,6 @@ using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Microsoft.Teams.AI.Tests")]
 namespace Microsoft.Teams.AI
 {
     /// <summary>

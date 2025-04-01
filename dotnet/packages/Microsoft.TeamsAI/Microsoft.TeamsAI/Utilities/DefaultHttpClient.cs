@@ -1,7 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
 
-// For Unit Test
-[assembly: InternalsVisibleTo("Microsoft.Teams.AI.Tests")]
 namespace Microsoft.Teams.AI.Utilities
 {
     /// <summary>

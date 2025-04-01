@@ -2,7 +2,6 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
-[assembly: InternalsVisibleTo("Microsoft.Teams.AI.Tests")]
 namespace Microsoft.Teams.AI.State
 {
     /// <summary>
