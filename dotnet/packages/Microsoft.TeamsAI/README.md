@@ -12,7 +12,7 @@ Python support is available via the [python](https://github.com/microsoft/teams-
 
 Requirements:
 
-*   [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
+*   [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 *   (Optional) [Azure OpenAI](https://azure.microsoft.com/en-us/products/ai-services/openai-service) resource or an account with [OpenAI](https://platform.openai.com/)
 
 

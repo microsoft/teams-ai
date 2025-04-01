@@ -3,6 +3,6 @@ Microsoft.TeamsAI/bin
 Microsoft.TeamsAI/obj
 Microsoft.TeamsAI.Tests/bin
 Microsoft.TeamsAI.Tests/obj
-Microsoft.TeamsAI.Tests/bin/Debug/net6.0
-Microsoft.TeamsAI.Tests/obj/Debug/net6.0
+Microsoft.TeamsAI.Tests/bin/Debug/net8.0
+Microsoft.TeamsAI.Tests/obj/Debug/net8.0
 Microsoft.TeamsAI.Tests/IntegrationTests/testsettings.json
