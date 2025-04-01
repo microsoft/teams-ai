@@ -2762,14 +2762,14 @@ files = [
 
 [[package]]
 name = "teams-ai"
-version = "1.7.0"
+version = "1.8.0"
 description = "SDK focused on building AI based applications for Microsoft Teams."
 optional = false
 python-versions = "<4.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "teams_ai-1.7.0-py3-none-any.whl", hash = "sha256:9380a7a9ae13f4207c882555855fa55eb8ad5090f17c69267713bb10e7b716dd"},
-    {file = "teams_ai-1.7.0.tar.gz", hash = "sha256:565cd6fba9aaa6eb8c38561a187ff2a8a98d50dcb49a46af9b5adf37f6833cbb"},
+    {file = "teams_ai-1.8.0-py3-none-any.whl", hash = "sha256:91b07f4fc60c591a2f1b6426f81fe8e24014cb3d7da8982dd08a4b6d4858c249"},
+    {file = "teams_ai-1.8.0.tar.gz", hash = "sha256:4ea1e2363008fcb001c2ffd5e741e416433d89c9d88f3af0fc6ba33195c3deef"},
 ]
 
 [package.dependencies]
@@ -3158,4 +3158,4 @@ test = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more-it
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<4.0"
-content-hash = "96bf8680c8ae6f2fd5495afbfd2aab22b9efe09c8cfa4b401e55ebd06f84ca0b"
+content-hash = "6b20a19a4da9b3ef2c17ddc8bbcf2025de8dc4c6b51c4ecce0ce5ba6d26a76d7"
