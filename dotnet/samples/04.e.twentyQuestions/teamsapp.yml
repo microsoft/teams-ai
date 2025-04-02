@@ -79,6 +79,6 @@ deploy:
   # Deploy to an Azure App Service using the artifact created in the above step.
   - uses: azureAppService/zipDeploy
     with:
-      artifactFolder: bin/Release/net6.0/win-x86/publish
+      artifactFolder: bin/Release/net8.0/win-x86/publish
       resourceId: ${{BOT_AZURE_APP_SERVICE_RESOURCE_ID}}
 projectId: 6d2b99e4-1480-4218-8d1c-46630228f713
