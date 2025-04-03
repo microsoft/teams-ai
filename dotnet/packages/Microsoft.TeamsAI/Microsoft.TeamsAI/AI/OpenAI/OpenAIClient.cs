@@ -12,8 +12,6 @@ using Microsoft.Teams.AI.AI.Moderator;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.Utilities;
 
-// For Unit Tests - so the Moq framework can mock internal classes
-[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace Microsoft.Teams.AI.AI.OpenAI
 {
     /// <summary>

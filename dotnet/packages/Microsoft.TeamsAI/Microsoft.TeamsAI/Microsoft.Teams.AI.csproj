@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
 	  <TargetFramework>netstandard2.0</TargetFramework>
@@ -33,6 +33,11 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Microsoft.Teams.AI.Tests" PublicKey="0024000004800000940000000602000000240000525341310004000001000100b1824ba3bb2e1e9ab1286076ceb0716adc32b46315c6bd106f45928aaa56d50d6cc4c8df7da3715bda9acda3652d964b2b4343a80121b35a815b3b462ddf18dbd4cb0af9b60760f40f85cd3a891a08856a8391b1e34fc09df50eb71b182a25e65476249a826f83445ed47b14747c01b9db2f3c7cd6909f2b06f5c7d15a108fde" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" PublicKey="0024000004800000940000000602000000240000525341310004000001000100c547cac37abd99c8db225ef2f6c8a3602f3b3606cc9891605d02baa56104f4cfc0734aa39b93bf7852f7d9266654753cc297e7d2edfe0bac1cdcf9f717241550e0a7b191195b7667bb4f64bcb8e2121380fd1d9d46ad2d92d2d15605093924cceaf74c4861eff62abf69b9291ed0a340e113be11e6a7d3113e92484cf7045cc7" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AdaptiveCards" Version="3.1.0" />

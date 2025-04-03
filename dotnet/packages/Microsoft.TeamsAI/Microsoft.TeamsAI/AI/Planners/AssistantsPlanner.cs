@@ -18,7 +18,6 @@ using System.Text.Json;
 #pragma warning disable OPENAI001
 // Assistants API is currently in beta and is subject to change.
 #pragma warning disable IDE0130 // Namespace does not match folder structure
-[assembly: InternalsVisibleTo("Microsoft.Teams.AI.Tests")]
 namespace Microsoft.Teams.AI.AI.Planners.Experimental
 #pragma warning restore IDE0130 // Namespace does not match folder structure
 {
