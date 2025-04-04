@@ -43,6 +43,8 @@ steps:
     AppRegistrationTenantId: d91c83b4-bfc6-40d3-a591-e5b0598a2796
     AuthAKVName: esrp-teams
     AuthSignCertName: d91c83b4-bfc6-40d3-a591-e5b0598a2796
+    EsrpClientId: d91c83b4-bfc6-40d3-a591-e5b0598a2796
+    UseMSIAuthentication: true
     FolderPath: '$(folderPath)'
     Pattern: |
       Release/**/Microsoft*Teams*AI*.dll
