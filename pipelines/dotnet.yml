@@ -47,7 +47,7 @@ steps:
     UseMSIAuthentication: true
     FolderPath: '$(folderPath)'
     Pattern: |
-      Release/**/Microsoft*Teams*AI*.dll
+      **/Release/**/Microsoft*Teams*AI*.dll
     UseMinimatch: true
     signConfigType: 'inlineSignParams'
     inlineOperation: |
