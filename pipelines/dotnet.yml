@@ -114,14 +114,14 @@ steps:
           {
               "keyCode": "CP-401405",
               "operationSetCode": "NuGetSign",
-              "parameters": [ ],
+              "parameters": [],
               "toolName": "sign",
               "toolVersion": "1.0"
           },
           {
               "keyCode": "CP-401405",
               "operationSetCode": "NuGetVerify",
-              "parameters": [ ],
+              "parameters": [],
               "toolName": "sign",
               "toolVersion": "1.0"
           }
