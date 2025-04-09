@@ -54,11 +54,11 @@ steps:
   displayName: "Strong Name Sign dll"
   inputs:
     ConnectedServiceName: 'TeamsESRP-CP-233863-SN'
+    AppRegistrationTenantId: cdc5aeea-15c5-4db6-b079-fcadd2505dc2
     AppRegistrationClientId: dae01fb4-173c-4081-9439-57e706eb2976
-    AppRegistrationTenantId: d91c83b4-bfc6-40d3-a591-e5b0598a2796
+    AuthSignCertName: dae01fb4-173c-4081-9439-57e706eb2976
+    EsrpClientId: dae01fb4-173c-4081-9439-57e706eb2976
     AuthAKVName: esrp-teams
-    AuthSignCertName: d91c83b4-bfc6-40d3-a591-e5b0598a2796
-    EsrpClientId: d91c83b4-bfc6-40d3-a591-e5b0598a2796
     UseMSIAuthentication: true
     FolderPath: '$(folderPath)'
     Pattern: |
@@ -90,11 +90,11 @@ steps:
   displayName: "Authenticode Sign dll"
   inputs:
     ConnectedServiceName: 'TeamsESRP-CP-230012'
+    AppRegistrationTenantId: cdc5aeea-15c5-4db6-b079-fcadd2505dc2
     AppRegistrationClientId: 2d5c4ab9-0b7e-4f60-bb92-70322df77b94
-    AppRegistrationTenantId: d91c83b4-bfc6-40d3-a591-e5b0598a2796
+    AuthSignCertName: 2d5c4ab9-0b7e-4f60-bb92-70322df77b94
+    EsrpClientId: 2d5c4ab9-0b7e-4f60-bb92-70322df77b94
     AuthAKVName: esrp-teams
-    AuthSignCertName: d91c83b4-bfc6-40d3-a591-e5b0598a2796
-    EsrpClientId: d91c83b4-bfc6-40d3-a591-e5b0598a2796
     UseMSIAuthentication: true
     FolderPath: '$(folderPath)'
     Pattern: |
@@ -155,11 +155,11 @@ steps:
   displayName: 'Sign Nuget package'
   inputs:
     ConnectedServiceName: 'TeamsESRP-CP-401405'
+    AppRegistrationTenantId: cdc5aeea-15c5-4db6-b079-fcadd2505dc2
     AppRegistrationClientId: a94a770a-9a7b-4888-a3ea-24584b851e49
-    AppRegistrationTenantId: d91c83b4-bfc6-40d3-a591-e5b0598a2796
+    AuthSignCertName: a94a770a-9a7b-4888-a3ea-24584b851e49
+    EsrpClientId: a94a770a-9a7b-4888-a3ea-24584b851e49
     AuthAKVName: esrp-teams
-    AuthSignCertName: d91c83b4-bfc6-40d3-a591-e5b0598a2796
-    EsrpClientId: d91c83b4-bfc6-40d3-a591-e5b0598a2796
     UseMSIAuthentication: true
     FolderPath: '$(Build.ArtifactStagingDirectory)'
     Pattern: '*.nupkg,*.snupkg'
