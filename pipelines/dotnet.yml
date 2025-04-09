@@ -28,21 +28,21 @@ steps:
     command: restore
     projects: '$(package)'
 
-- powershell: |
-    # This allows us to not have to checkin .csproj files with DelaySign and SignAssembly set to to true. If the flag is set,
-    # then project is not debuggable with SignAssembly set to true.
-    $csprojPath = @(".\dotnet\packages\Microsoft.TeamsAI\Microsoft.TeamsAI\Microsoft.Teams.AI.csproj")
-    $doc = New-Object System.Xml.XmlDocument
-    $doc.Load($csprojPath)
-    # Set the DelaySign element to 'true' so that delay signing is set.
-    $delaySign = $doc.SelectSingleNode("//DelaySign");
-    $delaySign.'#text'= "true"
-    # Set the SignAssembly element to 'true' so that we can sign the assemblies.
-    $signAssembly = $doc.SelectSingleNode("//SignAssembly");
-    $signAssembly.'#text'= "true"
-    $doc.Save($csprojPath);
-    Write-Host "Updated the .csproj files so that we can sign the built assemblies."
-  displayName: 'Set project ready to sign'
+# - powershell: |
+#     # This allows us to not have to checkin .csproj files with DelaySign and SignAssembly set to to true. If the flag is set,
+#     # then project is not debuggable with SignAssembly set to true.
+#     $csprojPath = @(".\dotnet\packages\Microsoft.TeamsAI\Microsoft.TeamsAI\Microsoft.Teams.AI.csproj")
+#     $doc = New-Object System.Xml.XmlDocument
+#     $doc.Load($csprojPath)
+#     # Set the DelaySign element to 'true' so that delay signing is set.
+#     $delaySign = $doc.SelectSingleNode("//DelaySign");
+#     $delaySign.'#text'= "true"
+#     # Set the SignAssembly element to 'true' so that we can sign the assemblies.
+#     $signAssembly = $doc.SelectSingleNode("//SignAssembly");
+#     $signAssembly.'#text'= "true"
+#     $doc.Save($csprojPath);
+#     Write-Host "Updated the .csproj files so that we can sign the built assemblies."
+#   displayName: 'Set project ready to sign'
 - task: DotNetCoreCLI@2
   displayName: 'Build'
   inputs:
@@ -50,41 +50,41 @@ steps:
     projects: '$(package)'
     arguments: '--configuration $(buildConfiguration) --no-incremental --no-restore'
 
-- task: EsrpCodeSigning@5
-  displayName: "Strong Name Sign dll"
-  inputs:
-    ConnectedServiceName: 'TeamsESRP-CP-233863-SN'
-    AppRegistrationTenantId: cdc5aeea-15c5-4db6-b079-fcadd2505dc2
-    AppRegistrationClientId: dae01fb4-173c-4081-9439-57e706eb2976
-    AuthSignCertName: dae01fb4-173c-4081-9439-57e706eb2976
-    EsrpClientId: dae01fb4-173c-4081-9439-57e706eb2976
-    AuthAKVName: esrp-teams
-    UseMSIAuthentication: true
-    FolderPath: '$(folderPath)'
-    Pattern: |
-      bin/Release/**/Microsoft*Teams*AI*.dll
-    UseMinimatch: true
-    signConfigType: 'inlineSignParams'
-    inlineOperation: |
-      [
-        {
-          "KeyCode": "CP-233863-SN",
-          "OperationCode": "StrongNameSign",
-          "Parameters": {},
-          "ToolName": "sign",
-          "ToolVersion": "1.0"
-        },
-        {
-          "KeyCode": "CP-233863-SN",
-          "OperationCode": "StrongNameVerify",
-          "Parameters": {},
-          "ToolName": "sign",
-          "ToolVersion": "1.0"
-        },
-      ]
-    SessionTimeout: '60'
-    MaxConcurrency: '50'
-    MaxRetryAttempts: '5'
+# - task: EsrpCodeSigning@5
+#   displayName: "Strong Name Sign dll"
+#   inputs:
+#     ConnectedServiceName: 'TeamsESRP-CP-233863-SN'
+#     AppRegistrationTenantId: cdc5aeea-15c5-4db6-b079-fcadd2505dc2
+#     AppRegistrationClientId: dae01fb4-173c-4081-9439-57e706eb2976
+#     AuthSignCertName: dae01fb4-173c-4081-9439-57e706eb2976
+#     EsrpClientId: dae01fb4-173c-4081-9439-57e706eb2976
+#     AuthAKVName: esrp-teams
+#     UseMSIAuthentication: true
+#     FolderPath: '$(folderPath)'
+#     Pattern: |
+#       bin/Release/**/Microsoft*Teams*AI*.dll
+#     UseMinimatch: true
+#     signConfigType: 'inlineSignParams'
+#     inlineOperation: |
+#       [
+#         {
+#           "KeyCode": "CP-233863-SN",
+#           "OperationCode": "StrongNameSign",
+#           "Parameters": {},
+#           "ToolName": "sign",
+#           "ToolVersion": "1.0"
+#         },
+#         {
+#           "KeyCode": "CP-233863-SN",
+#           "OperationCode": "StrongNameVerify",
+#           "Parameters": {},
+#           "ToolName": "sign",
+#           "ToolVersion": "1.0"
+#         },
+#       ]
+#     SessionTimeout: '60'
+#     MaxConcurrency: '50'
+#     MaxRetryAttempts: '5'
 
 - task: EsrpCodeSigning@5
   displayName: "Authenticode Sign dll"
