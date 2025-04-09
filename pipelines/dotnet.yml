@@ -42,7 +42,6 @@ steps:
     $signAssembly.'#text'= "true"
     $doc.Save($csprojPath);
     Write-Host "Updated the .csproj files so that we can sign the built assemblies."
-  workingDirectory: src
   displayName: 'Set project ready to sign'
 - task: DotNetCoreCLI@2
   displayName: 'Build'
