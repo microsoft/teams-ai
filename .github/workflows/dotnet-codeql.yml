@@ -48,7 +48,7 @@ jobs:
           dotnet-version: 8.0
       - name: Build .NET
         working-directory: dotnet/packages/Microsoft.TeamsAI/
-        run: dotnet build Microsoft.Teams.AI.sln --configuration Release
+        run: dotnet build Microsoft.Teams.AI.sln --configuration Debug
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@1b549b9259bda1cb5ddde3b41741a82a2d15a841 # v3.28.13
         with:
