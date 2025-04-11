@@ -50,41 +50,41 @@ steps:
     projects: '$(package)'
     arguments: '--configuration $(buildConfiguration) --no-incremental --no-restore'
 
-# - task: EsrpCodeSigning@5
-#   displayName: "Strong Name Sign dll"
-#   inputs:
-#     ConnectedServiceName: 'TeamsESRP-CP-233863-SN'
-#     AppRegistrationTenantId: cdc5aeea-15c5-4db6-b079-fcadd2505dc2
-#     AppRegistrationClientId: dae01fb4-173c-4081-9439-57e706eb2976
-#     AuthSignCertName: dae01fb4-173c-4081-9439-57e706eb2976
-#     EsrpClientId: dae01fb4-173c-4081-9439-57e706eb2976
-#     AuthAKVName: esrp-teams
-#     UseMSIAuthentication: true
-#     FolderPath: '$(folderPath)'
-#     Pattern: |
-#       bin/Release/**/Microsoft*Teams*AI*.dll
-#     UseMinimatch: true
-#     signConfigType: 'inlineSignParams'
-#     inlineOperation: |
-#       [
-#         {
-#           "KeyCode": "CP-233863-SN",
-#           "OperationCode": "StrongNameSign",
-#           "Parameters": {},
-#           "ToolName": "sign",
-#           "ToolVersion": "1.0"
-#         },
-#         {
-#           "KeyCode": "CP-233863-SN",
-#           "OperationCode": "StrongNameVerify",
-#           "Parameters": {},
-#           "ToolName": "sign",
-#           "ToolVersion": "1.0"
-#         },
-#       ]
-#     SessionTimeout: '60'
-#     MaxConcurrency: '50'
-#     MaxRetryAttempts: '5'
+- task: EsrpCodeSigning@5
+  displayName: "Strong Name Sign dll"
+  inputs:
+    ConnectedServiceName: 'TeamsESRP-CP-233863-SN'
+    AppRegistrationTenantId: cdc5aeea-15c5-4db6-b079-fcadd2505dc2
+    AppRegistrationClientId: dae01fb4-173c-4081-9439-57e706eb2976
+    AuthSignCertName: dae01fb4-173c-4081-9439-57e706eb2976
+    EsrpClientId: dae01fb4-173c-4081-9439-57e706eb2976
+    AuthAKVName: esrp-teams
+    UseMSIAuthentication: true
+    FolderPath: '$(folderPath)'
+    Pattern: |
+      bin/Release/**/Microsoft*Teams*AI*.dll
+    UseMinimatch: true
+    signConfigType: 'inlineSignParams'
+    inlineOperation: |
+      [
+        {
+          "KeyCode": "CP-233863-SN",
+          "OperationCode": "StrongNameSign",
+          "Parameters": {},
+          "ToolName": "sign",
+          "ToolVersion": "1.0"
+        },
+        {
+          "KeyCode": "CP-233863-SN",
+          "OperationCode": "StrongNameVerify",
+          "Parameters": {},
+          "ToolName": "sign",
+          "ToolVersion": "1.0"
+        },
+      ]
+    SessionTimeout: '60'
+    MaxConcurrency: '50'
+    MaxRetryAttempts: '5'
 
 - task: EsrpCodeSigning@5
   displayName: "Authenticode Sign dll"
@@ -147,7 +147,7 @@ steps:
     AuthAKVName: esrp-teams
     UseMSIAuthentication: true
     FolderPath: '$(Build.ArtifactStagingDirectory)'
-    Pattern: '*.nupkg,*.snupkg'
+    Pattern: '**/*.nupkg,**/*.snupkg,**/*.symbols.nupkg'
     UseMinimatch: true
     signConfigType: 'inlineSignParams'
     inlineOperation: |
