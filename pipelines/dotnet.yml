@@ -147,7 +147,7 @@ steps:
     AuthAKVName: esrp-teams
     UseMSIAuthentication: true
     FolderPath: '$(Build.ArtifactStagingDirectory)'
-    Pattern: '**/*.nupkg,**/*.snupkg,**/*.symbols.nupkg'
+    Pattern: 'Microsoft.Teams.AI.1.10.0.nupkg'
     UseMinimatch: true
     signConfigType: 'inlineSignParams'
     inlineOperation: |
