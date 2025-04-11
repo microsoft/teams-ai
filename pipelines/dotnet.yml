@@ -28,21 +28,21 @@ steps:
     command: restore
     projects: '$(package)'
 
-# - powershell: |
-#     # This allows us to not have to checkin .csproj files with DelaySign and SignAssembly set to to true. If the flag is set,
-#     # then project is not debuggable with SignAssembly set to true.
-#     $csprojPath = @(".\dotnet\packages\Microsoft.TeamsAI\Microsoft.TeamsAI\Microsoft.Teams.AI.csproj")
-#     $doc = New-Object System.Xml.XmlDocument
-#     $doc.Load($csprojPath)
-#     # Set the DelaySign element to 'true' so that delay signing is set.
-#     $delaySign = $doc.SelectSingleNode("//DelaySign");
-#     $delaySign.'#text'= "true"
-#     # Set the SignAssembly element to 'true' so that we can sign the assemblies.
-#     $signAssembly = $doc.SelectSingleNode("//SignAssembly");
-#     $signAssembly.'#text'= "true"
-#     $doc.Save($csprojPath);
-#     Write-Host "Updated the .csproj files so that we can sign the built assemblies."
-#   displayName: 'Set project ready to sign'
+- powershell: |
+    # This allows us to not have to checkin .csproj files with DelaySign and SignAssembly set to to true. If the flag is set,
+    # then project is not debuggable with SignAssembly set to true.
+    $csprojPath = @(".\dotnet\packages\Microsoft.TeamsAI\Microsoft.TeamsAI\Microsoft.Teams.AI.csproj")
+    $doc = New-Object System.Xml.XmlDocument
+    $doc.Load($csprojPath)
+    # Set the DelaySign element to 'true' so that delay signing is set.
+    $delaySign = $doc.SelectSingleNode("//DelaySign");
+    $delaySign.'#text'= "true"
+    # Set the SignAssembly element to 'true' so that we can sign the assemblies.
+    $signAssembly = $doc.SelectSingleNode("//SignAssembly");
+    $signAssembly.'#text'= "true"
+    $doc.Save($csprojPath);
+    Write-Host "Updated the .csproj files so that we can sign the built assemblies."
+  displayName: 'Set project ready to sign'
 - task: DotNetCoreCLI@2
   displayName: 'Build'
   inputs:
