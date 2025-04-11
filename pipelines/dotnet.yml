@@ -135,6 +135,7 @@ steps:
     packagesToPack: '$(package)'
     packDestination: '$(Build.ArtifactStagingDirectory)'
     includeSymbols: true
+    arguments: '--no-build -c Release'
 
 - task: EsrpCodeSigning@5
   displayName: 'Sign Nuget package'
