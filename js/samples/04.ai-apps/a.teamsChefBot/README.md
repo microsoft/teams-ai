@@ -46,7 +46,7 @@ If you are using Azure OpenAI then follow these steps:
 
 - Comment the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
 - Add your Azure OpenAI key and endpoint values to the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables.
-- Open the `teamsapp.local.yml` file and modify the last step to use Azure OpenAI variables instead:
+- Open the `m365agents.local.yml` file and modify the last step to use Azure OpenAI variables instead:
 
 ```yml
 - uses: file/createOrUpdateEnvironmentFile
@@ -104,7 +104,7 @@ If you are using Azure OpenAI then follow these steps:
 
 - Comment the `SECRET_OPENAI_KEY` variable in the `./env/.env.testtool` file.
 - Add your Azure OpenAI key and endpoint values to the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables
-- Open the `teamsapp.testtool.yml` file and modify the last step to use Azure OpenAI variables instead:
+- Open the `m365agents.testtool.yml` file and modify the last step to use Azure OpenAI variables instead:
 
 ```yml
 - uses: file/createOrUpdateEnvironmentFile

@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://aka.ms/teams-toolkit/1.0.0/yaml.schema.json
 #
-# The teamsapp.yml composes automation tasks for Microsoft 365 Agents Toolkit when running other environment configurations.
+# The m365agents.yml composes automation tasks for Microsoft 365 Agents Toolkit when running other environment configurations.
 # This file is used when selecting the Provision, Deploy, or Publish menu items in the Microsoft 365 Agents Toolkit for Visual Studio Code window
 # or with the TeamsFx CLI commands.
 # i.e. `teamsfx provision --env {environment name}` or `teamsfx deploy --env {environment name}`.
