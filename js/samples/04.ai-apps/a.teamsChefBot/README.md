@@ -11,7 +11,7 @@ This is a conversational bot for Microsoft Teams that thinks it's a Chef to help
     - [Setting up the sample](#setting-up-the-sample)
     - [Testing the sample](#testing-the-sample)
         - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
-        - [Using Teams App test tool](#using-teams-app-test-tool)
+        - [Using Microsoft 365 Agents playground](#using-teams-app-test-tool)
 
 <!-- /code_chunk_output -->
 
@@ -98,7 +98,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 > If you do not have permission to upload custom apps (sideloading), Teams Toolkit will recommend creating and using a Microsoft 365 Developer Program account - a free program to get your own dev environment sandbox that includes Teams.
 
-### Using Teams App test tool
+### Using Microsoft 365 Agents playground
 
 If you are using Azure OpenAI then follow these steps:
 
@@ -121,6 +121,6 @@ If you are using Azure OpenAI then follow these steps:
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
 1. Copy this sample into a new folder outside of teams-ai
 1. Select File > Open Folder in VS Code and choose this sample's directory
-1. From the left pane, select **Run and Debug**(Ctrl+Shift+D) and select **Debug in Test Tool** in dropdown list.
+1. From the left pane, select **Run and Debug**(Ctrl+Shift+D) and select **Debug in Microsoft 365 Agents playground** in dropdown list.
 1. Select Debug > Start Debugging or F5 to run the app.
-1. The browser will pop up to open Teams App Test Tool.
+1. The browser will pop up to open Microsoft 365 Agents playground.
