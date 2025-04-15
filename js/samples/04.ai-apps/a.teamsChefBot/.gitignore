@@ -107,7 +107,7 @@ dist
 # TernJS port file
 .tern-port
 
-# Teams Toolkit
+# Microsoft 365 Agents Toolkit
 env/.env.*.user
 env/.env.local
 appPackage/build
