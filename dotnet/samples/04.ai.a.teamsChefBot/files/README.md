@@ -1,1 +1,0 @@
-Each document in this folder is a markdown file that was scraped from the Teams AI Github repository. This knowledge base will be used by the Teams Chef bot to answer questions about the Teams AI library.

@@ -1,5 +1,0 @@
-{
-    "extension": ["ts"],
-    "spec": "packages/teams-ai/src/**/*.spec.ts",
-    "require": "ts-node/register"
-}

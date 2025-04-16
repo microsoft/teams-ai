@@ -1,9 +1,0 @@
-bin
-build
-demo-packages
-dist
-docs/assets/main.js
-lib
-manifest
-node_modules
-package-lock.json

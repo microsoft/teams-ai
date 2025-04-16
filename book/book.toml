@@ -1,0 +1,29 @@
+[book]
+authors = ["aacebo <aacebowork@gmail.com>"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Teams SDK: Typescript"
+
+[build]
+build-dir = "../docs"
+create-missing = false
+
+[preprocessor.theme]
+pagetoc = false
+sidebar-width = "250px"
+
+[output.html]
+default-theme = "ayu"
+preferred-dark-theme = "ayu"
+git-repository-url = "http://github.com/microsoft/teams.ts"
+
+[output.html.fold]
+enable = true
+level = 1
+
+[output.html.playground]
+editable = false
+
+[output.html.print]
+enable = false

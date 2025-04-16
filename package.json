@@ -1,0 +1,29 @@
+{
+  "name": "teams-ai",
+  "private": true,
+  "scripts": {
+    "clean": "npx turbo clean",
+    "build": "npx turbo build",
+    "build:packages": "npx turbo build --filter=./packages/*",
+    "dev": "npx turbo dev",
+    "lint": "npx turbo lint",
+    "lint:fix": "npx turbo lint:fix",
+    "test": "npx turbo test --concurrency=100%",
+    "fmt": "npx prettier --write \"**/*.{js,ts,tsx,md,json}\"",
+    "docs:build": "mdbook build book",
+    "docs:serve": "mdbook serve book"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "turbo": "^2.5.0",
+    "typescript": "5.8.2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "npm@10.9.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

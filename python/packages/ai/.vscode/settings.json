@@ -1,7 +1,0 @@
-{
-  "python.analysis.typeCheckingMode": "standard",
-  "python.analysis.enablePytestSupport": false,
-  "python.analysis.enableSyncServer": false,
-  "python.terminal.activateEnvironment": true,
-  "python.terminal.activateEnvInCurrentTerminal": true
-}
