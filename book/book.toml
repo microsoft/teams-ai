@@ -3,7 +3,7 @@ authors = ["aacebo <aacebowork@gmail.com>"]
 language = "en"
 multilingual = false
 src = "src"
-title = "Teams SDK: Typescript"
+title = "Teams AI SDK (v2)"
 
 [build]
 build-dir = "../docs"
@@ -13,10 +13,12 @@ create-missing = false
 pagetoc = false
 sidebar-width = "250px"
 
+[preprocessor.alerts]
+
 [output.html]
 default-theme = "ayu"
 preferred-dark-theme = "ayu"
-git-repository-url = "http://github.com/microsoft/teams.ts"
+git-repository-url = "http://github.com/microsoft/teams-ai"
 
 [output.html.fold]
 enable = true
