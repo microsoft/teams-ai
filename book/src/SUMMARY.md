@@ -4,6 +4,7 @@
 - [🚀 Getting Started](./2.getting-started/README.md)
   - [Your First Application](./2.getting-started/1.create-application.md)
   - [Anatomy of an App](./2.getting-started/2.anatomy-of-an-app.md)
+  - [Running in Teams](./2.getting-started/3.running-in-teams.md)
 - [Basics](./3.basics/README.md)
   - [Listening To Activities](./3.basics/1.on-activity.md)
   - [Listening To Messages](./3.basics/2.on-message.md)

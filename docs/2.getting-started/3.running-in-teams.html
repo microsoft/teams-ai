@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Adaptive Card - Teams AI SDK</title>
+        <title>Running in Teams - Teams AI SDK</title>
 
 
         <!-- Custom HTML head -->
@@ -12,32 +12,32 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
-        <link rel="icon" href="../../../favicon.svg">
-        <link rel="shortcut icon" href="../../../favicon.png">
-        <link rel="stylesheet" href="../../../css/variables.css">
-        <link rel="stylesheet" href="../../../css/general.css">
-        <link rel="stylesheet" href="../../../css/chrome.css">
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="../../../FontAwesome/css/font-awesome.css">
-        <link rel="stylesheet" href="../../../fonts/fonts.css">
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" id="highlight-css" href="../../../highlight.css">
-        <link rel="stylesheet" id="tomorrow-night-css" href="../../../tomorrow-night.css">
-        <link rel="stylesheet" id="ayu-highlight-css" href="../../../ayu-highlight.css">
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
 
 
         <!-- Provide site root and default themes to javascript -->
         <script>
-            const path_to_root = "../../../";
+            const path_to_root = "../";
             const default_light_theme = "ayu";
             const default_dark_theme = "ayu";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../../../toc.js"></script>
+        <script src="../toc.js"></script>
     </head>
     <body>
     <div id="body-container">
@@ -90,7 +90,7 @@
             <!-- populated by js -->
             <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
             <noscript>
-                <iframe class="sidebar-iframe-outer" src="../../../toc.html"></iframe>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
             </noscript>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -221,32 +221,69 @@
 }
 
 </style>
-<h1 id="activity-adaptive-card-invoke"><a class="header" href="#activity-adaptive-card-invoke">Activity: Adaptive Card Invoke</a></h1>
-<p><a href="https://learn.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-reference#adaptive-card">Adaptive Cards</a> are a way to send rich content to users. They can be used to send messages, notifications, or to display information.</p>
-<p>Invokes on Adaptive Cards are used to perform some action dependent on interaction from the user.</p>
-<pre><code class="language-typescript">// Long-hand form of retrieving the invoke value
-app.on('invoke', async ({ activity }) =&gt; {
-    if (activity.name === 'adaptiveCard/action') {
-        const { action } = activity.value;
-    }
-});
+<h1 id="running-in-teams"><a class="header" href="#running-in-teams">Running in Teams</a></h1>
+<p>Now that you have your agent running locally, let's deploy it to Microsoft Teams for testing. This guide will walk you through the process of running your agent directly in Teams.</p>
+<h2 id="installing-teams-toolkit"><a class="header" href="#installing-teams-toolkit">Installing Teams Toolkit</a></h2>
+<p>First, you'll need to install the Teams Toolkit extension:</p>
+<ol>
+<li>Visit the <a href="https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/install-teams-toolkit?tabs=vscode">Teams Toolkit installation guide</a></li>
+<li>Follow the instructions to install for your preferred IDE</li>
+</ol>
+<div class="mdbook-alerts mdbook-alerts-tip">
+<p class="mdbook-alerts-title">
+  <span class="mdbook-alerts-icon"></span>
+  tip
+</p>
+<p>The Teams Toolkit extension makes it easy to debug and test your Teams applications directly in Microsoft Teams.</p>
+</div>
+<h2 id="adding-teams-configuration"><a class="header" href="#adding-teams-configuration">Adding Teams Configuration</a></h2>
+<p>Your agent needs some basic configuration to work with Teams. Add this by running:</p>
+<pre><code class="language-bash">npx @microsoft/teams.cli config add ttk.basic
 </code></pre>
-<p>The name of the invoke activity for Adaptive Cards is <code>adaptiveCard/action</code>. However, the <code>@microsoft/teams.api</code> package includes an alias for this invoke activity, <code>card.action</code>.</p>
-<p>See the next section for more information on the <code>value</code> field of the invoke activity.</p>
-<h2 id="resources"><a class="header" href="#resources">Resources</a></h2>
+<p>This command adds the necessary configuration files that Teams Toolkit expects, including:</p>
 <ul>
-<li><a href="https://learn.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-actions?tabs=json#action-type-invoke">Microsoft Learn: AC invokes</a></li>
+<li>Environment setup</li>
+<li>Teams app manifest template</li>
+<li>Debug configurations</li>
 </ul>
+<h2 id="debugging-in-teams"><a class="header" href="#debugging-in-teams">Debugging in Teams</a></h2>
+<p>Once you've installed Teams Toolkit and added the configuration:</p>
+<ol>
+<li>Open your agent's project in your IDE</li>
+<li>Open the Teams Toolkit panel (usually on the left sidebar)</li>
+<li>Under Environment Settings, select "Local".</li>
+<li>Click on Debug (Chrome) or Debug (Edge) to start debugging</li>
+</ol>
+<p><img src="teams-toolkit.png" alt="Teams Toolkit" /></p>
+<p>The Teams Toolkit will:</p>
+<ul>
+<li>Build your application</li>
+<li>Start a devtunnel which will assign a public URL to your local server</li>
+<li>Provision the Teams app for your tenant so that it can be installed and be authenticated on Teams</li>
+<li>Set up all the local variables necessary for your agent to run in Teams</li>
+<li>Start the local server</li>
+<li>Open Teams in your browser</li>
+<li>Package your file into a Teams application zip package</li>
+<li>Upload the package to Teams and signal it to sideload the app (fancy word for installing this app just for you)</li>
+</ul>
+<h2 id="testing-your-agent"><a class="header" href="#testing-your-agent">Testing Your Agent</a></h2>
+<p>After the debugging session starts:</p>
+<ol>
+<li>Teams will open in your browser</li>
+<li>You'll be prompted to sign in (if not already)</li>
+<li>Teams will ask permission to install the app</li>
+<li>Once installed, you can start chatting with your agent</li>
+</ol>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../../../9.activity/7.invoke/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../2.getting-started/2.anatomy-of-an-app.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../../../9.activity/7.invoke/1.adaptive-card/1.action.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../3.basics/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -256,11 +293,11 @@ app.on('invoke', async ({ activity }) =&gt; {
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../../../9.activity/7.invoke/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../2.getting-started/2.anatomy-of-an-app.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../../../9.activity/7.invoke/1.adaptive-card/1.action.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../3.basics/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
@@ -275,13 +312,13 @@ app.on('invoke', async ({ activity }) =&gt; {
         </script>
 
 
-        <script src="../../../elasticlunr.min.js"></script>
-        <script src="../../../mark.min.js"></script>
-        <script src="../../../searcher.js"></script>
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
 
-        <script src="../../../clipboard.min.js"></script>
-        <script src="../../../highlight.js"></script>
-        <script src="../../../book.js"></script>
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
 
         <!-- Custom JS scripts -->
 

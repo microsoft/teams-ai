@@ -13,6 +13,8 @@ create-missing = false
 pagetoc = false
 sidebar-width = "250px"
 
+[preprocessor.alerts]
+
 [output.html]
 default-theme = "ayu"
 preferred-dark-theme = "ayu"
