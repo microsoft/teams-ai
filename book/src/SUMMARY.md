@@ -1,7 +1,7 @@
 # Summary
 
 - [👋 Welcome](./1.welcome/README.md)
-- [🚀 Getting Started](./2.getting-started/1.create-application.md)
+- [🚀 Getting Started](./2.getting-started/README.md)
   - [Your First Application](./2.getting-started/1.create-application.md)
   - [Anatomy of an App](./2.getting-started/2.anatomy-of-an-app.md)
 - [Basics](./3.basics/README.md)

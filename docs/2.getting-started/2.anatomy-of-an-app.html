@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>👋 Welcome - Teams SDK: Typescript</title>
+        <title>Anatomy of an App - Teams SDK: Typescript</title>
 
 
         <!-- Custom HTML head -->
@@ -154,44 +154,77 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="-teams-sdk-typescript-documentation"><a class="header" href="#-teams-sdk-typescript-documentation">📖 Teams SDK: Typescript: Documentation</a></h1>
-<p>Microsoft Teams is a feature rich messaging platform. It provides features that developers can use
-to create immersive app experiences, below are some of the different packages/features that can be used with this SDK.</p>
-<h2 id="microsoftteamsapps"><a class="header" href="#microsoftteamsapps"><a href="https://www.npmjs.com/package/@microsoft/teams.apps"><code>@microsoft/teams.apps</code></a></a></h2>
-<p>Tools for building server side apps for Microsoft Teams.</p>
-<h2 id="microsoftteamsapi"><a class="header" href="#microsoftteamsapi"><a href="https://www.npmjs.com/package/@microsoft/teams.api"><code>@microsoft/teams.api</code></a></a></h2>
-<p>Core types and client implementations for the Teams Platform API,
-used for fetching data, authentication, and sending activities.</p>
-<h2 id="microsoftteamsai"><a class="header" href="#microsoftteamsai"><a href="https://www.npmjs.com/package/@microsoft/teams.ai"><code>@microsoft/teams.ai</code></a></a></h2>
-<p>Tools that make it easier to integrate apps with LLM's and enabling
-multi-agent scenarios.</p>
-<h2 id="microsoftteamsbotbuilder"><a class="header" href="#microsoftteamsbotbuilder"><a href="https://www.npmjs.com/package/@microsoft/teams.botbuilder"><code>@microsoft/teams.botbuilder</code></a></a></h2>
-<p>A plugin implementation, allowing developers to integrate an existing <code>botbuilder</code>
-<code>Adapter</code> into a project using Teams. This plugin allows you to use <code>botbuilder</code>
-as the <code>Sender</code> and <code>Receiver</code> of activities, while still being able to leverage
-Teams's new typings and routing system.</p>
-<h2 id="microsoftteamscards"><a class="header" href="#microsoftteamscards"><a href="https://www.npmjs.com/package/@microsoft/teams.cards"><code>@microsoft/teams.cards</code></a></a></h2>
-<p>Adaptive Cards typings and builders for type safe and intuitive card design.</p>
-<h2 id="microsoftteamscli"><a class="header" href="#microsoftteamscli"><a href="https://www.npmjs.com/package/@microsoft/teams.cli"><code>@microsoft/teams.cli</code></a></a></h2>
-<p>A CLI for building apps using <code>@microsoft/teams.ts</code>.</p>
-<h2 id="microsoftteamsclient"><a class="header" href="#microsoftteamsclient"><a href="https://www.npmjs.com/package/@microsoft/teams.client"><code>@microsoft/teams.client</code></a></a></h2>
-<p>A client used to create app/bot surfaces such as tabs using <code>@microsoft/teams.ts</code>.</p>
-<h2 id="microsoftteamscommon"><a class="header" href="#microsoftteamscommon"><a href="https://www.npmjs.com/package/@microsoft/teams.common"><code>@microsoft/teams.common</code></a></a></h2>
-<p>Common implementations used by all the packages, for example <code>logging</code>.</p>
-<h2 id="microsoftteamsdev"><a class="header" href="#microsoftteamsdev"><a href="https://www.npmjs.com/package/@microsoft/teams.dev"><code>@microsoft/teams.dev</code></a></a></h2>
-<p>Developer tools to streamline the development process.</p>
-<h2 id="microsoftteamsgraph"><a class="header" href="#microsoftteamsgraph"><a href="https://www.npmjs.com/package/@microsoft/teams.graph"><code>@microsoft/teams.graph</code></a></a></h2>
-<p>MSGraph api client.</p>
-<h2 id="microsoftteamsopenai"><a class="header" href="#microsoftteamsopenai"><a href="https://www.npmjs.com/package/@microsoft/teams.openai"><code>@microsoft/teams.openai</code></a></a></h2>
-<p>AI model implementations for <code>OpenAI</code>, allowing you to integrate your models
-with the core <code>@microsoft/teams.ai</code> package.</p>
+                        <h1 id="anatomy-of-an-app"><a class="header" href="#anatomy-of-an-app">Anatomy of an App</a></h1>
+<p>After creating your first Teams application, let's understand its structure and key components. This will help you build more complex applications as you progress.</p>
+<h2 id="project-structure"><a class="header" href="#project-structure">Project Structure</a></h2>
+<p>When you create a new Teams application, it generates a directory with this basic structure:</p>
+<pre><code>quote-agent/
+|── appPackage/       # Teams app package files
+├── src/
+│   └── index.ts      # Main application code
+</code></pre>
+<h2 id="core-components"><a class="header" href="#core-components">Core Components</a></h2>
+<p>Let's break down the simple application we created earlier:</p>
+<h3 id="the-app-class"><a class="header" href="#the-app-class">The App Class</a></h3>
+<p>The heart of your application is the <code>App</code> class. This class handles all incoming activities and manages your application's lifecycle. It also acts as a</p>
+<pre><code class="language-typescript">import { App } from "@microsoft/teams.apps";
+import { ConsoleLogger } from "@microsoft/teams.common/logging";
+import { DevtoolsPlugin } from "@microsoft/teams.dev";
+
+const app = new App({
+  plugins: [new DevtoolsPlugin()],
+});
+</code></pre>
+<p>The App configuration includes a variety of options which allow you to customize its behavior from controlling the underlying server, authentication, and others. For simplicity sake, let's focus on plugins.</p>
+<h3 id="pluginhs"><a class="header" href="#pluginhs">Pluginhs</a></h3>
+<p>Plugins are a core part of the Teams AI SDK. They allow you to hook into various lifecycles of the application. The lifecycles include server events (start, stop, initialize etc.), and also Teams Activity events (onActivity, onActivitySent, etc.). In fact, the DevTools application you have running is a plugin itself. It allows you to inspect and debug your application in real-time.</p>
+<blockquote>
+<p>[!CAUTION]
+DevTools is a plugin that should only be used in development mode. It should not be used in production applications since it offers no authantication and allows your application to be accessed by anyone.</p>
+</blockquote>
+<h3 id="message-handling"><a class="header" href="#message-handling">Message Handling</a></h3>
+<p>Teams applications respond to various types of activities. The most basic is handling messages:</p>
+<pre><code class="language-typescript">app.on("message", async ({ send, activity }) =&gt; {
+  await send({ type: "typing" });
+  await send(`you said "${activity.text}"`);
+});
+</code></pre>
+<p>This code:</p>
+<ol>
+<li>Listens for incoming messages using <code>app.on('message')</code></li>
+<li>Shows a typing indicator</li>
+<li>Responds by echoing back the received message</li>
+</ol>
+<blockquote>
+<p>[!NOTE]
+Type safety is a core tenet of this version of the SDK. You're able to change the activity <code>name</code> to a different supported value, and the type-system will automatically adjust the type for <code>activity</code> to match the new type.</p>
+</blockquote>
+<h3 id="application-lifecycle"><a class="header" href="#application-lifecycle">Application Lifecycle</a></h3>
+<p>Your application starts when you run:</p>
+<pre><code class="language-typescript">(async () =&gt; {
+  await app.start();
+})();
+</code></pre>
+<p>This part initializes your application, and if it's configured for Teams also authenticates it so that it's ready to send and receive messages.</p>
+<h2 id="next-steps"><a class="header" href="#next-steps">Next Steps</a></h2>
+<p>Now that you understand the basic structure of your Teams application, you can:</p>
+<ul>
+<li>Add more activity handlers for different types of interactions</li>
+<li>Integrate with external services</li>
+<li>Add interactive cards and dialogs</li>
+<li>Implement AI capabilities</li>
+</ul>
+<p>Continue reading to learn about these advanced features.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../2.getting-started/1.create-application.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
-                            <a rel="next prefetch" href="../2.getting-started/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../3.basics/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -201,8 +234,11 @@ with the core <code>@microsoft/teams.ai</code> package.</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../2.getting-started/1.create-application.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
-                    <a rel="next prefetch" href="../2.getting-started/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../3.basics/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
