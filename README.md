@@ -13,7 +13,7 @@ For a detailed explanation of the motivations and architectural decisions behind
 
 This repository contains submodules that point to dedicated repositories for different language implementations of the SDK:
 
-- [TypeScript/JavaScript](https://github.com/microsoft/teams.ts/tree/aada2ed01fbacf01a162ac193313722796febf13)
+- [TypeScript/JavaScript](https://github.com/microsoft/teams.ts)
 - [.NET](https://microsoft.github.io/teams.net/) (early stage)
 - Python (coming soon)
 
