@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Simple - Teams AI SDK (v2)</title>
+        <title>Teams - Teams AI SDK (v2)</title>
 
 
         <!-- Custom HTML head -->
@@ -12,32 +12,32 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
-        <link rel="icon" href="../../favicon.svg">
-        <link rel="shortcut icon" href="../../favicon.png">
-        <link rel="stylesheet" href="../../css/variables.css">
-        <link rel="stylesheet" href="../../css/general.css">
-        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
-        <link rel="stylesheet" href="../../fonts/fonts.css">
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" id="highlight-css" href="../../highlight.css">
-        <link rel="stylesheet" id="tomorrow-night-css" href="../../tomorrow-night.css">
-        <link rel="stylesheet" id="ayu-highlight-css" href="../../ayu-highlight.css">
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
 
 
         <!-- Provide site root and default themes to javascript -->
         <script>
-            const path_to_root = "../../";
+            const path_to_root = "../";
             const default_light_theme = "ayu";
             const default_dark_theme = "ayu";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../../toc.js"></script>
+        <script src="../toc.js"></script>
     </head>
     <body>
     <div id="body-container">
@@ -90,7 +90,7 @@
             <!-- populated by js -->
             <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
             <noscript>
-                <iframe class="sidebar-iframe-outer" src="../../toc.html"></iframe>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
             </noscript>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -221,44 +221,34 @@
 }
 
 </style>
-<h1 id="simple"><a class="header" href="#simple">Simple</a></h1>
-<p>A simple prompt for finding the right emojis.</p>
-<pre><code class="language-typescript">import { ChatPrompt } from "@microsoft/teams.ai";
-import { OpenAIChatModel } from "@microsoft/teams.openai";
-
-const prompt = new ChatPrompt({
-  instructions: [
-    "you are an assistant that helps find the perfect emoji to use for a given situation.",
-    "you will only respond with emojis.",
-  ].join("\n"),
-  model: new OpenAIChatModel({
-    model: "gpt-4o",
-    apiKey: process.OPENAI_API_KEY,
-  }),
-});
-
-const generateEmojis = async (message: string) =&gt; {
-  const res = await prompt.send(message);
-  return res?.content ?? "Unknown"; // 😄🌞🎉
-};
-</code></pre>
-<p>Somewhere else in the app:</p>
-<pre><code class="language-ts">app.on("message", async ({ send, activity }) =&gt; {
-  await send({ type: "typing" });
-  const emoji = await generateEmojis(activity.text);
-  await send(emoji);
-});
-</code></pre>
+<h1 id="teams-integration"><a class="header" href="#teams-integration">Teams Integration</a></h1>
+<p>This section describes Teams-specific features and components of the SDK, helping you understand how your agent integrates with the Microsoft Teams platform.</p>
+<h2 id="core-concepts"><a class="header" href="#core-concepts">Core Concepts</a></h2>
+<p>When working with Teams, several key components come into play:</p>
+<ul>
+<li><strong>DevTunnel</strong>: Enables local development by creating secure public endpoints</li>
+<li><strong>App Provisioning</strong>: Handles registration and configuration in Teams</li>
+<li><strong>Environment Setup</strong>: Manages Teams-specific configuration files</li>
+<li><strong>App Packaging</strong>: Bundles your agent for Teams deployment</li>
+</ul>
+<h2 id="in-this-section"><a class="header" href="#in-this-section">In This Section</a></h2>
+<ol>
+<li><a href="1.running-agent.html">Running Your Agent</a> - Understanding the Teams deployment process</li>
+<li><a href="2.manifest.html">Teams Manifest</a> - Configuring your agent's Teams presence</li>
+<li><a href="3.deployment.html">Deployment</a> - Moving to production</li>
+<li><a href="4.teams-toolkit.html">Teams Toolkit</a> - Using Teams development tools</li>
+</ol>
+<p>Each guide provides detailed information about specific aspects of Teams integration, from local development to production deployment.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../../8.ai/1.chat/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../3.basics/10.mention.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../../8.ai/1.chat/2.streaming.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../10.teams/1.core-concepts.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -268,11 +258,11 @@ const generateEmojis = async (message: string) =&gt; {
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../../8.ai/1.chat/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../3.basics/10.mention.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../../8.ai/1.chat/2.streaming.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../10.teams/1.core-concepts.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
@@ -287,13 +277,13 @@ const generateEmojis = async (message: string) =&gt; {
         </script>
 
 
-        <script src="../../elasticlunr.min.js"></script>
-        <script src="../../mark.min.js"></script>
-        <script src="../../searcher.js"></script>
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
 
-        <script src="../../clipboard.min.js"></script>
-        <script src="../../highlight.js"></script>
-        <script src="../../book.js"></script>
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
 
         <!-- Custom JS scripts -->
 
