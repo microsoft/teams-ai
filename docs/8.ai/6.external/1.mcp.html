@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>💬 🔈 📷 Multi Media - Teams AI SDK (v2)</title>
+        <title>MCP - Teams AI SDK (v2)</title>
 
 
         <!-- Custom HTML head -->
@@ -221,7 +221,89 @@
 }
 
 </style>
-<h1 id="---multi-media"><a class="header" href="#---multi-media">💬 🔈 📷 Multi Media</a></h1>
+<h1 id="mcp-model-context-protocol"><a class="header" href="#mcp-model-context-protocol">MCP (Model Context Protocol)</a></h1>
+<p>Teams AI SDK supports <a href="https://modelcontextprotocol.io/introduction">MCP</a> as an optional add-on both as a service or as a client.</p>
+<h2 id="mcp-server"><a class="header" href="#mcp-server">MCP Server</a></h2>
+<p>It is possible to co-opt a Teams AI SDK service to be also used as an MCP server. Doing so will allow other MCP clients to connect to this service and use it to accomplish tasks. Check out the <a href="https://github.com/microsoft/teams.ts/tree/main/samples/mcp">MCP server sample</a> for a working example.</p>
+<pre><code class="language-typescript">import { ChatPrompt } from "@microsoft/teams.ai";
+import { McpPlugin } from "@microsoft/teams.mcp";
+import { OpenAIChatModel } from "@microsoft/teams.openai";
+
+// Create a normal ChatPrompt.
+// This isn't going to serve AI requests, but rather serve MCP tool calls
+const prompt = new ChatPrompt({
+  model: new OpenAIChatModel({
+    model: "gpt-4o-mini",
+    apiKey: process.env.OPENAI_API_KEY,
+  }),
+});
+
+// Expose the functions for your MCP server
+prompt.function(
+  "echo",
+  "echos back whatever you said",
+  {
+    type: "object",
+    properties: {
+      input: {
+        type: "string",
+        description: "the text to echo back",
+      },
+    },
+    required: ["input"],
+  } as const,
+  async ({ input }: { input: string }) =&gt; {
+    return `You said "${input}" :)`;
+  }
+);
+
+const app = new App({
+  logger: new ConsoleLogger("@samples/echo", { level: "debug" }),
+  plugins: [
+    new DevtoolsPlugin(),
+    // Include it as an McpPlugin for your App.
+    new McpPlugin({
+      name: "echo",
+      // Can observe requsts to your MCP server via Devtools if this is passed in.
+      inspector: "http://localhost:5173?proxyPort=9000",
+    }).use(prompt),
+  ],
+});
+</code></pre>
+<h2 id="mcp-client"><a class="header" href="#mcp-client">MCP Client</a></h2>
+<p>On the other hand, if you want your application to use an MCP server, you can do so by using the <code>McpClient</code> plugin. This plugin is a plugin for your <code>ChatPrompt</code> and will allow your prompt to use remote MCP servers to serve tool calls.</p>
+<pre><code class="language-typescript">import { ChatPrompt } from "@microsoft/teams.ai";
+import { McpClientPlugin } from "@microsoft/teams.mcpclient";
+import { OpenAIChatModel } from "@microsoft/teams.openai";
+const prompt = new ChatPrompt(
+  {
+    instructions:
+      "You are a helpful assistant. You MUST use tool calls to do all your work.",
+    model: new OpenAIChatModel({
+      model: "gpt-4o-mini",
+      apiKey: process.env.OPENAI_API_KEY,
+    }),
+  },
+  [new McpClientPlugin()]
+  // Here we point to the MCP server we want to use.
+  // In this case it happens to be the one we created
+  // in a different Teams AI SDK application above
+).usePlugin("mcpClient", { url: "http://localhost:3000/mcp" });
+</code></pre>
+<p>Somewhere else in the app:</p>
+<pre><code class="language-typescript">app.on("message", async ({ send, activity }) =&gt; {
+  await send({ type: "typing" });
+
+  // Use the prompt as usual. It will now be able to use the
+  // definitions exposed by the MCP server it pointed to
+  // and if the model decides it needs to use its tool,
+  // the plugin will do the work of calling the server for you
+  const result = await prompt.send(activity.text);
+  if (result.content) {
+    await send(result.content);
+  }
+});
+</code></pre>
 
                     </main>
 
@@ -231,7 +313,7 @@
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../../8.ai/5.memory/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../../9.activity/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -245,7 +327,7 @@
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../../8.ai/5.memory/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../../9.activity/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

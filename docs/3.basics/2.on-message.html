@@ -222,13 +222,14 @@
 
 </style>
 <h1 id="-listening-to-message-activities"><a class="header" href="#-listening-to-message-activities">👂 Listening To Message Activities</a></h1>
-<p>You can listen/subscribe to messages using static text or <code>Regexp</code>.</p>
+<p>You can listen/subscribe to messages using static text or <code>Regexp</code>. This is a shorthand for <code>app.on('message')</code> activity handler, where it will only trigger the handler if it matches the pattern you have provided. These types of handlers are common enough that we have provided a shorthand for them.</p>
 <blockquote>
 <p>Example: when the user sends a message to the bot with the text <code>/logout</code>
 we send a message back.</p>
 </blockquote>
-<pre><code class="language-typescript">app.message('/logout', async ({ activity, send }) =&gt; {
-    await send("ok, I'll sign you out!");
+<pre><code class="language-typescript">app.message("/logout", async ({ activity, send, signout }) =&gt; {
+  await send("ok, I'll sign you out!");
+  await signout();
 });
 </code></pre>
 
