@@ -222,37 +222,41 @@
 
 </style>
 <h1 id="-sending-activities"><a class="header" href="#-sending-activities">💬 Sending Activities</a></h1>
-<p>To send an activity you can either use the <code>send</code> or <code>reply</code> methods.
-You can also <code>stream</code> chunks of an activity.</p>
+<p>To send an activity you can either use the <code>send</code> or <code>reply</code> methods. You can also <code>stream</code> chunks of an activity.</p>
 <h2 id="send"><a class="header" href="#send">Send</a></h2>
 <blockquote>
 <p>Example: a bot that listens for when a member is added to the conversation and sends a greeting.</p>
 </blockquote>
-<pre><code class="language-typescript">app.on('conversationUpdate', async ({ activity, send }) =&gt; {
-    for (const account of activity.membersAdded || []) {
-        await send(`👋 welcome ${account.name}!`);
-    }
+<pre><code class="language-typescript">app.on("conversationUpdate", async ({ activity, send }) =&gt; {
+  for (const account of activity.membersAdded || []) {
+    await send(`👋 welcome ${account.name}!`);
+  }
 });
 </code></pre>
 <h2 id="reply"><a class="header" href="#reply">Reply</a></h2>
 <blockquote>
 <p>Example: an echo bot that listens for messages sent to it and responds.</p>
 </blockquote>
-<pre><code class="language-typescript">app.on('message', async ({ activity, reply, send }) =&gt; {
-    await send({ type: 'typing' }); // send typing indicator...
-    await reply(`you said: "${activity.text}"`);
+<pre><code class="language-typescript">app.on("message", async ({ activity, reply, send }) =&gt; {
+  await send({ type: "typing" }); // send typing indicator...
+  await reply(`you said: "${activity.text}"`);
 });
 </code></pre>
 <h2 id="streaming"><a class="header" href="#streaming">Streaming</a></h2>
-<pre><code class="language-typescript">app.on('message', async ({ activity, stream }) =&gt; {
-    stream.emit('hello');
-    stream.emit(', ');
-    stream.emit('world!');
+<pre><code class="language-typescript">app.on("message", async ({ activity, stream }) =&gt; {
+  stream.emit("hello");
+  stream.emit(", ");
+  stream.emit("world!");
 
-    // result message: "hello, world!"
+  // result message: "hello, world!"
 });
 </code></pre>
 <p><img src="https://github.com/microsoft/teams.ts/blob/main/assets/screenshots/streaming.gif?raw=true" alt="Streaming Activity" /></p>
+<h2 id="proactive-messaging"><a class="header" href="#proactive-messaging">Proactive Messaging</a></h2>
+<p>In the above examples, the bot is reacting to the messages that are sent to it. However, there are times when you want to send a message to the user without them sending a message first. This is called proactive messaging. You can do this by using the <code>send</code> method in the <code>app</code> instance. This is useful for sending notifications or reminders to the user.</p>
+<p>The main thing to note is that you need to have the <code>conversationId</code> of the user you want to send the message to. It's a good idea to store this value somewhere from an activity handler so you can use it for proactive messaging later.</p>
+<pre><code class="language-typescript">await app.send(conversationId, "Don't forget to eat your vegetables!");
+</code></pre>
 
                     </main>
 

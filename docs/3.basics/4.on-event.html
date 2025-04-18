@@ -227,17 +227,17 @@ Handlers will be called in the order they are added.</p>
 <blockquote>
 <p>Example: We subscribe to errors that occur in the app.</p>
 </blockquote>
-<pre><code class="language-typescript">app.event('error', ({ err, log }) =&gt; {
-    log.error(err);
+<pre><code class="language-typescript">app.event("error", ({ err, log }) =&gt; {
+  log.error(err);
 });
 </code></pre>
 <blockquote>
 <p>Example: When a user signs in using <code>OAuth</code> or <code>SSO</code>, use the graph api to
 fetch their profile and say hello.</p>
 </blockquote>
-<pre><code class="language-typescript">app.event('signin', async ({ activity, send, api }) =&gt; {
-    const me = await api.user.me.get();
-    await send(`👋 Hello ${me.name}`);
+<pre><code class="language-typescript">app.event("signin", async ({ activity, send, api }) =&gt; {
+  const me = await api.user.me.get();
+  await send(`👋 Hello ${me.name}`);
 });
 </code></pre>
 

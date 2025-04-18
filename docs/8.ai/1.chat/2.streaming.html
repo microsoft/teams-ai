@@ -222,29 +222,34 @@
 
 </style>
 <h1 id="streaming"><a class="header" href="#streaming">Streaming</a></h1>
+<div class="mdbook-alerts mdbook-alerts-note">
+<p class="mdbook-alerts-title">
+  <span class="mdbook-alerts-icon"></span>
+  note
+</p>
+<p>Currently, streaming in Teams is only supported in the personal scope, not group chats or channels.</p>
+</div>
 <p>Now lets add streaming support...</p>
-<pre><code class="language-typescript">import { ChatPrompt } from '@microsoft/teams.ai';
-import { OpenAIChatModel } from '@microsoft/teams.openai';
+<pre><code class="language-typescript">import { ChatPrompt } from "@microsoft/teams.ai";
+import { OpenAIChatModel } from "@microsoft/teams.openai";
 
 const prompt = new ChatPrompt({
-    instructions: [
-        'you are an assistant that helps find the perfect emoji to use for a given situation.',
-        'you will only respond with emojis.',
-    ].join('\n'),
-    model: new OpenAIChatModel({
-        model: 'gpt-4o',
-        apiKey: process.OPENAI_API_KEY,
-        stream: true,
-    }),
+  instructions: "You are a helpful assistant who talks like a pirate.",
+  model: new OpenAIChatModel({
+    model: "gpt-4o",
+    apiKey: process.env.OPENAI_API_KEY,
+  }),
 });
-
-(async () =&gt; {
-    await prompt.chat('having a great day!', (chunk) =&gt; {
-        process.stdout.write(chunk); // 😄🌞🎉
-    });
-
-    process.stdout.write('\n');
-})();
+</code></pre>
+<p>Somewhere else in your app:</p>
+<pre><code class="language-typescript">app.on("message", async ({ send, stream, activity }) =&gt; {
+  await prompt.send(activity.text, {
+    // Passing in an onChunk handler automatically enables streaming
+    onChunk: (chunk) =&gt; {
+      stream.emit(chunk);
+    },
+  });
+});
 </code></pre>
 
                     </main>
