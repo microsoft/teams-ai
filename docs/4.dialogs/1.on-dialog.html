@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>@Mention - Teams AI SDK (v2)</title>
+        <title>Listening To Dialogs - Teams AI SDK (v2)</title>
 
 
         <!-- Custom HTML head -->
@@ -221,10 +221,31 @@
 }
 
 </style>
-<h1 id="mention"><a class="header" href="#mention">@Mention</a></h1>
-<p>Sending a message at <code>@mentions</code> a user is as simple as:</p>
-<pre><code class="language-typescript">app.on('message', async ({ send, activity }) =&gt; {
-    await send(MessageSendActivity('hi!').mention(activity.from));
+<h1 id="-listening-to-dialogs"><a class="header" href="#-listening-to-dialogs">👂 Listening To Dialogs</a></h1>
+<p>You can listen on the <code>dialog.open</code> activity and respond with adaptive cards or url to
+be rendered as the dialogs content.</p>
+<h2 id="dialogopen-taskfetch"><a class="header" href="#dialogopen-taskfetch"><a href="https://learn.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/task-modules/task-modules-bots?tabs=nodejs#invoke-a-dialog-using-taskfetch"><code>dialog.open</code> (task/fetch)</a></a></h2>
+<p>triggered when a dialog is opened, used to render dialog contents.</p>
+<blockquote>
+<p>Example: when a dialog is opened, render an <a href="https://adaptivecards.io/">Adaptive Card</a> as the body.</p>
+</blockquote>
+<pre><code class="language-typescript">app.on('dialog.open', ({ }) =&gt; {
+    return {
+        status: 200,
+        body: {
+            task: {
+                type: 'continue',
+                value: {
+                    width: 'large',
+                    card: cardAttachment('adaptive', {
+                        type: 'AdaptiveCard',
+                        version: '1.6',
+                        body: [...]
+                    })
+                }
+            }
+        }
+    };
 });
 </code></pre>
 
@@ -232,11 +253,11 @@
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../3.basics/9.feedback.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../4.dialogs/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../10.teams/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../4.dialogs/2.on-dialog-submit.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -246,11 +267,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../3.basics/9.feedback.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../4.dialogs/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../10.teams/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../4.dialogs/2.on-dialog-submit.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

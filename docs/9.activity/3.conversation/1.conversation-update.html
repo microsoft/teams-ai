@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>@Mention - Teams AI SDK (v2)</title>
+        <title>Conversation Update - Teams AI SDK (v2)</title>
 
 
         <!-- Custom HTML head -->
@@ -12,32 +12,32 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
-        <link rel="icon" href="../favicon.svg">
-        <link rel="shortcut icon" href="../favicon.png">
-        <link rel="stylesheet" href="../css/variables.css">
-        <link rel="stylesheet" href="../css/general.css">
-        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
-        <link rel="stylesheet" href="../fonts/fonts.css">
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
-        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
-        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+        <link rel="stylesheet" id="highlight-css" href="../../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
 
 
         <!-- Provide site root and default themes to javascript -->
         <script>
-            const path_to_root = "../";
+            const path_to_root = "../../";
             const default_light_theme = "ayu";
             const default_dark_theme = "ayu";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc.js"></script>
+        <script src="../../toc.js"></script>
     </head>
     <body>
     <div id="body-container">
@@ -90,7 +90,7 @@
             <!-- populated by js -->
             <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
             <noscript>
-                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+                <iframe class="sidebar-iframe-outer" src="../../toc.html"></iframe>
             </noscript>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -221,22 +221,35 @@
 }
 
 </style>
-<h1 id="mention"><a class="header" href="#mention">@Mention</a></h1>
-<p>Sending a message at <code>@mentions</code> a user is as simple as:</p>
-<pre><code class="language-typescript">app.on('message', async ({ send, activity }) =&gt; {
-    await send(MessageSendActivity('hi!').mention(activity.from));
-});
+<h1 id="activity-conversation-update"><a class="header" href="#activity-conversation-update">Activity: Conversation Update</a></h1>
+<p>Conversation update activities describe a change in a conversation's members, description, existence, or otherwise. Conversation update activities generally do not contain user-generated content. The conversation being updated is described in the <code>conversation</code> field.</p>
+<pre><code class="language-typescript">app.on('conversationUpdate', async ({ activity }) =&gt; {});
 </code></pre>
+<h2 id="schema"><a class="header" href="#schema">Schema</a></h2>
+<p>Conversation update activities are identified by a <code>type</code> value of <code>conversationUpdate</code>.</p>
+<p><code>A4100</code>: Senders MAY include zero or more of <code>membersAdded</code>, <code>membersRemoved</code>, <code>topicName</code>, and <code>historyDisclosed</code> fields in a conversation update activity.</p>
+<p><code>A4101</code>: Each <code>channelAccount</code> (identified by <code>id</code> field) SHOULD appear at most once within the <code>membersAdded</code> and <code>membersRemoved</code> fields. An ID SHOULD NOT appear in both fields. An ID SHOULD NOT be duplicated within either field.</p>
+<p><code>A4102</code>: Channels SHOULD NOT use conversation update activities to indicate changes to a channel account's fields (e.g., <code>name</code>) if the channel account was not added to or removed from the conversation.</p>
+<p><code>A4103</code>: Channels SHOULD NOT send the <code>topicName</code> or <code>historyDisclosed</code> fields if the activity is not signaling a change in value for either field.</p>
+<h3 id="members-added"><a class="header" href="#members-added">Members added</a></h3>
+<p>The <code>membersAdded</code> field contains a list of channel participants (bots or users) added to the conversation. The value of the <code>membersAdded</code> field is an array of type <a href="https://github.com/microsoft/Agents/blob/main/specs/activity/protocol-activity.md#channel-account"><code>channelAccount</code></a>.</p>
+<h3 id="members-removed"><a class="header" href="#members-removed">Members removed</a></h3>
+<p>The <code>membersRemoved</code> field contains a list of channel participants (bots or users) removed from the conversation. The value of the <code>membersRemoved</code> field is an array of type <a href="#https://github.com/microsoft/Agents/blob/main/specs/activity/protocol-activity.md#channel-account"><code>channelAccount</code></a>.</p>
+<h3 id="topic-name"><a class="header" href="#topic-name">Topic name</a></h3>
+<p>The <code>topicName</code> field contains the text topic or description for the conversation. The value of the <code>topicName</code> field is of type string.</p>
+<h3 id="history-disclosed"><a class="header" href="#history-disclosed">History disclosed</a></h3>
+<p>The <code>historyDisclosed</code> field is deprecated.</p>
+<p><code>A4110</code>: Senders SHOULD NOT include the <code>historyDisclosed</code> field.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../3.basics/9.feedback.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../../9.activity/3.conversation/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../10.teams/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../../9.activity/3.conversation/2.conversation-update-events.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -246,11 +259,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../3.basics/9.feedback.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../../9.activity/3.conversation/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../10.teams/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../../9.activity/3.conversation/2.conversation-update-events.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
@@ -265,13 +278,13 @@
         </script>
 
 
-        <script src="../elasticlunr.min.js"></script>
-        <script src="../mark.min.js"></script>
-        <script src="../searcher.js"></script>
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
 
-        <script src="../clipboard.min.js"></script>
-        <script src="../highlight.js"></script>
-        <script src="../book.js"></script>
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
 
         <!-- Custom JS scripts -->
 

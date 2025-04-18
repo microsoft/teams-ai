@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>@Mention - Teams AI SDK (v2)</title>
+        <title>Meeting Events - Teams AI SDK (v2)</title>
 
 
         <!-- Custom HTML head -->
@@ -12,32 +12,32 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
-        <link rel="icon" href="../favicon.svg">
-        <link rel="shortcut icon" href="../favicon.png">
-        <link rel="stylesheet" href="../css/variables.css">
-        <link rel="stylesheet" href="../css/general.css">
-        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
-        <link rel="stylesheet" href="../fonts/fonts.css">
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
-        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
-        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+        <link rel="stylesheet" id="highlight-css" href="../../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
 
 
         <!-- Provide site root and default themes to javascript -->
         <script>
-            const path_to_root = "../";
+            const path_to_root = "../../";
             const default_light_theme = "ayu";
             const default_dark_theme = "ayu";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc.js"></script>
+        <script src="../../toc.js"></script>
     </head>
     <body>
     <div id="body-container">
@@ -90,7 +90,7 @@
             <!-- populated by js -->
             <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
             <noscript>
-                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+                <iframe class="sidebar-iframe-outer" src="../../toc.html"></iframe>
             </noscript>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -221,22 +221,37 @@
 }
 
 </style>
-<h1 id="mention"><a class="header" href="#mention">@Mention</a></h1>
-<p>Sending a message at <code>@mentions</code> a user is as simple as:</p>
-<pre><code class="language-typescript">app.on('message', async ({ send, activity }) =&gt; {
-    await send(MessageSendActivity('hi!').mention(activity.from));
-});
+<h1 id="activity-meeting-start-and-end-events"><a class="header" href="#activity-meeting-start-and-end-events">Activity: Meeting Start and End Events</a></h1>
+<p>Meeting extensibility provides a way for bots to participate in meetings and receive notifications that are specific to meeting events. Please note that Teams has three types of meetings: channel meetings, scheduled meetings, and instant meetings.</p>
+<h2 id="meeting-start-event"><a class="header" href="#meeting-start-event">Meeting start event</a></h2>
+<pre><code class="language-typescript">app.on('meetingStart', async ({ activity }) =&gt; {});
 </code></pre>
+<p>The <code>'meetingStart'</code> is alias for the event name <code>'application/vnd.microsoft.meetingStart'</code>. This event is sent when a meeting starts.</p>
+<h2 id="meeting-end-event"><a class="header" href="#meeting-end-event">Meeting end event</a></h2>
+<pre><code class="language-typescript">app.on('meetingEnd', async ({ activity }) =&gt; {});
+</code></pre>
+<p>The <code>'meetingEnd'</code> is the alias for the event name <code>'application/vnd.microsoft.meetingEnd'</code>. This event is sent when a meeting ends.</p>
+<h2 id="app-permissions"><a class="header" href="#app-permissions">App permissions</a></h2>
+<p>In Teams, the app manifest requires specific setup to have meetings permissions.</p>
+<ul>
+<li>The <code>'webApplicationInfo'</code> section must be populated with the <code>'id'</code> and <code>'resource'</code> values.</li>
+<li>The <code>'permissions'</code> section under <code>'authorization'</code> must have the <code>'OnlineMeeting.ReadBasic.Chat'</code> and <code>'ChannelMeeting.ReadBasic.Group'</code> permissions.</li>
+</ul>
+<h2 id="resources"><a class="header" href="#resources">Resources</a></h2>
+<ul>
+<li><a href="https://learn.microsoft.com/en-us/microsoftteams/platform/apps-in-teams-meetings/meeting-apps-apis#example-of-getting-meeting-start-or-end-events">Microsoft Learn: Teams Meeting Extensibility</a></li>
+<li><a href="https://learn.microsoft.com/en-us/microsoftteams/platform/graph-api/rsc/resource-specific-consent">Microsoft Learn: Graph API - Resource specific consent</a></li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../3.basics/9.feedback.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../../9.activity/5.event/1.read-receipt.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../10.teams/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../../9.activity/5.event/3.meeting-participant-events.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -246,11 +261,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../3.basics/9.feedback.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../../9.activity/5.event/1.read-receipt.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../10.teams/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../../9.activity/5.event/3.meeting-participant-events.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
@@ -265,13 +280,13 @@
         </script>
 
 
-        <script src="../elasticlunr.min.js"></script>
-        <script src="../mark.min.js"></script>
-        <script src="../searcher.js"></script>
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
 
-        <script src="../clipboard.min.js"></script>
-        <script src="../highlight.js"></script>
-        <script src="../book.js"></script>
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
 
         <!-- Custom JS scripts -->
 

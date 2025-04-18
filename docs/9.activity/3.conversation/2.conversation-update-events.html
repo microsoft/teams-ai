@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>@Mention - Teams AI SDK (v2)</title>
+        <title>Conversation Update Events - Teams AI SDK (v2)</title>
 
 
         <!-- Custom HTML head -->
@@ -12,32 +12,32 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
-        <link rel="icon" href="../favicon.svg">
-        <link rel="shortcut icon" href="../favicon.png">
-        <link rel="stylesheet" href="../css/variables.css">
-        <link rel="stylesheet" href="../css/general.css">
-        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
-        <link rel="stylesheet" href="../fonts/fonts.css">
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
-        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
-        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+        <link rel="stylesheet" id="highlight-css" href="../../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
 
 
         <!-- Provide site root and default themes to javascript -->
         <script>
-            const path_to_root = "../";
+            const path_to_root = "../../";
             const default_light_theme = "ayu";
             const default_dark_theme = "ayu";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc.js"></script>
+        <script src="../../toc.js"></script>
     </head>
     <body>
     <div id="body-container">
@@ -90,7 +90,7 @@
             <!-- populated by js -->
             <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
             <noscript>
-                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+                <iframe class="sidebar-iframe-outer" src="../../toc.html"></iframe>
             </noscript>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -221,22 +221,66 @@
 }
 
 </style>
-<h1 id="mention"><a class="header" href="#mention">@Mention</a></h1>
-<p>Sending a message at <code>@mentions</code> a user is as simple as:</p>
-<pre><code class="language-typescript">app.on('message', async ({ send, activity }) =&gt; {
-    await send(MessageSendActivity('hi!').mention(activity.from));
+<h1 id="activity-conversation-update-events"><a class="header" href="#activity-conversation-update-events">Activity: Conversation Update Events</a></h1>
+<p>As seen from the previous page, the <code>conversationUpdate</code> activity is used to describe a change in a conversation's members, description, existence, or otherwise. There are several default events that originate from the Agents protocol. However, Teams also has custom events that can be used to extend the conversation update activity.</p>
+<h2 id="default-conversation-update-events"><a class="header" href="#default-conversation-update-events">Default conversation update events</a></h2>
+<p>The following events are part of the original Agents protocol and are supported by Teams.</p>
+<pre><code class="language-typescript">// Initiate an action when a team member is added to a conversation
+app.on('conversationUpdate', async ({ activity }) =&gt; {
+    if (activity.membersAdded) {
+    }
 });
 </code></pre>
-
+<ul>
+<li><code>historyDisclosed</code> - Deprecated</li>
+<li><code>membersAdded</code></li>
+<li><code>membersRemoved</code></li>
+<li><code>topicName</code></li>
+</ul>
+<h2 id="custom-teams-conversation-update-events"><a class="header" href="#custom-teams-conversation-update-events">Custom Teams conversation update events</a></h2>
+<p>The following events are custom to Teams and are not part of the original Agents protocol. These events are handled by the router and can be referenced directly as below.</p>
+<pre><code class="language-typescript">app.on('channelCreated', async ({ activity }) =&gt; {});
+</code></pre>
+<p>The following events are custom to Teams and are not part of the original Agents protocol.</p>
+<ul>
+<li><code>channelCreated</code></li>
+<li><code>channelDeleted</code></li>
+<li><code>channelRenamed</code></li>
+<li><code>channelRestored</code></li>
+<li><code>teamArchived</code></li>
+<li><code>teamDeleted</code></li>
+<li><code>teamHardDeleted</code></li>
+<li><code>teamRenamed</code></li>
+<li><code>teamRestored</code></li>
+<li><code>teamUnarchived</code></li>
+</ul>
+<h2 id="table-of-conversation-update-events"><a class="header" href="#table-of-conversation-update-events">Table of conversation update events</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Event</th><th>Action taken</th><th>Scope</th></tr></thead><tbody>
+<tr><td><code>'channelCreated'</code></td><td>Channel created</td><td>Team</td></tr>
+<tr><td><code>'channelDeleted'</code></td><td>Channel deleted</td><td>Team</td></tr>
+<tr><td><code>'channelRenamed'</code></td><td>Channel renamed</td><td>Team</td></tr>
+<tr><td><code>'channelRestored'</code></td><td>Channel restored</td><td>Team</td></tr>
+<tr><td><code>'historyDisclosed'</code></td><td><em>Deprecated.</em> Whether channel history is disclosed</td><td>Team</td></tr>
+<tr><td><code>'membersAdded'</code></td><td>List of members added</td><td>Personal, Group, Team</td></tr>
+<tr><td><code>'membersRemoved'</code></td><td>List of members removed</td><td>Personal, Group, Team</td></tr>
+<tr><td><code>'teamRenamed'</code></td><td>Team is renamed</td><td>Team</td></tr>
+<tr><td><code>'teamDeleted'</code></td><td>Team is deleted</td><td>Team</td></tr>
+<tr><td><code>'teamHardDeleted'</code></td><td>Team is permanently deleted</td><td>Team</td></tr>
+<tr><td><code>'teamArchived'</code></td><td>Team is archived</td><td>Team</td></tr>
+<tr><td><code>'teamUnarchived'</code></td><td>Team is unarchived</td><td>Team</td></tr>
+<tr><td><code>'teamRestored'</code></td><td>Team is restored after being deleted</td><td>Team</td></tr>
+<tr><td><code>'topicName'</code></td><td>Chat's display name for a group chat</td><td>Group</td></tr>
+</tbody></table>
+</div>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../3.basics/9.feedback.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../../9.activity/3.conversation/1.conversation-update.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../10.teams/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../../9.activity/3.conversation/3.end-of-conversation.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -246,11 +290,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../3.basics/9.feedback.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../../9.activity/3.conversation/1.conversation-update.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../10.teams/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../../9.activity/3.conversation/3.end-of-conversation.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
@@ -265,13 +309,13 @@
         </script>
 
 
-        <script src="../elasticlunr.min.js"></script>
-        <script src="../mark.min.js"></script>
-        <script src="../searcher.js"></script>
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
 
-        <script src="../clipboard.min.js"></script>
-        <script src="../highlight.js"></script>
-        <script src="../book.js"></script>
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
 
         <!-- Custom JS scripts -->
 

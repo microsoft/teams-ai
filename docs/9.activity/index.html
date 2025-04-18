@@ -1,0 +1,381 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Activity - Teams AI SDK (v2)</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "ayu";
+            const default_dark_theme = "ayu";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Teams AI SDK (v2)</h1>
+
+                    <div class="right-buttons">
+                        <a href="http://github.com/microsoft/teams-ai" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <style>
+.mdbook-alerts {
+  padding: 8px 16px;
+  margin-bottom: 16px;
+  border-left: 0.25em solid var(--mdbook-alerts-color);
+}
+
+.mdbook-alerts > *:first-child {
+  margin-top: 0;
+}
+
+.mdbook-alerts > *:last-child {
+  margin-bottom: 0;
+}
+
+.mdbook-alerts-title {
+  display: flex;
+  font-weight: 600;
+  align-items: center;
+  line-height: 1;
+  color: var(--mdbook-alerts-color);
+  text-transform: capitalize;
+}
+
+.mdbook-alerts-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.2em;
+  background-color: currentColor;
+  -webkit-mask: no-repeat center / 100%;
+  mask: no-repeat center / 100%;
+  -webkit-mask-image: var(--mdbook-alerts-icon);
+  mask-image: var(--mdbook-alerts-icon);
+}
+
+.mdbook-alerts-note {
+  --mdbook-alerts-color: rgb(9, 105, 218);
+  /* https://icon-sets.iconify.design/material-symbols/info-outline-rounded/ */
+  --mdbook-alerts-icon: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="24" height="24" viewBox="0 0 24 24"%3E%3Cpath fill="currentColor" d="M12 17q.425 0 .713-.288T13 16v-4q0-.425-.288-.712T12 11q-.425 0-.712.288T11 12v4q0 .425.288.713T12 17m0-8q.425 0 .713-.288T13 8q0-.425-.288-.712T12 7q-.425 0-.712.288T11 8q0 .425.288.713T12 9m0 13q-2.075 0-3.9-.788t-3.175-2.137q-1.35-1.35-2.137-3.175T2 12q0-2.075.788-3.9t2.137-3.175q1.35-1.35 3.175-2.137T12 2q2.075 0 3.9.788t3.175 2.137q1.35 1.35 2.138 3.175T22 12q0 2.075-.788 3.9t-2.137 3.175q-1.35 1.35-3.175 2.138T12 22m0-2q3.35 0 5.675-2.325T20 12q0-3.35-2.325-5.675T12 4Q8.65 4 6.325 6.325T4 12q0 3.35 2.325 5.675T12 20m0-8"%2F%3E%3C%2Fsvg%3E');
+}
+
+.mdbook-alerts-tip {
+  --mdbook-alerts-color: rgb(26, 127, 55);
+  /* https://icon-sets.iconify.design/material-symbols/lightbulb-outline-rounded/ */
+  --mdbook-alerts-icon: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="24" height="24" viewBox="0 0 24 24"%3E%3Cpath fill="currentColor" d="M12 22q-.825 0-1.412-.587T10 20h4q0 .825-.587 1.413T12 22m-3-3q-.425 0-.712-.288T8 18q0-.425.288-.712T9 17h6q.425 0 .713.288T16 18q0 .425-.288.713T15 19zm-.75-3q-1.725-1.025-2.738-2.75T4.5 9.5q0-3.125 2.188-5.312T12 2q3.125 0 5.313 2.188T19.5 9.5q0 2.025-1.012 3.75T15.75 16zm.6-2h6.3q1.125-.8 1.738-1.975T17.5 9.5q0-2.3-1.6-3.9T12 4Q9.7 4 8.1 5.6T6.5 9.5q0 1.35.613 2.525T8.85 14M12 14"%2F%3E%3C%2Fsvg%3E');
+}
+
+.mdbook-alerts-important {
+  --mdbook-alerts-color: rgb(130, 80, 223);
+  /* https://icon-sets.iconify.design/material-symbols/chat-info-outline-rounded/ */
+  --mdbook-alerts-icon: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="24" height="24" viewBox="0 0 24 24"%3E%3Cpath fill="currentColor" d="M12 7q.425 0 .713-.288T13 6q0-.425-.288-.712T12 5q-.425 0-.712.288T11 6q0 .425.288.713T12 7m0 8q.425 0 .713-.288T13 14v-4q0-.425-.288-.712T12 9q-.425 0-.712.288T11 10v4q0 .425.288.713T12 15m-6 3l-2.3 2.3q-.475.475-1.088.213T2 19.575V4q0-.825.588-1.412T4 2h16q.825 0 1.413.588T22 4v12q0 .825-.587 1.413T20 18zm-.85-2H20V4H4v13.125zM4 16V4z"%2F%3E%3C%2Fsvg%3E');
+}
+
+.mdbook-alerts-warning {
+  --mdbook-alerts-color: rgb(154, 103, 0);
+  /* https://icon-sets.iconify.design/material-symbols/warning-outline-rounded/ */
+  --mdbook-alerts-icon: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="24" height="24" viewBox="0 0 24 24"%3E%3Cpath fill="currentColor" d="M2.725 21q-.275 0-.5-.137t-.35-.363q-.125-.225-.137-.488t.137-.512l9.25-16q.15-.25.388-.375T12 3q.25 0 .488.125t.387.375l9.25 16q.15.25.138.513t-.138.487q-.125.225-.35.363t-.5.137zm1.725-2h15.1L12 6zM12 18q.425 0 .713-.288T13 17q0-.425-.288-.712T12 16q-.425 0-.712.288T11 17q0 .425.288.713T12 18m0-3q.425 0 .713-.288T13 14v-3q0-.425-.288-.712T12 10q-.425 0-.712.288T11 11v3q0 .425.288.713T12 15m0-2.5"%2F%3E%3C%2Fsvg%3E');
+}
+
+.mdbook-alerts-caution {
+  --mdbook-alerts-color: rgb(207, 34, 46);
+  /* https://icon-sets.iconify.design/material-symbols/brightness-alert-outline-rounded/ */
+  --mdbook-alerts-icon: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="24" height="24" viewBox="0 0 24 24"%3E%3Cpath fill="currentColor" d="M12 17q.425 0 .713-.288T13 16q0-.425-.288-.712T12 15q-.425 0-.712.288T11 16q0 .425.288.713T12 17m0-4q.425 0 .713-.288T13 12V8q0-.425-.288-.712T12 7q-.425 0-.712.288T11 8v4q0 .425.288.713T12 13m-3.35 7H6q-.825 0-1.412-.587T4 18v-2.65L2.075 13.4q-.275-.3-.425-.662T1.5 12q0-.375.15-.737t.425-.663L4 8.65V6q0-.825.588-1.412T6 4h2.65l1.95-1.925q.3-.275.663-.425T12 1.5q.375 0 .738.15t.662.425L15.35 4H18q.825 0 1.413.588T20 6v2.65l1.925 1.95q.275.3.425.663t.15.737q0 .375-.15.738t-.425.662L20 15.35V18q0 .825-.587 1.413T18 20h-2.65l-1.95 1.925q-.3.275-.662.425T12 22.5q-.375 0-.737-.15t-.663-.425zm.85-2l2.5 2.5l2.5-2.5H18v-3.5l2.5-2.5L18 9.5V6h-3.5L12 3.5L9.5 6H6v3.5L3.5 12L6 14.5V18zm2.5-6"%2F%3E%3C%2Fsvg%3E');
+}
+
+</style>
+<h1 id="activity"><a class="header" href="#activity">Activity</a></h1>
+<!--  The Activity protocol is defined by the [Agents SDK Activity Protocol](https://github.com/microsoft/Agents/blob/main/specs/activity/protocol-activity.md#introduction). -->
+<p>An activity is an application-level representation of conversational actions made by humans and automated software.</p>
+<pre><code class="language-typescript">app.on('activity', async ({ activity }) =&gt; {});
+</code></pre>
+<h2 id="schema"><a class="header" href="#schema">Schema</a></h2>
+<p>Activity objects include a flat list of name/value pairs, called fields. Fields may be primitive and complex types. JSON is used as the common interchange format and although not all activities must be serialized to JSON at all times, they must be serializable to it. This allows implementations to rely on a simple set of conventions for handling known and unknown activity fields.</p>
+<p><code>A2001</code>: Activities MUST be serializable to the JSON format defined in <a href="http://www.ietf.org/rfc/rfc4627.txt">RFC 4627</a> [<a href="#references">14</a>], including adherence to e.g. field uniqueness constraints.</p>
+<p><code>A2002</code>: Receivers MAY allow improperly-cased field names, although this is not required. Receivers MAY reject activities that do not include fields with the proper casing.</p>
+<p><code>A2004</code>: Unless otherwise noted, senders SHOULD NOT include empty string values for string fields.</p>
+<p><code>A2005</code>: Unless otherwise noted, senders MAY include additional fields within the activity or any nested complex objects. Receivers MUST accept fields they do not understand.</p>
+<p><code>A2006</code>: Receivers SHOULD accept events of types they do not understand.</p>
+<p>This document defines data types for fields used within the Activity object. These type definitions include a syntactic type (e.g. <code>string</code> or <code>complex type</code>) and in the case of strings, an optional format (e.g. <a href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO 8601 date time format</a> [<a href="#references">2</a>]).</p>
+<p><code>A2007</code>: Senders MUST adhere to data type definitions contained in this document.</p>
+<p><code>A2003</code>: Receivers SHOULD reject activities that contain field values whose types do not match the data types described in this specification.</p>
+<h3 id="type"><a class="header" href="#type">Type</a></h3>
+<p>The <code>type</code> field controls the meaning of each activity, and are by convention short strings (e.g. "<code>message</code>"). Senders may define their own application-layer types, although they are encouraged to choose values that are unlikely to collide with future well-defined values. If senders use URIs as type values, they SHOULD NOT implement URI ladder comparisons to establish equivalence.</p>
+<p><code>A2010</code>: Activities MUST include a <code>type</code> field, with string value type.</p>
+<p><code>A2011</code>: Two <code>type</code> values are equivalent only if they are ordinally identical.</p>
+<p><code>A2012</code>: A sender MAY generate activity <code>type</code> values not defined in this document.</p>
+<p><code>A2013</code>: A channel SHOULD reject activities of type it does not understand.</p>
+<p><code>A2014</code>: A bot or client SHOULD ignore activities of type it does not understand.</p>
+<h3 id="channel-id"><a class="header" href="#channel-id">Channel ID</a></h3>
+<p>The <code>channelId</code> field establishes the channel and authoritative store for the activity. The value of the <code>channelId</code> field is of type string.</p>
+<blockquote>
+<p>For Teams, the <code>channelId</code> is <code>'msteams'</code>.</p>
+</blockquote>
+<p><code>A2020</code>: Channel Activities MUST include a <code>channelId</code> field, with string value type.</p>
+<p><code>A2021</code>: Two <code>channelId</code> values are equivalent only if they are ordinally identical.</p>
+<p><code>A2022</code>: A channel MAY ignore or reject any activity it receives without an expected <code>channelId</code> value.</p>
+<h3 id="id"><a class="header" href="#id">ID</a></h3>
+<p>The <code>id</code> field establishes the identity for the activity once it has been recorded in the channel. Activities in-flight that have not yet been recorded do not have identities. Not all activities are assigned identities (for example, a <a href="#typing-activity">typing activity</a> may never be assigned an <code>id</code>.) The value of the <code>id</code> field is of type string.</p>
+<p><code>A2030</code>: Channels SHOULD include an <code>id</code> field if it is available for that activity.</p>
+<p><code>A2031</code>: Clients and bots SHOULD NOT include an <code>id</code> field in activities they generate.</p>
+<p>For ease of implementation, it should be assumed that other participants do not have sophisticated knowledge of activity IDs, and that they will use only ordinal comparison to establish equivalency.</p>
+<p>For example, a channel may use hex-encoded GUIDs for each activity ID. Even though GUIDs encoded in uppercase are logically equivalent to GUIDs encoded in lowercase, senders SHOULD NOT use these alternative encodings when possible. The normalized version of each ID is established by the authoritative store, the channel.</p>
+<p><code>A2032</code>: When generating <code>id</code> values, senders SHOULD choose values whose equivalency can be established by ordinal comparison. However, senders and receivers MAY allow logical equivalence of two values that are not ordinally equivalent if they have special knowledge of the circumstances.</p>
+<p>The <code>id</code> field is designed to allow de-duplication, but this is prohibitive in most applications.</p>
+<p><code>A2033</code>: Receivers MAY de-duplicate activities by ID, however senders SHOULD NOT rely on receivers performing this de-duplication.</p>
+<h3 id="timestamp"><a class="header" href="#timestamp">Timestamp</a></h3>
+<p>The <code>timestamp</code> field records the exact UTC time when the activity occurred. Due to the distributed nature of computing systems, the important time is when the channel (the authoritative store) records the activity. The time when a client or bot initiated an activity may be transmitted separately in the <code>localTimestamp</code> field. The value of the <code>timestamp</code> field is an <a href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO 8601 date time format</a> [<a href="#references">2</a>] encoded datetime within a string.</p>
+<p><code>A2040</code>: Channels SHOULD include a <code>timestamp</code> field if it is available for that activity.</p>
+<p><code>A2041</code>: Clients and bots SHOULD NOT include a <code>timestamp</code> field in activities they generate.</p>
+<p><code>A2042</code>: Clients and bots SHOULD NOT use <code>timestamp</code> to reject activities, as they may appear out-of-order. However, they MAY use <code>timestamp</code> to order activities within a UI or for downstream processing.</p>
+<p><code>A2043</code>: Senders SHOULD always use encode the value of <code>timestamp</code> fields as UTC, and they SHOULD always include Z as an explicit UTC mark within the value.</p>
+<h3 id="local-timezone"><a class="header" href="#local-timezone">Local timezone</a></h3>
+<p>The <code>localTimezone</code> field expresses the timezone where the activity was generated. The value of the <code>localTimezone</code> field is a time zone name (zone entry) per the IANA Time Zone database. [<a href="#references">14</a>]</p>
+<p><code>A2055</code>: Clients MAY include the <code>localTimezone</code> in their activities.</p>
+<p><code>A2056</code>: Channels SHOULD preserve <code>localTimezone</code> when forwarding activities from a sender to recipient(s).</p>
+<p><code>A2057</code>: A receiver MAY ignore <code>localTimezone</code> values it does not understand.</p>
+<h3 id="local-timestamp"><a class="header" href="#local-timestamp">Local timestamp</a></h3>
+<p>The <code>localTimestamp</code> field expresses the datetime and timezone offset where the activity was generated. This may be different from the UTC <code>timestamp</code> where the activity was recorded. The value of the <code>localTimestamp</code> field is an ISO 8601 [<a href="#references">2</a>] encoded datetime within a string.</p>
+<p>When both the <code>localTimezone</code> and <code>localTimestamp</code> fields are included in an activity, the interpretation is to first convert the value of the localTimestamp to UTC and then apply a conversion to the local timezone.</p>
+<p><code>A2050</code>: Clients and bots MAY include the <code>localTimestamp</code> field in their activities. They SHOULD explicitly list the timezone offset within the encoded value.</p>
+<p><code>A2051</code>: Channels SHOULD preserve <code>localTimestamp</code> when forwarding activities from a sender to recipient(s).</p>
+<h3 id="from"><a class="header" href="#from">From</a></h3>
+<p>The <code>from</code> field describes which client, bot, or channel generated an activity. The value of the <code>from</code> field is a complex object of the <a href="#channel-account">Channel account</a> type.</p>
+<p>The <code>from.id</code> field identifies who generated an activity. Most commonly, this is another user or bot within the system. In some cases, the <code>from</code> field identifies the channel itself.</p>
+<p><code>A2060</code>: Channels MUST include the <code>from</code> and <code>from.id</code> fields when generating an activity.</p>
+<p><code>A2061</code>: Bots and clients SHOULD include the <code>from</code> and <code>from.id</code> fields when generating an activity. A channel MAY reject an activity due to missing <code>from</code> and <code>from.id</code> fields.</p>
+<p>The <code>from.name</code> field is optional and represents the display name for the account within the channel. Channels SHOULD include this value so clients and bots can populate their UIs and backend systems. Bots and clients SHOULD NOT send this value to channels that have a central record of this store, but they MAY send this value to channels that populate the value on every activity (e.g. an email channel).</p>
+<p><code>A2062</code>: Channels SHOULD include the <code>from.name</code> field if the <code>from</code> field is present and <code>from.name</code> is available.</p>
+<p><code>A2063</code>: Bots and clients SHOULD NOT include the <code>from.name</code> field unless it is semantically valuable within the channel.</p>
+<h3 id="recipient"><a class="header" href="#recipient">Recipient</a></h3>
+<p>The <code>recipient</code> field describes which client or bot is receiving this activity. This field is only meaningful when an activity is transmitted to exactly one recipient; it is not meaningful when it is broadcast to multiple recipients (as happens when an activity is sent to a channel). The purpose of the field is to allow the recipient to identify themselves. This is helpful when a client or bot has more than one identity within the channel. The value of the <code>recipient</code> field is a complex object of the <a href="#channel-account">Channel account</a> type.</p>
+<p><code>A2070</code>: Channels MUST include the <code>recipient</code> and <code>recipient.id</code> fields when transmitting an activity to a single recipient.</p>
+<p><code>A2071</code>: Bots and clients SHOULD NOT include the <code>recipient</code> field when generating an activity. The exception to this is when sending a <a href="#suggestion-activity">Suggestion activity</a>, in which case the recipient MUST identify the user that should receive the suggestion.</p>
+<p>The <code>recipient.name</code> field is optional and represents the display name for the account within the channel. Channels SHOULD include this value so clients and bots can populate their UIs and backend systems.</p>
+<p><code>A2072</code>: Channels SHOULD include the <code>recipient.name</code> field if the <code>recipient</code> field is present and <code>recipient.name</code> is available.</p>
+<h3 id="conversation"><a class="header" href="#conversation">Conversation</a></h3>
+<p>The <code>conversation</code> field describes the conversation in which the activity exists. The value of the <code>conversation</code> field is a complex object of the <a href="#conversation-account">Conversation account</a> type.</p>
+<p><code>A2080</code>: Channels, bots, and clients MUST include the <code>conversation</code> and <code>conversation.id</code> fields when generating an activity.</p>
+<p>The <code>conversation.name</code> field is optional and represents the display name for the conversation if it exists and is available.</p>
+<p><code>A2081</code>: Channels SHOULD include the <code>conversation.name</code> and <code>conversation.isGroup</code> fields if they are available.</p>
+<p><code>A2082</code>: Bots and clients SHOULD NOT include the <code>conversation.name</code> field unless it is semantically valuable within the channel.</p>
+<p><code>A2083</code>: Bots and clients SHOULD NOT include the <code>conversation.isGroup</code> and <code>conversation.converationType</code> fields in activities they generate.</p>
+<p><code>A2084</code>: Channels SHOULD include the <code>conversation.conversationType</code> field if more than one value is defined for the channel. Channels SHOULD NOT include the field if there is only one possible value.</p>
+<h3 id="reply-to-id"><a class="header" href="#reply-to-id">Reply to ID</a></h3>
+<p>The <code>replyToId</code> field identifies the prior activity to which the current activity is a reply. This field allows threaded conversation and comment nesting to be communicated between participants. <code>replyToId</code> is valid only within the current conversation. (See <a href="#relates-to">relatesTo</a> for references to other conversations.) The value of the <code>replyToId</code> field is a string.</p>
+<p><code>A2090</code>: Senders SHOULD include <code>replyToId</code> on an activity when it is a reply to another activity.</p>
+<p><code>A2091</code>: A channel MAY reject an activity if its <code>replyToId</code> does not reference a valid activity within the conversation.</p>
+<p><code>A2092</code>: Bots and clients MAY omit <code>replyToId</code> if it knows the channel does not make use of the field, even if the activity being sent is a reply to another activity.</p>
+<h3 id="entities"><a class="header" href="#entities">Entities</a></h3>
+<p>The <code>entities</code> field contains a flat list of metadata objects pertaining to this activity. Unlike attachments (see the <a href="#attachments">attachments</a> field), entities do not necessarily manifest as user-interactable content elements, and are intended to be ignored if not understood. Senders may include entities they think may be useful to a receiver even if they are not certain the receiver can accept them. The value of each <code>entities</code> list element is a complex object of the <a href="#entity">Entity</a> type.</p>
+<p><code>A2100</code>: Senders SHOULD omit the <code>entities</code> field if it contains no elements.</p>
+<p><code>A2101</code>: Senders MAY send multiple entities of the same type, provided the entities have distinct meaning.</p>
+<p><code>A2102</code>: Senders MUST NOT include two or more entities with identical types and contents.</p>
+<p><code>A2103</code>: Senders and receivers SHOULD NOT rely on specific ordering of the entities included in an activity.</p>
+<p><code>A2104</code>: Receivers MUST ignore entities whose types they do not understand.</p>
+<p><code>A2105</code>: Receivers SHOULD ignore entities whose type they understand but are unable to process due to e.g. syntactic errors.</p>
+<h3 id="channel-data"><a class="header" href="#channel-data">Channel data</a></h3>
+<p>Extensibility data in the activity schema is organized principally within the <code>channelData</code> field. This simplifies plumbing in SDKs that implement the protocol. The format of the <code>channelData</code> object is defined by the channel sending or receiving the activity.</p>
+<p><code>A2200</code>: Channels can define <code>channelData</code> formats that are JSON primitives (e.g., strings, ints). However, they SHOULD define <code>channelData</code> as a complex type, or leave it undefined.</p>
+<p><code>A2201</code>: If the <code>channelData</code> format is undefined for the current channel, receivers SHOULD ignore the contents of <code>channelData</code>.</p>
+<h3 id="caller-id"><a class="header" href="#caller-id">Caller ID</a></h3>
+<p>In some cases, it's important to record where an activity was sent. The <code>callerId</code> field is a string containing an <a href="https://tools.ietf.org/html/rfc3987">IRI</a> [<a href="#references">3</a>] identifying the caller of a bot, described in more detail in <a href="#appendix-v---caller-id-values">Appendix V</a>. This field is not intended to be transmitted over the wire, but is instead populated by bots and clients based on cryptographically verifiable data that asserts the identity of the callers (e.g. tokens).</p>
+<p><code>A2250</code>: Senders SHOULD NOT populate the <code>callerId</code> field.</p>
+<p><code>A2251</code>: Receivers SHOULD discard any data included in the <code>callerId</code> field on the wire.</p>
+<p><code>A2252</code>: Bots SHOULD, after receiving an Activity, populate its <code>callerId</code> field with an identifier described in <a href="#appendix-v---caller-id-values">Appendix V</a></p>
+<h3 id="service-url"><a class="header" href="#service-url">Service URL</a></h3>
+<p>Activities are frequently sent asynchronously, with separate transport connections for sending and receiving traffic. The <code>serviceUrl</code> field is used by channels to denote the URL where replies to the current activity may be sent. The value of the <code>serviceUrl</code> field is of type string.</p>
+<p><code>A2300</code>: Channels MUST include the <code>serviceUrl</code> field in all activities they send to bots.</p>
+<p><code>A2301</code>: Channels SHOULD NOT include the <code>serviceUrl</code> field to clients who demonstrate they already know the channel's endpoint.</p>
+<p><code>A2302</code>: Bots and clients SHOULD NOT populate the <code>serviceUrl</code> field in activities they generate.</p>
+<p><code>A2302</code>: Channels MUST ignore the value of <code>serviceUrl</code> in activities sent by bots and clients.</p>
+<p><code>A2304</code>: Channels SHOULD use stable values for the <code>serviceUrl</code> field as bots may persist them for long periods.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../8.ai/5.memory/2.long-term.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../9.activity/1.message/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../8.ai/5.memory/2.long-term.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../9.activity/1.message/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

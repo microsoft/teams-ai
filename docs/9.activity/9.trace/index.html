@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>@Mention - Teams AI SDK (v2)</title>
+        <title>Trace - Teams AI SDK (v2)</title>
 
 
         <!-- Custom HTML head -->
@@ -12,32 +12,32 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
-        <link rel="icon" href="../favicon.svg">
-        <link rel="shortcut icon" href="../favicon.png">
-        <link rel="stylesheet" href="../css/variables.css">
-        <link rel="stylesheet" href="../css/general.css">
-        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
-        <link rel="stylesheet" href="../fonts/fonts.css">
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
-        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
-        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+        <link rel="stylesheet" id="highlight-css" href="../../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
 
 
         <!-- Provide site root and default themes to javascript -->
         <script>
-            const path_to_root = "../";
+            const path_to_root = "../../";
             const default_light_theme = "ayu";
             const default_dark_theme = "ayu";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc.js"></script>
+        <script src="../../toc.js"></script>
     </head>
     <body>
     <div id="body-container">
@@ -90,7 +90,7 @@
             <!-- populated by js -->
             <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
             <noscript>
-                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+                <iframe class="sidebar-iframe-outer" src="../../toc.html"></iframe>
             </noscript>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -221,24 +221,40 @@
 }
 
 </style>
-<h1 id="mention"><a class="header" href="#mention">@Mention</a></h1>
-<p>Sending a message at <code>@mentions</code> a user is as simple as:</p>
-<pre><code class="language-typescript">app.on('message', async ({ send, activity }) =&gt; {
-    await send(MessageSendActivity('hi!').mention(activity.from));
-});
+<h1 id="activity-trace"><a class="header" href="#activity-trace">Activity: Trace</a></h1>
+<p>The Trace activity is an activity which the developer inserts in to the stream of activities to represent a point in the developers bot logic. The trace activity typically is logged by transcript history components to become part of a <a href="../transcript/transcript.html">Transcript-format</a> history file. In remote debugging scenarios the Trace activity can be sent to the client so that the activity can be inspected as part of the debug flow.</p>
+<p>Trace activities are normally not shown to the user, and are internal to transcript logging and developer debugging.</p>
+<pre><code class="language-typescript">app.on('trace', async ({ activity }) =&gt; {});
 </code></pre>
+<h2 id="schema"><a class="header" href="#schema">Schema</a></h2>
+<p>Trace activities are identified by a <code>type</code> value of <code>trace</code>.</p>
+<p><code>A6150</code>: channels SHOULD NOT display trace activities to the user, unless the user has identified itself as the developer in a secure manner.</p>
+<h3 id="name"><a class="header" href="#name">Name</a></h3>
+<p>The <code>name</code> field controls the name of the trace operation. The value of the <code>name</code> field is of type string.</p>
+<p><code>A6151</code>: Trace activities MAY contain a <code>name</code> field.</p>
+<p><code>A6152</code>: Receivers MUST ignore event activities with <code>name</code> fields they do not understand.</p>
+<h3 id="label"><a class="header" href="#label">Label</a></h3>
+<p>The <code>label</code> field contains optional a label which can provide contextual information about the trace. The value of the <code>label</code> field is of type string.</p>
+<p><code>A6153</code>: Trace activities MAY contain a <code>label</code> field.</p>
+<h3 id="valuetype"><a class="header" href="#valuetype">ValueType</a></h3>
+<p>The <code>valueType</code> field is a string type which contains a unique value which identifies the shape of the <code>value</code> object for this trace.</p>
+<p><code>A6154</code>: The <code>valueType</code> field MAY be missing or empty, if the <code>name</code> property is sufficient to understand the shape of the <code>value</code> property.</p>
+<h3 id="value"><a class="header" href="#value">Value</a></h3>
+<p>The <code>value</code> field contains an object for this trace, as defined by the <code>valueType</code> or <code>name</code> property if there is no <code>valueType</code>. The value of the <code>value</code> field is a complex type.</p>
+<p><code>A6155</code>: The <code>value</code> field MAY be missing or empty.</p>
+<p><code>A6156</code>: Extensions to the trace activity SHOULD NOT require receivers to use any information other than the activity <code>type</code> and <code>name</code> or <code>valueType</code> field to understand the schema of the <code>value</code> field.</p>
+<h3 id="relates-to"><a class="header" href="#relates-to">Relates to</a></h3>
+<p>The <code>relatesTo</code> field references another conversation, and optionally a specific activity within that conversation. The value of the <code>relatesTo</code> field is a complex object of the <a href="#conversation-reference">Conversation reference</a> type.</p>
+<p><code>A6157</code>: <code>relatesTo</code> MAY reference an activity within the conversation identified by the <code>conversation</code> field.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../3.basics/9.feedback.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../../9.activity/8.handoff/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../10.teams/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -246,13 +262,10 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../3.basics/9.feedback.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../../9.activity/8.handoff/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../10.teams/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
             </nav>
 
         </div>
@@ -265,13 +278,13 @@
         </script>
 
 
-        <script src="../elasticlunr.min.js"></script>
-        <script src="../mark.min.js"></script>
-        <script src="../searcher.js"></script>
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
 
-        <script src="../clipboard.min.js"></script>
-        <script src="../highlight.js"></script>
-        <script src="../book.js"></script>
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
 
         <!-- Custom JS scripts -->
 

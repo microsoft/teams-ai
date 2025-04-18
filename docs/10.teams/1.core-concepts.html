@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>@Mention - Teams AI SDK (v2)</title>
+        <title>Core Concepts - Teams AI SDK (v2)</title>
 
 
         <!-- Custom HTML head -->
@@ -221,22 +221,67 @@
 }
 
 </style>
-<h1 id="mention"><a class="header" href="#mention">@Mention</a></h1>
-<p>Sending a message at <code>@mentions</code> a user is as simple as:</p>
-<pre><code class="language-typescript">app.on('message', async ({ send, activity }) =&gt; {
-    await send(MessageSendActivity('hi!').mention(activity.from));
-});
-</code></pre>
+<h1 id="core-teams-concepts"><a class="header" href="#core-teams-concepts">Core Teams Concepts</a></h1>
+<p>When you run your agent on Teams using Teams Toolkit, several Teams-specific processes happen behind the scenes. Understanding these components will help you better debug and deploy your agents. Obviously, all these processes can be done manually, but Teams Toolkit automates them for you.</p>
+<h2 id="core-concepts"><a class="header" href="#core-concepts">Core Concepts</a></h2>
+<p><img src="basic-concepts.png" alt="Basic flow for messages" /></p>
+<p>When working with Teams, these are the key concepts. Keep in mind, this is a simplified view of the architecture.</p>
+<ul>
+<li>Teams Client: This is the Teams application where users interact with your agent. This can be the desktop app, web app, or mobile app.</li>
+<li>Teams Backend: This service handles all the Teams-related operations, including keeping a record of your manifest, and routing messages from your agent to the Azure bot service.</li>
+<li>App Registration: This is the registration of your agent in Azure. This Application Registration issues a unique client ID for your application and a client secret. This is used to authenticate your agent application with the Teams backend and other Azure services (including Graph if you are using it).</li>
+<li>Azure Bot Service: This is the service that handles all the bot-related operations, including routing messages from Teams to your agent and vice versa. This holds the URL to your agent application.</li>
+<li>DevTunnel: This is a service that creates a public facing URL to your locally running application. Azure Bot Service requires that you have a public facing https URL to your agent application.</li>
+<li>Local Agent Application: This is your agent application running on your local machine.</li>
+<li>Deployed Agent Application: This is your deployed agent which probably has a public facing URL.</li>
+</ul>
+<h2 id="devtunnel"><a class="header" href="#devtunnel">DevTunnel</a></h2>
+<p><a href="https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/overview">DevTunnel</a> is a critical component that makes your locally running agent accessible to Teams. When you</p>
+<div class="mdbook-alerts mdbook-alerts-note">
+<p class="mdbook-alerts-title">
+  <span class="mdbook-alerts-icon"></span>
+  note
+</p>
+<p>DevTunnel is only one way of exposing your localling running service to the internet. Other tools like ngrok can also accomplish the same thing.</p>
+</div>
+<ul>
+<li>Creates a secure public HTTPS endpoint that forwards to your local server</li>
+<li>Manages SSL certificates automatically</li>
+<li>Routes Teams messages and events to your local agent</li>
+</ul>
+<h2 id="teams-app-provisioning"><a class="header" href="#teams-app-provisioning">Teams App Provisioning</a></h2>
+<p>Before your agent can interact with Teams, it needs to be properly registered and configured. This step handles creating or updating the App Registration and creating or registering the Azure Bot instance in Azure.</p>
+<h3 id="app-registration"><a class="header" href="#app-registration">App Registration</a></h3>
+<ul>
+<li>Creates an App ID (i.e. Client ID) in the Teams platform</li>
+<li>Sets up a bot registration with the Bot Framework</li>
+<li>Creates a client secret that your agent can use to authenticate to be able to send and receive messages. Teams Toolkit will automatically get this value and store it in the <code>.env</code> file for you.</li>
+</ul>
+<h3 id="azure-bot"><a class="header" href="#azure-bot">Azure Bot</a></h3>
+<ul>
+<li>Creates an Azure Bot resource</li>
+<li>Associates the bot with your App Registration</li>
+<li>Configures the messaging endpoint to point to your DevTunnel (or public URL if deployed)</li>
+</ul>
+<h2 id="sideloading-process"><a class="header" href="#sideloading-process">Sideloading Process</a></h2>
+<p>Sideloading is the process of installing your agent in Teams. You are able to pass in the manifest and icons (zipped up) to the Teams client. Sideloading an application automatically makes that application available to you. You are also able to sideload the application in a Team or a Group chat. In this case, the application will be available to all members of that Team or Group chat.</p>
+<div class="mdbook-alerts mdbook-alerts-important">
+<p class="mdbook-alerts-title">
+  <span class="mdbook-alerts-icon"></span>
+  important
+</p>
+<p>Sideloading needs to be enabled in your tenant. If this is not the case, then you will need to contact your Teams administrator to enable it.</p>
+</div>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../3.basics/9.feedback.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../10.teams/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../10.teams/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../4.dialogs/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -246,11 +291,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../3.basics/9.feedback.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../10.teams/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../10.teams/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../4.dialogs/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

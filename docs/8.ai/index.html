@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>@Mention - Teams AI SDK (v2)</title>
+        <title>🤖 AI - Teams AI SDK (v2)</title>
 
 
         <!-- Custom HTML head -->
@@ -221,22 +221,42 @@
 }
 
 </style>
-<h1 id="mention"><a class="header" href="#mention">@Mention</a></h1>
-<p>Sending a message at <code>@mentions</code> a user is as simple as:</p>
-<pre><code class="language-typescript">app.on('message', async ({ send, activity }) =&gt; {
-    await send(MessageSendActivity('hi!').mention(activity.from));
-});
-</code></pre>
+<h1 id="-ai"><a class="header" href="#-ai">🤖 AI</a></h1>
+<p>Tools that make it easier to integrate apps with LLM's and enabling multi-agent scenarios.
+The <code>@microsoft/teams.ai</code> package has three main components:</p>
+<h2 id="-models"><a class="header" href="#-models">🧠 Models</a></h2>
+<p>A <code>Model</code> is the component that interfaces with the LLM,
+being given some <code>input</code> and returning the <code>output</code>.</p>
+<p>It is in the model implementation that the individual LLM features (ie Streaming/Tools etc)
+are made compatible with the more general features of the <code>@microsoft/teams.ai</code> package.</p>
+<h2 id="-templates"><a class="header" href="#-templates">📄 Templates</a></h2>
+<p>A <code>Template</code> is the component that allows the <code>instructions</code> or "System Prompt" to be
+parsed. Via this abstraction developer can bring their own templating language like
+<code>handlebars</code> if they want.</p>
+<h2 id="-prompts"><a class="header" href="#-prompts">📦 Prompts</a></h2>
+<p>A <code>Prompt</code> is the component that orchestrates everything, it handles state management,
+function definitions, and invokes the model/template when needed.</p>
+<blockquote>
+<p>[<strong>ℹ️ Note</strong>]
+A prompt can have one model and one template. The type of model that can be provided to a
+prompt must match that of the prompt.</p>
+</blockquote>
+<h2 id="---multi-media"><a class="header" href="#---multi-media">💬 🔈 📷 Multi Media</a></h2>
+<p><code>Prompts</code> and <code>Models</code> are typically separated into different media types, but some
+support multiple media types at once.</p>
+<p>The model given to a prompt must have one or more matching media types, this is because
+the media type of a model affects how a prompt will interface with it, and the media type of
+a prompt affects the features it supports <strong>and</strong> how you can interface/prompt it.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../3.basics/9.feedback.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../7.devtools/4.devtools-development.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../10.teams/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../8.ai/1.chat/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -246,11 +266,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../3.basics/9.feedback.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../7.devtools/4.devtools-development.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../10.teams/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../8.ai/1.chat/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
