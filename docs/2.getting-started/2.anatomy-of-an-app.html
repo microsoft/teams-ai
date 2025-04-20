@@ -233,7 +233,7 @@
 <h2 id="core-components"><a class="header" href="#core-components">Core Components</a></h2>
 <p>Let's break down the simple application we created earlier:</p>
 <h3 id="the-app-class"><a class="header" href="#the-app-class">The App Class</a></h3>
-<p>The heart of your application is the <code>App</code> class. This class handles all incoming activities and manages your application's lifecycle. It also acts as a</p>
+<p>The heart of your application is the <code>App</code> class. This class handles all incoming activities and manages your application's lifecycle. It also acts as a way to host your application service.</p>
 <pre><code class="language-typescript">import { App } from "@microsoft/teams.apps";
 import { ConsoleLogger } from "@microsoft/teams.common/logging";
 import { DevtoolsPlugin } from "@microsoft/teams.dev";
@@ -278,7 +278,7 @@ const app = new App({
   await app.start();
 })();
 </code></pre>
-<p>This part initializes your application, and if it's configured for Teams, also authenticates it so that it's ready to send and receive messages.</p>
+<p>This part initializes your application server, and if it's configured for Teams, also authenticates it so that it's ready to send and receive messages.</p>
 <h2 id="next-steps"><a class="header" href="#next-steps">Next Steps</a></h2>
 <p>Now that you understand the basic structure of your Teams application, you're ready to <a href="3.running-in-teams.html">run it in Teams</a>. After that, you can:</p>
 <ul>

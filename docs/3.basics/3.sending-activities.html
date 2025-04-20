@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Sending Activities - Teams AI SDK (v2)</title>
+        <title>Sending Messages - Teams AI SDK (v2)</title>
 
 
         <!-- Custom HTML head -->
@@ -233,6 +233,13 @@
   }
 });
 </code></pre>
+<div class="mdbook-alerts mdbook-alerts-tip">
+<p class="mdbook-alerts-title">
+  <span class="mdbook-alerts-icon"></span>
+  tip
+</p>
+<p>This shows an example of sending a text message. Additionally, you are able to send back things like <a href="../6.cards/">adaptive cards</a>.</p>
+</div>
 <h2 id="reply"><a class="header" href="#reply">Reply</a></h2>
 <blockquote>
 <p>Example: an echo bot that listens for messages sent to it and responds.</p>
@@ -252,11 +259,6 @@
 });
 </code></pre>
 <p><img src="https://github.com/microsoft/teams.ts/blob/main/assets/screenshots/streaming.gif?raw=true" alt="Streaming Activity" /></p>
-<h2 id="proactive-messaging"><a class="header" href="#proactive-messaging">Proactive Messaging</a></h2>
-<p>In the above examples, the bot is reacting to the messages that are sent to it. However, there are times when you want to send a message to the user without them sending a message first. This is called proactive messaging. You can do this by using the <code>send</code> method in the <code>app</code> instance. This is useful for sending notifications or reminders to the user.</p>
-<p>The main thing to note is that you need to have the <code>conversationId</code> of the user you want to send the message to. It's a good idea to store this value somewhere from an activity handler so you can use it for proactive messaging later.</p>
-<pre><code class="language-typescript">await app.send(conversationId, "Don't forget to eat your vegetables!");
-</code></pre>
 
                     </main>
 
@@ -266,7 +268,7 @@
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../3.basics/4.on-event.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../3.basics/13.proactive-messaging.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -280,7 +282,7 @@
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../3.basics/4.on-event.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../3.basics/13.proactive-messaging.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

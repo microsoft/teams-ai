@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Listening To Activities - Teams AI SDK (v2)</title>
+        <title>Proactive Messages - Teams AI SDK (v2)</title>
 
 
         <!-- Custom HTML head -->
@@ -221,27 +221,37 @@
 }
 
 </style>
-<h1 id="-listening-to-activities"><a class="header" href="#-listening-to-activities">👂 Listening To Activities</a></h1>
-<p>To listen/subscribe to different activity types, you can use the <code>on()</code> method.
-Handlers will be called in the order they are added.</p>
-<blockquote>
-<p>Example: an echo bot that listens for messages sent to it and responds.</p>
-</blockquote>
+<h2 id="proactive-messaging"><a class="header" href="#proactive-messaging">Proactive Messaging</a></h2>
+<p>In <a href="./3.sending-activities.html">Sending Activities</a>, we show how we can respond to an event when it happens. However, there are times when you want to send a message to the user without them sending a message first. This is called proactive messaging. You can do this by using the <code>send</code> method in the <code>app</code> instance. This is useful for sending notifications or reminders to the user.</p>
+<p>The main thing to note is that you need to have the <code>conversationId</code> of the chat or channel you want to send the message to. It's a good idea to store this value somewhere from an activity handler so you can use it for proactive messaging later.</p>
 <pre><code class="language-typescript">app.on("message", async ({ activity, send }) =&gt; {
-  await send(`you said: "${activity.text}"`);
+  const conversationId = activity.conversation.id;
+
+  // Store the conversation id somewhere
+  await myStorage.save(conversationId);
 });
 </code></pre>
-<p>Teams exposes a variety of <a href="../9.activity/">activities</a> that your agent can listen to and react to if it chooses. In the above example, the agent is listening to message events. However, it can listen to events such as dialog events, card actions, installation events, conversation updates and more. These events serve as the entrypoint to your application from a Teams agent point of view.</p>
+<p>Then, when you want to send a proactive message, you can retrieve the <code>conversationId</code> from storage and use it to send the message.</p>
+<pre><code class="language-typescript">const conversationId = await myStorage.getConversationId();
+await app.send(conversationId, "Don't forget to eat your vegetables!");
+</code></pre>
+<div class="mdbook-alerts mdbook-alerts-tip">
+<p class="mdbook-alerts-title">
+  <span class="mdbook-alerts-icon"></span>
+  tip
+</p>
+<p>In this example, we show that we get the message using a <code>message</code> event. However, there are many other types of events that can be used to get conversation ids, including <code>conversationUpdate</code>, <code>installUpdate</code>, and <code>invoke</code> events. You can also use the <code>conversationId</code> from the activity object in the <code>activity</code> event handler (<code>app.event('activity', ...)</code>)</p>
+</div>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../3.basics/12.app-class.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../3.basics/3.sending-activities.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../3.basics/2.on-message.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../3.basics/4.on-event.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -251,11 +261,11 @@ Handlers will be called in the order they are added.</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../3.basics/12.app-class.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../3.basics/3.sending-activities.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../3.basics/2.on-message.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../3.basics/4.on-event.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
