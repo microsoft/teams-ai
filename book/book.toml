@@ -15,6 +15,10 @@ sidebar-width = "250px"
 
 [preprocessor.alerts]
 
+[preprocessor.mermaid]
+command = "ts-node book/preprocessors/mermaid.ts"
+debug = false
+
 [output.html]
 default-theme = "ayu"
 preferred-dark-theme = "ayu"

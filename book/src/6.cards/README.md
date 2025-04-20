@@ -7,47 +7,58 @@ The Adaptive Card framework is used across many Microsoft products, including Te
 ## Typescript/Javascript
 
 ```typescript
-import { Card, ColumnSet, Column, Image, CodeBlock } from '@microsoft/teams.cards';
+import {
+  Card,
+  ColumnSet,
+  Column,
+  Image,
+  CodeBlock,
+} from "@microsoft/teams.cards";
 
-Card([ColumnSet([Column([Image('...')]), Column([CodeBlock({ codeSnippet: '...' })])])]);
+Card([
+  ColumnSet([
+    Column([Image("...")]),
+    Column([CodeBlock({ codeSnippet: "..." })]),
+  ]),
+]);
 ```
 
 ## Json
 
 ```json
 {
-    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-    "type": "AdaptiveCard",
-    "version": "1.6",
-    "body": [
+  "$schema": "http://https://adaptivecards.microsoft.com//schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.6",
+  "body": [
+    {
+      "type": "ColumnSet",
+      "columns": [
         {
-            "type": "ColumnSet",
-            "columns": [
-                {
-                    "type": "Column",
-                    "items": [
-                        {
-                            "type": "Image",
-                            "url": "..."
-                        }
-                    ]
-                },
-                {
-                    "type": "Column",
-                    "items": [
-                        {
-                            "type": "CodeBlock",
-                            "codeSnippet": "..."
-                        }
-                    ]
-                }
-            ]
+          "type": "Column",
+          "items": [
+            {
+              "type": "Image",
+              "url": "..."
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "CodeBlock",
+              "codeSnippet": "..."
+            }
+          ]
         }
-    ]
+      ]
+    }
+  ]
 }
 ```
 
-[AdaptiveCards.io](https://adaptivecards.io/)
+[https://adaptivecards.microsoft.com/](https://https://adaptivecards.microsoft.com//)
 
 ## Resources
 

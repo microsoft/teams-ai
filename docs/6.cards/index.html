@@ -225,43 +225,54 @@
 <p>An Adaptive Card contains a freeform body of card elements and optional set of actions. Adaptive Cards are actionable snippets of content that you can add to a conversation through a bot or message extension. Using text, graphics, and buttons, these cards provide rich communication to your audience.</p>
 <p>The Adaptive Card framework is used across many Microsoft products, including Teams. You can send cards inside messages to users via bots or message extensions. Users can also take actions on cards when present.</p>
 <h2 id="typescriptjavascript"><a class="header" href="#typescriptjavascript">Typescript/Javascript</a></h2>
-<pre><code class="language-typescript">import { Card, ColumnSet, Column, Image, CodeBlock } from '@microsoft/teams.cards';
+<pre><code class="language-typescript">import {
+  Card,
+  ColumnSet,
+  Column,
+  Image,
+  CodeBlock,
+} from "@microsoft/teams.cards";
 
-Card([ColumnSet([Column([Image('...')]), Column([CodeBlock({ codeSnippet: '...' })])])]);
+Card([
+  ColumnSet([
+    Column([Image("...")]),
+    Column([CodeBlock({ codeSnippet: "..." })]),
+  ]),
+]);
 </code></pre>
 <h2 id="json"><a class="header" href="#json">Json</a></h2>
 <pre><code class="language-json">{
-    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-    "type": "AdaptiveCard",
-    "version": "1.6",
-    "body": [
+  "$schema": "http://https://adaptivecards.microsoft.com//schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.6",
+  "body": [
+    {
+      "type": "ColumnSet",
+      "columns": [
         {
-            "type": "ColumnSet",
-            "columns": [
-                {
-                    "type": "Column",
-                    "items": [
-                        {
-                            "type": "Image",
-                            "url": "..."
-                        }
-                    ]
-                },
-                {
-                    "type": "Column",
-                    "items": [
-                        {
-                            "type": "CodeBlock",
-                            "codeSnippet": "..."
-                        }
-                    ]
-                }
-            ]
+          "type": "Column",
+          "items": [
+            {
+              "type": "Image",
+              "url": "..."
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "CodeBlock",
+              "codeSnippet": "..."
+            }
+          ]
         }
-    ]
+      ]
+    }
+  ]
 }
 </code></pre>
-<p><a href="https://adaptivecards.io/">AdaptiveCards.io</a></p>
+<p><a href="https://https://adaptivecards.microsoft.com//">https://adaptivecards.microsoft.com/</a></p>
 <h2 id="resources"><a class="header" href="#resources">Resources</a></h2>
 <ul>
 <li><a href="https://learn.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-actions?tabs=json#adaptive-cards-actions">Microsoft Learn: Adaptive Cards Actions</a></li>
