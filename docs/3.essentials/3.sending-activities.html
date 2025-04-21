@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>🚀 Getting Started - Teams AI SDK (v2)</title>
+        <title>Sending Messages - Teams AI SDK (v2)</title>
 
 
         <!-- Custom HTML head -->
@@ -221,18 +221,54 @@
 }
 
 </style>
-<h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
-<p>This guide will help you set up your first Teams AI SDK application. You'll learn the basics of creating an application, understanding its structure, and running it locally. By the end of this guide, you'll have a solid foundation to build upon as you explore more advanced features and capabilities of the SDK.</p>
+<h1 id="-sending-activities"><a class="header" href="#-sending-activities">💬 Sending Activities</a></h1>
+<p>To send an activity you can either use the <code>send</code> or <code>reply</code> methods. You can also <code>stream</code> chunks of an activity.</p>
+<h2 id="send"><a class="header" href="#send">Send</a></h2>
+<blockquote>
+<p>Example: a bot that listens for when a member is added to the conversation and sends a greeting.</p>
+</blockquote>
+<pre><code class="language-typescript">app.on("conversationUpdate", async ({ activity, send }) =&gt; {
+  for (const account of activity.membersAdded || []) {
+    await send(`👋 welcome ${account.name}!`);
+  }
+});
+</code></pre>
+<div class="mdbook-alerts mdbook-alerts-tip">
+<p class="mdbook-alerts-title">
+  <span class="mdbook-alerts-icon"></span>
+  tip
+</p>
+<p>This shows an example of sending a text message. Additionally, you are able to send back things like <a href="../5.in-depth-guides/1.cards/">adaptive cards</a>.</p>
+</div>
+<h2 id="reply"><a class="header" href="#reply">Reply</a></h2>
+<blockquote>
+<p>Example: an echo bot that listens for messages sent to it and responds.</p>
+</blockquote>
+<pre><code class="language-typescript">app.on("message", async ({ activity, reply, send }) =&gt; {
+  await send({ type: "typing" }); // send typing indicator...
+  await reply(`you said: "${activity.text}"`);
+});
+</code></pre>
+<h2 id="streaming"><a class="header" href="#streaming">Streaming</a></h2>
+<pre><code class="language-typescript">app.on("message", async ({ activity, stream }) =&gt; {
+  stream.emit("hello");
+  stream.emit(", ");
+  stream.emit("world!");
+
+  // result message: "hello, world!"
+});
+</code></pre>
+<p><img src="https://github.com/microsoft/teams.ts/blob/main/assets/screenshots/streaming.gif?raw=true" alt="Streaming Activity" /></p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../1.welcome/1.need-for-sdk.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../3.essentials/2.on-message.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../2.getting-started/1.create-application.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../3.essentials/13.proactive-messaging.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -242,11 +278,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../1.welcome/1.need-for-sdk.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../3.essentials/2.on-message.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../2.getting-started/1.create-application.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../3.essentials/13.proactive-messaging.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

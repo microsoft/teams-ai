@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>🚀 Getting Started - Teams AI SDK (v2)</title>
+        <title>Listening To Messages - Teams AI SDK (v2)</title>
 
 
         <!-- Custom HTML head -->
@@ -221,18 +221,27 @@
 }
 
 </style>
-<h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
-<p>This guide will help you set up your first Teams AI SDK application. You'll learn the basics of creating an application, understanding its structure, and running it locally. By the end of this guide, you'll have a solid foundation to build upon as you explore more advanced features and capabilities of the SDK.</p>
+<h1 id="-listening-to-message-activities"><a class="header" href="#-listening-to-message-activities">👂 Listening To Message Activities</a></h1>
+<p>You can listen/subscribe to messages using static text or <code>Regexp</code>. This is a shorthand for <code>app.on('message')</code> activity handler, where it will only trigger the handler if it matches the pattern you have provided. These types of handlers are common enough that we have provided a shorthand for them.</p>
+<blockquote>
+<p>Example: when the user sends a message to the bot with the text <code>/logout</code>
+we send a message back.</p>
+</blockquote>
+<pre><code class="language-typescript">app.message("/logout", async ({ activity, send, signout }) =&gt; {
+  await send("ok, I'll sign you out!");
+  await signout();
+});
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../1.welcome/1.need-for-sdk.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../3.essentials/1.on-activity.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../2.getting-started/1.create-application.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../3.essentials/3.sending-activities.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -242,11 +251,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../1.welcome/1.need-for-sdk.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../3.essentials/1.on-activity.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../2.getting-started/1.create-application.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../3.essentials/3.sending-activities.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

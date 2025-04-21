@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>🚀 Getting Started - Teams AI SDK (v2)</title>
+        <title>🔒 User Authentication - Teams AI SDK (v2)</title>
 
 
         <!-- Custom HTML head -->
@@ -221,18 +221,33 @@
 }
 
 </style>
-<h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
-<p>This guide will help you set up your first Teams AI SDK application. You'll learn the basics of creating an application, understanding its structure, and running it locally. By the end of this guide, you'll have a solid foundation to build upon as you explore more advanced features and capabilities of the SDK.</p>
+<h1 id="--user-authentication"><a class="header" href="#--user-authentication">📖 <a href="https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/authentication/add-authentication">🔒 User Authentication</a></a></h1>
+<p>Prompting the user to sign in using an <code>OAuth</code> connection has
+never been easier! Just use the <code>signin</code> method to send the request
+and the listen to the <code>signin</code> event to handle the token result.</p>
+<pre><code class="language-typescript">app.on('message', async ({ signin, send, isSignedIn }) =&gt; {
+    if (!isSignedIn) {
+        await signin(); // call signin for your auth connection...
+        return;
+    }
+
+    await send('you are already signed in!');
+});
+
+app.event('signin', async ({ token }) =&gt; {
+    // do something with the token...
+});
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../1.welcome/1.need-for-sdk.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../3.essentials/6.api.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../2.getting-started/1.create-application.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../3.essentials/9.feedback.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -242,11 +257,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../1.welcome/1.need-for-sdk.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../3.essentials/6.api.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../2.getting-started/1.create-application.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../3.essentials/9.feedback.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
