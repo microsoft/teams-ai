@@ -44,6 +44,7 @@
   - [Observability](./5.in-depth-guides/6.observability/README.md)
     - [Middleware](./5.in-depth-guides/6.observability/1.middleware.md)
     - [Logging](./5.in-depth-guides/6.observability/2.logging.md)
+  - [Migrating from V1](./5.in-depth-guides/7.migrating-from-v1.md)
 - [🛠️ Developer Tools](./7.developer-tools/README.md)
   - [CLI]()
   - [🛠️ Dev Tools](./7.developer-tools/2.devtools/README.md)
