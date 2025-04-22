@@ -2,7 +2,9 @@ name: Deploy
 on:
   push:
     branches:
-      - aamirj/docsghaction
+      - v2-preview
+    paths:
+      - "book/**"
 
 jobs:
   deploy:
