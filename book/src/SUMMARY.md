@@ -5,7 +5,7 @@
   - [Package Decomposition](./1.welcome/2.package-decomposition.md)
 - [🚀 Getting Started](./2.getting-started/README.md)
   - [Quickstart](./2.getting-started/1.quickstart.md)
-  - [Anatomy of an App](./2.getting-started/2.anatomy-of-an-app.md)
+  - [Anatomy of an App](./2.getting-started/2.code-basics.md)
   - [Running in Teams](./2.getting-started/3.running-in-teams.md)
 - [Essentials](./3.essentials/README.md)
   - [App Basics](./3.essentials/12.app-class.md)
