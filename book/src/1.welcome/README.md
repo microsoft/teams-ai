@@ -1,54 +1,19 @@
-# 📖 Teams SDK: Typescript: Documentation
+# 📖 Teams SDK v2
 
-Microsoft Teams is a feature rich messaging platform. It provides features that developers can use
-to create immersive app experiences, below are some of the different packages/features that can be used with this SDK.
+Teams SDK v2 is a suite of packages used to build on Microsoft Teams Platform.
 
-## [`@microsoft/teams.apps`](https://www.npmjs.com/package/@microsoft/teams.apps)
+## ⭐ What's new?
 
-Tools for building server side apps for Microsoft Teams.
+### Streamlined Developer Experience
+We’ve refined the developer experience so you can concentrate on building your app’s logic— not wrestling with integrations.
 
-## [`@microsoft/teams.api`](https://www.npmjs.com/package/@microsoft/teams.api)
+### Effortless Integration
+We’ve simplified complex integration workflows to help you deliver a richer, more seamless user experience.
 
-Core types and client implementations for the Teams Platform API,
-used for fetching data, authentication, and sending activities.
+### Accelerate Your Workflow
+Get your application up and running in under 30 seconds with our lightning-fast CLI—so you can spend more time on what really matters.
 
-## [`@microsoft/teams.ai`](https://www.npmjs.com/package/@microsoft/teams.ai)
+## 🔎 Navigation Tips
+We encourage you to use the left sidebar to navigate to your desired section.
 
-Tools that make it easier to integrate apps with LLM's and enabling
-multi-agent scenarios.
-
-## [`@microsoft/teams.botbuilder`](https://www.npmjs.com/package/@microsoft/teams.botbuilder)
-
-A plugin implementation, allowing developers to integrate an existing `botbuilder`
-`Adapter` into a project using Teams. This plugin allows you to use `botbuilder`
-as the `Sender` and `Receiver` of activities, while still being able to leverage
-Teams's new typings and routing system.
-
-## [`@microsoft/teams.cards`](https://www.npmjs.com/package/@microsoft/teams.cards)
-
-Adaptive Cards typings and builders for type safe and intuitive card design.
-
-## [`@microsoft/teams.cli`](https://www.npmjs.com/package/@microsoft/teams.cli)
-
-A CLI for building apps using `@microsoft/teams.ts`.
-
-## [`@microsoft/teams.client`](https://www.npmjs.com/package/@microsoft/teams.client)
-
-A client used to create app/bot surfaces such as tabs using `@microsoft/teams.ts`.
-
-## [`@microsoft/teams.common`](https://www.npmjs.com/package/@microsoft/teams.common)
-
-Common implementations used by all the packages, for example `logging`.
-
-## [`@microsoft/teams.dev`](https://www.npmjs.com/package/@microsoft/teams.dev)
-
-Developer tools to streamline the development process.
-
-## [`@microsoft/teams.graph`](https://www.npmjs.com/package/@microsoft/teams.graph)
-
-MSGraph api client.
-
-## [`@microsoft/teams.openai`](https://www.npmjs.com/package/@microsoft/teams.openai)
-
-AI model implementations for `OpenAI`, allowing you to integrate your models
-with the core `@microsoft/teams.ai` package.
+Can't find what you're searching for? Use the search button above.
