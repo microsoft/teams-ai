@@ -1,65 +1,16 @@
-# 📖 [🪪 Cards](https://learn.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/design-effective-cards)
+# Adaptive Cards
 
-An Adaptive Card contains a freeform body of card elements and optional set of actions. Adaptive Cards are actionable snippets of content that you can add to a conversation through a bot or message extension. Using text, graphics, and buttons, these cards provide rich communication to your audience.
+Adaptive Cards provide a flexible, cross-platform content format for creating rich, interactive experiences. They consist of a customizable body of card elements combined with optional action sets, all fully serializable for delivery to clients. Through a powerful combination of text, graphics, and interactive buttons, Adaptive Cards enable compelling user experiences across various platforms.
 
-The Adaptive Card framework is used across many Microsoft products, including Teams. You can send cards inside messages to users via bots or message extensions. Users can also take actions on cards when present.
+The Adaptive Card framework is widely implemented throughout Microsoft's ecosystem, with significant integration in Microsoft Teams. Within Teams, Adaptive Cards power numerous key scenarios including:
 
-## Typescript/Javascript
+- Rich interactive messages
+- Dialogs
+- Message Extensions
+- Link Unfurling
+- Configuration forms
+- And many more application contexts
 
-```typescript
-import {
-  Card,
-  ColumnSet,
-  Column,
-  Image,
-  CodeBlock,
-} from "@microsoft/teams.cards";
+Mastering Adaptive Cards is essential for creating sophisticated, engaging experiences that leverage the full capabilities of the Teams platform. This guide will help you learn how to use them in this SDK.
 
-Card([
-  ColumnSet([
-    Column([Image("...")]),
-    Column([CodeBlock({ codeSnippet: "..." })]),
-  ]),
-]);
-```
-
-## Json
-
-```json
-{
-  "$schema": "http://https://adaptivecards.microsoft.com//schemas/adaptive-card.json",
-  "type": "AdaptiveCard",
-  "version": "1.6",
-  "body": [
-    {
-      "type": "ColumnSet",
-      "columns": [
-        {
-          "type": "Column",
-          "items": [
-            {
-              "type": "Image",
-              "url": "..."
-            }
-          ]
-        },
-        {
-          "type": "Column",
-          "items": [
-            {
-              "type": "CodeBlock",
-              "codeSnippet": "..."
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-```
-
-[https://adaptivecards.microsoft.com/](https://https://adaptivecards.microsoft.com//)
-
-## Resources
-
-- [Microsoft Learn: Adaptive Cards Actions](https://learn.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-actions?tabs=json#adaptive-cards-actions)
+For a more comprehensive guide on Adaptive Cards, see the [official documentation](https://adaptivecards.microsoft.com/).
