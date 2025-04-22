@@ -11,9 +11,11 @@
     "test": "npx turbo test --concurrency=100%",
     "fmt": "npx prettier --write \"**/*.{js,ts,tsx,md,json}\"",
     "docs:build": "mdbook build book",
-    "docs:serve": "mdbook serve book"
+    "docs:serve": "mdbook serve book",
+    "generate:snippets": "bluehawk snip --output book/generated-snippets teams.ts"
   },
   "devDependencies": {
+    "bluehawk": "^1.6.0",
     "prettier": "^3.5.3",
     "turbo": "^2.5.0",
     "typescript": "5.8.2"
