@@ -28,5 +28,3 @@ function createTaskCard() {
     )
   );
 }
-
-const card = createTaskCard();

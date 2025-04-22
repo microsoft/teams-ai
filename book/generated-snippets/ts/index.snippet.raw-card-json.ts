@@ -19,7 +19,6 @@ const rawCard: ICard = {
                 { title: 'Grand Theft Auto V', value: 'grand_theft' },
                 { title: 'Minecraft', value: 'minecraft' },
               ],
-              'choices.data': new ChoiceDataQuery('games'),
               style: 'filtered',
               placeholder: 'Search for a game',
               id: 'choiceGameSingle',
@@ -36,12 +35,9 @@ const rawCard: ICard = {
   actions: [
     {
       title: 'Request purchase',
-      type: 'Action.Submit',
+      type: 'Action.Execute',
+      data: { action: 'purchase_item' },
     },
   ],
   version: '1.5',
 };
-
-// Test just verifies the type system accepts it
-expect(rawCard.type).toBe('AdaptiveCard');
-expect(rawCard.version).toBe('1.5');
