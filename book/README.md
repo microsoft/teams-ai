@@ -18,9 +18,3 @@ npm run docs:build
 ```bash
 npm run docs:serve
 ```
-
-> [!CAUTION]
-> `serve` will include a bunch of websocket code in the output code. Before committing, make sure you run `npm run docs:build`.
-
-
-
