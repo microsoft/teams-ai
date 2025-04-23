@@ -1,4 +1,4 @@
-# Teams AI SDK Docs
+# Teams AI Library Docs
 
 These docs are built using [mdbook](https://github.com/rust-lang/mdBook).
 
