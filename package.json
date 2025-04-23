@@ -12,7 +12,7 @@
     "fmt": "npx prettier --write \"**/*.{js,ts,tsx,md,json}\"",
     "docs:build": "mdbook build book",
     "docs:serve": "mdbook serve book",
-    "generate:snippets": "bluehawk snip --output book/generated-snippets/ts teams.ts --ignore packages/graph/** --ignore !**/*.ts"
+    "gen:snips": "node ./scripts/generate-snippets.js ./book/generated-snippets/ts"
   },
   "devDependencies": {
     "bluehawk": "^1.6.0",
