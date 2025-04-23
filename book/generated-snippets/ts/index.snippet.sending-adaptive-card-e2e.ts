@@ -1,5 +1,6 @@
-function createTaskCard() {
-  return new Card().withBody(
+app.on('message', async ({ send, activity }) => {
+  await send({ type: 'typing' });
+  const card = new Card().withBody(
     new TextBlock('Create New Task', {
       size: 'large',
       weight: 'bolder',
@@ -27,4 +28,8 @@ function createTaskCard() {
         .withStyle('positive')
     )
   );
-}
+  await send(card);
+  // Or build a complex activity out that includes the card:
+  // const message  = new MessageActivity('Enter this form').addCard('adaptive', card);
+  // await send(message);
+});
