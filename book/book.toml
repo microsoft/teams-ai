@@ -3,7 +3,7 @@ authors = ["aacebo <aacebowork@gmail.com>"]
 language = "en"
 multilingual = false
 src = "src"
-title = "Teams AI SDK (v2)"
+title = "Teams AI Library (v2)"
 
 [build]
 build-dir = "../docs"

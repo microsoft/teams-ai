@@ -1,11 +1,11 @@
-# Welcome to the Teams AI SDK v2
+# Welcome to the Teams AI Library v2
 
 > \[!CAUTION]
-> **PREVIEW VERSION** This is a preview version of the Teams AI SDK v2. While we will do our best to avoid breaking changes, some breaking changes should be expected until the first major version.
+> **PREVIEW VERSION** This is a preview version of the Teams AI Library v2. While we will do our best to avoid breaking changes, some breaking changes should be expected until the first major version.
 
 ## Overview
 
-Teams AI SDK v2 represents a fundamental reimagining of how Teams apps and AI agents are built, while maintaining compatibility with existing botframework-based agents. This new version focuses on developer experience, simplified architecture, and enhanced AI capabilities.
+Teams AI Library v2 represents a fundamental reimagining of how Teams apps and AI agents are built, while maintaining compatibility with existing botframework-based agents. This new version focuses on developer experience, simplified architecture, and enhanced AI capabilities.
 
 For a detailed explanation of the motivations and architectural decisions behind v2, please see our [WHY.md](./WHY.md) document.
 
