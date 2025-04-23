@@ -1,11 +1,11 @@
 # 📖 Teams SDK v2
 
-Teams SDK v2 is a suite of packages used to build on Microsoft Teams Platform.
+Teams SDK v2 is a suite of packages used to develop on Microsoft Teams. Rebuilt from the ground up with improved developer experience in mind, create powerful agents and applications today.
 
 ## ⭐ What's new?
 
 ### Streamlined Developer Experience
-We’ve refined the developer experience so you can concentrate on building your app’s logic— not wrestling with integrations.
+We’ve refined the developer experience so you can concentrate on building your app’s logic — not wrestling with integrations.
 
 ### Effortless Integration
 We’ve simplified complex integration workflows to help you deliver a richer, more seamless user experience.
