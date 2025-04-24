@@ -32,7 +32,8 @@ app.on('dialog.submit', async ({ activity, send, next }) => {
         // This indicates that the dialog flow should continue
         type: 'continue',
         value: {
-          title: `Thanks ${name} - Get Email`, // Here we customize the title based on the previous response
+          // Here we customize the title based on the previous response
+          title: `Thanks ${name} - Get Email`,
           card: cardAttachment('adaptive', nextStepCard),
         },
       },

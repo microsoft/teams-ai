@@ -23,7 +23,7 @@ app.on('message', async ({ send }) => {
       },
       // Special type of action to open a dialog
       new TaskFetchAction({})
-        .withTitle('Webpage Dialogx')
+        .withTitle('Webpage Dialog')
         // This data will be passed back in an event so we can
         // handle what to show in the dialog
         .withValue(new TaskFetchData({ opendialogtype: 'webpage_dialog' })),
