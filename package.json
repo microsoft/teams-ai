@@ -28,5 +28,11 @@
     "apps/*",
     "packages/*",
     "book"
-  ]
+  ],
+  "tsconfig": {
+    "exclude": [
+      "node_modules",
+      "book/generated-snippets"
+    ]
+  }
 }
