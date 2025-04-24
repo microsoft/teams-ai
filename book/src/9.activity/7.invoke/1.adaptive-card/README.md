@@ -7,9 +7,9 @@ Invokes on Adaptive Cards are used to perform some action dependent on interacti
 ```typescript
 // Long-hand form of retrieving the invoke value
 app.on('invoke', async ({ activity }) => {
-    if (activity.name === 'adaptiveCard/action') {
-        const { action } = activity.value;
-    }
+  if (activity.name === 'adaptiveCard/action') {
+    const { action } = activity.value;
+  }
 });
 ```
 

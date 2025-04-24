@@ -7,7 +7,7 @@ Typing activities are intended to persist within UIs for three seconds.
 ```typescript
 // Send a typing indicator to the user upon receiving a message
 app.on('message', async ({ send }) => {
-    await send({ type: 'typing' });
+  await send({ type: 'typing' });
 });
 ```
 
