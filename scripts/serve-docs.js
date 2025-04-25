@@ -26,7 +26,6 @@ const checkForErrors = (data) => {
 };
 
 child.stdout.on("data", checkForErrors);
-child.stderr.on("data", checkForErrors);
 
 // Handle clean shutdown
 process.on("SIGINT", () => {
