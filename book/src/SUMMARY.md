@@ -55,7 +55,6 @@
     - [💬 Chat](./7.developer-tools/2.devtools/1.chat.md)
     - [🔍 Inspect](./7.developer-tools/2.devtools/2.inspect.md)
     - [🪪 Cards](./7.developer-tools/2.devtools/3.cards.md)
-    - [Development](./7.developer-tools/2.devtools/4.devtools-development.md)
 - [Activity](./9.activity/README.md)
   - [Message](./9.activity/1.message/README.md)
     - [Message Update](./9.activity/1.message/1.message-update.md)
