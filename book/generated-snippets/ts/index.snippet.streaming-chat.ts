@@ -1,4 +1,4 @@
-app.on('message', async ({ stream, activity, next }) => {
+app.on('message', async ({ stream, send, activity, next }) => {
   // const query = activity.text;
 
   const prompt = new ChatPrompt({
@@ -14,5 +14,9 @@ app.on('message', async ({ stream, activity, next }) => {
     },
   });
 
-  console.log('final response', response.content);
+  if (activity.conversation.isGroup && response.content) {
+    // If the conversation is a group chat, we need to send the final response
+    // back to the group chat
+    await send(response.content);
+  }
 });
