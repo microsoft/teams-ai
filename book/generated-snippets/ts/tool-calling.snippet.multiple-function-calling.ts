@@ -1,4 +1,4 @@
-// query could be something like "what's my weather?"
+// activity.text could be something like "what's my weather?"
 // The LLM will need to first figure out the user's location
 // Then pass that in to the weatherSearch
 const prompt = new ChatPrompt({
@@ -50,5 +50,5 @@ const prompt = new ChatPrompt({
   );
 
 // The LLM will then produce a final response to be sent back to the user
-const result = await prompt.send(query);
+const result = await prompt.send(activity.text);
 await send(result.content ?? 'Sorry I could not figure it out');

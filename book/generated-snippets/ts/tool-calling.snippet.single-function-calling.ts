@@ -1,4 +1,4 @@
-// query could be something like "pikachu"
+// activity could have text like 'pikachu'
 const prompt = new ChatPrompt({
   instructions: 'You are a helpful assistant that can look up Pokemon for the user.',
   model,
@@ -39,5 +39,5 @@ const prompt = new ChatPrompt({
   );
 
 // The LLM will then produce a final response to be sent back to the user
-const result = await prompt.send(query);
+const result = await prompt.send(activity.text);
 await send(result.content ?? 'Sorry I could not find that pokemon');

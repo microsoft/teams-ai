@@ -2,7 +2,7 @@ app.on('message', async ({ stream, send, activity, next }) => {
   // const query = activity.text;
 
   const prompt = new ChatPrompt({
-    instructions: 'You are a friendly assistant who responds on wordy prose',
+    instructions: 'You are a friendly assistant who responds in terse language',
     model,
   });
 
@@ -14,9 +14,13 @@ app.on('message', async ({ stream, send, activity, next }) => {
     },
   });
 
-  if (activity.conversation.isGroup && response.content) {
+  if (activity.conversation.isGroup) {
     // If the conversation is a group chat, we need to send the final response
     // back to the group chat
-    await send(response.content);
+    const activity = new MessageActivity(response.content).addAiGenerated();
+    await send(activity);
+  } else {
+    // We wrap the final response with an AI Generated indicator
+    stream.emit(new MessageActivity().addAiGenerated());
   }
 });

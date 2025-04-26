@@ -27,7 +27,11 @@ export const handleStatefulConversation = async (
   const result = await prompt.send(activity.text);
 
   if (result) {
-    await send(result.content ?? 'I did not generate a response.');
+    await send(
+      result.content != null
+        ? new MessageActivity(result.content).addAiGenerated()
+        : 'I did not generate a response.'
+    );
   }
 
   console.log('Messages after sending to prompt:', existingMessages);

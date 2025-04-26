@@ -13,7 +13,8 @@ app.on('message', async ({ send, activity, next }) => {
 
   const response = await prompt.send(activity.text);
   if (response.content) {
-    await send(response.content);
+    const activity = new MessageActivity(response.content).addAiGenerated();
+    await send(activity);
     // Ahoy, matey! 🏴‍☠️ How be ye doin' this fine day on th' high seas? What can this ol’ salty sea dog help ye with? 🚢☠️
   }
 });
