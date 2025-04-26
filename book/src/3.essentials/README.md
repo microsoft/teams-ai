@@ -9,9 +9,9 @@ All contexts have access to the apps `Logger` instance.
 
 ```typescript
 app.on('activity', async ({ log, activity }) => {
-    log.info(activity);
-    log.warn(activity);
-    log.error(activity);
-    log.debug(activity);
+  log.info(activity);
+  log.warn(activity);
+  log.error(activity);
+  log.debug(activity);
 });
 ```

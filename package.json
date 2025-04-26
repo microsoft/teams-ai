@@ -10,9 +10,9 @@
     "lint:fix": "npx turbo lint:fix",
     "test": "npx turbo test --concurrency=100%",
     "fmt": "npx prettier --write \"**/*.{js,ts,tsx,md,json}\"",
-    "docs:build": "mdbook build book",
-    "docs:serve": "mdbook serve book",
-    "gen:snips": "node ./scripts/generate-snippets.js ./book/generated-snippets/ts"
+    "docs:build": "node ./scripts/build-docs.js",
+    "docs:serve": "node ./scripts/serve-docs.js",
+    "gen:snips": "node ./scripts/generate-snippets.js"
   },
   "devDependencies": {
     "bluehawk": "^1.6.0",
@@ -21,12 +21,18 @@
     "typescript": "5.8.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "packageManager": "npm@10.9.2",
   "workspaces": [
     "apps/*",
     "packages/*",
     "book"
-  ]
+  ],
+  "tsconfig": {
+    "exclude": [
+      "node_modules",
+      "book/generated-snippets"
+    ]
+  }
 }
