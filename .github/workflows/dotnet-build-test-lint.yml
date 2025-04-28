@@ -39,9 +39,9 @@ jobs:
       - name: Restore
         run: dotnet restore Microsoft.Teams.AI.sln
       - name: Build
-        run: dotnet build Microsoft.Teams.AI.sln --no-restore --configuration Debug
+        run: dotnet build Microsoft.Teams.AI.sln --no-restore --configuration Release
       - name: Test
-        run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.Teams.AI.Tests.csproj --no-restore --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration Debug
+        run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.Teams.AI.Tests.csproj --no-restore --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration Release
       - name: Coverage
         uses: danielpalme/ReportGenerator-GitHub-Action@25b1e0261a9f68d7874dbbace168300558ef68f7 # 5.4.5
         with:
