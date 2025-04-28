@@ -15,6 +15,9 @@ variables:
   buildConfiguration: 'Release'
   package: 'dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/Microsoft.Teams.AI.csproj'
   folderPath: 'dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI'
+  appRegistrationTenantId: 'cdc5aeea-15c5-4db6-b079-fcadd2505dc2'
+  authenticodeSignId: '2d5c4ab9-0b7e-4f60-bb92-70322df77b94'
+  nugetSignId: 'a94a770a-9a7b-4888-a3ea-24584b851e49'
 
 steps:
 - task: UseDotNet@2
@@ -39,10 +42,10 @@ steps:
   displayName: "Authenticode Sign dll"
   inputs:
     ConnectedServiceName: 'TeamsESRP-CP-230012'
-    AppRegistrationTenantId: cdc5aeea-15c5-4db6-b079-fcadd2505dc2
-    AppRegistrationClientId: 2d5c4ab9-0b7e-4f60-bb92-70322df77b94
-    AuthSignCertName: 2d5c4ab9-0b7e-4f60-bb92-70322df77b94
-    EsrpClientId: 2d5c4ab9-0b7e-4f60-bb92-70322df77b94
+    AppRegistrationTenantId: '$(appRegistrationTenantId)'
+    AppRegistrationClientId: '$(authenticodeSignId)'
+    AuthSignCertName: '$(authenticodeSignId)'
+    EsrpClientId: '$(authenticodeSignId)'
     AuthAKVName: esrp-teams
     UseMSIAuthentication: true
     FolderPath: '$(folderPath)'
@@ -91,10 +94,10 @@ steps:
   displayName: 'Sign Nuget package'
   inputs:
     ConnectedServiceName: 'TeamsESRP-CP-401405'
-    AppRegistrationTenantId: cdc5aeea-15c5-4db6-b079-fcadd2505dc2
-    AppRegistrationClientId: a94a770a-9a7b-4888-a3ea-24584b851e49
-    AuthSignCertName: a94a770a-9a7b-4888-a3ea-24584b851e49
-    EsrpClientId: a94a770a-9a7b-4888-a3ea-24584b851e49
+    AppRegistrationTenantId: '$(appRegistrationTenantId)'
+    AppRegistrationClientId: '$(nugetSignId)'
+    AuthSignCertName: '$(nugetSignId)'
+    EsrpClientId: '$(nugetSignId)'
     AuthAKVName: esrp-teams
     UseMSIAuthentication: true
     FolderPath: '$(Build.ArtifactStagingDirectory)'
