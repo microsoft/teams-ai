@@ -27,6 +27,9 @@ npm install -g @microsoft/teams.cli@latest
 
 The `new` token will create a brand new agent with `app-name` applied as the directory name and project name.
 
+> [!NOTE]
+> The name you choose may have case changes when applied; for example, "My App" would become "my-app' due to the requirements for `package.json` files.
+
 ### Optional parameters
 
 > [!TIP]
@@ -35,8 +38,8 @@ The `new` token will create a brand new agent with `app-name` applied as the dir
 - `--template`: Ready-to-run templates that serve as a starting point depending on your scenario. Template examples include `ai`, `echo`, `graph`, and more.
 - `--start`: Run the agent immediately upon finishing the creation of the project.
 - `--toolkit` or `--ttk`: Include the configuration files required to run the agent in the debugger via the [Teams Toolkit](https://github.com/OfficeDev/teams-toolkit) extension. Options include `basic`, `embed`, and `oauth`, and more may be added in the future.
-- `client-id`: The app client id, if you already have deployed a resource. This will be added to the root `.env` file of the project.
-- `client-secret`: The app client secret, if you already have deployed a resource. This will be added to the root `.env` file of the project.
+- `--client-id`: The app client id, if you already have deployed a resource. This will be added to the root `.env` file of the project.
+- `--client-secret`: The app client secret, if you already have deployed a resource. This will be added to the root `.env` file of the project.
 
 ## Add Teams Toolkit configuration to existing agent
 
