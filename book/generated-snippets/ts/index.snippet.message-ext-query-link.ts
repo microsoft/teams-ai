@@ -4,21 +4,21 @@ app.on('message.ext.query-link', async ({ activity }) => {
   if (!url) {
     return {
       status: 400,
-      body: {}
+      body: {},
     };
   }
 
   const { card, thumbnail } = createLinkUnfurlCard(url);
   const attachment = {
     ...cardAttachment('adaptive', card),
-    preview: cardAttachment('thumbnail', thumbnail)
+    preview: cardAttachment('thumbnail', thumbnail),
   };
 
   return {
     composeExtension: {
       type: 'result',
       attachmentLayout: 'list',
-      attachments: [attachment]
-    }
+      attachments: [attachment],
+    },
   };
 });

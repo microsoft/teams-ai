@@ -4,24 +4,24 @@ app.on('message.ext.query', async ({ activity }) => {
 
   if (commandId == 'searchQuery') {
     const cards = await createDummyCards(searchQuery);
-    const attachments = cards.map(({card, thumbnail}) => { 
+    const attachments = cards.map(({ card, thumbnail }) => {
       return {
         ...cardAttachment('adaptive', card),
-        preview: cardAttachment('thumbnail', thumbnail)
-      }
+        preview: cardAttachment('thumbnail', thumbnail),
+      };
     });
 
     return {
       composeExtension: {
         type: 'result',
         attachmentLayout: 'list',
-        attachments: attachments
-      }
+        attachments: attachments,
+      },
     };
   }
 
   return {
     status: 400,
-    body: {}
+    body: {},
   };
 });

@@ -21,7 +21,6 @@ There are three different areas action commands can be invoked from:
 > [!tip]
 > See this [guide](https://learn.microsoft.com/en-us/microsoftteams/platform/messaging-extensions/how-to/action-commands/define-action-command?tabs=Teams-toolkit%2Cdotnet#select-action-command-invoke-locations) to learn more about the different action command invocation locations.
 
-
 ## Setting up your Teams app manifest
 
 To use action commands you have define them in the Teams app manifest. Here is an example:
@@ -84,14 +83,14 @@ To use action commands you have define them in the Teams app manifest. Here is a
     }
 ]
 ```
+
 Here we are defining three different commands:
 
 1. `createCard` - that can be invoked from either the `compose` or `commandBox` areas. Upon invocation a dialog will popup asking the user to fill the `title`, `subTitle`, and `text`.
 
 2. `getMessageDetails` - It is invoked from the `message` bubble. Upon invocation the message payload will be sent to the app which will then return the details like `createdDate`...etc.
 
-3. `fetchConversationMembers` - It is invoked from the `compose` area. Upon invocation the app will return an adaptive card in the form of a dialog with the conversation roster. 
-
+3. `fetchConversationMembers` - It is invoked from the `compose` area. Upon invocation the app will return an adaptive card in the form of a dialog with the conversation roster.
 
 ## Handle submission
 
