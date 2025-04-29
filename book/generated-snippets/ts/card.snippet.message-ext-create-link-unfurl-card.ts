@@ -4,7 +4,7 @@ export function createLinkUnfurlCard(url: string) {
     text: url,
     images: [
       {
-        url: 'https://raw.githubusercontent.com/microsoft/botframework-sdk/master/icon.png',
+        url: IMAGE_URL,
       },
     ],
   } as ThumbnailCard;
