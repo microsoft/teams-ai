@@ -15,7 +15,7 @@ const prompt = new ChatPrompt({
       const locations = ['Seattle', 'San Francisco', 'New York'];
       const randomIndex = Math.floor(Math.random() * locations.length);
       const location = locations[randomIndex];
-      console.log('Found user location', location);
+      log.info('Found user location', location);
       return location;
     }
   )
@@ -44,7 +44,7 @@ const prompt = new ChatPrompt({
         return 'Sorry, I could not find the weather for that location';
       }
 
-      console.log('Found weather', weather);
+      log.info('Found weather', weather);
       return weather;
     }
   );

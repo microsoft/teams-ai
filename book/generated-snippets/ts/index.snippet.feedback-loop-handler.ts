@@ -1,7 +1,7 @@
-app.on('message.submit.feedback', async ({ activity }) => {
+app.on('message.submit.feedback', async ({ activity, log }) => {
   const { reaction, feedback: feedbackJson } = activity.value.actionValue;
   if (activity.replyToId == null) {
-    console.warn(`No replyToId found for messageId ${activity.id}`);
+    log.warn(`No replyToId found for messageId ${activity.id}`);
     return;
   }
   const existingFeedback = storedFeedbackByMessageId.get(activity.replyToId);
@@ -10,7 +10,7 @@ app.on('message.submit.feedback', async ({ activity }) => {
    * {"feedbackText":"Nice!"}
    */
   if (!existingFeedback) {
-    console.warn(`No feedback found for messageId ${activity.id}`);
+    log.warn(`No feedback found for messageId ${activity.id}`);
   } else {
     storedFeedbackByMessageId.set(activity.id, {
       ...existingFeedback,
