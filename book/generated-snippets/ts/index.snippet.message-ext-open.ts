@@ -4,16 +4,13 @@ app.on('message.ext.open', async ({ activity, api }) => {
   const card = createConversationMembersCard(members);
 
   return {
-    status: 200,
-    body: {
-      task: {
-        type: 'continue',
-        value: {
-          title: 'Conversation members',
-          height: 'small',
-          width: 'small',
-          card: cardAttachment('adaptive', card),
-        },
+    task: {
+      type: 'continue',
+      value: {
+        title: 'Conversation members',
+        height: 'small',
+        width: 'small',
+        card: cardAttachment('adaptive', card),
       },
     },
   };

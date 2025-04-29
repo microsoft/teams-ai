@@ -6,8 +6,8 @@ app.on('message.ext.query', async ({ activity }) => {
     const cards = await createDummyCards(searchQuery);
     const attachments = cards.map(({ card, thumbnail }) => {
       return {
-        ...cardAttachment('adaptive', card),
-        preview: cardAttachment('thumbnail', thumbnail),
+        ...cardAttachment('adaptive', card), // expanded card in the compose box...
+        preview: cardAttachment('thumbnail', thumbnail), // preview card in the compose box...
       };
     });
 
@@ -20,8 +20,5 @@ app.on('message.ext.query', async ({ activity }) => {
     };
   }
 
-  return {
-    status: 400,
-    body: {},
-  };
+  return { status: 400 };
 });

@@ -1,6 +1,6 @@
-app.on('message.ext.submit', async ({ send, activity }) => {
+app.on('message.ext.submit', async ({ activity }) => {
   const { commandId } = activity.value;
-  let card: Card;
+  let card: ICard;
 
   if (commandId === 'createCard') {
     // activity.value.commandContext == "compose"
@@ -12,10 +12,11 @@ app.on('message.ext.submit', async ({ send, activity }) => {
     throw new Error(`Unknown commandId: ${commandId}`);
   }
 
-  await send(card);
-
   return {
-    status: 200,
-    body: {},
+    composeExtension: {
+      type: 'result',
+      attachmentLayout: 'list',
+      attachments: [cardAttachment('adaptive', card)],
+    },
   };
 });
