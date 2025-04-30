@@ -1,6 +1,25 @@
 # Teams AI Library Docs
 
+## Introducing `mdbook`
+
 These docs are built using [mdbook](https://github.com/rust-lang/mdBook).
+
+`mdbook` is a tool that allows you to write documentation in markdown. Please see the [`mdbook` documentation](https://rust-lang.github.io/mdBook/index.html) for detailed documentation on editing and adding content.
+
+## Installing mdbook
+
+- If you do not have cargo installed, please see the [rust installation guide](https://www.rust-lang.org/tools/install).
+- Once cargo is installed, be sure to add cargo/env to your PATH and source it:
+
+```sh
+# Configure shell for cargo on Mac
+cd $HOME/.cargo
+ls # Should see a cargo/env file
+source $HOME/.cargo/env
+echo $PATH # Should see cargo/bin in the path
+source ~/.zshrc # or ~/.bashrc
+```
+
 
 ## Prerequisites
 
