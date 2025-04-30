@@ -11,10 +11,15 @@ For a detailed explanation of the motivations and architectural decisions behind
 
 ### Quick start
 
-The Teams CLI makes it easy to bootstrap your first agent.
+The Teams CLI makes it easy to bootstrap your first agent. First, install the CLI via NPM:
 
 ```sh
 npm install -g @microsoft/teams.cli@latest
+```
+
+Next, use the CLI to create your agent:
+
+```sh
 teams new quote-agent --template echo
 ```
 
