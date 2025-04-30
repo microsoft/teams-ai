@@ -20,8 +20,8 @@ const prepareOutputFolder = (folder) => {
     // Just create it if it doesn't exist
     if (!fs.existsSync(resolvedOutputPath)) {
       fs.mkdirSync(resolvedOutputPath, { recursive: true });
-      return;
     }
+    return;
   }
 
   // Remove existing folder if it exists and if it's not the current working directory
@@ -77,7 +77,8 @@ for (let i = 0; i < extraArgs.length; i++) {
 const finalArgs = { ...defaultArgs, ...extraArgsMap };
 
 // Prepare output directory
-prepareOutputFolder(finalArgs['--output'][0]);
+const outputDir = finalArgs['--output'][0];
+prepareOutputFolder(outputDir);
 
 // Convert to array of args
 const allArgs = ['snip', finalArgs.input];

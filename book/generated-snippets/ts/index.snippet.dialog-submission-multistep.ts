@@ -47,5 +47,4 @@ app.on('dialog.submit', async ({ activity, send, next }) => {
       status: 200,
     };
   }
-
 });
