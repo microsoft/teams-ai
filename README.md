@@ -9,6 +9,47 @@ Teams AI Library v2 represents a fundamental reimagining of how Teams apps and A
 
 For a detailed explanation of the motivations and architectural decisions behind v2, please see our [WHY.md](./WHY.md) document.
 
+### Quick start
+
+The Teams CLI makes it easy to bootstrap your first agent.
+
+```sh
+npm install -g @microsoft/teams.cli@latest
+teams new quote-agent --template echo
+```
+
+For more information, follow our [quick start guide](book/src/2.getting-started/1.quickstart.md).
+
+### SDK
+
+Microsoft Teams has a robust developer ecosystem with a broad suite of capabilities, now unified via Teams AI v2. Whether you are building [AI-powered agents](book/src/5.in-depth-guides/5.ai/README.md), [message extensions](book/src/5.in-depth-guides/3.message-extensions/README.md), embedded web applications, or Graph, Teams AI v2 has you covered.
+
+Here is a simple example, which responds to incoming messages with information retrieved from Graph.
+
+```typescript
+import { App } from '@microsoft/teams.apps';
+import { DevtoolsPlugin } from '@microsoft/teams.dev';
+
+const app = new App({
+  plugins: [new DevtoolsPlugin()],
+});
+
+// Listen for incoming messages
+app.on('message', async ({ api, isSignedIn, send, signin }) => {
+  if (!isSignedIn) {
+    await signin(); // initiates Entra login flow
+    return;
+  }
+  const me = await api.user.me.get();
+  await send(`Hello, ${me.displayName} from Earth!`);
+});
+
+// Start your application
+(async () => {
+  await app.start();
+})();
+```
+
 ## SDK Language Support
 
 This repository contains submodules that point to dedicated repositories for different language implementations of the SDK:
