@@ -11,4 +11,4 @@ new ActionSet(
     .withData({ action: 'submit_feedback' })
     .withAssociatedInputs('auto'),
   new OpenUrlAction('https://adaptivecards.microsoft.com').withTitle('Learn More')
-);
+)

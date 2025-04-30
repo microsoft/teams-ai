@@ -4,3 +4,4 @@ coverage
 docs
 packages/graph/src
 book/*.min.js
+book/
