@@ -14,7 +14,7 @@ the complexities of the Models to provide a common interface.
 A `Model` is the component that interfaces with the LLM, being given some `input` and returning the `output`.
 This layer deals with any of the nuances of the particular Models being used.
 
-It is in the model implementation that the individual LLM features (ie Streaming/Tools etc)
+It is in the model implementation that the individual LLM features (i.e. streaming/tools etc.)
 are made compatible with the more general features of the `@microsoft/teams.ai` package.
 
 > [!NOTE]
