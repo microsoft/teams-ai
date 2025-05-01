@@ -7,10 +7,12 @@ const path = require('path');
 const args = process.argv.slice(2);
 // Check if there are any script args
 const possibleScriptArgs = ['--clear-existing-snips'];
-const clearExistingSnips = args.includes('--clear-existing-snips') || false;
 
 // Remove any script-related args from the command line arguments
 const extraArgs = args.filter((arg) => !possibleScriptArgs.includes(arg));
+
+// Check if clearExistingSnips is set
+const clearExistingSnips = extraArgs.includes('--clear-existing-snips');
 
 const prepareOutputFolder = (folder) => {
   const resolvedOutputPath = path.resolve(folder);
