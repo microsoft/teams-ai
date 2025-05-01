@@ -2,7 +2,7 @@
 
 - [👋 Welcome](./1.welcome/README.md)
   - [Why an SDK?](./1.welcome/1.need-for-sdk.md)
-  - [Package Decomposition](./1.welcome/2.package-decomposition.md)
+  - [Packages](./1.welcome/2.packages.md)
 - [🚀 Getting Started](./2.getting-started/README.md)
   - [Quickstart](./2.getting-started/1.quickstart.md)
   - [Anatomy of an App](./2.getting-started/2.code-basics.md)
