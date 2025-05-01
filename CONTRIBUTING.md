@@ -2,8 +2,8 @@
 
 Teams AI v2 is a mono-repo that hosts GitHub submodules to other repos that contain code by language. The submodules in this repository uses the latest commit from those submodules. To make changes to Teams AI v2 Typescript, C#, etc., please use the following repos:
 
-1. [Teams.ts](https://github.com/microsoft/teams.ts)
-2. [Teams.net] (TBD)
+- [Teams.ts](https://github.com/microsoft/teams.ts)
+- [Teams.net](https://github.com/microsoft/teams.net)
 
 Please note that as of August 2023, signed commits are required for all contributions to this project. For more information on how to set up, see the [GitHub Authentication verify commit signature](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification) documentation.
 
@@ -45,4 +45,4 @@ Please note that we place high importance on documentation, which we host as [Te
 
 ### Testing changes
 
-Please use any of the agents in the [tests]
+Please use any of the agents in the `tests` directory of the repo you are writing in. These apps use the latest local changes and are intended to quickly set up and test feature work, bug fixes, etc.
