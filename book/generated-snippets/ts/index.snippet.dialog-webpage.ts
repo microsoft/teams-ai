@@ -7,7 +7,7 @@ return {
       // server as the agent. This server needs to be publicly accessible,
       // needs to set up teams.js client library (https://www.npmjs.com/package/@microsoft/teams-js)
       // and needs to be registered in the manifest.
-      url: process.env['BOT_ENDPOINT'],
+      url: `${process.env['BOT_ENDPOINT']}/tabs/dialog-form`,
       width: 1000,
       height: 800,
     },
