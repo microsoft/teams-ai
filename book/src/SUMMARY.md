@@ -11,6 +11,7 @@
   - [App Basics](./3.essentials/1.app-class.md)
   - [Listening To Events](./3.essentials/1.on-event.md)
   - [Listening To Activities](./3.essentials/2.on-activity.md)
+    - [Activity Reference](./3.essentials/activity-ref.md)
   - [Sending Messages](./3.essentials/4.sending-messages.md)
     - [Proactive Messages](./3.essentials/5.proactive-messaging.md)
   - [Using The API Client](./3.essentials/6.api.md)
