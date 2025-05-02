@@ -9,8 +9,9 @@ const stat = promisify(fs.stat);
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 
-// Path to the book directory (default or from command line)
-const bookPath = process.argv[2] || path.join(__dirname, '..', 'book', 'src');
+// Path to the book directory and SUMMARY.md (default or from command line)
+const summaryPath = process.argv[2] || path.join(__dirname, '..', 'book', 'src', 'SUMMARY.md');
+const bookPath = path.dirname(summaryPath);
 // Path for the results file
 const resultsPath = path.join(__dirname, '..', 'link-check-results.txt');
 
@@ -25,23 +26,64 @@ function log(message) {
 // Regex to match markdown links [text](url)
 const LINK_REGEX = /\[([^\]]+)\]\(([^)]+)\)/g;
 
-async function getAllMarkdownFiles(dir) {
-  const items = await readdir(dir);
-  const files = await Promise.all(
-    items.map(async (item) => {
-      const fullPath = path.join(dir, item);
-      const stats = await stat(fullPath);
+// Add a function to extract headers from markdown content
+function extractHeaders(content) {
+  // Regex to match only # style headers (from # to ######)
+  const headerRegex = /^(#{1,6})\s+(.+?)(?:\s+\1)?$/gm;
+  const headers = new Map();
 
-      if (stats.isDirectory()) {
-        return getAllMarkdownFiles(fullPath);
-      } else if (item.endsWith('.md')) {
-        return [fullPath];
+  let match;
+  while ((match = headerRegex.exec(content)) !== null) {
+    const level = match[1].length;
+    const text = match[2].trim();
+
+    // Convert header text to GitHub-style anchor
+    const anchor =
+      '#' +
+      text
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '') // Remove special chars
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .replace(/-+/g, '-'); // Replace multiple hyphens with single hyphen
+
+    headers.set(anchor, text);
+  }
+
+  return headers;
+}
+
+// Function to extract all markdown files linked from SUMMARY.md
+async function getLinkedMarkdownFiles(summaryPath) {
+  const content = await readFile(summaryPath, 'utf8');
+  const links = extractLinks(content);
+  const baseDir = path.dirname(summaryPath);
+
+  // Filter out external links and extract file paths
+  const markdownFiles = new Set();
+
+  for (const link of links) {
+    if (!link.isExternal && link.url.trim() !== '') {
+      // Resolve path relative to SUMMARY.md location
+      let filePath = path.resolve(baseDir, decodeURIComponent(link.url.split('#')[0]));
+
+      // If it's a directory, assume README.md
+      const isDir = await isDirectory(filePath);
+      if (isDir) {
+        filePath = path.join(filePath, 'README.md');
       }
-      return [];
-    })
-  );
+      // If no extension, assume .md
+      else if (!path.extname(filePath)) {
+        filePath += '.md';
+      }
 
-  return files.flat();
+      markdownFiles.add(filePath);
+    }
+  }
+
+  // Add the summary file itself to the list
+  markdownFiles.add(path.resolve(summaryPath));
+
+  return Array.from(markdownFiles);
 }
 
 function extractLinks(content) {
@@ -89,9 +131,24 @@ async function verifyInternalLink(baseDir, filePath, link) {
   // Handle anchors in links
   const urlParts = link.url.split('#');
   const linkPath = urlParts[0];
+  const anchor = urlParts.length > 1 ? '#' + urlParts[1] : null;
 
   if (!linkPath) {
     // Link is just an anchor to the current file
+    if (anchor) {
+      // Check if the anchor exists in the current file
+      const content = await readFile(filePath, 'utf8');
+      const headers = extractHeaders(content);
+
+      if (!headers.has(anchor)) {
+        return {
+          valid: false,
+          link,
+          resolvedPath: filePath,
+          issue: `Header "${anchor}" not found in current file`,
+        };
+      }
+    }
     return { valid: true, link };
   }
 
@@ -105,12 +162,31 @@ async function verifyInternalLink(baseDir, filePath, link) {
     const readmePath = path.join(targetPath, 'README.md');
     const readmeExists = await fileExists(readmePath);
 
-    return {
-      valid: readmeExists,
-      link,
-      resolvedPath: targetPath,
-      issue: readmeExists ? null : 'Directory missing README.md',
-    };
+    if (!readmeExists) {
+      return {
+        valid: false,
+        link,
+        resolvedPath: targetPath,
+        issue: 'Directory missing README.md',
+      };
+    }
+
+    // If there's an anchor, check if it exists in the README.md
+    if (anchor && readmeExists) {
+      const content = await readFile(readmePath, 'utf8');
+      const headers = extractHeaders(content);
+
+      if (!headers.has(anchor)) {
+        return {
+          valid: false,
+          link,
+          resolvedPath: readmePath,
+          issue: `Header "${anchor}" not found in directory's README.md`,
+        };
+      }
+    }
+
+    return { valid: true, link, resolvedPath: targetPath };
   }
 
   // Check if the file exists as is without adding extension
@@ -149,6 +225,21 @@ async function verifyInternalLink(baseDir, filePath, link) {
     };
   }
 
+  // If there's an anchor, check if it exists in the target file
+  if (anchor) {
+    const content = await readFile(targetPath, 'utf8');
+    const headers = extractHeaders(content);
+
+    if (!headers.has(anchor)) {
+      return {
+        valid: false,
+        link,
+        resolvedPath: targetPath,
+        issue: `Header "${anchor}" not found in target file`,
+      };
+    }
+  }
+
   return {
     valid: true,
     link,
@@ -157,20 +248,26 @@ async function verifyInternalLink(baseDir, filePath, link) {
 }
 
 async function main() {
-  if (!bookPath) {
-    console.error('Please provide a directory to scan');
+  if (!fs.existsSync(summaryPath)) {
+    console.error(`SUMMARY.md not found at ${summaryPath}`);
     process.exit(1);
   }
 
-  log(`Scanning markdown files in ${bookPath}...`);
+  log(`Using SUMMARY.md at ${summaryPath}`);
 
-  const files = await getAllMarkdownFiles(bookPath);
-  log(`Found ${files.length} markdown files`);
+  // Get files linked in SUMMARY.md
+  const files = await getLinkedMarkdownFiles(summaryPath);
+  log(`Found ${files.length} markdown files referenced in SUMMARY.md`);
 
   const brokenLinks = [];
   const externalLinks = [];
 
   for (const file of files) {
+    if (!(await fileExists(file))) {
+      log(`\nWARNING: Referenced file does not exist: ${file}`);
+      continue;
+    }
+
     const content = await readFile(file, 'utf8');
     const links = extractLinks(content);
 
