@@ -17,7 +17,7 @@ Once an action is executed to open a dialog, the Teams client will send an event
 
 ```ts
 app.on('dialog.open', async ({ activity }) => {
-  const card: ICard = new Card()...
+  const card: IAdaptiveCard = new AdaptiveCard()...
 
   // Return an object with the task value that renders a card
   return {

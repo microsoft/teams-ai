@@ -51,14 +51,14 @@ Prefer a drag‑and‑drop approach? Use [Microsoft's Adaptive Card Designer](ht
 
 ```ts
 const cardJson = /* copied JSON */;
-const card = new Card().withBody(cardJson);
+const card = new AdaptiveCard().withBody(cardJson);
 ```
 
 ```ts
 {{#include ../../../generated-snippets/ts/index.snippet.raw-card-json.ts }}
 ```
 
-This method leverages the full Adaptive Card schema and ensures that the payload adheres strictly to `ICard`.
+This method leverages the full Adaptive Card schema and ensures that the payload adheres strictly to `IAdaptiveCard`.
 
 > [!TIP]
 > You can use a combination of raw JSON and builder helpers depending on whatever you find easier.

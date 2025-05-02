@@ -1,6 +1,6 @@
 app.on('message', async ({ send, activity }) => {
   await send({ type: 'typing' });
-  const card = new Card().withBody(
+  const card = new AdaptiveCard().withBody(
     new TextBlock('Create New Task', {
       size: 'large',
       weight: 'bolder',

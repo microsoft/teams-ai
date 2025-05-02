@@ -1,5 +1,5 @@
 if (dialogType === 'simple_form') {
-  const dialogCard = new Card()
+  const dialogCard = new AdaptiveCard()
     .withBody(
       {
         type: 'TextBlock',
@@ -15,7 +15,7 @@ if (dialogType === 'simple_form') {
     )
     // Inside the dialog, the card actions for submitting the card must be
     // of type Action.Submit
-    .addActions(
+    .withActions(
       new SubmitAction().withTitle('Submit').withData({ submissiondialogtype: 'simple_form' })
     );
 
