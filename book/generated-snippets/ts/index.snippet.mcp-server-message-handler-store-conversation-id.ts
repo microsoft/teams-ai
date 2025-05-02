@@ -3,7 +3,7 @@ app.on('message', async ({ send, activity }) => {
   await send(`you said "${activity.text}"`);
   if (activity.from.aadObjectId && !userToConversationId.has(activity.from.aadObjectId)) {
     userToConversationId.set(activity.from.aadObjectId, activity.conversation.id);
-    console.log(
+    app.log.info(
       `Just added user ${activity.from.aadObjectId} to conversation ${activity.conversation.id}`
     );
   }

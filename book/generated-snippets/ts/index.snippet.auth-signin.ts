@@ -1,5 +1,5 @@
 app.on('message', async ({ log, signin, api, isSignedIn }) => {
-  if (!isSignedIn) { // no need to sign in if already signed in...
+  if (!isSignedIn) {
     await signin(); // call signin for your auth connection...
     return;
   }

@@ -1,8 +1,8 @@
-app.on('message', async ({ stream, send, activity, next }) => {
+app.on("message", async ({ stream, send, activity, next }) => {
   // const query = activity.text;
 
   const prompt = new ChatPrompt({
-    instructions: 'You are a friendly assistant who responds in terse language',
+    instructions: "You are a friendly assistant who responds in terse language",
     model,
   });
 
