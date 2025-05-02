@@ -18,7 +18,7 @@ quote-agent/
 
 ## Core Components
 
-Let's break down the simple application we created in the [quickstart](1.quickstart.md) into its core components.:
+Let's break down the simple application we created in the [quickstart](quickstart.md) into its core components.:
 
 ### The App Class
 
@@ -78,7 +78,7 @@ This part initializes your application server and, when configured for Teams, al
 
 ## Next Steps
 
-Now that you understand the basic structure of your Teams application, you're ready to [run it in Teams](3.running-in-teams.md). You will learn about Teams Toolkit and other important tools that help you with deployment and testing your application.
+Now that you understand the basic structure of your Teams application, you're ready to [run it in Teams](running-in-teams.md). You will learn about Teams Toolkit and other important tools that help you with deployment and testing your application.
 
 After that, you can:
 
@@ -91,6 +91,6 @@ Continue on to the next page to learn about these advanced features.
 
 ## Other Resources
 
-- [Essentials](../3.essentials)
-- [Teams concepts](../4.teams)
-- [Teams developer tools](../7.developer-tools)
+- [Essentials](../essentials)
+- [Teams concepts](../teams)
+- [Teams developer tools](../developer-tools)

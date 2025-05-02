@@ -9,7 +9,7 @@ In this section we will walk through creating an app that can access the [Micros
 > This is an advanced guide. It is highly recommended that you are familiar with [creating an app](https://microsoft.github.io/teams-ai/2.getting-started/1.quickstart.html) and [running it in Teams](https://microsoft.github.io/teams-ai/2.getting-started/3.running-in-teams.html) before attempting to follow this guide.
 
 > [!Warning]
-> User authentication does not work with the developer tools setup. You have to run the app in Teams. Follow these [instructions](../../2.getting-started/3.running-in-teams.html#debugging-in-teams) to run your app in Teams.
+> User authentication does not work with the developer tools setup. You have to run the app in Teams. Follow these [instructions](../../getting-started/3.running-in-teams.html#debugging-in-teams) to run your app in Teams.
 
 ## Setup Instructions
 
@@ -54,7 +54,7 @@ Once you have successfully sideloaded the app into Teams you can now interact wi
 ### Signing the user in
 
 > [!Note]
-> This is the Single Sign-On (SSO) authentication flow. To learn more about all the available flows and their differences see the [How Auth Works](5.auth-sso.md) guide. 
+> This is the Single Sign-On (SSO) authentication flow. To learn more about all the available flows and their differences see the [How Auth Works](auth-sso.md) guide. 
 
 
 When the user sends a message to the user a consent form will popup:
