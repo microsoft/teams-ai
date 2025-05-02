@@ -69,7 +69,7 @@ The chat window emulates Teams features as closely as possible. Not all Teams fe
 
 ### Send messages
 
-You can [send messages](../../essentials/sending-activities.md) to your agent just like in Teams. In the compose box, type your message and press <kbd>Enter</kbd> to send it.
+You can [send messages](../../essentials/sending-messages.md) to your agent just like in Teams. In the compose box, type your message and press <kbd>Enter</kbd> to send it.
 
 ### Attachments
 
@@ -84,29 +84,29 @@ Check your app's connectivity in three ways:
 
 1. The DevTools banner shows a green badge or 'Connected' text when connected, and red or 'Disconnected' when not.
 2. Similarly, the agent's avatar shows a 'Connected' or 'Disconnected' badge.
-3. DevTools uses the [ConsoleLogger](../../in-depth-guides/6.observability/logging.md) that logs connectivity events to the console. Use the browser's console tool to see the logs.
+3. DevTools uses the [ConsoleLogger](../../in-depth-guides/observability/logging.md) that logs connectivity events to the console. Use the browser's console tool to see the logs.
 
 ### Message reactions
 
-You can [react to messages](../../activity/1.message/message-reaction.md) selecting an emoji in the message actions menu.
+You can [react to messages](../../activity/message/message-reaction.md) selecting an emoji in the message actions menu.
 
 ![Devtools react to a message](https://github.com/microsoft/teams.ts/blob/main/assets/screenshots/devtools_message_reaction.gif?raw=true)
 
 ### Edit your message
 
-[Edit messages](../../activity/1.message/message-update.md) by selecting the Edit (pencil) icon from the message actions menu. Press Enter or the checkmark button to send the edited message, or the Dismiss (X) button to cancel.
+[Edit messages](../../activity/message/message-update.md) by selecting the Edit (pencil) icon from the message actions menu. Press Enter or the checkmark button to send the edited message, or the Dismiss (X) button to cancel.
 
 ### Delete your message
 
-Soft [delete messages](../../activity/1.message/message-delete.md) by hovering over your message, pressing the More (ellipsis) button, then the Delete (trash) button. Click "Undo" to restore the message.
+Soft [delete messages](../../activity/message/message-delete.md) by hovering over your message, pressing the More (ellipsis) button, then the Delete (trash) button. Click "Undo" to restore the message.
 
 ### Streaming
 
-If your agent is using [streaming](../../in-depth-guides/5.ai/1.chat/streaming.md),DevTools will render messages as a stream with a rainbow border until the stream ends. See the full stream on the [Activities](inspect.md) page by clicking the Inspect (magnifying glass) button in the message actions menu of the message.
+If your agent is using [streaming](../../in-depth-guides/ai/chat.md#streaming-chat-responses),DevTools will render messages as a stream with a rainbow border until the stream ends. See the full stream on the [Activities](inspect.md) page by clicking the Inspect (magnifying glass) button in the message actions menu of the message.
 
 ### Feedback
 
-Send [feedback](../../in-depth-guides/5.ai/feedback.md) to your app by clicking the Feedback (thumbs up/down) buttons in the message actions menu and completing the dialog form.
+Send [feedback](../../in-depth-guides/feedback.md) to your app by clicking the Feedback (thumbs up/down) buttons in the message actions menu and completing the dialog form.
 
 > [!NOTE]
 > The capabilities above will also populate activities to the Activities page, where you can inspect activity payloads and see the full activity history.

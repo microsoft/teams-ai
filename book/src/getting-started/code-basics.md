@@ -38,7 +38,7 @@ The app configuration includes a variety of options that allow you to customize 
 
 ### Plugins
 
-Plugins are a core part of the Teams AI v2 SDK. They allow you to hook into various lifecycles of the application. The lifecycles include server events (start, stop, initialize etc.), and also Teams Activity events (onActivity, onActivitySent, etc.). In fact, the [DevTools](../developer-tools/2.devtools) application you already have running is a plugin too. It allows you to inspect and debug your application in real-time.
+Plugins are a core part of the Teams AI v2 SDK. They allow you to hook into various lifecycles of the application. The lifecycles include server events (start, stop, initialize etc.), and also Teams Activity events (onActivity, onActivitySent, etc.). In fact, the [DevTools](../developer-tools/devtools/) application you already have running is a plugin too. It allows you to inspect and debug your application in real-time.
 
 > [!CAUTION]
 > DevTools is a plugin that should only be used in development mode. It should not be used in production applications since it offers no authentication and allows your application to be accessed by anyone.\
@@ -82,10 +82,10 @@ Now that you understand the basic structure of your Teams application, you're re
 
 After that, you can:
 
-- Add more activity handlers for different types of interactions. See [Listening to Activities](../essentials/1.on-activity.md) and [Listening to Messages](../essentials/on-message.md) for more details.
+- Add more activity handlers for different types of interactions. See [Listening to Activities](../essentials/on-activity.md) for more details.
 - Integrate with external services using the [API Client](../essentials/api.md).
-- Add interactive [cards](../in-depth-guides/1.cards/README.md) and [dialogs](../in-depth-guides/2.dialogs/README.md). See and for more information.
-- Implement [AI](../in-depth-guides/5.ai/README.md).
+- Add interactive [cards](../in-depth-guides/cards) and [dialogs](../in-depth-guides/dialogs). See and for more information.
+- Implement [AI](../in-depth-guides/ai/).
 
 Continue on to the next page to learn about these advanced features.
 

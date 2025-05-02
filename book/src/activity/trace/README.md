@@ -1,6 +1,6 @@
 # Activity: Trace
 
-The Trace activity is an activity which the developer inserts in to the stream of activities to represent a point in the developers bot logic. The trace activity typically is logged by transcript history components to become part of a [Transcript-format](../transcript/transcript.md) history file. In remote debugging scenarios the Trace activity can be sent to the client so that the activity can be inspected as part of the debug flow.
+The Trace activity is an activity which the developer inserts in to the stream of activities to represent a point in the developers bot logic. The trace activity typically is logged by transcript history components to become part of a Transcript-Format history file. In remote debugging scenarios the Trace activity can be sent to the client so that the activity can be inspected as part of the debug flow.
 
 Trace activities are normally not shown to the user, and are internal to transcript logging and developer debugging.
 

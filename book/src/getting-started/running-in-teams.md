@@ -25,7 +25,7 @@ npx @microsoft/teams.cli config add ttk.basic
 > The `ttk.basic` configuration is a basic setup for Teams Toolkit. It includes the necessary files and configuration to get started with Teams development.<br/>
 > Explore more advanced configurations as needed with teams config --help.<br>
 
-This [CLI](./(developer-tools)/1.cli/README.md) command adds configuration files required by Teams Toolkit, including:
+This [CLI](../developer-tools/cli) command adds configuration files required by Teams Toolkit, including:
 
 - Environment setup in the `env` folder and root `.env` file
 - Teams app manifest in the `appPackage` folder (if not already present)
@@ -52,12 +52,12 @@ After installing Teams Toolkit and adding the configuration:
 4. **Select "Local"** under Environment Settings of the TTK extension.
 5. **Click on Debug (Chrome) or Debug (Edge)** to start debugging via the 'play' button.
 
-![Teams Toolkit local environment UI](../../assets/screenshots/teams-toolkit.png)
+![Teams Toolkit local environment UI](../assets/screenshots/teams-toolkit.png)
 
 When debugging starts, the Teams Toolkit will:
 
 - **Build** your application
-- **Start a [devtunnel](../teams/1.core-concepts.html#devtunnel)** which will assign a temporary public URL to your local server
+- **Start a [devtunnel](../teams/core-concepts.md#devtunnel)** which will assign a temporary public URL to your local server
 - **Provision the Teams app** for your tenant so that it can be installed and be authenticated on Teams
 - **Set up the local variables** necessary for your agent to run in Teams in `env/.env.local` and `env/env.local.user`. This includes propagating the app manifest with your newly provisioned resources.
 - **Start** the local server.
@@ -87,12 +87,12 @@ After the debugging session starts:
 3. Teams will ask permission to install the app
 4. Once installed, you can start chatting with your agent!
 
-![Agent running on Teams](example-on-teams.png)
+![Agent running on Teams](../assets/screenshots/example-on-teams.png)
 
 Congratulations! Now you have a fully functional agent running in Microsoft Teams. Interact with it just like any other Teams app and explore the rest of the documentation to build more complex agents.
 
 > [!TIP]
-> If you want to monitor the activities and events in your app, you can still use the [DevTools plugin](../developer-tools/2.devtools/README.md)! Note that the DevTools server is running on port 3979. You can open it in your browser to interact with your agent and monitor activities in real time.
+> If you want to monitor the activities and events in your app, you can still use the [DevTools plugin](../developer-tools/devtools/)! Note that the DevTools server is running on port 3979. You can open it in your browser to interact with your agent and monitor activities in real time.
 
 ## Troubleshooting
 
@@ -106,11 +106,11 @@ While Teams AI v2 SDK heavily endorses Teams Tookit (TTK), you can run your agen
 
 ## Next steps
 
-Now that your agent is running in Teams, you can learn more [essential concepts](../essentials/README.md) to understand how to build more complex agents. Explore the [in-depth guides](../in-depth-guides/README.md) for advanced topics like authentication, message extensions, and more.
+Now that your agent is running in Teams, you can learn more [essential concepts](../essentials) to understand how to build more complex agents. Explore the [in-depth guides](../in-depth-guides) for advanced topics like authentication, message extensions, and more.
 
 ## Resources
 
-- [Teams CLI documentation](./(developer-tools)/1.cli/README.md)
+- [Teams CLI documentation](../developer-tools/cli/)
 - [Teams Toolkit documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/overview)
 - [Teams Toolkit CLI documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/cli)
 - [Teams CLI GitHub repository](https://github.com/OfficeDev/Teams-Toolkit)

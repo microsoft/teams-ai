@@ -33,6 +33,6 @@ Press the Copy button in the top right corner of the Activity details view to co
 
 ### Inspect activities by ID
 
-When in [Chat](chat.md), you can inspect activities by ID by clicking the magnifying glass icon in the message actions menu. This opens the Activities page with the activity ID filtered in the list, which is useful for inspecting [streaming](../../in-depth-guides/5.ai/1.chat/streaming.md) messages, which have multiple activities.
+When in [Chat](chat.md), you can inspect activities by ID by clicking the magnifying glass icon in the message actions menu. This opens the Activities page with the activity ID filtered in the list, which is useful for inspecting [streaming](../../in-depth-guides/ai/chat.md#streaming-chat-responses) messages, which have multiple activities.
 
 To reset the filter, use the filter button in the Type column header and de-select the activity ID to show all activities again.

@@ -9,7 +9,7 @@ In this section we will walk through creating an app that can access the [Micros
 > This is an advanced guide. It is highly recommended that you are familiar with [creating an app](https://microsoft.github.io/teams-ai/2.getting-started/1.quickstart.html) and [running it in Teams](https://microsoft.github.io/teams-ai/2.getting-started/3.running-in-teams.html) before attempting to follow this guide.
 
 > [!Warning]
-> User authentication does not work with the developer tools setup. You have to run the app in Teams. Follow these [instructions](../../getting-started/3.running-in-teams.html#debugging-in-teams) to run your app in Teams.
+> User authentication does not work with the developer tools setup. You have to run the app in Teams. Follow these [instructions](../../getting-started/running-in-teams.md#debugging-in-teams) to run your app in Teams.
 
 ## Setup Instructions
 
@@ -43,7 +43,7 @@ teams config add ttk.oauth
 This will add relevant Teams Toolkit files to your project.
 
 > [!tip]
-> See [App Setup](./2.setup.html#using-teams-toolkit-with-the-teams-cli) to learn more about what this command does.
+> See [App Setup](./setup.md#using-teams-toolkit-with-the-teams-cli) to learn more about what this command does.
 
 
 

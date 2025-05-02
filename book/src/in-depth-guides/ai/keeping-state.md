@@ -22,4 +22,4 @@ To avoid this, you need to get messages from your persistent (or in-memory) stor
 {{#include ../../../generated-snippets/ts/stateful-prompts.snippet.stateful-prompts-example.ts }}
 ```
 
-![Stateful Chat Example](../../assets/stateful-chat-example.png)
+![Stateful Chat Example](../../assets/screenshots/stateful-chat-example.png)
