@@ -12,7 +12,8 @@
     "fmt": "npx prettier --write \"**/*.{js,ts,tsx,md,json}\"",
     "docs:build": "node ./scripts/build-docs.js",
     "docs:serve": "node ./scripts/serve-docs.js",
-    "gen:snips": "node ./scripts/generate-snippets.js"
+    "gen:snips": "node ./scripts/generate-snippets.js",
+    "check:links": "node ./scripts/check-links.js"
   },
   "devDependencies": {
     "bluehawk": "^1.6.0",

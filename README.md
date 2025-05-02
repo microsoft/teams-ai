@@ -23,11 +23,11 @@ Next, use the CLI to create your agent:
 teams new quote-agent --template echo
 ```
 
-For more information, follow our [quick start guide](book/src/2.getting-started/1.quickstart.md).
+For more information, follow our [quick start guide](book/src/getting-started/quickstart.md).
 
 ### SDK
 
-Microsoft Teams has a robust developer ecosystem with a broad suite of capabilities, now unified via Teams AI v2. Whether you are building [AI-powered agents](book/src/5.in-depth-guides/5.ai/README.md), [message extensions](book/src/5.in-depth-guides/3.message-extensions/README.md), embedded web applications, or Graph, Teams AI v2 has you covered.
+Microsoft Teams has a robust developer ecosystem with a broad suite of capabilities, now unified via Teams AI v2. Whether you are building [AI-powered agents](book/src/in-depth-guides/ai/README.md), [message extensions](book/src/in-depth-guides/message-extensions/README.md), embedded web applications, or Graph, Teams AI v2 has you covered.
 
 Here is a simple example, which responds to incoming messages with information retrieved from Graph.
 
