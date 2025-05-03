@@ -34,7 +34,7 @@ This command:
 
 ### Add Teams toolkit auth configuration
 
-Open your terminal with the `oauth-app/` folder set as the curent working directory and run the following command:
+Open your terminal with the `oauth-app/` folder set as the current working directory and run the following command:
 
 ```sh
 teams config add ttk.oauth
