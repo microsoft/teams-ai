@@ -14,7 +14,7 @@ When the app is created, you can use the Teams Toolkit to run and debug it insid
 ## Adding to an existing project
 This package is set up to integrate well with existing Tab apps. The main consideration is that the AAD app must be configured to support Nested App Authentication (NAA). Otherwise it will not be possible to acquire the bearer token needed to call Microsoft Graph APIs or remote agent functions.
 
-After verifying that the app is configured for NAA, simply use your package manager to add a dependency on `@microsoft/teams.client` and then proceed with [Starting the app](./starting-the-app.md).
+After verifying that the app is configured for NAA, simply use your package manager to add a dependency on `@microsoft/teams.client` and then proceed with [Starting the app](./using-the-app.md).
 
 If you're already using a current version of TeamsJS, that's fine. This package works well with TeamsJS.
 
