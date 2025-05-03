@@ -1,7 +1,15 @@
-# Using the API Client
+# Teams API Client
 
-an instance of the web api client is passed to handlers that can be used
-to fetch team/meeting/conversation/etc... details.
+Teams has a number of areas that your application has access to via its API. These are all available via the `app.api` object. Here is a short summary of the different areas:
+
+| Area | Description |
+|------|-------------|
+| `conversations` | Gives your application the ability to perform activities on conversations (send, update, delete messages, etc.), or create conversations (like 1:1 chat with a user) |
+| `meetings` | Gives your application access to meeting details |
+| `teams` | Gives your application access to team or channel details |
+
+
+An instance of the Api Client is passed to handlers that can be used to fetch details:
 
 > Example: we use the api client to fetch the conversations array of members.
 
@@ -9,22 +17,4 @@ to fetch team/meeting/conversation/etc... details.
 app.on('message', async ({ activity, api }) => {
   const members = await api.conversations.members(activity.conversation.id).get();
 });
-```
-
-## Graph
-
-The api also comes with graph support built in which can be easily accessed.
-
-```typescript
-app.on('message', async ({ activity, api }) => {
-  const res = await api.user.chats.getAllMessages.get();
-});
-```
-
-## Proactive
-
-The api client can also be accessed from outside a handler via the app instance.
-
-```typescript
-const res = await app.api.graph.chats.getAllMessages.get();
 ```
