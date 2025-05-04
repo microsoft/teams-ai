@@ -1,3 +1,8 @@
+# About the `@microsoft/teams.client` App
+The `@microsoft/teams.client` App class helps solve common challenges when building Single Page Applications hosted in Microsoft Teams, Outlook, and Microsoft 365. It is the client-side counterpart to the `@microsoft/teams.app` App that you can use to build AI agents.
+
+These two App classes are designed to work well together. For instance, when you use the `@microsoft/teams.app` App to expose a server-side function, you can then use the `@microsoft/teams.client` App `exec` method to easily invoke that function, as the client-side app knows how to construct an HTTP request that the server-side app can process. It can issue a request to the right URL, with the expected payload and contextual headers. The client-side app even includes a bearer token that the server side app uses to authenticate the caller.
+
 # Starting the app
 
 To use the `@microsoft/teams.client` package, you first create an App instance and then call `app.start()`. 
