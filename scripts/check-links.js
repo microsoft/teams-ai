@@ -158,7 +158,7 @@ async function verifyInternalLink(baseDir, filePath, link) {
   // Check if the link is a directory
   const isDir = await isDirectory(targetPath);
   if (isDir) {
-    // Rule 1: If it's a directory, check for README.md
+    // Rule 1: If it's a directory link, it should link directly to README.md instead
     const readmePath = path.join(targetPath, 'README.md');
     const readmeExists = await fileExists(readmePath);
 
@@ -171,22 +171,13 @@ async function verifyInternalLink(baseDir, filePath, link) {
       };
     }
 
-    // If there's an anchor, check if it exists in the README.md
-    if (anchor && readmeExists) {
-      const content = await readFile(readmePath, 'utf8');
-      const headers = extractHeaders(content);
-
-      if (!headers.has(anchor)) {
-        return {
-          valid: false,
-          link,
-          resolvedPath: readmePath,
-          issue: `Header "${anchor}" not found in directory's README.md`,
-        };
-      }
-    }
-
-    return { valid: true, link, resolvedPath: targetPath };
+    // Links should be to README.md, not to the directory itself
+    return {
+      valid: false,
+      link,
+      resolvedPath: targetPath,
+      issue: 'Links to directories should explicitly include README.md',
+    };
   }
 
   // Check if the file exists as is without adding extension
@@ -210,18 +201,6 @@ async function verifyInternalLink(baseDir, filePath, link) {
       link,
       resolvedPath: targetPath,
       issue: 'File does not exist',
-    };
-  }
-
-  // Rule 2: Links should not be directly to README.md (except for SUMMARY.md)
-  const fileName = path.basename(targetPath);
-  const sourceFileName = path.basename(filePath);
-  if (fileName === 'README.md' && sourceFileName !== 'SUMMARY.md') {
-    return {
-      valid: false,
-      link,
-      resolvedPath: targetPath,
-      issue: 'Links should not be directly to README.md files (except from SUMMARY.md)',
     };
   }
 

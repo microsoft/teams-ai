@@ -4,5 +4,5 @@ One of the main motivations for Teams AI (v2) Library is to provide excellent to
 
 Learn more about the developer tools that come with Teams AI (v2) Library.
 
-1. [Teams CLI](./cli)
-2. [DevTools](./devtools)
+1. [Teams CLI](./cli/README.md)
+2. [DevTools](./devtools/README.md)
