@@ -54,7 +54,7 @@ Once you have successfully sideloaded the app into Teams you can now interact wi
 ### Signing the user in
 
 > [!Note]
-> This is the Single Sign-On (SSO) authentication flow. To learn more about all the available flows and their differences see the [How Auth Works](auth-sso.md) guide. 
+> This is the Single Sign-On (SSO) authentication flow. To learn more about all the available flows and their differences see the [How Auth Works](auth-sso.md) guide.
 
 
 When the user sends a message to the user a consent form will popup:

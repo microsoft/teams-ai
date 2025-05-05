@@ -22,7 +22,8 @@ sidebar-width = "250px"
 default-theme = "ayu"
 preferred-dark-theme = "ayu"
 git-repository-url = "http://github.com/microsoft/teams-ai"
-additional-js = ["mermaid.min.js", "mermaid-init.js"]
+additional-js = ["mermaid.min.js", "mermaid-init.js", "theme/pagetoc.js"]
+additional-css = ["theme/css/pagetoc.css"]
 
 [output.html.fold]
 enable = true
