@@ -13,10 +13,21 @@ An instance of the Api Client is passed to handlers that can be used to fetch de
 
 ## Example
 
-In this example, we use the api client to fetch the members in a conversation.
+In this example, we use the api client to fetch the members in a conversation. The `api` object is passed to the activity handler in this case.
 
 ```typescript
 app.on('message', async ({ activity, api }) => {
   const members = await api.conversations.members(activity.conversation.id).get();
 });
 ```
+
+## Proactive API
+
+It's also possible to access the api client from outside a handler via the app instance. Here we have the same example as above, but we're access the api client via the app instance.
+
+```typescript
+const res = await app.api.conversations.members(conversationId).get();
+```
+
+
+
