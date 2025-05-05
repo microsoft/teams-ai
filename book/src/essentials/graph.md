@@ -23,11 +23,11 @@ To access the graph using the user's token, you need to do this as part of a mes
 
 ```typescript
 app.on('message', async ({ activity, userGraph }) => {
-  const graph = await userGraph.me.get();
-  console.log(`User ID: ${graph.id}`);
-  console.log(`User Display Name: ${graph.displayName}`);
-  console.log(`User Email: ${graph.mail}`);
-  console.log(`User Job Title: ${graph.jobTitle}`);
+  const me = await userGraph.me.get();
+  console.log(`User ID: ${me.id}`);
+  console.log(`User Display Name: ${me.displayName}`);
+  console.log(`User Email: ${me.mail}`);
+  console.log(`User Job Title: ${me.jobTitle}`);
 });
 ```
 
