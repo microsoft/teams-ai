@@ -11,7 +11,9 @@ Teams has a number of areas that your application has access to via its API. The
 
 An instance of the Api Client is passed to handlers that can be used to fetch details:
 
-> Example: we use the api client to fetch the conversations array of members.
+## Example
+
+In this example, we use the api client to fetch the members in a conversation.
 
 ```typescript
 app.on('message', async ({ activity, api }) => {
