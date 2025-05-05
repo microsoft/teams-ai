@@ -1,5 +1,5 @@
 [book]
-authors = ["aacebo <aacebowork@gmail.com>"]
+authors = ["Microsoft"]
 language = "en"
 multilingual = false
 src = "src"
@@ -18,11 +18,15 @@ sidebar-width = "250px"
 
 [preprocessor.alerts]
 
+[preprocessor.langtabs]
+command = "mdbook-langtabs"
+
 [output.html]
 default-theme = "ayu"
 preferred-dark-theme = "ayu"
 git-repository-url = "http://github.com/microsoft/teams-ai"
-additional-js = ["mermaid.min.js", "mermaid-init.js"]
+additional-js = ["mermaid.min.js", "mermaid-init.js", "pagetoc.js", "langtabs.js"]
+additional-css = ["theme/css/pagetoc.css", "theme/css/langtabs.css"]
 
 [output.html.fold]
 enable = true

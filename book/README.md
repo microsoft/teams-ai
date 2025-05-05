@@ -29,6 +29,7 @@ You will need to install the following packages to run the docs server via `carg
 - [mdbook-theme](https://github.com/zjp-CN/mdbook-theme)
 - [mdbook-mermaid](https://github.com/badboy/mdbook-mermaid)
 - [mdbook-alerts](https://github.com/lambdalisue/rs-mdbook-alerts)
+- [mdbook-langtabs](https://github.com/nx10/mdbook-langtabs)
 
 ## Build
 

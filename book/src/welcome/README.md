@@ -2,19 +2,23 @@
 
 Teams AI Library v2 is a suite of packages used to develop on Microsoft Teams. Rebuilt from the ground up with improved developer experience in mind, it's never been easier to build powerful agents and applications for the hundreds of millions Microsoft Teams users.
 
-## Quick start
+## Quickstart
 
 The Teams CLI makes it easy to bootstrap your first agent. First, install the CLI via NPM:
 
+<!-- langtabs-start -->
 ```sh
 npm install -g @microsoft/teams.cli@latest
 ```
+<!-- langtabs-end -->
 
 Next, use the CLI to create your agent:
 
+<!-- langtabs-start -->
 ```sh
 teams new quote-agent --template echo
 ```
+<!-- langtabs-end -->
 
 For more information, follow our [quick start guide](../getting-started/quickstart.md).
 
@@ -24,6 +28,7 @@ Microsoft Teams has a robust developer ecosystem with a broad suite of capabilit
 
 Here is a simple example, which responds to incoming messages with information retrieved from Graph.
 
+<!-- langtabs-start -->
 ```typescript
 import { App } from '@microsoft/teams.apps';
 import { DevtoolsPlugin } from '@microsoft/teams.dev';
@@ -47,6 +52,7 @@ app.on('message', async ({ api, isSignedIn, send, signin }) => {
   await app.start();
 })();
 ```
+<!-- langtabs-end -->
 
 ## ⭐ What's new?
 

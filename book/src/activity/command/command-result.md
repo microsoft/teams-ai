@@ -5,9 +5,11 @@ Command result activities communicate the result of a [command activity](https:/
 > [**ℹ️ Note**]
 > This event type is not applicable to Teams.
 
+<!-- langtabs-start -->
 ```typescript
 app.on('commandResult', async ({ activity }) => {});
 ```
+<!-- langtabs-end -->
 
 ## Schema
 

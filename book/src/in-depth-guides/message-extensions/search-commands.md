@@ -17,6 +17,7 @@ There are three different areas search commands can be invoked from:
 
 To use search commands you have define them in the Teams app manifest. Here is an example:
 
+<!-- langtabs-start -->
 ```json
 "composeExtensions": [
     {
@@ -44,6 +45,7 @@ To use search commands you have define them in the Teams app manifest. Here is a
     }
 ]
 ```
+<!-- langtabs-end -->
 
 Here we are defining the `searchQuery` search (or query) command.
 
@@ -51,15 +53,19 @@ Here we are defining the `searchQuery` search (or query) command.
 
 Handle opening adaptive card dialog when the `searchQuery` query is submitted.
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/index.snippet.message-ext-query.ts }}
 ```
+<!-- langtabs-end -->
 
 `createDummyCards()` function
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/card.snippet.message-ext-create-dummy-cards.ts }}
 ```
+<!-- langtabs-end -->
 
 The search results include both a full adaptive card and a preview card. The preview card appears as a list item in the search command area:
 

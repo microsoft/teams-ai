@@ -5,9 +5,11 @@ To use this package, you can either set up a new project using the Teams CLI, or
 ## Setting up a new project
 The Teams CLI contains a Teams Toolkit configuration and a template to easily scaffold a new tab app with a callable remote function. To set this up, first install the Teams CLI as outlined in the [Quickstart](../../getting-started/quickstart.md) guide. Then, create the app by running:
 
+<!-- langtabs-start -->
 ```sh
 teams new my-first-tab-app --tk embed --template tab
 ```
+<!-- langtabs-end -->
 
 When the app is created, you can use the Teams Toolkit to run and debug it inside of Teams from your local machine, same as for any other Teams Toolkit tab app.
 

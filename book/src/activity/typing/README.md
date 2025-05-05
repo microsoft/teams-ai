@@ -4,12 +4,14 @@ Typing activities represent ongoing input from a user or a bot. This activity is
 
 Typing activities are intended to persist within UIs for three seconds.
 
+<!-- langtabs-start -->
 ```typescript
 // Send a typing indicator to the user upon receiving a message
 app.on('message', async ({ send }) => {
   await send({ type: 'typing' });
 });
 ```
+<!-- langtabs-end -->
 
 ## Schema
 

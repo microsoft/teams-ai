@@ -4,6 +4,7 @@
 
 Invokes on Adaptive Cards are used to perform some action dependent on interaction from the user.
 
+<!-- langtabs-start -->
 ```typescript
 // Long-hand form of retrieving the invoke value
 app.on('invoke', async ({ activity }) => {
@@ -12,6 +13,7 @@ app.on('invoke', async ({ activity }) => {
   }
 });
 ```
+<!-- langtabs-end -->
 
 The name of the invoke activity for Adaptive Cards is `adaptiveCard/action`. However, the `@microsoft/teams.api` package includes an alias for this invoke activity, `card.action`.
 

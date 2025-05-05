@@ -4,9 +4,11 @@ The Trace activity is an activity which the developer inserts in to the stream o
 
 Trace activities are normally not shown to the user, and are internal to transcript logging and developer debugging.
 
+<!-- langtabs-start -->
 ```typescript
 app.on('trace', async ({ activity }) => {});
 ```
+<!-- langtabs-end -->
 
 ## Schema
 

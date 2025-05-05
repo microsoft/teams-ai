@@ -16,10 +16,12 @@ First, you'll need to install the Teams Toolkit IDE extension:
 
 To configure your agent for Teams, run the following command in the terminal inside your quote-agent folder:
 
+<!-- langtabs-start -->
 ```bash
 # (if you have `teams` CLI installed globally, use `teams` instead of `npx`)
 npx @microsoft/teams.cli config add ttk.basic
 ```
+<!-- langtabs-end -->
 
 > [!TIP]
 > The `ttk.basic` configuration is a basic setup for Teams Toolkit. It includes the necessary files and configuration to get started with Teams development.<br/>
@@ -67,6 +69,7 @@ When debugging starts, the Teams Toolkit will:
 
 If you set up TTK via the Teams AI CLI, you should see something like the following in your terminal:
 
+<!-- langtabs-start -->
 ```sh
 [nodemon] 3.1.9
 [nodemon] to restart at any time, enter `rs`
@@ -77,6 +80,7 @@ If you set up TTK via the Teams AI CLI, you should see something like the follow
 [INFO] @teams/app/http listening on port 3978 🚀
 [INFO] @teams/app/devtools available at http://localhost:3979/devtools
 ```
+<!-- langtabs-end -->
 
 ## Testing your agent
 

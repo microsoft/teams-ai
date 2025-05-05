@@ -4,12 +4,16 @@ Dialogs have a specific `dialog.submit` event to handle submissions. When a user
 
 In this example, we show how to handle dialog submissions from an Adaptive Card form:
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/index.snippet.dialog-submission.ts }}
 ```
+<!-- langtabs-end -->
 
 Similarly, handling dialog submissions from rendered webpages is also possible:
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/index.snippet.dialog-submission-webpage.ts }}
 ```
+<!-- langtabs-end -->

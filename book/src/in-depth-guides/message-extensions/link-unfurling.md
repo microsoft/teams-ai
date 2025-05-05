@@ -4,6 +4,7 @@ Link unfurling lets your app respond when users paste URLs into Teams. When a UR
 
 ## Setting up your Teams app manifest
 
+<!-- langtabs-start -->
 ```json
 "composeExtensions": [
     {
@@ -21,6 +22,7 @@ Link unfurling lets your app respond when users paste URLs into Teams. When a UR
     }
 ]
 ```
+<!-- langtabs-end -->
 
 When a user pastes a URL from your registered domain (like `www.test.com`) into the Teams compose box, your app will receive a notification. Your app can then respond by returning an adaptive card that displays a preview of the linked content. This preview card appears before the user sends their message in the compose box, allowing them to see how the link will be displayed to others.
 
@@ -46,15 +48,19 @@ flowchart TD
 
 Handle link unfurling when a URL from your registered domain is submited into the Teams compose box.
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/index.snippet.message-ext-query-link.ts }}
 ```
+<!-- langtabs-end -->
 
 `createLinkUnfurlCard()` function
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/card.snippet.message-ext-create-link-unfurl-card.ts }}
 ```
+<!-- langtabs-end -->
 
 The link unfurling response includes both a full adaptive card and a preview card. The preview card appears in the compose box when a user pastes a URL:
 

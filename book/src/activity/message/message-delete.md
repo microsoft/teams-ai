@@ -2,9 +2,11 @@
 
 Message delete activities represent a deletion of an existing message activity within a conversation. The deleted activity is referred to by the `id` and `conversation` fields within the activity.
 
+<!-- langtabs-start -->
 ```typescript
 app.on('messageDelete', async ({ activity }) => {});
 ```
+<!-- langtabs-end -->
 
 ## Schema
 

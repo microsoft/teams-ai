@@ -15,9 +15,11 @@ The Teams CLI was created with the intent of supporting developers by making com
 
 Install the Teams CLI globally using npm:
 
+<!-- langtabs-start -->
 ```sh
 npm install -g @microsoft/teams.cli@latest
 ```
+<!-- langtabs-end -->
 
 > [!TIP]
 > If you prefer not to install globally, all commands below can replace `teams` with npx:
@@ -25,7 +27,11 @@ npm install -g @microsoft/teams.cli@latest
 
 ## Create an agent with one command line
 
-`teams new <app-name> <optional>`
+<!-- langtabs-start -->
+```sh
+teams new <app-name> <optional>
+```
+<!-- langtabs-end -->
 
 The `new` token will create a brand new agent with `app-name` applied as the directory name and project name.
 
@@ -49,9 +55,11 @@ The `new` token will create a brand new agent with `app-name` applied as the dir
 
 An existing project may also have the appropriate Teams Toolkit configuration files added by configuration name.
 
+<!-- langtabs-start -->
 ```bash
 teams config add <config-name>
 ```
+<!-- langtabs-end -->
 
 | Configuration | Description |
 |--------------|-------------|
@@ -66,6 +74,8 @@ Using this command will include
 
 ## Remove Teams Toolkit configuration files
 
+<!-- langtabs-start -->
 ```bash
 teams config remove <config-name>
 ```
+<!-- langtabs-end -->

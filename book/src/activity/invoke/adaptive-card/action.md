@@ -2,10 +2,12 @@
 
 The invoke `name` for Adaptive Cards is `adaptiveCard/action`. However, it is also possible to use the alias `card.action` to invoke an Adaptive Card.
 
+<!-- langtabs-start -->
 ```typescript
 // Short-hand form of invoking an Adaptive Card
 app.on('card.action', async ({ activity }) => {});
 ```
+<!-- langtabs-end -->
 
 ## Invoke value
 

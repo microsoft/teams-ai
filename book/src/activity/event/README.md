@@ -4,9 +4,11 @@ Event activities communicate programmatic information from a client or channel t
 
 Event activities are the asynchronous counterpart to [invoke activities](https://github.com/microsoft/Agents/blob/main/specs/activity/protocol-activity.md#invoke-activity). (See [Invoke Activity](../invoke) for more information on invokes.) Unlike invoke, event is designed to be extended by client application extensions.
 
+<!-- langtabs-start -->
 ```typescript
 app.on('event', async ({ activity }) => {});
 ```
+<!-- langtabs-end -->
 
 ## Schema
 

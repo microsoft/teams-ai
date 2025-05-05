@@ -7,6 +7,7 @@ The `exec()` method supports passing arguments and provides options to attach cu
 ## Invoking a remote function
 When the tab app and the remote agent are deployed to the same location and in the same AAD app, it's simple to construct the client app and call the function.
 
+<!-- langtabs-start -->
 ```typescript
 import { App } from '@microsoft/teams.client';
 
@@ -17,21 +18,25 @@ await app.start();
 // that to an HTTP POST request to /api/functions/my-function
 const result = await app.exec<string>('my-function');
 ```
+<!-- langtabs-end -->
 If the deployment is more complex, the [AppOptions](./app-options.md) can be used to influence the URL as well as the scope in the token.
 
 ## Function arguments
 Any argument for the remote function can be provided as an object.
 
+<!-- langtabs-start -->
 ```typescript
 const args = { arg1: 'value1', arg2: 'value2' };
 const result = await app.exec('my-function', args);
 ```
+<!-- langtabs-end -->
 
 ## Request headers
 By default, the HTTP request will include a header with a bearer token as well as headers that give contextual information about the state of the app, such as which channel or team or chat or meeting the tab is active in.
 
 If needed, you can add additional headers to the `requestHeaders` option field. This may be handy to provide additional context to the remote function, such as a logging correlation ID.
 
+<!-- langtabs-start -->
 ```typescript
 const requestHeaders = {
   'x-custom-correlation-id': 'bf12aa3c-7460-4644-a22e-fb890af2ff41',
@@ -44,6 +49,7 @@ const result = await app.exec('my-function', undefined, { requestHeaders} );
 const args = { arg1: 'value1', arg2: 'value2' };
 const result = await app.exec('my-other-function', args, { requestHeaders} );
 ```
+<!-- langtabs-end -->
 
 ## Request bearer token
 By default, the HTTP request will include a header with a bearer token acquired by requesting an `access_as_user` permission. The resource used for the request depends on the `remoteApiOptions.remoteAppResource` [AppOption](./app-options.md). If this app option is not provided, the token is requested for the scope `api://<clientId>/access_as_user`. If this option is provided, the token is requested for the scope `<remoteApiOptions.remoteAppResource>/access_as_user`.
@@ -52,6 +58,7 @@ When calling a function that requires a different permission or scope, the `exec
 
 To specify a custom permission, set the permission field in the `exec` options.
 
+<!-- langtabs-start -->
 ```typescript
 // with this option, the exec() call will request a token for either
 // api://<clientId>/my_custom_permission or 
@@ -68,9 +75,11 @@ const result = await app.exec('my-function', undefined, options );
 const args = { arg1: 'value1', arg2: 'value2' };
 const result = await app.exec('my-other-function', args, options );
 ```
+<!-- langtabs-end -->
 
 Sometimes you may need even more control. You might for need a scope for a different resource than your default when calling a particular remote agent function. In these cases you can provide the exact token request object you need as part of the `exec` options.
 
+<!-- langtabs-start -->
 ```typescript
 // with this option, the exec() call will request a token for exactly
 // api://my-custom-resources/my_custom_scope, regardless of which app
@@ -88,6 +97,7 @@ const result = await app.exec('my-function', undefined, options );
 const args = { arg1: 'value1', arg2: 'value2' };
 const result = await app.exec('my-other-function', args, options );
 ```
+<!-- langtabs-end -->
 
 ## Ensuring user consent
 The `exec()` function supports incremental, just-in-time consent such that the user is prompted to consent during the `exec()` call, if they haven't already consented earlier.
