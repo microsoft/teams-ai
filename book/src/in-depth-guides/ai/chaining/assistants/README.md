@@ -7,6 +7,7 @@ We are going to make a developer assistant, someone who
 specializes in Typescript, can search internal documentation,
 and can read/write files in the project source code.
 
+<!-- langtabs-start -->
 ```bash
 src
 ├── prompts
@@ -15,3 +16,4 @@ src
 │   └── typescript.ts
 └── developer.ts
 ```
+<!-- langtabs-end -->

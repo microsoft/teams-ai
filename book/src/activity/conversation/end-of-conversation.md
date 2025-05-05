@@ -5,9 +5,11 @@ End of conversation activities signal the end of a conversation from the recipie
 > [**ℹ️ Note**]
 > This event is not applicable to Teams.
 
+<!-- langtabs-start -->
 ```typescript
 app.on('endOfConversation', async ({ activity }) => {});
 ```
+<!-- langtabs-end -->
 
 ## Schema
 

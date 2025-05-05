@@ -2,9 +2,11 @@
 
 Conversation update activities describe a change in a conversation's members, description, existence, or otherwise. Conversation update activities generally do not contain user-generated content. The conversation being updated is described in the `conversation` field.
 
+<!-- langtabs-start -->
 ```typescript
 app.on('conversationUpdate', async ({ activity }) => {});
 ```
+<!-- langtabs-end -->
 
 ## Schema
 

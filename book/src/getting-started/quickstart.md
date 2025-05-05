@@ -14,9 +14,11 @@ Get started with Teams AI Library (v2) quickly using the Teams CLI.
 
 Use your terminal to install the Teams CLI globally using npm:
 
+<!-- langtabs-start -->
 ```sh
 npm install -g @microsoft/teams.cli@latest
 ```
+<!-- langtabs-end -->
 
 > [!NOTE]
 >
@@ -27,9 +29,11 @@ npm install -g @microsoft/teams.cli@latest
 
 Let's create a simple echo agent that responds to messages. Run:
 
+<!-- langtabs-start -->
 ```sh
 teams new quote-agent --template echo
 ```
+<!-- langtabs-end -->
 
 This command:
 
@@ -43,24 +47,31 @@ This command:
 
 Navigate to your new agent's directory:
 
+<!-- langtabs-start -->
 ```sh
 cd quote-agent
 ```
+<!-- langtabs-end -->
 
 Install the dependencies:
 
+<!-- langtabs-start -->
 ```sh
 npm install
 ```
+<!-- langtabs-end -->
 
 Start the development server:
 
+<!-- langtabs-start -->
 ```sh
 npm run dev
 ```
+<!-- langtabs-end -->
 
 In the console, you should see a similar output:
 
+<!-- langtabs-start -->
 ```sh
 > quote-agent@0.0.0 dev
 > npx nodemon -w "./src/**" -e ts --exec "node -r ts-node/register -r dotenv/config ./src/index.ts"
@@ -74,6 +85,7 @@ In the console, you should see a similar output:
 [INFO] @teams/app/http listening on port 3000 🚀
 [INFO] @teams/app/devtools available at http://localhost:3001/devtools
 ```
+<!-- langtabs-end -->
 
 When the application starts, you'll see:
 

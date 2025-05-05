@@ -2,6 +2,7 @@
 
 The assistant that specializes in documentation searching.
 
+<!-- langtabs-start -->
 ```bash
 src
 ├── prompts
@@ -10,9 +11,11 @@ src
 │   └── typescript.ts
 └── developer.ts
 ```
+<!-- langtabs-end -->
 
 ## `/src/prompts/documentation.ts`
 
+<!-- langtabs-start -->
 ```typescript
 import { ChatPrompt } from '@microsoft/teams.ai';
 import { OpenAIChatModel } from '@microsoft/teams.openai';
@@ -44,3 +47,4 @@ export const documentation = new ChatPrompt({
   }
 );
 ```
+<!-- langtabs-end -->

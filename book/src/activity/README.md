@@ -4,9 +4,11 @@
 
 An activity is an application-level representation of conversational actions made by humans and automated software.
 
+<!-- langtabs-start -->
 ```typescript
 app.on('activity', async ({ activity }) => {});
 ```
+<!-- langtabs-end -->
 
 ## Schema
 

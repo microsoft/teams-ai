@@ -1,8 +1,10 @@
 # Activity: Message Update
 
+<!-- langtabs-start -->
 ```typescript
 app.on('messageUpdate', async ({ activity }) => {});
 ```
+<!-- langtabs-end -->
 
 Message update activities represent an update of an existing message activity within a conversation. The updated activity is referred to by the `id` and `conversation` fields within the activity, and the message update activity contains all fields in the revised message activity.
 

@@ -23,9 +23,11 @@ In this section we will walk through creating an app that can access the [Micros
 
 Use your terminal to run the following command: 
 
+<!-- langtabs-start -->
 ```sh
 teams new oauth-app --template graph
 ```
+<!-- langtabs-end -->
 
 This command:
 1. Creates a new directory called `oauth-app`.
@@ -36,9 +38,11 @@ This command:
 
 Open your terminal with the `oauth-app/` folder set as the current working directory and run the following command:
 
+<!-- langtabs-start -->
 ```sh
 teams config add ttk.oauth
 ```
+<!-- langtabs-end -->
 
 This will add relevant Teams Toolkit files to your project.
 

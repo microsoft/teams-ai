@@ -7,9 +7,11 @@ Commands look similar in structure to events but have different semantics. Comma
 > [**ℹ️ Note**]
 > This event type is not applicable to Teams.
 
+<!-- langtabs-start -->
 ```typescript
 app.on('command', async ({ activity }) => {});
 ```
+<!-- langtabs-end -->
 
 ## Schema
 

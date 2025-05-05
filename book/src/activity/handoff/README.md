@@ -2,9 +2,11 @@
 
 Handoff activities are used to request or signal a change in focus between elements inside a bot. They are not intended to be used in wire communication (besides internal communication that occurs between services in a distributed bot).
 
+<!-- langtabs-start -->
 ```typescript
 app.on('handoff', async ({ activity }) => {});
 ```
+<!-- langtabs-end -->
 
 ## Schema
 

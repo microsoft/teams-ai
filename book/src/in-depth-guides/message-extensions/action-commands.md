@@ -25,6 +25,7 @@ There are three different areas action commands can be invoked from:
 
 To use action commands you have define them in the Teams app manifest. Here is an example:
 
+<!-- langtabs-start -->
 ```json
 "composeExtensions": [
     {
@@ -83,6 +84,7 @@ To use action commands you have define them in the Teams app manifest. Here is a
     }
 ]
 ```
+<!-- langtabs-end -->
 
 Here we are defining three different commands:
 
@@ -102,35 +104,45 @@ Here we are defining three different commands:
 
 Handle submission when the `createCard` or `getMessageDetails` actions commands are invoked.
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/index.snippet.message-ext-submit.ts }}
 ```
+<!-- langtabs-end -->
 
 `createCard()` function
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/card.snippet.message-ext-create-card.ts }}
 ```
+<!-- langtabs-end -->
 
 `createMessageDetailsCard()` function
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/card.snippet.message-ext-create-message-details-card.ts }}
 ```
+<!-- langtabs-end -->
 
 ## Handle opening adaptive card dialog
 
 Handle opening adaptive card dialog when the `fetchConversationMembers` command is invoked.
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/index.snippet.message-ext-open.ts }}
 ```
+<!-- langtabs-end -->
 
 `createConversationMembersCard()` function
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/card.snippet.message-ext-create-conversation-members-card.ts }}
 ```
+<!-- langtabs-end -->
 
 ## Resources
 
