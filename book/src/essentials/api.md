@@ -26,7 +26,7 @@ app.on('message', async ({ activity, api }) => {
 It's also possible to access the api client from outside a handler via the app instance. Here we have the same example as above, but we're access the api client via the app instance.
 
 ```typescript
-const res = await app.api.conversations.members(conversationId).get();
+const res = await app.api.graph.chats.getAllMessages.get();
 ```
 
 
