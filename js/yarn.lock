@@ -160,10 +160,10 @@
     fast-xml-parser "^5.0.7"
     tslib "^2.8.1"
 
-"@azure/identity@^4.4.1", "@azure/identity@^4.8.0":
-  version "4.8.0"
-  resolved "https://registry.yarnpkg.com/@azure/identity/-/identity-4.8.0.tgz#686682683a470ccf4dbb2597ee234f9c5c483a40"
-  integrity sha512-l9ALUGHtFB/JfsqmA+9iYAp2a+cCwdNO/cyIr2y7nJLJsz1aae6qVP8XxT7Kbudg0IQRSIMXj0+iivFdbD1xPA==
+"@azure/identity@^4.4.1", "@azure/identity@^4.9.1":
+  version "4.9.1"
+  resolved "https://registry.yarnpkg.com/@azure/identity/-/identity-4.9.1.tgz#ee4b9435f1b96bea5985e7dec989760a67d9a119"
+  integrity sha512-986D7Cf1AOwYqSDtO/FnMAyk/Jc8qpftkGsxuehoh4F85MhQ4fICBGX/44+X1y78lN4Sqib3Bsoaoh/FvOGgmg==
   dependencies:
     "@azure/abort-controller" "^2.0.0"
     "@azure/core-auth" "^1.9.0"
@@ -173,11 +173,8 @@
     "@azure/core-util" "^1.11.0"
     "@azure/logger" "^1.0.0"
     "@azure/msal-browser" "^4.2.0"
-    "@azure/msal-node" "^3.2.3"
-    events "^3.0.0"
-    jws "^4.0.0"
+    "@azure/msal-node" "^3.5.0"
     open "^10.1.0"
-    stoppable "^1.1.0"
     tslib "^2.2.0"
 
 "@azure/logger@^1.0.0", "@azure/logger@^1.1.4":
@@ -218,10 +215,10 @@
   resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-15.3.0.tgz#cc75760f7929588b261b970a1dd1d292d0efdbc8"
   integrity sha512-lh+eZfibGwtQxFnx+mj6cYWn0pwA8tDnn8CBs9P21nC7Uw5YWRwfXaXdVQSMENZ5ojRqR+NzRaucEo4qUvs3pA==
 
-"@azure/msal-common@15.4.0":
-  version "15.4.0"
-  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-15.4.0.tgz#300779b88026ab7d60b4e9c368509a2ec0c20617"
-  integrity sha512-reeIUDXt6Xc+FpCBDEbUFQWvJ6SjE0JwsGYIfa3ZCR6Tpzjc9J1v+/InQgfCeJzfTRd7PDJVxI6TSzOmOd7+Ag==
+"@azure/msal-common@15.5.2":
+  version "15.5.2"
+  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-15.5.2.tgz#d9d3be6828872d0c444cff0728a6af02f0da645e"
+  integrity sha512-+G85T6oA6i4ubzjOw4BpWd8QCG2FunYN4jaz96gw3SUd8+89vwuiqLg6mtnm/lkPC95bayD+CwuwFn9wvhQGow==
 
 "@azure/msal-node@^2.13.1", "@azure/msal-node@^2.16.1":
   version "2.16.2"
@@ -232,12 +229,12 @@
     jsonwebtoken "^9.0.0"
     uuid "^8.3.0"
 
-"@azure/msal-node@^3.2.3":
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-3.4.1.tgz#838dbc3de3fe8dae919b2de20c300d3b9b0ff425"
-  integrity sha512-VlW6ygnKBIqUKIHnA/ubQ+F3rZ8aW3K6VA1bpZ90Ln0vlE4XaA6yGB/FibPJxet7gWinAG1oSpQqPN/PL9AqIw==
+"@azure/msal-node@^3.5.0":
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-3.5.2.tgz#332b64580f688ecc909d63326d4d7114e964be5f"
+  integrity sha512-mt97ieL+IpD/7Hj7Q6pGTPk3dBgvhkOV1HYyH+PkOakhbOOCEb9flAteDgBfADRXBsYJZT+ZlEbPJa4IDn9HZw==
   dependencies:
-    "@azure/msal-common" "15.4.0"
+    "@azure/msal-common" "15.5.2"
     jsonwebtoken "^9.0.0"
     uuid "^8.3.0"
 
@@ -732,10 +729,10 @@
   resolved "https://registry.yarnpkg.com/@microsoft/recognizers-text/-/recognizers-text-1.3.1.tgz#eda98a9148101ecdb04ed1424082d472b04aabd9"
   integrity sha512-HikLoRUgSzM4OKP3JVBzUUp3Q7L4wgI17p/3rERF01HVmopcujY3i6wgx8PenCwbenyTNxjr1AwSDSVuFlYedQ==
 
-"@microsoft/teams-js@^2.35.0":
-  version "2.35.0"
-  resolved "https://registry.yarnpkg.com/@microsoft/teams-js/-/teams-js-2.35.0.tgz#4b97176627bdf4bed02c68fa35103b67b835e01d"
-  integrity sha512-TVsfjJofxSvM0e/SR9k4IMHSGrkLzR7kVEAkvmzb4dmkB/BUNcFFlMKUdzAY2TLx6+rjkILEnDW9V+yU7EbZIA==
+"@microsoft/teams-js@^2.37.0":
+  version "2.37.0"
+  resolved "https://registry.yarnpkg.com/@microsoft/teams-js/-/teams-js-2.37.0.tgz#9b585ba439a3e72d2d19a235abae39b2d9c0070e"
+  integrity sha512-vF85QZ7nJsaV6pmhJegg7+R2gHtHr/sAl6ToDMFaobYugl1X6Hoil+4o1fg2aPLd7jHuiMwCrcK54N93ja24fw==
   dependencies:
     base64-js "^1.3.1"
     debug "^4.3.3"
@@ -1921,10 +1918,10 @@ axios@^0.26.0:
   dependencies:
     follow-redirects "^1.14.8"
 
-axios@^1.3.4, axios@^1.7.7, axios@^1.8.4:
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-1.8.4.tgz#78990bb4bc63d2cae072952d374835950a82f447"
-  integrity sha512-eBSYY4Y68NNlHbHBMdeDmKNtDgXWhQsJcGqzO3iLUM0GraQFSS9cVgPX5I9b3lbdFKyYoAEGAZF1DwhTaljNAw==
+axios@^1.3.4, axios@^1.7.7, axios@^1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.9.0.tgz#25534e3b72b54540077d33046f77e3b8d7081901"
+  integrity sha512-re4CqKTJaURpzbLHtIi6XpDv20/CnpXOtjRY5/CU32L8gU8ek9UIivcfvSWvmKEngmVbrUtPpdDwWDWL7DNHvg==
   dependencies:
     follow-redirects "^1.15.6"
     form-data "^4.0.0"
@@ -3235,10 +3232,10 @@ dot-prop@^4.2.1:
   dependencies:
     is-obj "^1.0.0"
 
-dotenv@^16.4.1, dotenv@^16.4.5:
-  version "16.4.7"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.4.7.tgz#0e20c5b82950140aa99be360a8a5f52335f53c26"
-  integrity sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==
+dotenv@^16.5.0:
+  version "16.5.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.5.0.tgz#092b49f25f808f020050051d1ff258e404c78692"
+  integrity sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==
 
 dotenv@^8.2.0:
   version "8.6.0"
@@ -5667,29 +5664,12 @@ jwa@^1.4.1:
     ecdsa-sig-formatter "1.0.11"
     safe-buffer "^5.0.1"
 
-jwa@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/jwa/-/jwa-2.0.0.tgz#a7e9c3f29dae94027ebcaf49975c9345593410fc"
-  integrity sha512-jrZ2Qx916EA+fq9cEAeCROWPTfCwi1IVHqT2tapuqLEVVDKFDENFw1oL+MwrTvH6msKxsd1YTDVw6uKEcsrLEA==
-  dependencies:
-    buffer-equal-constant-time "1.0.1"
-    ecdsa-sig-formatter "1.0.11"
-    safe-buffer "^5.0.1"
-
 jws@3.x.x, jws@^3.2.2:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/jws/-/jws-3.2.2.tgz#001099f3639468c9414000e99995fa52fb478304"
   integrity sha512-YHlZCB6lMTllWDtSPHz/ZXTsi8S00usEV6v1tjq8tOUZzw7DpSDWVXjXDre6ed1w/pd495ODpHZYSdkRTsa0HA==
   dependencies:
     jwa "^1.4.1"
-    safe-buffer "^5.0.1"
-
-jws@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/jws/-/jws-4.0.0.tgz#2d4e8cf6a318ffaa12615e9dec7e86e6c97310f4"
-  integrity sha512-KDncfTmOZoOMTFG4mBlG0qUIOlc03fmzH+ru6RgYVZhPkyiy/92Owlt/8UEN+a4TXR1FQetfIpJE8ApdvdVxTg==
-  dependencies:
-    jwa "^2.0.0"
     safe-buffer "^5.0.1"
 
 keyv@^4.5.3:
@@ -8134,11 +8114,6 @@ statuses@2.0.1:
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-2.0.1.tgz#55cb000ccf1d48728bd23c685a063998cf1a1b63"
   integrity sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==
 
-stoppable@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/stoppable/-/stoppable-1.1.0.tgz#32da568e83ea488b08e4d7ea2c3bcc9d75015d5b"
-  integrity sha512-KXDYZ9dszj6bzvnEMRYvxgeTHU74QBFL54XKtP3nyMuJ81CFYtABZ3bAzL2EdFUaEwJOBOgENyFj3R7oTzDyyw==
-
 stream-combiner@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/stream-combiner/-/stream-combiner-0.2.2.tgz#aec8cbac177b56b6f4fa479ced8c1912cee52858"
@@ -9006,10 +8981,10 @@ vasync@^2.2.0:
   dependencies:
     verror "1.10.0"
 
-vectra@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/vectra/-/vectra-0.9.0.tgz#8eef1076ff9e6ccc31007a3cd51ee6babe3ddac3"
-  integrity sha512-Ynt+es19854syZJKgCFTEiWP3CrUZepi4xeIhEpVgeWmFV38XXwgrh8WvPhEyw7WqPJ/ze56JkR4+eUOTyPzNA==
+vectra@^0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/vectra/-/vectra-0.10.0.tgz#ab9197c1d3fa6e7ae75727e22ed2ecd035a6e2d1"
+  integrity sha512-DIUvZe7h9GLZ93sSFTi3nY+dqcOaudxDziu+8Ia+thr54kS9ttycH0tYiFiGKJjLs4gGoAwtRw2KzFHFcD0jBQ==
   dependencies:
     axios "^1.3.4"
     cheerio "^1.0.0-rc.12"
@@ -9019,6 +8994,7 @@ vectra@^0.9.0:
     openai "^3.2.1"
     turndown "^7.1.2"
     uuid "^9.0.0"
+    wink-nlp "^2.3.2"
     yargs "^17.7.2"
 
 verror@1.10.0:
@@ -9150,6 +9126,11 @@ widest-line@^2.0.0:
   integrity sha512-Ba5m9/Fa4Xt9eb2ELXt77JxVDV8w7qQrH0zS/TWSJdLyAwQjWoOzpzj5lwVftDz6n/EOu3tNACS84v509qwnJA==
   dependencies:
     string-width "^2.1.1"
+
+wink-nlp@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/wink-nlp/-/wink-nlp-2.3.2.tgz#10310f232a24e75ff766646513c92756ee862b75"
+  integrity sha512-PsK/nOjI0nfC23HbpJa/eeca+wvmx2SVvH2hIhOJSDe0hbsyOwwImmRgYvv6BwsGN7/8aCHoeNzCac9xAsrvaw==
 
 word-wrap@^1.2.5:
   version "1.2.5"
