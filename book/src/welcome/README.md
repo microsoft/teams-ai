@@ -8,7 +8,7 @@ The Teams CLI makes it easy to bootstrap your first agent. First, install the CL
 
 <!-- langtabs-start -->
 ```sh
-npm install -g @microsoft/teams.cli@latest
+npm install -g @microsoft/teams.cli@preview
 ```
 <!-- langtabs-end -->
 
