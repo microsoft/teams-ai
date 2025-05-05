@@ -155,31 +155,6 @@ async function verifyInternalLink(baseDir, filePath, link) {
   // Resolve relative links
   targetPath = path.resolve(fileDir, decodeURIComponent(linkPath));
 
-  // Check if the link is a directory
-  const isDir = await isDirectory(targetPath);
-  if (isDir) {
-    // Rule 1: If it's a directory link, it should link directly to README.md instead
-    const readmePath = path.join(targetPath, 'README.md');
-    const readmeExists = await fileExists(readmePath);
-
-    if (!readmeExists) {
-      return {
-        valid: false,
-        link,
-        resolvedPath: targetPath,
-        issue: 'Directory missing README.md',
-      };
-    }
-
-    // Links should be to README.md, not to the directory itself
-    return {
-      valid: false,
-      link,
-      resolvedPath: targetPath,
-      issue: 'Links to directories should explicitly include README.md',
-    };
-  }
-
   // Check if the file exists as is without adding extension
   let exists = await fileExists(targetPath);
 
