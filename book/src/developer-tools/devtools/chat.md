@@ -17,7 +17,7 @@ Add the dev package to your Teams app.
 
 <!-- langtabs-start -->
 ```bash
-$: npm install @microsoft/teams.dev
+$: npm install @microsoft/teams.dev@preview
 ```
 <!-- langtabs-end -->
 

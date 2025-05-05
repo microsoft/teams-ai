@@ -17,13 +17,13 @@ Install the Teams CLI globally using npm:
 
 <!-- langtabs-start -->
 ```sh
-npm install -g @microsoft/teams.cli@latest
+npm install -g @microsoft/teams.cli@preview
 ```
 <!-- langtabs-end -->
 
 > [!TIP]
 > If you prefer not to install globally, all commands below can replace `teams` with npx:
-> > ```npx @microsoft/teams.cli@latest <arguments>```
+> > ```npx @microsoft/teams.cli@preview <arguments>```
 
 ## Create an agent with one command line
 
