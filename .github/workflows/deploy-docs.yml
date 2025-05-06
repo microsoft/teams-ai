@@ -52,7 +52,7 @@ jobs:
           echo `pwd`/mdbook-langtabs >> $GITHUB_PATH
       - name: Replace README.md links with index.md
         run: |
-          find book/src/ -type f -name "*.md" ! -iname "SUMMARY.md" -exec sed -i '' -E 's/(\[[^]]+\])\(([^)]*\/)?(readme\.md)([^)]*)\)/\1(\2index.md\4)/gi' {} \;
+          find book/src/ -type f -name "*.md" ! -iname "SUMMARY.md" -exec sed -ri 's/(\[.*\])\((.*\/)?(readme\.md)(#.*)?\)/\1\(\2index\.md\4\)/gI' {} \;
       - name: Build Book
         run: |
           cd book
