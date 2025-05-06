@@ -1,9 +1,8 @@
 app.on('message', async ({ log, signin, userGraph, isSignedIn }) => {
   if (!isSignedIn) {
     await signin({
-      // optional. This will work with explicit oauth.
+      // Customize the OAuth card text (only applies to OAuth flow, not SSO)
       oauthCardText: 'Sign in to your account',
-      // optional. This will work with explicit oauth.
       signInButtonText: 'Sign in' 
     }); // call signin for your auth connection...
     return;

@@ -31,6 +31,12 @@ The SSO signin flow involves several components working together. Here's how it 
 
 See the [SSO in Teams at runtime](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/authentication/bot-sso-overview#sso-in-teams-at-runtime) guide to learn more about the SSO signin flow
 
+### The SSO consent form
+
+This is what the SSO consent form looks like in Teams:
+
+![SSO Consent Form](../../assets/screenshots/auth-consent-popup.png)
+
 ## OAuth 
 
 You can use a third-party OAuth Identity Provider (IdP) to authenticate your app users. The app user is registered with the identity provider, which has a trust relationship with your app. When the user attempts to log in, the identity provider validates the app user and provides them with access to your app. Microsoft Entra ID is one such third party OAuth provider. You can use other providers, such as Google, Facebook, GitHub, or any other provider.
@@ -47,6 +53,12 @@ The OAuth signin flow involves several components working together. Here's how i
 6. App uses the token to access services on user's behalf
 
 When an access token expires, the user will need to go through the sign-in process again. Unlike SSO, there is no automatic token exchange - the user must explicitly authenticate each time their token expires.
+
+### The OAuth Card
+
+This is what the OAuth card looks like in Teams:
+
+![OAuthCard](../../assets/screenshots/auth-explicit-signin.png)
 
 ## OAuth vs SSO - Head-to-Head Comparison
 
