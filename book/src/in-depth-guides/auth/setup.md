@@ -17,7 +17,7 @@ A very common use case is to access enterprise related information about the use
 In this step you will have to tweak your Azure Bot service and App registration to add authentication configurations and enable Single Sign-On (SSO).
 
 > [!Note]
-> [Single Sign-On (SSO)](./auth-sso.md#single-sign-on-sso) within Teams is an authentication method that uses an app user's Teams identity to provide them with access to your app. A user who has logged into Teams doesn't need to log in again to your app within the Teams environment.
+> [Single Sign-On (SSO)](./auth-sso.md#single-sign-on-sso) in Teams allows users to access your app seamlessly by using their existing Teams account credentials for authentication. A user who has logged into Teams doesn't need to log in again to your app within the Teams environment.
 
 You can follow the [Enable SSO for bot and message extension app using Entra ID](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/authentication/bot-sso-register-aad?tabs=botid) guide in the Microsoft Learn docs.
 
@@ -46,6 +46,15 @@ This [CLI](../../developer-tools/cli/README.md) command adds configuration files
 
 You can follow the [Add authentication to bot app](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/authentication/add-authentication?tabs=dotnet%2Cdotnet-sample) Microsoft Learn guide.
 
+## Configure the OAuthConnectioName in the `App` instance
+
+In the [Using Teams Toolkit with `teams` CLI](#using-teams-toolkit-with-the-teams-cli) guide, you will notice that the OAuth Connection Name that was created in the Azure Bot configuration is `graph`. This is completely customizable and you can even create more than one configuration. You can specify which configuration to use by defining it in the app options on intialization:
+
+<!-- langtabs-start -->
+```typescript
+{{#include ../../../generated-snippets/ts/index.snippet.auth-config.ts }}
+```
+<!-- langtabs-end -->
 
 ## Resources
 

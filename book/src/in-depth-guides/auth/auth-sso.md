@@ -54,7 +54,7 @@ When an access token expires, the user will need to go through the sign-in proce
 |---------|-------|-----|
 | Identity Provider | Works with any OAuth provider (Microsoft Entra ID, Google, Facebook, GitHub, etc.) | Only works with Microsoft Entra ID |
 | Authentication Flow | User is sent a card with a sign-in link | If user has already consent to the requested scopes in the past they will "silently" login through the token exchange flow. Otherwise user is shown a consent form |
-| User Experience | Requires explicit sign-in | Seamless authentication using existing Teams identity |
+| User Experience | Requires explicit sign-in, and consent to scopes | Re-use existing Teams credential, Only requires consent to scopes |
 | Conversation scopes (`personal`, `groupChat`, `teams`) | `personal` scope only | `personal` scope only |
 | Azure Configuration differences | Same configuration except `Token Exchange URL` is blank | Same configuration except `Token Exchange URL` is set
 
