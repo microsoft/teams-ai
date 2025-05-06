@@ -12,7 +12,7 @@ export async function createDummyCards(searchQuery: string) {
 
   const cards = dummyItems.map((item) => {
     return {
-      card: new Card(
+      card: new AdaptiveCard(
         new TextBlock(item.title, {
           size: 'large',
           weight: 'bolder',

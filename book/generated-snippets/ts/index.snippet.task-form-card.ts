@@ -1,5 +1,5 @@
 function createTaskCard() {
-  return new Card().withBody(
+  return new AdaptiveCard().withBody(
     new TextBlock('Create New Task', {
       size: 'large',
       weight: 'bolder',

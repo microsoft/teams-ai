@@ -1,5 +1,5 @@
 function createFormCard() {
-  return new Card().withBody(
+  return new AdaptiveCard().withBody(
     new TextBlock('Please fill out the below form:', {
       wrap: true,
       style: 'heading',

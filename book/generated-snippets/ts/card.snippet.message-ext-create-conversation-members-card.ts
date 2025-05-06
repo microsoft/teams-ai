@@ -1,7 +1,7 @@
 export function createConversationMembersCard(members: Account[]) {
   const membersList = members.map((member) => member.name).join(', ');
 
-  return new Card(
+  return new AdaptiveCard(
     new TextBlock('Conversation members', {
       size: 'medium',
       weight: 'bolder',

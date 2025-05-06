@@ -2,14 +2,14 @@ app.on('message', async ({ send }) => {
   await send({ type: 'typing' });
 
   // Create the launcher adaptive card
-  const card: ICard = new Card()
+  const card: IAdaptiveCard = new AdaptiveCard()
     .withBody({
       type: 'TextBlock',
       text: 'Select the examples you want to see!',
       size: 'large',
       weight: 'bolder',
     })
-    .addActions(
+    .withActions(
       // raw action
       {
         type: 'Action.Submit',
