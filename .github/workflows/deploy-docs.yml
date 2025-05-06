@@ -52,7 +52,25 @@ jobs:
           echo `pwd`/mdbook-langtabs >> $GITHUB_PATH
       - name: Replace README.md links with index.md
         run: |
-          find book/src/ -type f -name "*.md" ! -iname "SUMMARY.md" -exec sed -ri 's/(\[.*\])\((.*\/)?(readme\.md)(#.*)?\)/\1\(\2index\.md\4\)/gI' {} \;
+          #!/bin/bash
+          for file in $(find book/src/ -type f -name "*.md" ! -iname "SUMMARY.md"); do
+            echo "Checking file: $file"
+            # Find matches and display them
+            matches=$(grep -i -o '\[[^]]*\]([^)]*readme\.md[^)]*)' "$file" || true)
+            if [ -n "$matches" ]; then
+              while IFS= read -r match; do
+                # Extract the link text and URL
+                link_text=$(echo "$match" | sed -E 's/\[(.*)\]\(.*/\1/')
+                old_url=$(echo "$match" | sed -E 's/\[.*\]\((.*)\)/\1/')
+                # Create the new URL by replacing readme.md with index.md (case insensitive)
+                new_url=$(echo "$old_url" | sed -E 's/(.*\/)?readme\.md(#.*)?/\1index.md\2/i')
+                echo "Found link: [$link_text]($old_url)"
+                echo "Replacing with: [$link_text]($new_url)"
+              done <<< "$matches"
+            fi
+            # Perform the actual replacement
+            sed -i -E 's/(\[.*\])\((.*\/)?(readme\.md)(#.*)?\)/\1\(\2index\.md\4\)/gI' "$file"
+          done
       - name: Build Book
         run: |
           cd book
