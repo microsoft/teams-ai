@@ -68,9 +68,42 @@ jobs:
                 echo "Replacing with: [$link_text]($new_url)"
               done <<< "$matches"
             fi
-            # Perform the actual replacement
-            sed -i -E 's/(\[.*\])\((.*\/)?(readme\.md)(#.*)?\)/\1\(\2index\.md\4\)/gI' "$file"
+            # Perform the actual replacement - improved pattern
+            sed -i -E 's/(\[[^]]*\])\(([^#)]*\/)?readme\.md(#[^)]*)?(\))/\1\(\2index.md\3\4/gI' "$file"
           done
+
+          # Check for remaining README.md links after the first replacement
+          remaining=$(find book/src/ -type f -name "*.md" -exec grep -l -i "readme\.md" {} \; || true)
+          if [ -n "$remaining" ]; then
+            echo "Found files with remaining README.md references:"
+            echo "$remaining"
+            echo "Applying additional replacement patterns..."
+            
+            # Apply different pattern for links without directory path
+            for file in $remaining; do
+              sed -i -E 's/(\[[^]]*\])\(readme\.md(#[^)]*)?(\))/\1\(index.md\2\3/gI' "$file"
+              echo "Applied additional fix to $file"
+            done
+          fi
+
+          # Print files where replacements were made to verify the changes
+          echo "===== PRINTING FILES WITH REPLACEMENTS ====="
+          files_with_changes=$(find book/src/ -type f -name "*.md" -exec grep -l -i "index\.md" {} \; || true)
+          for file in $files_with_changes; do
+            echo "===== CONTENT OF $file ====="
+            cat "$file"
+            echo ""
+            echo "===== END OF $file ====="
+          done
+
+          # Additional check for any remaining README.md links
+          final_check=$(find book/src/ -type f -name "*.md" -exec grep -l -i "readme\.md" {} \; || true)
+          if [ -n "$final_check" ]; then
+            echo "WARNING: Still found README.md references in these files:"
+            echo "$final_check"
+          else
+            echo "SUCCESS: No more README.md references found in the codebase."
+          fi
       - name: Build Book
         run: |
           cd book
