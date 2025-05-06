@@ -64,3 +64,4 @@
     - [💬 Chat](./developer-tools/devtools/chat.md)
     - [🔍 Inspect](./developer-tools/devtools/inspect.md)
     - [🪪 Cards](./developer-tools/devtools/cards.md)
+- [Privacy Policy](./privacy-policy/README.md)
