@@ -60,7 +60,7 @@ app.on('message', async ({ api, isSignedIn, send, signin }) => {
 This repository contains submodules that point to dedicated repositories for different language implementations of the SDK:
 
 - [TypeScript/JavaScript](https://github.com/microsoft/teams.ts)
-- [.NET](https://microsoft.github.io/teams.net/) (early stage)
+- [.NET](https://github.com/microsoft/teams.net) (early stage)
 - Python (coming soon)
 
 For language-specific bugs or issues, please use the Issues tab in the respective language repository.
