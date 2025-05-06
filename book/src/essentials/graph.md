@@ -72,7 +72,6 @@ The following clients are currently exposed:
 | communications | [/communications](https://learn.microsoft.com/en-us/graph/api/application-post-calls?view=graph-rest-1.0) | Calls and Online meetings |
 | employeeExperience | [/employeeExperience](https://learn.microsoft.com/en-us/graph/api/resources/engagement-api-overview?view=graph-rest-1.0) |  Employee Experience and Engagement |
 | me | [/me](https://learn.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http) | Same as `/users` but scoped to one user (who is making the request) |
-| solutions | [/solutions](https://learn.microsoft.com/en-us/graph/api/resources/solution-api-overview?view=graph-rest-1.0&tabs=http) |  |
 | teams | [/teams](https://learn.microsoft.com/en-us/graph/api/resources/team?view=graph-rest-1.0) | A Team resource  |
 | teamsTemplates | [/teamsTemplates](https://learn.microsoft.com/en-us/microsoftteams/get-started-with-teams-templates) | A Team Template resource |
 | teamwork | [/teamwork](https://learn.microsoft.com/en-us/graph/api/resources/teamwork?view=graph-rest-1.0) | A range of Microsoft Teams functionalities |
