@@ -19,7 +19,7 @@
 - [Teams](./teams/README.md)
   - [Core Concepts](./teams/core-concepts.md)
   - [Teams Manifest](./teams/manifest.md)
-  - [Deployment]()
+  <!-- - [Deployment]() -->
   - [Teams Toolkit](./teams/m365-toolkit.md)
 - [In-Depth Guides](./in-depth-guides/README.md)
   - [Adaptive Cards](./in-depth-guides/cards/README.md)
