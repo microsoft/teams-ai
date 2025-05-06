@@ -14,12 +14,16 @@ To avoid this, you need to get messages from your persistent (or in-memory) stor
 > [!NOTE]
 > The `ChatPrompt` class will modify the messages object that's passed into it. So if you want to manually manage it, you need to make a copy of the messages object before passing it in.
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/stateful-prompts.snippet.stateful-prompts-state-initialization.ts }}
 ```
+<!-- langtabs-end -->
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/stateful-prompts.snippet.stateful-prompts-example.ts }}
 ```
+<!-- langtabs-end -->
 
 ![Stateful Chat Example](../../assets/screenshots/stateful-chat-example.png)

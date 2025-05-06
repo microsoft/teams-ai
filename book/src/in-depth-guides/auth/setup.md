@@ -25,13 +25,15 @@ You can follow the [Enable SSO for bot and message extension app using Entra ID]
 
 Open your terminal and navigate to the root folder of your app and run the following command:
 
+<!-- langtabs-start -->
 ```sh
 teams config add ttk.oauth
 ```
+<!-- langtabs-end -->
 
 The `ttk.oauth` configuration is a basic setup for Teams Toolkit along with configurations to authenticate the user with Microsoft Entra ID to access Microsoft Graph APIs.
 
-This [CLI](../../developer-tools/cli/) command adds configuration files required by Teams Toolkit, including:
+This [CLI](../../developer-tools/cli/README.md) command adds configuration files required by Teams Toolkit, including:
 
 - Azure Application Entra ID manifest file `aad.manifest.json`.
 - Azure bicep files to provision Azure bot in `infra/` folder.

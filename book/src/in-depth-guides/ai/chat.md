@@ -38,13 +38,17 @@ Chat generation is the the most basic way of interacting with an LLM model. It i
 
 Import the relevant objects:
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/index.snippet.ai-imports.ts }}
 ```
+<!-- langtabs-end -->
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/index.snippet.simple-chat.ts }}
 ```
+<!-- langtabs-end -->
 
 > [!NOTE]
 > The current `OpenAIChatModel` implementation uses chat-completions API. The responses API is coming soon.
@@ -56,8 +60,10 @@ LLMs can take a while to generate a response, so often streaming the response le
 > [!IMPORTANT]
 > Streaming is only currently supported for single 1:1 chats, and not for groups or channels.
 
-```ts
+<!-- langtabs-start -->
+```typescript
 {{#include ../../../generated-snippets/ts/index.snippet.streaming-chat.ts }}
 ```
+<!-- langtabs-end -->
 
 ![Streaming the response](../../assets/screenshots/streaming-chat.gif)

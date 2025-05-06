@@ -6,6 +6,7 @@ Teams AI Library supports [MCP](https://modelcontextprotocol.io/introduction) as
 
 It is possible to co-opt a Teams AI Library service to be also used as an MCP server. Doing so will allow other MCP clients to connect to this service and use it to accomplish tasks. Check out the [MCP server sample](https://github.com/microsoft/teams.ts/tree/main/samples/mcp) for a working example.
 
+<!-- langtabs-start -->
 ```typescript
 import { ChatPrompt } from '@microsoft/teams.ai';
 import { McpPlugin } from '@microsoft/teams.mcp';
@@ -52,11 +53,13 @@ const app = new App({
   ],
 });
 ```
+<!-- langtabs-end -->
 
 ## MCP Client
 
 On the other hand, if you want your application to use an MCP server, you can do so by using the `McpClient` plugin. This plugin is a plugin for your `ChatPrompt` and will allow your prompt to use remote MCP servers to serve tool calls.
 
+<!-- langtabs-start -->
 ```typescript
 import { ChatPrompt } from '@microsoft/teams.ai';
 import { McpClientPlugin } from '@microsoft/teams.mcpclient';
@@ -75,9 +78,11 @@ const prompt = new ChatPrompt(
   // in a different Teams AI Library application above
 ).usePlugin('mcpClient', { url: 'http://localhost:3000/mcp' });
 ```
+<!-- langtabs-end -->
 
 Somewhere else in the app:
 
+<!-- langtabs-start -->
 ```typescript
 app.on('message', async ({ send, activity }) => {
   await send({ type: 'typing' });
@@ -92,3 +97,4 @@ app.on('message', async ({ send, activity }) => {
   }
 });
 ```
+<!-- langtabs-end -->

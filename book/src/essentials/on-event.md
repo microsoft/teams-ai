@@ -36,20 +36,24 @@ Here are the events that you can start building handlers for:
 
 We can subscribe to errors that occur in the app.
 
+<!-- langtabs-start -->
 ```typescript
 app.event('error', ({ err, log }) => {
   log.error(err);
   // Or Alternatively, send it to an observability platform
 });
 ```
+<!-- langtabs-end -->
 
 ### Example 2
 
 When a user signs in using `OAuth` or `SSO`, use the graph api to fetch their profile and say hello.
 
+<!-- langtabs-start -->
 ```typescript
 app.event('signin', async ({ activity, send, api }) => {
   const me = await api.user.me.get();
   await send(`👋 Hello ${me.name}`);
 });
 ```
+<!-- langtabs-end -->

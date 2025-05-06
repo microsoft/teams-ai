@@ -6,12 +6,14 @@ These two App classes are designed to work well together. For instance, when you
 # Starting the app
 
 To use the `@microsoft/teams.client` package, you first create an App instance and then call `app.start()`. 
+<!-- langtabs-start -->
 ```typescript
 import { App } from '@microsoft/teams.client';
 
 const app = new App(clientId);
 await app.start();
 ```
+<!-- langtabs-end -->
 
 The app constructor strives to make it easy to get started on a new app, while still being flexible enough that it can integrate easily with existing apps.
 
@@ -35,6 +37,7 @@ The `app.start()` call does the following:
 ## Using the app
 When the `app.start()` call has completed, you can use the app instance to call Graph APIs and to call remote agent functions using the `exec()` function, or directly by using the `app.http` HTTP client. TeamsJS is now initialized, so you can interact with the hosting app. The `app.msalInstance` is now populated, in case you need to use the same MSAL for other purposes.
 
+<!-- langtabs-start -->
 ```typescript
 import * as teamsJs from '@microsoft/teams-js';
 import { App } from '@microsoft/teams.client';
@@ -51,3 +54,4 @@ const presenceResult = await app.graph.me.presence.get();
 // ...end call remote agent functions...
 const agentResult = await app.exec<string>('hello-world');
 ```
+<!-- langtabs-end -->

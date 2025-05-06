@@ -6,6 +6,7 @@ As seen from the previous page, the `conversationUpdate` activity is used to des
 
 The following events are part of the original Agents protocol and are supported by Teams.
 
+<!-- langtabs-start -->
 ```typescript
 // Initiate an action when a team member is added to a conversation
 app.on('conversationUpdate', async ({ activity }) => {
@@ -13,6 +14,7 @@ app.on('conversationUpdate', async ({ activity }) => {
   }
 });
 ```
+<!-- langtabs-end -->
 
 - `historyDisclosed` - Deprecated
 - `membersAdded`
@@ -23,9 +25,11 @@ app.on('conversationUpdate', async ({ activity }) => {
 
 The following events are custom to Teams and are not part of the original Agents protocol. These events are handled by the router and can be referenced directly as below.
 
+<!-- langtabs-start -->
 ```typescript
 app.on('channelCreated', async ({ activity }) => {});
 ```
+<!-- langtabs-end -->
 
 The following events are custom to Teams and are not part of the original Agents protocol.
 

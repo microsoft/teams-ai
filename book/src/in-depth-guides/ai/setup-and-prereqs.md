@@ -21,12 +21,14 @@ You will need to deploy a model in Azure OpenAI. [Here](https://learn.microsoft.
 
 Once you have deployed a model, include the following key/values in your `.env` file:
 
+<!-- langtabs-start -->
 ```env
 AZURE_OPENAI_API_KEY=your-azure-openai-api-key
 AZURE_OPENAI_MODEL_DEPLOYMENT_NAME=your-azure-openai-model
 AZURE_OPENAI_ENDPOINT=you-azure-openai-endpoint
 AZURE_OPENAI_API_VERSION=your-azure-openai-api-version
 ```
+<!-- langtabs-end -->
 
 > [!NOTE]
 > The `AZURE_OPENAI_API_VERSION` is different from the model version. This is a common point of confusion. Look for the API Version [here](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference?WT.mc_id=AZ-MVP-5004796 'Azure OpenAI API Reference')
@@ -36,6 +38,8 @@ AZURE_OPENAI_API_VERSION=your-azure-openai-api-version
 You will need to create an OpenAI account and get an API key. [Here](https://platform.openai.com/docs/quickstart/build-your-application 'OpenAI Quickstart Guide') is a guide on how to do this.
 Once you have your API key, include the following key/values in your `.env` file:
 
+<!-- langtabs-start -->
 ```env
 OPENAI_API_KEY=sk-your-openai-api-key
 ```
+<!-- langtabs-end -->

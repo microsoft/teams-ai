@@ -23,9 +23,11 @@ In this section we will walk through creating an app that can access the [Micros
 
 Use your terminal to run the following command: 
 
+<!-- langtabs-start -->
 ```sh
 teams new oauth-app --template graph
 ```
+<!-- langtabs-end -->
 
 This command:
 1. Creates a new directory called `oauth-app`.
@@ -36,9 +38,11 @@ This command:
 
 Open your terminal with the `oauth-app/` folder set as the current working directory and run the following command:
 
+<!-- langtabs-start -->
 ```sh
 teams config add ttk.oauth
 ```
+<!-- langtabs-end -->
 
 This will add relevant Teams Toolkit files to your project.
 
@@ -54,7 +58,7 @@ Once you have successfully sideloaded the app into Teams you can now interact wi
 ### Signing the user in
 
 > [!Note]
-> This is the Single Sign-On (SSO) authentication flow. To learn more about all the available flows and their differences see the [How Auth Works](auth-sso.md) guide. 
+> This is the Single Sign-On (SSO) authentication flow. To learn more about all the available flows and their differences see the [How Auth Works](auth-sso.md) guide.
 
 
 When the user sends a message to the user a consent form will popup:

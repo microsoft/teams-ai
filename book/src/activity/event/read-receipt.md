@@ -2,9 +2,11 @@
 
 A read receipt event is sent when a user has read a message, and in the UI shows as an eye icon next to the message.
 
+<!-- langtabs-start -->
 ```typescript
 app.on('readReceipt', async ({ activity }) => {});
 ```
+<!-- langtabs-end -->
 
 `'readReceipt'` is alias for the event name `'application/vnd.microsoft.readReceipt'`.
 

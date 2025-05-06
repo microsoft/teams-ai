@@ -4,17 +4,21 @@ Meeting extensibility provides a way for bots to participate in meetings and rec
 
 ## Meeting start event
 
+<!-- langtabs-start -->
 ```typescript
 app.on('meetingStart', async ({ activity }) => {});
 ```
+<!-- langtabs-end -->
 
 The `'meetingStart'` is alias for the event name `'application/vnd.microsoft.meetingStart'`. This event is sent when a meeting starts.
 
 ## Meeting end event
 
+<!-- langtabs-start -->
 ```typescript
 app.on('meetingEnd', async ({ activity }) => {});
 ```
+<!-- langtabs-end -->
 
 The `'meetingEnd'` is the alias for the event name `'application/vnd.microsoft.meetingEnd'`. This event is sent when a meeting ends.
 

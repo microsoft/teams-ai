@@ -6,6 +6,7 @@ After creating your first Teams application, let's understand its structure and 
 
 When you create a new Teams application, it generates a directory with this basic structure:
 
+
 ```
 quote-agent/
 |── appPackage/       # Teams app package files
@@ -24,6 +25,7 @@ Let's break down the simple application we created in the [quickstart](quickstar
 
 The heart of your application is the `App` class. This class handles all incoming activities and manages your application's lifecycle. It also acts as a way to host your application service.
 
+<!-- langtabs-start -->
 ```typescript
 import { App } from '@microsoft/teams.apps';
 import { ConsoleLogger } from '@microsoft/teams.common/logging';
@@ -33,12 +35,13 @@ const app = new App({
   plugins: [new DevtoolsPlugin()],
 });
 ```
+<!-- langtabs-end -->
 
 The app configuration includes a variety of options that allow you to customize its behavior, including controlling the underlying server, authentication, and other settings. For simplicity's sake, let's focus on plugins.
 
 ### Plugins
 
-Plugins are a core part of the Teams AI v2 SDK. They allow you to hook into various lifecycles of the application. The lifecycles include server events (start, stop, initialize etc.), and also Teams Activity events (onActivity, onActivitySent, etc.). In fact, the [DevTools](../developer-tools/devtools/) application you already have running is a plugin too. It allows you to inspect and debug your application in real-time.
+Plugins are a core part of the Teams AI v2 SDK. They allow you to hook into various lifecycles of the application. The lifecycles include server events (start, stop, initialize etc.), and also Teams Activity events (onActivity, onActivitySent, etc.). In fact, the [DevTools](../developer-tools/devtools/README.md) application you already have running is a plugin too. It allows you to inspect and debug your application in real-time.
 
 > [!CAUTION]
 > DevTools is a plugin that should only be used in development mode. It should not be used in production applications since it offers no authentication and allows your application to be accessed by anyone.\
@@ -48,12 +51,14 @@ Plugins are a core part of the Teams AI v2 SDK. They allow you to hook into vari
 
 Teams applications respond to various types of activities. The most basic is handling messages:
 
+<!-- langtabs-start -->
 ```typescript
 app.on('message', async ({ send, activity }) => {
   await send({ type: 'typing' });
   await send(`you said "${activity.text}"`);
 });
 ```
+<!-- langtabs-end -->
 
 This code:
 
@@ -68,11 +73,13 @@ This code:
 
 Your application starts when you run:
 
+<!-- langtabs-start -->
 ```typescript
 (async () => {
   await app.start();
 })();
 ```
+<!-- langtabs-end -->
 
 This part initializes your application server and, when configured for Teams, also authenticates it to be ready for sending and receiving messages.
 
@@ -84,13 +91,13 @@ After that, you can:
 
 - Add more activity handlers for different types of interactions. See [Listening to Activities](../essentials/on-activity.md) for more details.
 - Integrate with external services using the [API Client](../essentials/api.md).
-- Add interactive [cards](../in-depth-guides/cards) and [dialogs](../in-depth-guides/dialogs). See and for more information.
-- Implement [AI](../in-depth-guides/ai/).
+- Add interactive [cards](../in-depth-guides/cards/README.md) and [dialogs](../in-depth-guides/dialogs/README.md). See and for more information.
+- Implement [AI](../in-depth-guides/ai/README.md).
 
 Continue on to the next page to learn about these advanced features.
 
 ## Other Resources
 
-- [Essentials](../essentials)
-- [Teams concepts](../teams)
-- [Teams developer tools](../developer-tools)
+- [Essentials](../essentials/README.md)
+- [Teams concepts](../teams/README.md)
+- [Teams developer tools](../developer-tools/README.md)

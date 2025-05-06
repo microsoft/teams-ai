@@ -6,6 +6,7 @@ You can easily register your own middleware using the `app.use` method.
 Below is an example of a middleware that will log the elapse time of all handers
 that come after it.
 
+<!-- langtabs-start -->
 ```typescript
 app.use(async ({ log, next }) => {
   const startedAt = new Date();
@@ -13,3 +14,4 @@ app.use(async ({ log, next }) => {
   log.debug(new Date().getTime() - startedAt.getTime());
 });
 ```
+<!-- langtabs-end -->

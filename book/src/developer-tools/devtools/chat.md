@@ -15,9 +15,11 @@ Use the Teams AI v2 dev package as a plugin.
 
 Add the dev package to your Teams app.
 
+<!-- langtabs-start -->
 ```bash
-$: npm install @microsoft/teams.dev
+$: npm install @microsoft/teams.dev@preview
 ```
+<!-- langtabs-end -->
 
 ### Usage
 
@@ -26,6 +28,7 @@ In your app's main file, ensure DevTools plugin is added to the app.
 > [!CAUTION]
 > DevTools is not secure and should not be used in production environments. Remove the plugin before deploying your app to production.
 
+<!-- langtabs-start -->
 ```typescript
 import { App } from '@microsoft/teams.apps';
 import { ConsoleLogger } from '@microsoft/teams.common/logging';
@@ -36,18 +39,21 @@ const app = new App({
   plugins: [new DevtoolsPlugin()],
 });
 ```
+<!-- langtabs-end -->
 
 When you run your app, for example `npm run dev`, devtools will be running on port 3001
 
+<!-- langtabs-start -->
 ```bash
 [nodemon] watching extensions: ts
 [nodemon] starting `node -r ts-node/register -r dotenv/config ./src/index.ts`
 [INFO] @samples/echo/http listening on port 3000 🚀
 [INFO] @samples/echo/devtools available at http://localhost:3001/devtools
 ```
+<!-- langtabs-end -->
 
 > [!NOTE]
-> If you used the [CLI](../cli/) to create a TTK configuration for your app, DevTools will run on port 3979 when you launch the debugger.
+> If you used the [CLI](../cli/README.md) to create a TTK configuration for your app, DevTools will run on port 3979 when you launch the debugger.
 
 When you open the page, you will see a Teams-like chat window and you can immediately interact with your agent.
 

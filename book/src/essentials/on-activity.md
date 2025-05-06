@@ -21,11 +21,13 @@ flowchart LR
 
 Here is an example of a basic message handler:
 
-```ts
+<!-- langtabs-start -->
+```typescript
 app.on('message', async ({ activity, send }) => {
   await send(`You said: ${activity.text}`);
 });
 ```
+<!-- langtabs-end -->
 
 In the above example, the `activity` parameter is of type `MessageActivity`, which has a `text` property. You'll notice that the handler here does not return anything, but instead handles it by `send`ing a message back. For message activities, Teams does not expect your application to return anything (though it's usually a good idea to send some sort of friendly acknowledgment!).
 
@@ -35,14 +37,17 @@ In the above example, the `activity` parameter is of type `MessageActivity`, whi
 
 The `on` activity handlers follow a [middleware](https://www.patterns.dev/vanilla/mediator-pattern/) pattern similar to how `express` middlewares work. This means that for each activity handler, a `next` function is passed in which can be called to pass control to the next handler. This allows you to build a chain of handlers that can process the same activity in different ways.
 
-```ts
+<!-- langtabs-start -->
+```typescript
 app.on('message', async ({ next }) => {
   console.log('global logger');
   next(); // pass control onward
 });
 ```
+<!-- langtabs-end -->
 
-```ts
+<!-- langtabs-start -->
+```typescript
 app.on('message', async ({ activity, next }) => {
   if (activity.text === '/help') {
     await send('Here are all the ways I can help you...');
@@ -53,13 +58,16 @@ app.on('message', async ({ activity, next }) => {
   next();
 });
 ```
+<!-- langtabs-end -->
 
-```ts
+<!-- langtabs-start -->
+```typescript
 app.on('message', async ({ activity }) => {
   // Fallthrough to the final handler
   await send(`Hello! you said ${activity.text}`);
 });
 ```
+<!-- langtabs-end -->
 
 > [!NOTE]
 > Just like other middlewares, if you stop the chain by not calling `next()`, the activity will not be passed to the next handler.

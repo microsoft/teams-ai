@@ -16,16 +16,18 @@ First, you'll need to install the Teams Toolkit IDE extension:
 
 To configure your agent for Teams, run the following command in the terminal inside your quote-agent folder:
 
+<!-- langtabs-start -->
 ```bash
 # (if you have `teams` CLI installed globally, use `teams` instead of `npx`)
 npx @microsoft/teams.cli config add ttk.basic
 ```
+<!-- langtabs-end -->
 
 > [!TIP]
 > The `ttk.basic` configuration is a basic setup for Teams Toolkit. It includes the necessary files and configuration to get started with Teams development.<br/>
 > Explore more advanced configurations as needed with teams config --help.<br>
 
-This [CLI](../developer-tools/cli) command adds configuration files required by Teams Toolkit, including:
+This [CLI](../developer-tools/cli/README.md) command adds configuration files required by Teams Toolkit, including:
 
 - Environment setup in the `env` folder and root `.env` file
 - Teams app manifest in the `appPackage` folder (if not already present)
@@ -67,6 +69,7 @@ When debugging starts, the Teams Toolkit will:
 
 If you set up TTK via the Teams AI CLI, you should see something like the following in your terminal:
 
+<!-- langtabs-start -->
 ```sh
 [nodemon] 3.1.9
 [nodemon] to restart at any time, enter `rs`
@@ -77,6 +80,7 @@ If you set up TTK via the Teams AI CLI, you should see something like the follow
 [INFO] @teams/app/http listening on port 3978 🚀
 [INFO] @teams/app/devtools available at http://localhost:3979/devtools
 ```
+<!-- langtabs-end -->
 
 ## Testing your agent
 
@@ -92,7 +96,7 @@ After the debugging session starts:
 Congratulations! Now you have a fully functional agent running in Microsoft Teams. Interact with it just like any other Teams app and explore the rest of the documentation to build more complex agents.
 
 > [!TIP]
-> If you want to monitor the activities and events in your app, you can still use the [DevTools plugin](../developer-tools/devtools/)! Note that the DevTools server is running on port 3979. You can open it in your browser to interact with your agent and monitor activities in real time.
+> If you want to monitor the activities and events in your app, you can still use the [DevTools plugin](../developer-tools/devtools/README.md)! Note that the DevTools server is running on port 3979. You can open it in your browser to interact with your agent and monitor activities in real time.
 
 ## Troubleshooting
 
@@ -106,12 +110,12 @@ While Teams AI v2 SDK heavily endorses Teams Tookit (TTK), you can run your agen
 
 ## Next steps
 
-Now that your agent is running in Teams, you can learn more [essential concepts](../essentials) to understand how to build more complex agents. Explore the [in-depth guides](../in-depth-guides) for advanced topics like authentication, message extensions, and more.
+Now that your agent is running in Teams, you can learn more [essential concepts](../essentials/README.md) to understand how to build more complex agents. Explore the [in-depth guides](../in-depth-guides/README.md) for advanced topics like authentication, message extensions, and more.
 
 ## Resources
 
-- [Teams CLI documentation](../developer-tools/cli/)
+- [Teams CLI documentation](../developer-tools/cli/README.md)
 - [Teams Toolkit documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/overview)
-- [Teams Toolkit CLI documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/cli)
+- [Teams Toolkit CLI documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/cli/README.md)
 - [Teams CLI GitHub repository](https://github.com/OfficeDev/Teams-Toolkit)
 - [Microsoft Teams deployment documentation](https://learn.microsoft.com/en-us/microsoftteams/deploy-overview)
