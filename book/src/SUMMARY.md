@@ -15,6 +15,7 @@
   - [Sending Messages](./essentials/sending-messages.md)
     - [Proactive Messages](./essentials/proactive-messaging.md)
   - [Using The API Client](./essentials/api.md)
+  - [Graph Access](./essentials/graph.md)
 - [Teams](./teams/README.md)
   - [Core Concepts](./teams/core-concepts.md)
   - [Teams Manifest](./teams/manifest.md)
