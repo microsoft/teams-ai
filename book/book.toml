@@ -25,8 +25,8 @@ command = "mdbook-langtabs"
 default-theme = "ayu"
 preferred-dark-theme = "ayu"
 git-repository-url = "http://github.com/microsoft/teams-ai"
-additional-js = ["mermaid.min.js", "mermaid-init.js", "pagetoc.js", "langtabs.js"]
-additional-css = ["theme/css/pagetoc.css", "theme/css/langtabs.css"]
+additional-js = ["theme/js/mermaid.min.js", "theme/js/mermaid-init.js", "theme/js/pagetoc.js", "theme/js/langtabs.js", "theme/js/custom.js"]
+additional-css = ["theme/css/pagetoc.css", "theme/css/langtabs.css", "theme/css/custom.css"]
 
 [output.html.fold]
 enable = true
