@@ -53,6 +53,9 @@ jobs:
       - name: Replace README.md links with index.md
         run: |
           #!/bin/bash
+          # Awful issue with mdbook. It doesn't replace README.md links with index.md links.
+          # other than in SUMMARY.md.
+          # https://github.com/rust-lang/mdBook/issues/984
           for file in $(find book/src/ -type f -name "*.md" ! -iname "SUMMARY.md"); do
             echo "Checking file: $file"
             # Find matches and display them
@@ -68,7 +71,7 @@ jobs:
                 echo "Replacing with: [$link_text]($new_url)"
               done <<< "$matches"
             fi
-            # Perform the actual replacement - improved pattern
+            # Perform the actual replacement
             sed -i -E 's/(\[[^]]*\])\(([^#)]*\/)?readme\.md(#[^)]*)?(\))/\1\(\2index.md\3\4/gI' "$file"
           done
       - name: Build Book
