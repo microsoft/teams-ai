@@ -5,7 +5,7 @@ on:
     branches:
       - v2-preview
     paths:
-      - "book/**"
+      - 'book/**'
       - .github/workflows/deploy-docs.yml
 
 jobs:
@@ -50,6 +50,9 @@ jobs:
           mkdir mdbook-langtabs
           curl -sSL $url | tar -xz --directory=./mdbook-langtabs
           echo `pwd`/mdbook-langtabs >> $GITHUB_PATH
+      - name: Replace README.md links with index.md
+        run: |
+          find book/src/ -type f -name "*.md" ! -iname "SUMMARY.md" -exec sed -i '' -E 's/(\[[^]]+\])\(([^)]*\/)?(readme\.md)([^)]*)\)/\1(\2index.md\4)/gi' {} \;
       - name: Build Book
         run: |
           cd book
@@ -60,7 +63,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          path: "docs"
+          path: 'docs'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
