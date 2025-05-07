@@ -7,7 +7,6 @@
 
 :root {
     --toc-width: 270px;
-    --center-content-toc-shift: calc(-1 * var(--toc-width) / 2);
 }
 
 .nav-chapters {
@@ -17,7 +16,7 @@
 
 .previous {
     /*
-    adjust the space between the left sidebar or the left side of the screen 
+    adjust the space between the left sidebar or the left side of the screen
     and the button that leads to the previous page
     */
     margin-left: var(--page-padding);
@@ -25,56 +24,30 @@
 
 @media only screen {
     main {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr var(--sidebar-width);
+        align-items: start;
+        gap: 0;
     }
-
-    @media (max-width: 1179px) {
-        .sidebar-hidden #sidetoc {
-            display: none;
-        }
-    }
-
-    @media (max-width: 1439px) {
-        .sidebar-visible #sidetoc {
-            display: none;
-        }
-    }
-
-    @media (1180px <= width <= 1439px) {
-        .sidebar-hidden main {
-            position: relative;
-            left: var(--center-content-toc-shift);
-        }
-    }
-
-    @media (1440px <= width <= 1700px) {
-        .sidebar-visible main {
-            position: relative;
-            left: var(--center-content-toc-shift);
-        }
-    }
-
-    .content-wrap {
+    .main-column {
+        max-width: var(--content-max-width);
         width: 100%;
+        margin: 0 auto;
     }
-
     #sidetoc {
         margin-top: 20px;
-        margin-left: 35px;
-        margin-right: auto;
+        margin-left: 0;
+        margin-right: 0;
+        width: var(--sidebar-width);
     }
     #pagetoc {
         position: fixed;
-        /* adjust TOC width */
-        width: var(--toc-width);
+        width: var(--sidebar-width);
         height: calc(100vh - var(--menu-bar-height) - 0.67em * 4);
         overflow: auto;
     }
     #pagetoc a {
         border-left: 1px solid var(--sidebar-bg);
-        color: var(--fg) !important;
         display: block;
         padding-bottom: 5px;
         padding-top: 5px;
@@ -85,7 +58,6 @@
     #pagetoc a:hover,
     #pagetoc a.active {
         background: var(--sidebar-bg);
-        color: var(--sidebar-fg) !important;
     }
     #pagetoc .active {
         background: var(--sidebar-bg);
@@ -99,6 +71,20 @@
     }
     #pagetoc .pagetoc-H4 {
         padding-left: 60px;
+    }
+}
+
+@media (max-width: 1439px) {
+    main {
+        display: block;
+    }
+    #sidetoc {
+        display: none;
+    }
+    .main-column {
+        max-width: var(--content-max-width);
+        width: 100%;
+        margin: 0 auto;
     }
 }
 
