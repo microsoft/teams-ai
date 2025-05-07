@@ -1,4 +1,4 @@
-const rawCard: ICard = {
+const rawCard: IAdaptiveCard = {
   type: 'AdaptiveCard',
   body: [
     {

@@ -9,7 +9,7 @@ export function createLinkUnfurlCard(url: string) {
     ],
   } as ThumbnailCard;
 
-  const card = new Card(
+  const card = new AdaptiveCard(
     new TextBlock('Unfurled Link', {
       size: 'large',
       weight: 'bolder',

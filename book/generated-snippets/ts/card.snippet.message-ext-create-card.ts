@@ -5,7 +5,7 @@ interface FormData {
 }
 
 export function createCard(data: FormData) {
-  return new Card(
+  return new AdaptiveCard(
     new Image(IMAGE_URL),
     new TextBlock(data.title, {
       size: 'large',

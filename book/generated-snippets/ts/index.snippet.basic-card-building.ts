@@ -8,7 +8,7 @@
 } from "@microsoft/teams.cards";
 */
 
-  const card = new Card(
+  const card = new AdaptiveCard(
     new TextBlock('Hello world', { wrap: true, weight: 'bolder' }),
     new ToggleInput('Notify me').withId('notify'),
     new ActionSet(

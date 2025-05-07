@@ -1,4 +1,4 @@
-const dialogCard = new Card()
+const dialogCard = new AdaptiveCard()
   .withBody(
     {
       type: 'TextBlock',
@@ -14,7 +14,7 @@ const dialogCard = new Card()
   )
   // Inside the dialog, the card actions for submitting the card must be
   // of type Action.Submit
-  .addActions(
+  .withActions(
     new SubmitAction()
       .withTitle('Submit')
       .withData({ submissiondialogtype: 'webpage_dialog_step_1' })

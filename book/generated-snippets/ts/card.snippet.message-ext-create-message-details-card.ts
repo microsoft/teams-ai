@@ -1,5 +1,5 @@
 export function createMessageDetailsCard(messagePayload: Message) {
-  const cardElements: Element[] = [
+  const cardElements: CardElement[] = [
     new TextBlock('Message Details', {
       size: 'large',
       weight: 'bolder',
@@ -62,5 +62,5 @@ export function createMessageDetailsCard(messagePayload: Message) {
     );
   }
 
-  return new Card(...cardElements);
+  return new AdaptiveCard(...cardElements);
 }

@@ -9,7 +9,7 @@ function createProfileCardInputValidation() {
     .withLabel('Name')
     .withRequired()
     .withError('Name is required!'); // Custom error messages
-  const card = new Card().withBody(
+  const card = new AdaptiveCard().withBody(
     nameInput,
     ageInput,
     new TextInput({ id: 'location' }).withLabel('Location'),
