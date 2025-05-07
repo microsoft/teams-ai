@@ -1,3 +1,3 @@
-app.http.use(`/searchSettings`, async (_, res) => {
-  res.sendFile(npath.join(__dirname, 'searchSettings.html'));
+app.http.use(`/settings`, async (_, res) => {
+  res.sendFile(npath.join(__dirname, 'settings.html'));
 });

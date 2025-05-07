@@ -1,15 +1,15 @@
-# Search Settings
+# Settings
 
 You can add a settings page that allows users to configure settings for your app.
 
 The user can access the settings by right-clicking the app item in the compose box
 
 <br/>
-<img src="../../assets/screenshots/search-settings.png" height="300px" alt="Settings">
+<img src="../../assets/screenshots/settings.png" height="300px" alt="Settings">
 
 This guide will show how to enable user access to settings, as well as setting up a page that looks like this:
 
-![Settings Page](../../assets/screenshots/search-settings-page.png)
+![Settings Page](../../assets/screenshots/settings-page.png)
 
 ## 1. Update the Teams Manifiest
 
@@ -33,11 +33,11 @@ This is the code snippet for the settings `html` page:
 
 <!-- langtabs-start -->
 ```html
-{{#include ../../../generated-snippets/ts/searchSettings.snippet.message-ext-settings-page.html }}
+{{#include ../../../generated-snippets/ts/settings.snippet.message-ext-settings-page.html }}
 ```
 <!-- langtabs-end -->
 
-Save it in the `searchSettings.html` file in the same folder as where you app is initialized.
+Save it in the `settings.html` file in the same folder as where you app is initialized.
 
 You can serve it by adding the following code to your app:
 

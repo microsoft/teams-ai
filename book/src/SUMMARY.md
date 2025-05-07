@@ -31,7 +31,7 @@
   - [Message Extensions](./in-depth-guides/message-extensions/README.md)
     - [Action Commands](./in-depth-guides/message-extensions/action-commands.md)
     - [Search Commands](./in-depth-guides/message-extensions/search-commands.md)
-    - [Search Settings](./in-depth-guides/message-extensions/search-settings.md)
+    - [⚙️ Settings](./in-depth-guides/message-extensions/settings.md)
     - [🔗 Link Unfurling](./in-depth-guides/message-extensions/link-unfurling.md)
   - [🔒 User Authentication](./in-depth-guides/auth/README.md)
     - [Quickstart](./in-depth-guides/auth/quickstart.md)
