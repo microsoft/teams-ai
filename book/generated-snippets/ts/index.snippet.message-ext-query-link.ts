@@ -1,4 +1,4 @@
-app.on('message.ext.query-link', async ({ activity }) => {
+app.on("message.ext.query-link", async ({ activity }) => {
   const { url } = activity.value;
 
   if (!url) {
@@ -7,14 +7,14 @@ app.on('message.ext.query-link', async ({ activity }) => {
 
   const { card, thumbnail } = createLinkUnfurlCard(url);
   const attachment = {
-    ...cardAttachment('adaptive', card), // expanded card in the compose box...
-    preview: cardAttachment('thumbnail', thumbnail), //preview card in the compose box...
+    ...cardAttachment("adaptive", card), // expanded card in the compose box...
+    preview: cardAttachment("thumbnail", thumbnail), //preview card in the compose box...
   };
 
   return {
     composeExtension: {
-      type: 'result',
-      attachmentLayout: 'list',
+      type: "result",
+      attachmentLayout: "list",
       attachments: [attachment],
     },
   };
