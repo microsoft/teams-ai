@@ -1,5 +1,8 @@
 # <img src="https://media.githubusercontent.com/media/microsoft/teams-ai/main/assets/icon.png" width="100px"> Teams AI Library
 
+> [!IMPORTANT] 
+> **V2 PREVIEW:** We recently released a preview of our Teams AI Library v2 in Typescript! Navigate to this [branch](https://github.com/microsoft/teams-ai/tree/v2-preview) for more information.
+
 [![Coverage Status](https://coveralls.io/repos/github/microsoft/teams-ai/badge.svg?branch=main)](https://coveralls.io/github/microsoft/teams-ai?branch=main)
 
 | Name       | Status                                                                                                                                                                                                                                                                  | Package                                                    |
