@@ -17,6 +17,7 @@ There are three different areas search commands can be invoked from:
 
 To use search commands you have define them in the Teams app manifest. Here is an example:
 
+<!-- This JSON Teams manifest snippet was pulled from `teams.ts/tests/message-extensions` -->
 <!-- langtabs-start -->
 ```json
 "composeExtensions": [
