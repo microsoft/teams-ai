@@ -194,14 +194,30 @@
 
                 <div id="content" class="content">
                     <main>
-                        <div class="content-wrap">
-                        {{{ content }}}
+                        <div class="main-column">
+                            <div class="content-wrap">
+                                {{{ content }}}
+                            </div>
+                            <footer id="footer">
+                                <div class="footer-links">
+                                    <a href="https://aka.ms/teamsai-v2" target="_blank" rel="noopener">GitHub</a>
+                                    <span class="separator">|</span>
+                                    <a href="https://github.com/microsoft/teams-ai/blob/v2-preview/LICENSE" target="_blank" rel="noopener">License</a>
+                                    <span class="separator">|</span>
+                                    <a href="https://github.com/microsoft/teams-ai/blob/v2-preview/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a>
+                                </div>
+                                <div class="privacy-disclosure">
+                                    We improve our product by using Microsoft Clarity to see how you use our website. By using our site, you agree that we and Microsoft can collect and use this data. Our <a href="{{ path_to_root }}privacy-policy/index.html">privacy statement</a> has more details.
+                                </div>
+                                <div class="copyright">
+                                    © {current_year} Microsoft Corporation. All rights reserved.
+                                </div>
+                            </footer>
                         </div>
                         <div id="sidetoc">
                             <nav id="pagetoc"></nav>
                         </div>
                     </main>
-
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         {{#previous}}
