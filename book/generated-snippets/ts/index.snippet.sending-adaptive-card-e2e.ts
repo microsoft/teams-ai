@@ -1,31 +1,33 @@
-app.on('message', async ({ send, activity }) => {
-  await send({ type: 'typing' });
-  const card = new Card().withBody(
-    new TextBlock('Create New Task', {
-      size: 'large',
-      weight: 'bolder',
+app.on("message", async ({ send, activity }) => {
+  await send({ type: "typing" });
+  const card = new AdaptiveCard(
+    new TextBlock("Create New Task", {
+      size: "Large",
+      weight: "Bolder",
     }),
-    new TextInput({ id: 'title' }).withLabel('Task Title').withPlaceholder('Enter task title'),
-    new TextInput({ id: 'description' })
-      .withLabel('Description')
-      .withPlaceholder('Enter task details')
-      .withMultiLine(true),
+    new TextInput({ id: "title" })
+      .withLabel("Task Title")
+      .withPlaceholder("Enter task title"),
+    new TextInput({ id: "description" })
+      .withLabel("Description")
+      .withPlaceholder("Enter task details")
+      .withIsMultiline(true),
     new ChoiceSetInput(
-      { title: 'High', value: 'high' },
-      { title: 'Medium', value: 'medium' },
-      { title: 'Low', value: 'low' }
+      { title: "High", value: "high" },
+      { title: "Medium", value: "medium" },
+      { title: "Low", value: "low" }
     )
-      .withId('priority')
-      .withLabel('Priority')
-      .withValue('medium'),
-    new DateInput({ id: 'due_date' })
-      .withLabel('Due Date')
-      .withValue(new Date().toISOString().split('T')[0]),
+      .withId("priority")
+      .withLabel("Priority")
+      .withValue("medium"),
+    new DateInput({ id: "due_date" })
+      .withLabel("Due Date")
+      .withValue(new Date().toISOString().split("T")[0]),
     new ActionSet(
-      new ExecuteAction({ title: 'Create Task' })
-        .withData({ action: 'create_task' })
-        .withAssociatedInputs('auto')
-        .withStyle('positive')
+      new ExecuteAction({ title: "Create Task" })
+        .withData({ action: "create_task" })
+        .withAssociatedInputs("auto")
+        .withStyle("positive")
     )
   );
   await send(card);

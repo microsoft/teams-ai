@@ -1,15 +1,17 @@
 function editProfileCard() {
-  const card = new Card().withBody(
-    new TextInput({ id: 'name' }).withLabel('Name').withValue('John Doe'),
-    new TextInput({ id: 'email', label: 'Email', value: 'john@contoso.com' }),
-    new ToggleInput('Subscribe to newsletter').withId('subscribe').withValue('false'),
+  const card = new AdaptiveCard(
+    new TextInput({ id: "name" }).withLabel("Name").withValue("John Doe"),
+    new TextInput({ id: "email", label: "Email", value: "john@contoso.com" }),
+    new ToggleInput("Subscribe to newsletter")
+      .withId("subscribe")
+      .withValue("false"),
     new ActionSet(
-      new ExecuteAction({ title: 'Save' })
+      new ExecuteAction({ title: "Save" })
         .withData({
-          action: 'save_profile',
-          entityId: '12345', // This will come back once the user submits
+          action: "save_profile",
+          entityId: "12345", // This will come back once the user submits
         })
-        .withAssociatedInputs('auto')
+        .withAssociatedInputs("auto")
     )
   );
 

@@ -1,5 +1,5 @@
 app.on('dialog.open', async ({ activity }) => {
-  const card: ICard = new Card()...
+  const card: IAdaptiveCard = new AdaptiveCard()...
 
   // Return an object with the task value that renders a card
   return {

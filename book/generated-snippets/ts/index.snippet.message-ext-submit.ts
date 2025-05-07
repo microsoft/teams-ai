@@ -1,11 +1,14 @@
-app.on('message.ext.submit', async ({ activity }) => {
+app.on("message.ext.submit", async ({ activity }) => {
   const { commandId } = activity.value;
-  let card: ICard;
+  let card: IAdaptiveCard;
 
-  if (commandId === 'createCard') {
+  if (commandId === "createCard") {
     // activity.value.commandContext == "compose"
     card = createCard(activity.value.data);
-  } else if (commandId === 'getMessageDetails' && activity.value.messagePayload) {
+  } else if (
+    commandId === "getMessageDetails" &&
+    activity.value.messagePayload
+  ) {
     // activity.value.commandContext == "message"
     card = createMessageDetailsCard(activity.value.messagePayload);
   } else {
@@ -14,9 +17,9 @@ app.on('message.ext.submit', async ({ activity }) => {
 
   return {
     composeExtension: {
-      type: 'result',
-      attachmentLayout: 'list',
-      attachments: [cardAttachment('adaptive', card)],
+      type: "result",
+      attachmentLayout: "list",
+      attachments: [cardAttachment("adaptive", card)],
     },
   };
 });

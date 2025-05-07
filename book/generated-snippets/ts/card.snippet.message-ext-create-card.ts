@@ -5,22 +5,22 @@ interface FormData {
 }
 
 export function createCard(data: FormData) {
-  return new Card(
+  return new AdaptiveCard(
     new Image(IMAGE_URL),
     new TextBlock(data.title, {
-      size: 'large',
-      weight: 'bolder',
-      color: 'accent',
-      style: 'heading',
+      size: "Large",
+      weight: "Bolder",
+      color: "Accent",
+      style: "heading",
     }),
     new TextBlock(data.subtitle, {
-      size: 'small',
-      weight: 'lighter',
-      color: 'good',
+      size: "Small",
+      weight: "Lighter",
+      color: "Good",
     }),
     new TextBlock(data.text, {
       wrap: true,
-      spacing: 'medium',
+      spacing: "Medium",
     })
   );
 }
