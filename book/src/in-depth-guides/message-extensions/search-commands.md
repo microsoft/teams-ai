@@ -75,6 +75,14 @@ When a user clicks on a list item the dummy adaptive card is added to the compos
 
 ![Card in compose box](../../assets/screenshots/card-in-compose.png)
 
+To implement custom actions when a user clicks on a search result item, you can add the `tap` property to the preview card. This allows you to handle the click event with custom logic:
+
+<!-- langtabs-start -->
+```typescript
+{{#include ../../../generated-snippets/ts/index.snippet.message-ext-select-item.ts }}
+```
+<!-- langtabs-end -->
+
 ## Resources
 
 - [Search command](https://learn.microsoft.com/en-us/microsoftteams/platform/messaging-extensions/how-to/search-commands/define-search-command?tabs=Teams-toolkit%2Cdotnet)
