@@ -63,19 +63,19 @@ Once you have successfully sideloaded the app into Teams you can now interact wi
 
 When the user sends a message to the user a consent form will popup:
 
-![Consent popup](../../assets/consent-popup.png)
+![Consent popup](../../assets/screenshots/auth-consent-popup.png)
 
 This will ask the user to consent to the `User.ReadBasic.All` Microsoft Graph scope:
 
 > [!note]
 > The `ttk.oauth` configuration explicitly requests the `User.ReadBasic.All` permission. It is possible to request other permissions by modifying the App Registration for the bot on Azure.
 
-![Entra ID signin](../../assets/entra-id-signin.png)
+![Entra ID signin](../../assets/screenshots/auth-entra-id-signin.png)
 
 Once the user signs in and grants the app access, they will be redirected back to the Teams client and the app will send back the user's information as retrieved from the graph client:
 
-![Graph message](../../assets/graph-message.png)
+![Graph message](../../assets/screenshots/auth-graph-message.png)
 
 The user can then signout by sending the `signout` command to the app:
 
-![Signout message](../../assets/signout-message.png)
+![Signout message](../../assets/screenshots/auth-signout-message.png)
