@@ -1,3 +1,4 @@
+const logger = new ConsoleLogger('mcp-client', { level: 'debug' });
 const prompt = new ChatPrompt(
   {
     instructions:
