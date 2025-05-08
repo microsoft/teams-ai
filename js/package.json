@@ -24,9 +24,9 @@
         "openai": "4.77.4"
     },
     "devDependencies": {
-        "@azure/logger": "^1.1.4",
+        "@azure/logger": "^1.2.0",
         "@azure/ms-rest-js": "2.7.0",
-        "@microsoft/api-extractor": "^7.52.2",
+        "@microsoft/api-extractor": "^7.52.7",
         "@standardlabs/is-private": "^1.0.1",
         "@types/jsonwebtoken": "9.0.4",
         "@types/lodash": "^4.17.16",
@@ -44,7 +44,7 @@
         "eslint-plugin-jsdoc": "^46.10.1",
         "eslint-plugin-mocha": "^10.5.0",
         "eslint-plugin-only-warn": "^1.1.0",
-        "eslint-plugin-prettier": "^5.2.5",
+        "eslint-plugin-prettier": "^5.4.0",
         "exorcist": "^2.0.0",
         "express": "^4.21.1",
         "mocha-junit-reporter": "^2.0.0",

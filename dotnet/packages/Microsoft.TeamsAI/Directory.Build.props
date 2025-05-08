@@ -1,8 +1,6 @@
 <Project>
-
   <PropertyGroup>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>$([MSBuild]::GetPathOfFileAbove('key.snk'))</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-
 </Project>
