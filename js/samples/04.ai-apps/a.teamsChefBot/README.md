@@ -10,8 +10,8 @@ This is a conversational bot for Microsoft Teams that thinks it's a Chef to help
     - [Summary](#summary)
     - [Setting up the sample](#setting-up-the-sample)
     - [Testing the sample](#testing-the-sample)
-        - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
-        - [Using Teams App test tool](#using-teams-app-test-tool)
+        - [Using Microsoft 365 Agents Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+        - [Using Microsoft 365 Agents playground](#using-teams-app-test-tool)
 
 <!-- /code_chunk_output -->
 
@@ -33,7 +33,7 @@ git clone https://github.com/Microsoft/teams-ai.git
 
 > [!IMPORTANT]
 > To prevent issues when installing dependencies after cloning the repo, copy or move the sample directory to it's own location first.
-> If you opened this sample from the Sample Gallery in Teams Toolkit, you can skip to step 2.
+> If you opened this sample from the Sample Gallery in Microsoft 365 Agents Toolkit, you can skip to step 2.
 
 ```bash
 cd path/to/04.ai-apps/a.teamsChefBot
@@ -46,7 +46,7 @@ If you are using Azure OpenAI then follow these steps:
 
 - Comment the `SECRET_OPENAI_KEY` variable in the `./env/.env.local.user` file.
 - Add your Azure OpenAI key and endpoint values to the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables.
-- Open the `teamsapp.local.yml` file and modify the last step to use Azure OpenAI variables instead:
+- Open the `m365agents.local.yml` file and modify the last step to use Azure OpenAI variables instead:
 
 ```yml
 - uses: file/createOrUpdateEnvironmentFile
@@ -78,38 +78,38 @@ If you are using Azure OpenAI then follow these steps:
 
 ## Testing the sample
 
-The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
+The easiest and fastest way to get up and running is with Microsoft 365 Agents Toolkit as your development guide. To use Microsoft 365 Agents Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](https://github.com/microsoft/teams-ai/blob/main/getting-started/OTHER/BOTFRAMEWORK-EMULATOR.md) section.
 For different ways to test a sample see: [Multiple ways to test](https://github.com/microsoft/teams-ai/tree/main/getting-started/OTHER)
 
-### Using Teams Toolkit for Visual Studio Code
+### Using Microsoft 365 Agents Toolkit for Visual Studio Code
 
-The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
+The simplest way to run this sample in Teams is to use Microsoft 365 Agents Toolkit for Visual Studio Code.
 
 1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
-1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
+1. Install the [Microsoft 365 Agents Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
 1. Copy this sample into a new folder outside of teams-ai
 1. Select File > Open Folder in VS Code and choose this sample's directory
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
-1. Verify that the Teams Toolkit extension is connected to your Teams account from the above step.
+1. Verify that the Microsoft 365 Agents Toolkit extension is connected to your Teams account from the above step.
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
 1. In the browser that launches, select the **Add** button to install the app to Teams.
 
-> If you do not have permission to upload custom apps (sideloading), Teams Toolkit will recommend creating and using a Microsoft 365 Developer Program account - a free program to get your own dev environment sandbox that includes Teams.
+> If you do not have permission to upload custom apps (sideloading), Microsoft 365 Agents Toolkit will recommend creating and using a Microsoft 365 Developer Program account - a free program to get your own dev environment sandbox that includes Teams.
 
-### Using Teams App test tool
+### Using Microsoft 365 Agents playground
 
 If you are using Azure OpenAI then follow these steps:
 
-- Comment the `SECRET_OPENAI_KEY` variable in the `./env/.env.testtool` file.
+- Comment the `SECRET_OPENAI_KEY` variable in the `./env/.env.playground` file.
 - Add your Azure OpenAI key and endpoint values to the `SECRET_AZURE_OPENAI_KEY` and `SECRET_AZURE_OPENAI_ENDPOINT` variables
-- Open the `teamsapp.testtool.yml` file and modify the last step to use Azure OpenAI variables instead:
+- Open the `m365agents.playground.yml` file and modify the last step to use Azure OpenAI variables instead:
 
 ```yml
 - uses: file/createOrUpdateEnvironmentFile
   with:
-      target: ./.localConfigs.testTool
+      target: ./.localConfigs.playground
       envs:
           TEAMSFX_NOTIFICATION_STORE_FILENAME: ${{TEAMSFX_NOTIFICATION_STORE_FILENAME}}
           # OPENAI_KEY: ${{SECRET_OPENAI_KEY}}
@@ -118,9 +118,9 @@ If you are using Azure OpenAI then follow these steps:
 ```
 
 1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
-1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
+1. Install the [Microsoft 365 Agents Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
 1. Copy this sample into a new folder outside of teams-ai
 1. Select File > Open Folder in VS Code and choose this sample's directory
-1. From the left pane, select **Run and Debug**(Ctrl+Shift+D) and select **Debug in Test Tool** in dropdown list.
+1. From the left pane, select **Run and Debug**(Ctrl+Shift+D) and select **Debug in Microsoft 365 Agents playground** in dropdown list.
 1. Select Debug > Start Debugging or F5 to run the app.
-1. The browser will pop up to open Teams App Test Tool.
+1. The browser will pop up to open Microsoft 365 Agents playground.
