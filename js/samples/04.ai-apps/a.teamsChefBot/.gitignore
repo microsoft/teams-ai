@@ -112,6 +112,6 @@ env/.env.*.user
 env/.env.local
 appPackage/build
 .deployment
-env/.env.testtool
-.localConfigs.testTool
+env/.env.playground
+.localConfigs.playground
 devTools/
