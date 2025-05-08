@@ -10,7 +10,7 @@ export async function createDummyCards(searchQuery: string) {
     { title: "Item 5", description: "This is the fifth item" },
   ];
 
-  const cards = dummyItems.map((item) => {
+  const cards = dummyItems.map((item, index) => {
     return {
       card: new AdaptiveCard(
         new TextBlock(item.title, {
@@ -27,6 +27,16 @@ export async function createDummyCards(searchQuery: string) {
       thumbnail: {
         title: item.title,
         text: item.description,
+        // When a user clicks on a list item in Teams:
+        // - If the thumbnail has a `tap` property: Teams will trigger the `message.ext.select-item` activity
+        // - If no `tap` property: Teams will insert the full adaptive card into the compose box
+        // tap: { 
+        //   type: "invoke",
+        //   title: item.title,
+        //   value: {
+        //     "option": index,
+        //   },
+        // },
       } as ThumbnailCard,
     };
   });
