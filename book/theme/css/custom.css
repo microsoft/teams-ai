@@ -1,0 +1,22 @@
+/* Custom CSS overrides */
+
+/* Footer */
+#footer {
+    width: 100%;
+    font-size: 1.2rem;
+    margin: 4rem 0 0 0;
+    padding: 1rem 0;
+}
+
+.footer-links, .copyright {
+    text-align: center;
+}
+
+.separator {
+    margin: 0 0.5rem;
+}
+
+.privacy-disclosure {
+    margin: 0.75rem 0;
+    line-height: 1.4;
+}
