@@ -8,6 +8,7 @@ Microsoft Graph can be accessed by your application using its own application to
 
 To access the graph using the Graph using the app, you may use the `app.graph` object. 
 
+<!-- langtabs-start -->
 ```typescript
 // Equivalent of https://learn.microsoft.com/en-us/graph/api/user-get
 // Gets the details of the bot-user
@@ -18,9 +19,11 @@ app.graph.me.get().then((user) => {
   console.log(`User Job Title: ${user.jobTitle}`);
 });
 ```
+<!-- langtabs-end -->
 
 To access the graph using the user's token, you need to do this as part of a message handler:
 
+<!-- langtabs-start -->
 ```typescript
 app.on('message', async ({ activity, userGraph }) => {
   const me = await userGraph.me.get();
@@ -30,6 +33,7 @@ app.on('message', async ({ activity, userGraph }) => {
   console.log(`User Job Title: ${me.jobTitle}`);
 });
 ```
+<!-- langtabs-end -->
 
 Here, the `userGraph` object is a scoped graph client for the user that sent the message.
 
@@ -48,6 +52,7 @@ GET /users/{user-id | user-principal-name}/teamwork/installedApps/{app-installat
 
 The equivalent using the graph client would look like this:
 
+<!-- langtabs-start -->
 ```ts
 const chat = await userGraph.teamwork(user.id).installedApps.chat(appInstallationId).get({
   "user-id": user.id,
@@ -55,6 +60,7 @@ const chat = await userGraph.teamwork(user.id).installedApps.chat(appInstallatio
   "$select": ["id"],
 })
 ```
+<!-- langtabs-end -->
 
 Here, the client takes care of using the correct token, provides helpful hints via intellisense, and performs the fetch request for you.
 
