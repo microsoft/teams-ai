@@ -31,6 +31,12 @@ The SSO signin flow involves several components working together. Here's how it 
 
 See the [SSO in Teams at runtime](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/authentication/bot-sso-overview#sso-in-teams-at-runtime) guide to learn more about the SSO signin flow
 
+### The SSO consent form
+
+This is what the SSO consent form looks like in Teams:
+
+![SSO Consent Form](../../assets/screenshots/auth-consent-popup.png)
+
 ## OAuth 
 
 You can use a third-party OAuth Identity Provider (IdP) to authenticate your app users. The app user is registered with the identity provider, which has a trust relationship with your app. When the user attempts to log in, the identity provider validates the app user and provides them with access to your app. Microsoft Entra ID is one such third party OAuth provider. You can use other providers, such as Google, Facebook, GitHub, or any other provider.
@@ -48,13 +54,19 @@ The OAuth signin flow involves several components working together. Here's how i
 
 When an access token expires, the user will need to go through the sign-in process again. Unlike SSO, there is no automatic token exchange - the user must explicitly authenticate each time their token expires.
 
+### The OAuth Card
+
+This is what the OAuth card looks like in Teams:
+
+![OAuthCard](../../assets/screenshots/auth-explicit-signin.png)
+
 ## OAuth vs SSO - Head-to-Head Comparison
 
 | Feature | OAuth | SSO |
 |---------|-------|-----|
 | Identity Provider | Works with any OAuth provider (Microsoft Entra ID, Google, Facebook, GitHub, etc.) | Only works with Microsoft Entra ID |
 | Authentication Flow | User is sent a card with a sign-in link | If user has already consent to the requested scopes in the past they will "silently" login through the token exchange flow. Otherwise user is shown a consent form |
-| User Experience | Requires explicit sign-in | Seamless authentication using existing Teams identity |
+| User Experience | Requires explicit sign-in, and consent to scopes | Re-use existing Teams credential, Only requires consent to scopes |
 | Conversation scopes (`personal`, `groupChat`, `teams`) | `personal` scope only | `personal` scope only |
 | Azure Configuration differences | Same configuration except `Token Exchange URL` is blank | Same configuration except `Token Exchange URL` is set
 
