@@ -50,3 +50,11 @@ editable = false
 
 [output.html.print]
 enable = false
+
+# WARNING: Do not add anything below the following section.
+
+[output.html.copy-files]
+"src/getting-started/_lang/_lang.code-basics.cs.md" = "getting-started/_lang/_lang.code-basics.cs.md"
+"src/getting-started/_lang/_lang.code-basics.ts.md" = "getting-started/_lang/_lang.code-basics.ts.md"
+"src/getting-started/_lang/_lang.quickstart.cs.md" = "getting-started/_lang/_lang.quickstart.cs.md"
+"src/getting-started/_lang/_lang.quickstart.ts.md" = "getting-started/_lang/_lang.quickstart.ts.md"

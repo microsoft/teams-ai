@@ -21,6 +21,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Install latest mdbook
         run: |
           tag=$(curl 'https://api.github.com/repos/rust-lang/mdbook/releases/latest' | jq -r '.tag_name')
@@ -77,7 +81,7 @@ jobs:
       - name: Build Book
         run: |
           cd book
-          mdbook build
+          npm run docs:build
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact

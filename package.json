@@ -10,8 +10,9 @@
     "lint:fix": "npx turbo lint:fix",
     "test": "npx turbo test --concurrency=100%",
     "fmt": "npx prettier --write \"**/*.{js,ts,tsx,md,json}\"",
-    "docs:build": "node ./scripts/build-docs.js",
+    "docs:build": "node ./scripts/build-docs.js && node ./scripts/mdbook-lang.js",
     "docs:serve": "node ./scripts/serve-docs.js",
+    "docs:lang-file": "node ./book/theme/lang/lang-file.js",
     "gen:snips": "node ./scripts/generate-snippets.js",
     "check:links": "node ./scripts/check-links.js"
   },

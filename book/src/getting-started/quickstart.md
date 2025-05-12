@@ -6,7 +6,10 @@ Get started with Teams AI Library (v2) quickly using the Teams CLI.
 
 ### Prerequisites
 
-- **Node.js** v.20 or higher. Install or upgrade from [nodejs.org](https://nodejs.org/).
+{{#lang=ts name=prerequisites}}
+
+
+
 
 ## Instructions
 
