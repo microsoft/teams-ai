@@ -1,6 +1,6 @@
 # Summary
 
-- [👋 Welcome](./welcome/README.md)
+- [👋 Welcome](./README.md)
   - [Why an SDK?](./welcome/need-for-sdk.md)
   - [Packages](./welcome/packages.md)
 - [🚀 Getting Started](./getting-started/README.md)
