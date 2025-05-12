@@ -10,7 +10,7 @@ export async function createDummyCards(searchQuery: string) {
     { title: "Item 5", description: "This is the fifth item" },
   ];
 
-  const cards = dummyItems.map((item, index) => {
+  const cards = dummyItems.map((item) => {
     return {
       card: new AdaptiveCard(
         new TextBlock(item.title, {
@@ -37,7 +37,7 @@ export async function createDummyCards(searchQuery: string) {
         //     "option": index,
         //   },
         // },
-      } as ThumbnailCard,
+      } satisfies ThumbnailCard,
     };
   });
 

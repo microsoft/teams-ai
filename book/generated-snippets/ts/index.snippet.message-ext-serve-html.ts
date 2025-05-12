@@ -1,3 +1,1 @@
-app.http.use(`/settings`, async (_, res) => {
-  res.sendFile(npath.join(__dirname, 'settings.html'));
-});
+app.tab(`settings`, path.resolve(__dirname));

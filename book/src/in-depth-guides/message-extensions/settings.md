@@ -33,11 +33,11 @@ This is the code snippet for the settings `html` page:
 
 <!-- langtabs-start -->
 ```html
-{{#include ../../../generated-snippets/ts/settings.snippet.message-ext-settings-page.html }}
+{{#include ../../../generated-snippets/ts/index.snippet.message-ext-settings-page.html }}
 ```
 <!-- langtabs-end -->
 
-Save it in the `settings.html` file in the same folder as where you app is initialized.
+Save it in the `index.html` file in the same folder as where you app is initialized.
 
 You can serve it by adding the following code to your app:
 
@@ -48,7 +48,7 @@ You can serve it by adding the following code to your app:
 <!-- langtabs-end -->
 
 > [!note]
-> You can import `npath` from `path` or resolve the path using a separate method.
+> This will serve the HTML page to the `${BOT_ENDPOINT}/tabs/settings` endpoint as a tab. See [Tabs Guide](../tabs/README.md) to learn more.
 
 ## 3. Specify the URL to the settings page
 
