@@ -46,9 +46,9 @@ This [CLI](../../developer-tools/cli/README.md) command adds configuration files
 
 You can follow the [Add authentication to bot app](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/authentication/add-authentication?tabs=dotnet%2Cdotnet-sample) Microsoft Learn guide.
 
-## Configure the OAuthConnectioName in the `App` instance
+## Configure the OAuth Connection Name in the `App` instance
 
-In the [Using Teams Toolkit with `teams` CLI](#using-teams-toolkit-with-the-teams-cli) guide, you will notice that the OAuth Connection Name that was created in the Azure Bot configuration is `graph`. This is completely customizable and you can even create more than one configuration. You can specify which configuration to use by defining it in the app options on intialization:
+In the [Using Teams Toolkit with `teams` CLI](#using-teams-toolkit-with-the-teams-cli) guide, you will notice that the OAuth Connection Name that was created in the Azure Bot configuration is `graph`. This is arbitrary and you can even create more than one configuration. You can specify which configuration to use by defining it in the app options on intialization:
 
 <!-- langtabs-start -->
 ```typescript
