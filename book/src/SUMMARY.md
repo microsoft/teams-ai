@@ -1,6 +1,6 @@
 # Summary
 
-- [👋 Welcome](./welcome/README.md)
+- [👋 Welcome](./README.md)
   - [Why an SDK?](./welcome/need-for-sdk.md)
   - [Packages](./welcome/packages.md)
 - [🚀 Getting Started](./getting-started/README.md)
@@ -64,3 +64,4 @@
     - [💬 Chat](./developer-tools/devtools/chat.md)
     - [🔍 Inspect](./developer-tools/devtools/inspect.md)
     - [🪪 Cards](./developer-tools/devtools/cards.md)
+- [Privacy Policy](./privacy-policy/README.md)
