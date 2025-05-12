@@ -1,6 +1,6 @@
 app.on('message.ext.submit', async ({ activity }) => {
   const { commandId } = activity.value;
-  let card: ICard;
+  let card: IAdaptiveCard;
 
   if (commandId === 'createCard') {
     // activity.value.commandContext == "compose"

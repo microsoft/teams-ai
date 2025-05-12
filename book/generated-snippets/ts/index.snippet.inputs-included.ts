@@ -1,5 +1,5 @@
 function editProfileCard() {
-  const card = new Card().withBody(
+  const card = new AdaptiveCard().withBody(
     new TextInput({ id: 'name' }).withLabel('Name').withValue('John Doe'),
     new TextInput({ id: 'email', label: 'Email', value: 'john@contoso.com' }),
     new ToggleInput('Subscribe to newsletter').withId('subscribe').withValue('false'),

@@ -4,7 +4,7 @@ app.on('dialog.submit', async ({ activity, send, next }) => {
   if (dialogType === 'webpage_dialog_step_1') {
     // This is data from the form that was submitted
     const name = activity.value.data.name;
-    const nextStepCard = new Card()
+    const nextStepCard = new AdaptiveCard()
       .withBody(
         {
           type: 'TextBlock',
@@ -18,7 +18,7 @@ app.on('dialog.submit', async ({ activity, send, next }) => {
           .withId('email')
           .withPlaceholder('Enter your email')
       )
-      .addActions(
+      .withActions(
         new SubmitAction().withTitle('Submit').withData({
           // This same handler will get called, so we need to identify the step
           // in the returned data
