@@ -48,7 +48,7 @@ You can follow the [Add authentication to bot app](https://learn.microsoft.com/e
 
 ## Configure the OAuth Connection Name in the `App` instance
 
-In the [Using M365 Agents Toolkit with `teams` CLI](#using-teams-toolkit-with-the-teams-cli) guide, you will notice that the OAuth Connection Name that was created in the Azure Bot configuration is `graph`. This is arbitrary and you can even create more than one configuration. You can specify which configuration to use by defining it in the app options on intialization:
+In the [Using M365 Agents Toolkit with `teams` CLI](#using-m365-agents-toolkit-with-the-teams-cli) guide, you will notice that the OAuth Connection Name that was created in the Azure Bot configuration is `graph`. This is arbitrary and you can even create more than one configuration. You can specify which configuration to use by defining it in the app options on intialization:
 
 <!-- langtabs-start -->
 ```typescript
