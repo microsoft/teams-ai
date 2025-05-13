@@ -59,7 +59,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/");
             var versions = new List<string>
             {
-                "2024-06-01", "2024-08-01-preview", "2024-10-01-preview"
+                "2024-06-01", "2024-10-21"
             };
 
             // Act

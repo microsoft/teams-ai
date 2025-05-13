@@ -461,8 +461,7 @@ namespace Microsoft.Teams.AI.AI.Models
             return apiVersion switch
             {
                 "2024-06-01" => ServiceVersion.V2024_06_01,
-                "2024-08-01-preview" => ServiceVersion.V2024_08_01_Preview,
-                "2024-10-01-preview" => ServiceVersion.V2024_10_01_Preview,
+                "2024-10-21" => ServiceVersion.V2024_10_21,
                 _ => null,
             };
         }
