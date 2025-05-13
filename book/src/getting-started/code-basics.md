@@ -85,7 +85,7 @@ This part initializes your application server and, when configured for Teams, al
 
 ## Next Steps
 
-Now that you understand the basic structure of your Teams application, you're ready to [run it in Teams](running-in-teams.md). You will learn about Teams Toolkit and other important tools that help you with deployment and testing your application.
+Now that you understand the basic structure of your Teams application, you're ready to [run it in Teams](running-in-teams.md). You will learn about M365 Agents Toolkit and other important tools that help you with deployment and testing your application.
 
 After that, you can:
 

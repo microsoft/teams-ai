@@ -1,6 +1,6 @@
 # Quickstart
 
-In this section we will walk through creating an app that can access the [Microsoft Graph APIs](https://learn.microsoft.com/en-us/graph/overview) on behalf of the user by authenticating them with the [Microsoft Entra ID](https://www.microsoft.com/en-us/security/business/identity-access/microsoft-entra-id) oauth provider. 
+In this section we will walk through creating an app that can access the [Microsoft Graph APIs](https://learn.microsoft.com/en-us/graph/overview) on behalf of the user by authenticating them with the [Microsoft Entra ID](https://www.microsoft.com/en-us/security/business/identity-access/microsoft-entra-id) oauth provider.
 
 > [!Note]
 > It is possible to authenticate the user into [other auth providers](https://learn.microsoft.com/en-us/azure/bot-service/bot-builder-concept-identity-providers?view=azure-bot-service-4.0&tabs=adv2%2Cga2#other-identity-providers) like Facebook, Github, Google, Dropbox, and so on.
@@ -21,7 +21,7 @@ In this section we will walk through creating an app that can access the [Micros
 > [!note]
 > In this template, `graph` is the default name of the OAuth connection, but you can change that by supplying `defaultOauthConnectionName` in the `app`.
 
-Use your terminal to run the following command: 
+Use your terminal to run the following command:
 
 <!-- langtabs-start -->
 ```sh
@@ -34,7 +34,7 @@ This command:
 2. Bootstraps the graph agent template files into it under `oauth-app/src`.
 3. Creates your agent's manifest files, including a `manifest.json` file and placeholder icons in the `oauth-app/appPackage` directory. The Teams [app manifest](https://learn.microsoft.com/en-us/microsoftteams/platform/resources/schema/manifest-schema) is required for [sideloading](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) the app into Teams.
 
-### Add Teams toolkit auth configuration
+### Add M365 Agents Toolkit auth configuration
 
 Open your terminal with the `oauth-app/` folder set as the current working directory and run the following command:
 
@@ -44,7 +44,7 @@ teams config add ttk.oauth
 ```
 <!-- langtabs-end -->
 
-This will add relevant Teams Toolkit files to your project.
+This will add relevant Agents Toolkit files to your project.
 
 > [!tip]
 > See [App Setup](./setup.md#using-teams-toolkit-with-the-teams-cli) to learn more about what this command does.
@@ -53,7 +53,7 @@ This will add relevant Teams Toolkit files to your project.
 
 ## Interacting with the app in Teams
 
-Once you have successfully sideloaded the app into Teams you can now interact with it and sign the user in. 
+Once you have successfully sideloaded the app into Teams you can now interact with it and sign the user in.
 
 ### Signing the user in
 
