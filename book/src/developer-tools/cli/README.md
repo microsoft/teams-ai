@@ -53,7 +53,7 @@ The `new` token will create a brand new agent with `app-name` applied as the dir
 
 ## Add M365 Toolkit configuration to existing agent
 
-An existing project may also have the appropriate Agents Toolkit configuration files added by configuration name.
+An existing project may also have the appropriate M365 Agents Toolkit configuration files added by configuration name.
 
 <!-- langtabs-start -->
 ```bash
