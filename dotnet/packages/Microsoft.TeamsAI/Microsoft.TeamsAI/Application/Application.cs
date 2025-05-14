@@ -684,7 +684,7 @@ namespace Microsoft.Teams.AI
                 }
                 
 
-                Activity activity = ActivityUtilities.CreateInvokeResponseActivity(response);
+                Activity activity = ActivityUtilities.CreateInvokeResponseActivity(result);
                 await turnContext.SendActivityAsync(activity, cancellationToken);
             };
             AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
