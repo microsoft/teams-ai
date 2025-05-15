@@ -118,7 +118,7 @@ namespace Microsoft.Teams.AI.Application
 
                     this.Citations.Add(new ClientCitation()
                     {
-                        Position = currPos,
+                        Position = currPos + 1,
                         Appearance = new ClientCitationAppearance()
                         {
                             Name = citation.Title,
