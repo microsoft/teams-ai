@@ -300,5 +300,72 @@ namespace Microsoft.Teams.AI.Tests.Application
             // Assert
             Assert.Equal("Error occurred when sending activity while streaming", ex.Message);
         }
+
+        [Fact]
+        public async Task Test_SendTextChunk_SendsFinalMessageWithUniqueCitations()
+        {
+            // Arrange
+            List<Activity> activitiesToSend = [];
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend.AddRange(arg);
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            ITurnContext turnContext = new TurnContext(adapter, new Activity(
+                text: "hello",
+                channelId: "channelId",
+                recipient: new() { Id = "recipientId" },
+                conversation: new() { Id = "conversationId" },
+                from: new() { Id = "fromId" }
+            ));
+
+            StreamingResponse streamer = new(turnContext);
+
+            // Prepare two citations and set them on the streamer.
+            // Citation with [1] and citation with [2]
+            var citations = new List<Citation>
+            {
+                new Citation(content: "Citation 1 content", title: "Citation 1", url: "https://example.com/1"),
+                new Citation(content: "Citation 2 content", title: "Citation 2", url: "https://example.com/2")
+            };
+            streamer.SetCitations(citations);
+
+            // Queue text chunks where citation [1] is referenced multiple times and [2] is referenced once.
+            streamer.QueueTextChunk("This is a test with citation [1] and again citation [1].");
+            await streamer.WaitForQueue();
+            streamer.QueueTextChunk("Adding citation [2] and citation [1] again.");
+            await streamer.WaitForQueue();
+
+            // End the stream which should combine text chunks and deduplicate citations.
+            await streamer.EndStream();
+
+            // Assert that two updates were sent.
+            Assert.Equal(2, streamer.UpdatesSent());
+
+            // Assert that the citations included in the final message are unique.
+            // Since [1] was referenced multiple times, the final unique citation count should be 2.
+            Assert.NotNull(streamer.Citations);
+            Assert.Equal(2, streamer.Citations.Count);
+
+            // Assert that the citations are unique in the activities to send collection
+            activitiesToSend.ForEach(activity =>
+            {
+                if (activity.Entities != null)
+                {
+                    foreach (var entity in activity.Entities)
+                    {
+                        if (entity is AIEntity)
+                        {
+                            var citations = ((AIEntity)entity).Citation;
+
+                            // Assert that the citations are unique by comparing the property "position"
+                            var uniqueCitations = citations.GroupBy(c => c.Position).Select(g => g.First()).ToList();
+                            Assert.Equal(citations.Count, uniqueCitations.Count);
+                        }
+                    }
+                }
+            }) ;
+
+        }
     }
 }
