@@ -19,7 +19,7 @@
 - [Teams](./teams/README.md)
   - [Core Concepts](./teams/core-concepts.md)
   - [Teams Manifest](./teams/manifest.md)
-  - [Teams Toolkit](./teams/m365-toolkit.md)
+  - [M365 Agents Toolkit](./teams/m365-toolkit.md)
 - [In-Depth Guides](./in-depth-guides/README.md)
   - [Adaptive Cards](./in-depth-guides/cards/README.md)
     - [Building Adaptive Cards](./in-depth-guides/cards/building-adaptive-cards.md)
