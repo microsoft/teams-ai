@@ -17,6 +17,7 @@ There are three different areas search commands can be invoked from:
 
 To use search commands you have define them in the Teams app manifest. Here is an example:
 
+<!-- This JSON Teams manifest snippet was pulled from `teams.ts/tests/message-extensions` -->
 <!-- langtabs-start -->
 ```json
 "composeExtensions": [
@@ -75,6 +76,15 @@ When a user clicks on a list item the dummy adaptive card is added to the compos
 
 ![Card in compose box](../../assets/screenshots/card-in-compose.png)
 
+To implement custom actions when a user clicks on a search result item, you can add the `tap` property to the preview card. This allows you to handle the click event with custom logic:
+
+<!-- langtabs-start -->
+```typescript
+{{#include ../../../generated-snippets/ts/index.snippet.message-ext-select-item.ts }}
+```
+<!-- langtabs-end -->
+
 ## Resources
 
 - [Search command](https://learn.microsoft.com/en-us/microsoftteams/platform/messaging-extensions/how-to/search-commands/define-search-command?tabs=Teams-toolkit%2Cdotnet)
+- [Just-In-Time Install](https://learn.microsoft.com/en-us/microsoftteams/platform/messaging-extensions/how-to/search-commands/universal-actions-for-search-based-message-extensions#just-in-time-install)
