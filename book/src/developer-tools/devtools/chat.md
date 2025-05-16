@@ -53,7 +53,7 @@ When you run your app, for example `npm run dev`, devtools will be running on po
 <!-- langtabs-end -->
 
 > [!NOTE]
-> If you used the [CLI](../cli/README.md) to create a TTK configuration for your app, DevTools will run on port 3979 when you launch the debugger.
+> If you used the [CLI](../cli/README.md) to create an Agents Toolkit configuration for your app, DevTools will run on port 3979 when you launch the debugger.
 
 When you open the page, you will see a Teams-like chat window and you can immediately interact with your agent.
 
