@@ -1,0 +1,18 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.default.category.In Depth Guides": {
+    "message": "In Depth Guides",
+    "description": "The label for category In Depth Guides in sidebar default"
+  },
+  "sidebar.typescript.category.In Depth Guides": {
+    "message": "In Depth Guides",
+    "description": "The label for category In Depth Guides in sidebar typescript"
+  },
+  "sidebar.csharp.category.In Depth Guides": {
+    "message": "In Depth Guides",
+    "description": "The label for category In Depth Guides in sidebar csharp"
+  }
+}
