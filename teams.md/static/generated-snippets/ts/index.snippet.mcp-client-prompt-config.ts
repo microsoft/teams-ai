@@ -17,7 +17,7 @@ const prompt = new ChatPrompt(
 )
   // Here we are saying you can use any tool from localhost:3000/mcp
   // (that is the URL for the server we built using the mcp plugin)
-  // .usePlugin("mcpClient", { url: "http://localhost:3000/mcp" })
+  .usePlugin("mcpClient", { url: "http://localhost:3000/mcp" })
   // Alternatively, you can use a different server hosted somewhere else
   // Here we are using the mcp server hosted on an Azure Function
   .usePlugin("mcpClient", {
