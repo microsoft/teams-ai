@@ -8,6 +8,12 @@ import FileCodeBlock from '@site/src/components/FileCodeBlock';
 
 You are able to leverage other MCP servers that expose tools via the SSE protocol as part of your application. This allows your AI agent to use remote tools to accomplish tasks.
 
+Install it to your application:
+
+```bash
+npm install @microsoft/teams.mcpclient@preview
+```
+
 :::info
 Take a look at [Function calling](../function-calling) to understand how the `ChatPrompt` leverages tools to enhance the LLM's capabilities. MCP extends this functionality by allowing remote tools, that may or may not be developed or maintained by you, to be used by your application.
 :::
