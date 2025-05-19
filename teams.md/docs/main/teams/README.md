@@ -19,6 +19,6 @@ When working with Teams, several key components come into play:
 
 1. [Running Your Agent](#) - Understanding the Teams deployment process
 2. [Teams Manifest](manifest.md) - Configuring your agent's Teams presence
-3. [Teams Toolkit](teams-toolkit.md) - Using the Teams Toolkit extension for sideloading, deployment, and provisioning.
+3. [M365 Agents Toolkit](agents-toolkit.md) - Using the M365 Agents Toolkit extension for sideloading, deployment, and provisioning.
 
 Each guide provides detailed information about specific aspects of Teams integration, from local development to production deployment.
