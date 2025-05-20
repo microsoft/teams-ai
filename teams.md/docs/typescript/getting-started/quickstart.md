@@ -1,4 +1,4 @@
----
+![image](https://github.com/user-attachments/assets/b6e22a3e-da17-4c40-8a5a-2616e83ed0da)---
 sidebar_position: 1
 ---
 
@@ -35,7 +35,7 @@ Let's create a simple echo agent that responds to messages. Run:
 
 
 ```sh
-teams new quote-agent --template echo
+teams new (typescript|csharp) quote-agent --template echo
 ```
 
 
