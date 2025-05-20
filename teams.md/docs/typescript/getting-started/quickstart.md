@@ -35,7 +35,7 @@ Let's create a simple echo agent that responds to messages. Run:
 
 
 ```sh
-teams new (typescript|csharp) quote-agent --template echo
+teams new typescript quote-agent --template echo
 ```
 
 
