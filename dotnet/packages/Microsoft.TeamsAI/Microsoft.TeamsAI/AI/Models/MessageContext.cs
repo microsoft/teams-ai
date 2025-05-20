@@ -36,7 +36,7 @@ namespace Microsoft.Teams.AI.AI.Models
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
                 foreach (ChatCitation citation in azureContext.Citations)
                 {
-                    this.Citations.Add(new Citation(citation.Content, citation.Title, citation.Uri.ToString()));
+                    this.Citations.Add(new Citation(citation.Content, citation.Title, citation.Url));
                 }
 #pragma warning restore AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             }
