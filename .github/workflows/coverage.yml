@@ -7,13 +7,8 @@ name: Coverage
 on:
   workflow_dispatch:
   push:
-    branches: ['**']
-    paths: [
-        '.github/workflows/coverage.yml',
-        'js/**',
-        'dotnet/**',
-        'python/**'
-    ]
+    branches: ["**"]
+    paths: [".github/workflows/coverage.yml", "js/**", "dotnet/**", "python/**"]
 
 permissions: read-all
 
@@ -30,23 +25,23 @@ jobs:
       dotnet: ${{ steps.filter.outputs.dotnet }}
       python: ${{ steps.filter.outputs.python }}
     steps:
-    - uses: actions/checkout@v4
-    - uses: dorny/paths-filter@v3
-      id: filter
-      with:
-        filters: |
-          js:
-            - 'js/**'
-          dotnet:
-            - 'dotnet/**'
-          python:
-            - 'python/**'
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            js:
+              - 'js/**'
+            dotnet:
+              - 'dotnet/**'
+            python:
+              - 'python/**'
   javascript:
     name: Javascript
     runs-on: ubuntu-latest
     environment: main
     env:
-      node-version: 18.x
+      node-version: 20.x
     defaults:
       run:
         shell: bash
@@ -102,7 +97,7 @@ jobs:
         with:
           reports: ${{ env.SOLUTION_DIR }}TestResults/*/coverage.cobertura.xml
           targetdir: ${{ env.SOLUTION_DIR }}TestResults/coverage
-          reporttypes: 'HtmlInline;lcov'
+          reporttypes: "HtmlInline;lcov"
           toolpath: ${{ env.SOLUTION_DIR }}report-generator-tool
       - name: Coveralls
         uses: coverallsapp/github-action@v2.2.3
@@ -161,4 +156,4 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           parallel-finished: true
-          carryforward: 'javascript,dotnet,python'
+          carryforward: "javascript,dotnet,python"

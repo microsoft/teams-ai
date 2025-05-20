@@ -8,8 +8,8 @@ on:
   workflow_call:
   workflow_dispatch:
   push:
-    branches: ['**']
-    paths: ['.github/workflows/js-*.yml', 'js/**']
+    branches: ["**"]
+    paths: [".github/workflows/js-*.yml", "js/**"]
 
 permissions: read-all
 
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [20.x]
     defaults:
       run:
         shell: bash
