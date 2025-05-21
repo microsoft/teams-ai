@@ -1967,11 +1967,13 @@ namespace Microsoft.Teams.AI.Tests.Application
                 From = new() { Id = "fromId" },
             };
             var turnContext1 = new TurnContext(adapter, activity1);
-            var messageFetchTaskResponse = new Mock<MessageFetchTaskResponse>();
+            var messageFetchTaskResponse = new MessageFetchTaskResponse() { Message = "response" };
             var expectedInvokeResponse = new InvokeResponse()
             {
                 Status = 200,
-                Body = messageFetchTaskResponse.Object
+                Body = new TaskModuleResponse() {
+                    Task = new TaskModuleMessageResponse("response")
+                }
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
             var app = new Application<TurnState>(new()
@@ -1984,7 +1986,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             app.OnMessageFetchTask((turnContext, _, _, _) =>
             {
                 names.Add(turnContext.Activity.Name);
-                return Task.FromResult(messageFetchTaskResponse.Object);
+                return Task.FromResult(messageFetchTaskResponse);
             });
 
             // Act
