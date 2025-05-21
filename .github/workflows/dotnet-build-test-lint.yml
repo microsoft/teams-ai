@@ -11,7 +11,8 @@ on:
     branches: ['**']
     paths: ['.github/workflows/dotnet-*.yml', 'dotnet/**']
   pull_request:
-    branches: ['main', 'v2-preview']
+    branches: ['main']
+    paths: ['dotnet/**']
 
 permissions: read-all
 
