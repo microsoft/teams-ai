@@ -81,3 +81,7 @@ The following clients are currently exposed:
 | teamsTemplates | [/teamsTemplates](https://learn.microsoft.com/en-us/microsoftteams/get-started-with-teams-templates) | A Team Template resource |
 | teamwork | [/teamwork](https://learn.microsoft.com/en-us/graph/api/resources/teamwork?view=graph-rest-1.0) | A range of Microsoft Teams functionalities |
 | users | [/users](https://learn.microsoft.com/en-us/graph/api/resources/users?view=graph-rest-1.0) | A user resource |
+
+## Direct access to currently non-exposed graph endpoints:
+
+Add an example to e.g. access to Calendar or events.
