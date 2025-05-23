@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Teams Core Concepts
 
-When you run your agent on Teams using Teams Toolkit, several Teams-specific processes happen behind the scenes. Understanding these components will help you better debug and deploy your agents. Obviously, all these processes can be done manually, but Teams Toolkit automates them for you.
+When you run your agent on Teams using M365 Agents Toolkit, several Teams-specific processes happen behind the scenes. Understanding these components will help you better debug and deploy your agents. Obviously, all these processes can be done manually, but M365 Agents Toolkit automates them for you.
 
 ## Basic Flow
 
@@ -96,7 +96,7 @@ Before your agent can interact with Teams, it needs to be properly registered an
 
 - Creates an App ID (i.e. Client ID) in the Teams platform
 - Sets up a bot registration with the Bot Framework
-- Creates a client secret that your agent can use to authenticate to be able to send and receive messages. Teams Toolkit will automatically get this value and store it in the `.env` file for you.
+- Creates a client secret that your agent can use to authenticate to be able to send and receive messages. M365 Agents Toolkit will automatically get this value and store it in the `.env` file for you.
 
 ### Azure Bot
 

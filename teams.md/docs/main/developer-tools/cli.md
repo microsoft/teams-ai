@@ -9,7 +9,7 @@ The Teams CLI was created with the intent of supporting developers by making com
 | Feature | Description |
 |---------|-------------|
 | `new` | Create a new Teams AI v2 agent by choosing a template that will be ready to run with one command line. |
-| `config` | Add Teams Toolkit configuration files to your existing Teams AI v2 agent project. |
+| `config` | Add M365 Agents Toolkit configuration files to your existing Teams AI v2 agent project. |
 | `environment` | Manage multiple environments (e.g. dev, prod) and their keys for your agent. |
 
 :::tip
@@ -51,13 +51,13 @@ Use command line `teams new --help` to see the latest options for all optional p
 |-----------|-------------|
 | `--template` | Ready-to-run templates that serve as a starting point depending on your scenario. Template examples include `ai`, `echo`, `graph`, and more. |
 | `--start` | Run the agent immediately upon finishing the creation of the project. |
-| `--toolkit` or `--ttk` | Include the configuration files required to run the agent in the debugger via the [Teams Toolkit](https://github.com/OfficeDev/teams-toolkit) extension. Options include `basic`, `embed`, and `oauth`, and more may be added in the future. |
+| `--toolkit` or `--atk` | Include the configuration files required to run the agent in the debugger via the [M365 Agents Toolkit](https://github.com/OfficeDev/teams-toolkit) extension. Options include `basic`, `embed`, and `oauth`, and more may be added in the future. |
 | `--client-id` | The app client id, if you already have deployed a resource. This will be added to the root `.env` file of the project. |
 | `--client-secret` | The app client secret, if you already have deployed a resource. This will be added to the root `.env` file of the project. |
 
-## Add Teams Toolkit configuration to existing agent
+## Add M365 Agents Toolkit configuration to existing agent
 
-An existing project may also have the appropriate Teams Toolkit configuration files added by configuration name.
+An existing project may also have the appropriate M365 Agents Toolkit configuration files added by configuration name.
 
 ```bash
 teams config add <config-name>
@@ -65,16 +65,16 @@ teams config add <config-name>
 
 | Configuration | Description |
 |--------------|-------------|
-| `ttk.basic` | Basic Teams Toolkit configuration |
-| `ttk.embed` | Configuration for embedded Teams applications |
-| `ttk.oauth` | Configuration for OAuth-enabled applications |
+| `atk.basic` | Basic M365 Agents Toolkit configuration |
+| `atk.embed` | Configuration for embedded Teams applications |
+| `atk.oauth` | Configuration for OAuth-enabled applications |
 
 Using this command will include
 - `env`: folders for managing multiple environments
 - `infra`: files for deployment and provisioning
 - `.yml` files for tasks, launch, deployment, etc.
 
-## Remove Teams Toolkit configuration files
+## Remove M365 Agents Toolkit configuration files
 
 ```bash
 teams config remove <config-name>
