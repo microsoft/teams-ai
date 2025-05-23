@@ -49,7 +49,7 @@ The Teams CLI (Teams AI v2 CLI) helps with TTK configuration, but it is not a re
 | Cmd name   | CLI name      | Description                                                                                                                                        |
 | ---------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `teams`    | Teams AI v2   | A tool for setting up and utilizing the Teams AI v2 library including integration with TTK, if desired.                                            |
-| `teamsapp` | Teams Toolkit | A tool for managing provisioning, deployment, and in-client debugging for Teams. These samples do **not** necessarily use the Teams AI v2 library. |
+| `atk` | Teams Toolkit | A tool for managing provisioning, deployment, and in-client debugging for Teams. These samples do not necessarily use the Teams AI v2 library. |
 
 ## Debugging in Teams
 
@@ -108,10 +108,10 @@ If you want to monitor the activities and events in your app, you can still use 
 
 ## Troubleshooting
 
-While Teams AI v2 SDK heavily endorses Teams Tookit (TTK), you can run your agent in Teams without it. However, using TTK saves time and effort.
+In general, we strongly recommend using M365 Agents Toolkit for managing your resources, deployment, etc. If you have chosen to manually deploy and publish your resources, please refer to the [Teams app documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-publish-overview) for support. Because Teams AI library does not support resource management, please refer to the [Microsoft Teams deployment documentation](https://learn.microsoft.com/en-us/microsoftteams/deploy-overview).
 
 :::warning
-Please note that TTK is not managed by the Teams AI team. For problems running TTK, please refer to the [Teams Toolkit documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/overview) or contact the [Teams Toolkit team](https://github.com/OfficeDev/Teams-Toolkit).
+Please note: for problems you may run into using M365 Agent Toolkit please refer to the [M365 Agent Toolkit documentation](https://learn.microsoft.com/en-us/microsoft-365/developer/overview-m365-agents-toolkit) or contact the [M365 Agent Toolkit team](https://github.com/OfficeDev/microsoft-365-agents-toolkit).
 :::
 
 :::warning
