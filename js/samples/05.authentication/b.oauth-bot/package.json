@@ -37,7 +37,7 @@
         "prettier": "^3.5.3",
         "rimraf": "^5.0.10",
         "ts-node": "^10.9.2",
-        "tsc-watch": "^6.2.1",
+        "tsc-watch": "^6.3.1",
         "typescript": "~5.5.4"
     }
 }
