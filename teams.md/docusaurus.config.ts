@@ -61,6 +61,17 @@ const config: Config = {
 
   plugins: [
     [
+      'docusaurus-search-local',
+      {
+        hashed: true,
+        language: ['en'],
+        docsRouteBasePath: ['/','/typescript','/csharp'],
+        indexDocs: true,
+        indexPages: true,
+        highlightSearchTermsOnTargetPage: true
+      }
+    ],
+    [
       '@docusaurus/plugin-content-docs',
       {
         id: 'typescript',
