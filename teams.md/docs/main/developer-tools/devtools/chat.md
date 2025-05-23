@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# 💬 Devtools Chat
+# 💬 Devtools chat
 
 ![Empty DevTools chat](https://github.com/microsoft/teams.ts/blob/main/assets/screenshots/devtools_blank_chat.png?raw=true)
 
