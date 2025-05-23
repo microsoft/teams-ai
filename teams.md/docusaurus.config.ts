@@ -1,8 +1,8 @@
-import path from 'node:path';
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
-import type * as Preset from '@docusaurus/preset-classic';
 import type * as DocsPlugin from '@docusaurus/plugin-content-docs';
+import type * as Preset from '@docusaurus/preset-classic';
+import type { Config } from '@docusaurus/types';
+import path from 'node:path';
+import { themes as prismThemes } from 'prism-react-renderer';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 const baseUrl = '/teams-ai/';
@@ -29,7 +29,7 @@ const config: Config = {
   // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
-    locales: ['en', 'es', 'zh-Hans'],
+    locales: ['en'],
   },
 
   markdown: {
@@ -85,7 +85,17 @@ const config: Config = {
   ],
 
   themes: [
-    '@docusaurus/theme-mermaid'
+    '@docusaurus/theme-mermaid',
+    [require.resolve("@easyops-cn/docusaurus-search-local"),
+    /** @type {import("@easyops-cn/docusaurus-search-local").PluginOptions} */
+    ({
+      hashed: true,
+      language: ['en'],
+      docsRouteBasePath: ['/', '/typescript', '/csharp'],
+      indexDocs: true,
+      indexPages: true,
+      highlightSearchTermsOnTargetPage: true
+    })],
   ],
 
   themeConfig: {
