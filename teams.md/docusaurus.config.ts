@@ -36,9 +36,7 @@ const config: Config = {
     mermaid: true,
   },
 
-  scripts: [
-    path.join(baseUrl, '/scripts/clarity.js')
-  ],
+  scripts: [path.join(baseUrl, '/scripts/clarity.js')],
 
   presets: [
     [
@@ -83,7 +81,6 @@ const config: Config = {
       } satisfies Partial<DocsPlugin.PluginOptions>,
     ],
   ],
-
   themes: [
     '@docusaurus/theme-mermaid',
     [require.resolve("@easyops-cn/docusaurus-search-local"),
@@ -97,7 +94,6 @@ const config: Config = {
       highlightSearchTermsOnTargetPage: true
     })],
   ],
-
   themeConfig: {
     colorMode: {
       respectPrefersColorScheme: true,
@@ -106,7 +102,7 @@ const config: Config = {
       backgroundColor: '#515cc6',
       isCloseable: true,
       textColor: '#fff',
-      content: '🎉️ Teams AI v2.0.0-preview is out! 🥳️'
+      content: '🎉️ Teams AI v2.0.0-preview is out! 🥳️',
     },
     navbar: {
       title: 'Teams AI (v2)',
@@ -133,7 +129,7 @@ const config: Config = {
         {
           href: 'https://github.com/microsoft/teams-ai/tree/v2-preview',
           position: 'right',
-          className: 'header-github-link'
+          className: 'header-github-link',
         },
       ],
     },
@@ -147,18 +143,38 @@ const config: Config = {
               label: 'Getting Started',
               to: '/',
             },
+            {
+              label: 'TypeScript',
+              to: '/typescript/getting-started',
+            },
+            {
+              label: 'C#',
+              to: '/csharp/getting-started',
+            },
+            {
+              label: 'Privacy policy',
+              to: '/privacy',
+            },
           ],
         },
         {
           title: 'More',
           items: [
             {
+              label: 'GitHub',
+              href: 'https://github.com/microsoft/teams-ai/tree/v2-preview',
+            },
+            {
+              label: 'Contributing',
+              href: 'https://github.com/microsoft/teams-ai/blob/v2-preview/CONTRIBUTING.md',
+            },
+            {
               label: 'Blog',
               href: 'https://devblogs.microsoft.com/microsoft365dev/announcing-the-updated-teams-ai-library-and-mcp-support/',
             },
             {
-              label: 'GitHub',
-              href: 'https://github.com/microsoft/teams-ai/tree/v2-preview',
+              label: 'Teams agent accelerator templates',
+              href: 'https://microsoft.github.io/teams-agent-accelerator-templates/',
             },
           ],
         },
@@ -182,7 +198,7 @@ const config: Config = {
           line: 'highlight-error-line',
           block: {
             start: 'highlight-error-start',
-            end: 'highlight-error-end'
+            end: 'highlight-error-end',
           },
         },
         {
@@ -190,15 +206,19 @@ const config: Config = {
           line: 'highlight-success-line',
           block: {
             start: 'highlight-success-start',
-            end: 'highlight-success-end'
+            end: 'highlight-success-end',
           },
         },
       ],
       additionalLanguages: [
-        'typescript', 'javascript',
-        'csharp', 'python', 'bash',
-        'markdown', 'json'
-      ]
+        'typescript',
+        'javascript',
+        'csharp',
+        'python',
+        'bash',
+        'markdown',
+        'json',
+      ],
     },
   } satisfies Preset.ThemeConfig,
 };
