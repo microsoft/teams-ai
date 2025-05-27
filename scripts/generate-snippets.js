@@ -52,7 +52,7 @@ process.chdir(projectRoot); // Ensure we're in project root
 // Default arguments
 const defaultArgs = {
   input: path.join(projectRoot, 'teams.ts'),
-  '--output': [path.join(projectRoot, 'book/generated-snippets/ts')],
+  '--output': [path.join(projectRoot, 'teams.md/static/generated-snippets/ts')],
   '--ignore': ['packages/graph/**', '!**/*.ts'],
 };
 
