@@ -8,7 +8,7 @@ Now that your agent is running locally, let's deploy it to Microsoft Teams for t
 
 ## Microsoft 365 Agents Toolkit
 
-Agents Toolkit is a powerful tool that simplifies deploying and debugging Teams applications. It automates tasks like managing the Teams app manifest, configuring authentication, provisioning, and deployment. If you'd like to learn what it helps automate, check out [Teams core concepts](/teams/core-concepts).
+Agents Toolkit is a powerful tool that simplifies deploying and debugging Teams applications. It automates tasks like managing the Teams app manifest, configuring authentication, provisioning, and deployment. If you'd like to learn about these concepts, check out [Teams core concepts](/teams/core-concepts).
 
 ### Install Agents Toolkit 
 
@@ -40,16 +40,10 @@ This [CLI](/developer-tools/cli) command adds configuration files required by Ag
 - Debug instructions in `.vscode/launch.json` and `.vscode/tasks.json`
 - ATK automation files to your project (e.g. `teamsapp.local.yml`)
 
-:::note
-Note that running `teams config add` command line via the Teams CLI is equivalent **but not equal** to initializing a Teams project using the Agents Toolkit extension or the [Agents Toolkit CLI](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/microsoft-365-agents-toolkit-cli). **Depending on the sample you choose via Agents Toolkit, that project may or may not be using Teams AI v2 library.**
-:::
-
-The Teams CLI (Teams AI v2 CLI) helps with ATK configuration, but it is not a replacement for the Agents Toolkit extension or the Agents Toolkit CLI itself. Both CLI tools will support development in different ways.
-
 | Cmd name   | CLI name      | Description                                                                                                                                        |
 | ---------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `teams`    | Teams AI v2   | A tool for setting up and utilizing the Teams AI v2 library including integration with ATK, if desired.                                            |
-| `teamsapp` | Agents Toolkit | A tool for managing provisioning, deployment, and in-client debugging for Teams. These samples do **not** necessarily use the Teams AI v2 library. |
+| `teamsapp` | Agents Toolkit | A tool for managing provisioning, deployment, and in-client debugging for Teams. |
 
 ## Debugging in Teams
 
@@ -57,7 +51,7 @@ After installing Agents Toolkit and adding the configuration:
 
 1. **Open** your agent's project in your IDE.
 2. **Open the Agents Toolkit extension panel** (usually on the left sidebar). The extension icon is the Teams logo.
-3. **Log in** to your M365 and Azure accounts in the ATK extension.
+3. **Log in** to your Microsoft 365 and Azure accounts in the ATK extension.
 4. **Select "Local"** under Environment Settings of the ATK extension.
 5. **Click on Debug (Chrome) or Debug (Edge)** to start debugging via the 'play' button.
 
@@ -104,8 +98,6 @@ If you want to monitor the activities and events in your app, you can still use 
 :::
 
 ## Troubleshooting
-
-While Teams AI v2 SDK heavily endorses Teams Tookit , you can run your agent in Teams without it. However, using ATK saves time and effort.
 
 :::warning
 Please note that ATK is not managed by the Teams AI team. For problems running ATK, please refer to the [Agents Toolkit documentation](https://learn.microsoft.com/en-us/microsoft-365/developer/overview-m365-agents-toolkit?toc=%2Fmicrosoftteams%2Fplatform%2Ftoc.json&bc=%2Fmicrosoftteams%2Fplatform%2Fbreadcrumb%2Ftoc.json) or contact the [Agents Toolkit team](https://github.com/OfficeDev/Teams-Toolkit).
