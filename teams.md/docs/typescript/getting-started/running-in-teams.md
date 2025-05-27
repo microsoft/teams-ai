@@ -42,8 +42,8 @@ This [CLI](/developer-tools/cli) command adds configuration files required by Mi
 
 | Cmd name   | CLI name      | Description                                                                                                                                        |
 | ---------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `teams`    | Teams AI v2   | A tool for setting up and utilizing the Teams AI v2 library including integration with TTK, if desired.                                            |
-| `atk` | Teams Toolkit | A tool for managing provisioning, deployment, and in-client debugging for Teams. |
+| `teams`    | Teams AI v2   | A tool for setting up and utilizing the Teams AI v2 library including integration with Agents Toolkit, if desired.                                            |
+| `atk` | Agents Toolkit | A tool for managing provisioning, deployment, and in-client debugging for Teams. |
 
 ## Debugging in Teams
 
@@ -102,15 +102,7 @@ If you want to monitor the activities and events in your app, you can still use 
 
 ## Troubleshooting
 
-In general, we strongly recommend using Microsoft 365 Agents Toolkit for managing your resources, deployment, etc. If you have chosen to manually deploy and publish your resources, please refer to the [Teams app documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-publish-overview) for support. Because Teams AI library does not support resource management, please refer to the [Microsoft Teams deployment documentation](https://learn.microsoft.com/en-us/microsoftteams/deploy-overview).
-
-:::note
-For problems you may run into using Microsoft 365 Agent Toolkit please refer to the [Microsoft 365 Agent Toolkit documentation](https://learn.microsoft.com/en-us/microsoft-365/developer/overview-m365-agents-toolkit).
-:::
-
-:::note
-Teams AI v2 library focuses on building agents and does not support manual resource management. If you are having trouble with provisioning or deployment, please refer to the Microsoft 365 Agents Toolkit documentation or the [Microsoft Teams deployment documentation](https://learn.microsoft.com/en-us/microsoftteams/deploy-overview).
-:::
+For deployment and resource management we recommend the Microsoft 365 Agents Toolkit. If you prefer to set everything up by hand, follow the standard [Teams app documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-publish-overview). The Teams AI library itself doesn't handle deployment or Azure resources, so you'll need to rely on the general [Microsoft Teams deployment documentation](https://learn.microsoft.com/en-us/microsoftteams/deploy-overview).
 
 ## Next steps
 
