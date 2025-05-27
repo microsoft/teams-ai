@@ -10,6 +10,9 @@ on:
   push:
     branches: ['**']
     paths: ['.github/workflows/dotnet-*.yml', 'dotnet/**']
+  pull_request:
+    branches: ['main']
+    paths: ['dotnet/**']
 
 permissions: read-all
 
