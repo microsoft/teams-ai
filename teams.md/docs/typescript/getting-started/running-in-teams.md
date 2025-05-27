@@ -48,8 +48,8 @@ The Teams CLI (Teams AI v2 CLI) helps with ATK configuration, but it is not a re
 
 | Cmd name   | CLI name      | Description                                                                                                                                        |
 | ---------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `teams`    | Teams AI v2   | A tool for setting up and utilizing the Teams AI v2 library including integration with ATK, if desired.                                            |
-| `teamsapp` | M365 Agents Toolkit | A tool for managing provisioning, deployment, and in-client debugging for Teams. These samples do **not** necessarily use the Teams AI v2 library. |
+| `teams`    | Teams AI v2   | A tool for setting up and utilizing the Teams AI v2 library including integration with TTK, if desired.                                            |
+| `atk` | Teams Toolkit | A tool for managing provisioning, deployment, and in-client debugging for Teams. These samples do not necessarily use the Teams AI v2 library. |
 
 ## Debugging in Teams
 
@@ -108,10 +108,10 @@ If you want to monitor the activities and events in your app, you can still use 
 
 ## Troubleshooting
 
-While Teams AI v2 SDK heavily endorses Agents Toolkit, you can run your agent in Teams without it. However, using ATK saves time and effort.
+In general, we strongly recommend using M365 Agents Toolkit for managing your resources, deployment, etc. If you have chosen to manually deploy and publish your resources, please refer to the [Teams app documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-publish-overview) for support. Because Teams AI library does not support resource management, please refer to the [Microsoft Teams deployment documentation](https://learn.microsoft.com/en-us/microsoftteams/deploy-overview).
 
 :::warning
-Please note that ATK is not managed by the Teams AI team. For problems running ATK, please refer to the [M365 Agents Toolkit documentation](https://learn.microsoft.com/en-us/microsoft-365/developer/overview-m365-agents-toolkit?toc=%2Fmicrosoftteams%2Fplatform%2Ftoc.json&bc=%2Fmicrosoftteams%2Fplatform%2Fbreadcrumb%2Ftoc.json) or contact the [M365 Agents Toolkit team](https://github.com/OfficeDev/Teams-Toolkit).
+Please note: for problems you may run into using M365 Agent Toolkit please refer to the [M365 Agent Toolkit documentation](https://learn.microsoft.com/en-us/microsoft-365/developer/overview-m365-agents-toolkit) or contact the [M365 Agent Toolkit team](https://github.com/OfficeDev/microsoft-365-agents-toolkit).
 :::
 
 :::warning
