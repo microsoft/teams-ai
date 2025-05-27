@@ -8,7 +8,7 @@ Now that your agent is running locally, let's deploy it to Microsoft Teams for t
 
 ## Microsoft 365 Agents Toolkit
 
-Microsoft 365 Agents Toolkit is a powerful tool that simplifies deploying and debugging Teams applications. It automates tasks like managing the Teams app manifest, configuring authentication, provisioning, and deployment. If you'd like to learn what it helps automate, check out [Teams core concepts](/teams/core-concepts).
+Microsoft 365 Agents Toolkit is a powerful tool that simplifies deploying and debugging Teams applications. It automates tasks like managing the Teams app manifest, configuring authentication, provisioning, and deployment. If you'd like to learn about these concepts, check out [Teams core concepts](/teams/core-concepts).
 
 ### Install Microsoft 365 Agents Toolkit
 
