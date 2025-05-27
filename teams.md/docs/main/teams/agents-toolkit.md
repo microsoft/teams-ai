@@ -7,7 +7,7 @@ sidebar_position: 3
 Agents Toolkit is a powerful extension and CLI app available for customers that helps automate important tasks like manifest management, sideloading, deployment, and provisioning.
 
 :::note
-Please note that the Teams AI v2 library team does **NOT** manage Agents Toolkit, it is managed by the toolkit team. If you run into issues using [Agents Toolkit](https://github.com/OfficeDev/Teams-Toolkit), please contact their team team for support. Topics that fall under Agents Toolkit include using the extension, running apps chosen from Agents Toolkit, deployment and provisioning, and running the debugger via F5.
+The Teams AI v2 library and Microsoft 365 Agents Toolkit are separate tools. For any issues related to [Agents Toolkit](https://github.com/OfficeDev/microsoft-365-agents-toolkit), please file them in the repo. Topics that fall under Agents Toolkit include using the extension, running apps chosen from Agents Toolkit, deployment and provisioning, and running the debugger via F5.
 :::
 
 ## Installing Agents Toolkit
@@ -17,8 +17,8 @@ Agents Toolkit can be installed as an extension and CLI. Please see the document
 - [Installing Agents Toolkit extension](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/install-teams-toolkit)
 - [Installing Agents Toolkit CLI](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/microsoft-365-agents-toolkit-cli)
 
-:::warning
-Agents Toolkit CLI is not to be confused with the [Teams AI v2 library CLI](../developer-tools/cli), which is managed by our team.
+:::note
+Agents Toolkit CLI is not to be confused with the [Teams AI v2 library CLI](../developer-tools/cli).
 :::
 
 ## Official documentation
