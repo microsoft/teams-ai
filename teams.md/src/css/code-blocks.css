@@ -1,0 +1,47 @@
+.code-block-error-line {
+  background-color: #ff000020;
+  color: #ff000080 !important;
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
+  border-left: 3px solid #ff000080;
+
+  * {
+    color: #ff000080 !important;
+  }
+}
+
+.code-block-success-line {
+  background-color: #003100;
+  color: #e6f6e6 !important;
+  border-left: 3px solid #009400;
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
+
+  * {
+    color: #e6f6e6 !important;
+  }
+}
+
+[data-theme='dark'] {
+  .code-block-error-line {
+    background-color: #ff000020;
+    color: rgba(254, 100, 100, 0.67) !important;
+    border-left: 3px solid #ff000080;
+
+    * {
+      color:rgba(254, 100, 100, 0.67) !important;
+    }
+  }
+
+  .code-block-success-line {
+    background-color: #003100;
+    color: #e6f6e6 !important;
+    border-left: 3px solid #009400;
+
+    * {
+      color: #e6f6e6 !important;
+    }
+  }
+}

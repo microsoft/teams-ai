@@ -26,6 +26,7 @@ coverage
 out/
 build
 dist
+/docs/
 
 
 # Debug
@@ -36,5 +37,4 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
-docs/
 .specstory

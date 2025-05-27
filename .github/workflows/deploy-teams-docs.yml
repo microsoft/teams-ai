@@ -1,0 +1,48 @@
+name: Deploy-Teams-Docs
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - v2-preview
+    paths:
+      - 'teams.md/**'
+      - .github/workflows/deploy-teams-docs.yml
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # To push a branch
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+
+      - name: Install dependencies
+        working-directory: teams.md
+        run: npm install
+
+      - name: Build static site
+        working-directory: teams.md
+        run: npm run build
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: teams.md/build
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
