@@ -29,7 +29,7 @@
         "@microsoft/api-extractor": "^7.52.8",
         "@standardlabs/is-private": "^1.0.1",
         "@types/jsonwebtoken": "9.0.4",
-        "@types/lodash": "^4.17.16",
+        "@types/lodash": "^4.17.17",
         "@types/mocha": "^10.0.9",
         "@types/node": "^20.16.1",
         "@types/sinon": "^17.0.4",
