@@ -6,7 +6,7 @@
     "license": "MIT",
     "main": "./lib/index.js",
     "engines": {
-        "node": ">=18.0.0"
+        "node": ">=20.0.0"
     },
     "scripts": {
         "dev:teamsfx": "env-cmd --silent -f .env npm run dev",
@@ -25,15 +25,15 @@
         "url": "https://github.com/microsoft/teams-ai"
     },
     "dependencies": {
-        "@azure/identity": "^4.8.0",
+        "@azure/identity": "^4.10.0",
         "@azure/search-documents": "12.1.0",
         "@microsoft/teams-ai": "~1.7.4",
         "botbuilder": "^4.23.2",
-        "dotenv": "^16.4.1",
+        "dotenv": "^16.5.0",
         "openai": "4.77.4",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
-        "vectra": "^0.9.0"
+        "vectra": "^0.11.1"
     },
     "devDependencies": {
         "@types/debug": "^4.1.12",
@@ -43,7 +43,7 @@
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
         "copyfiles": "^2.4.1",
-        "debug": "^4.3.7",
+        "debug": "^4.4.1",
         "env-cmd": "^10.1.0",
         "eslint": "^8.57.1",
         "nodemon": "~3.0.1",

@@ -49,23 +49,23 @@ namespace Microsoft.Teams.AI.Utilities
             {
                 return null;
             }
-            else
+
+            // Remove duplicate matches
+            HashSet<string> filteredMatches = new();
+            foreach (Match match in matches)
             {
-                List<ClientCitation> usedCitations = new();
-                foreach (Match match in matches)
-                {
-                    citations.Find((citation) =>
-                    {
-                        if ($"[{citation.Position}]" == match.Value)
-                        {
-                            usedCitations.Add(citation);
-                            return true;
-                        }
-                        return false;
-                    });
-                }
-                return usedCitations;
+                filteredMatches.Add(match.Value);
             }
+
+            List<ClientCitation> usedCitations = new();
+            foreach (string match in filteredMatches)
+            {
+                var citation = citations.Find(c => $"[{c.Position}]" == match);
+                if (citation != null)
+                    usedCitations.Add(citation);
+            }
+
+            return usedCitations;
         }
     }
 }
