@@ -43,7 +43,7 @@ This [CLI](/developer-tools/cli) command adds configuration files required by Ag
 | Cmd name   | CLI name      | Description                                                                                                                                        |
 | ---------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `teams`    | Teams AI v2   | A tool for setting up and utilizing the Teams AI v2 library including integration with ATK, if desired.                                            |
-| `teamsapp` | Agents Toolkit | A tool for managing provisioning, deployment, and in-client debugging for Teams. |
+| `atk` | Agents Toolkit | A tool for managing provisioning, deployment, and in-client debugging for Teams. |
 
 ## Debugging in Teams
 
