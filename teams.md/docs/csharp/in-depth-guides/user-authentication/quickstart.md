@@ -43,7 +43,7 @@ This command:
 2. Bootstraps the graph agent template files into it under `oauth-app/src`.
 3. Creates your agent's manifest files, including a `manifest.json` file and placeholder icons in the `oauth-app/appPackage` directory. The Teams [app manifest](https://learn.microsoft.com/en-us/microsoftteams/platform/resources/schema/manifest-schema) is required for [sideloading](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) the app into Teams.
 
-### Add M365 Agents Toolkit auth configuration
+### Add Agents Toolkit auth configuration
 
 Open your terminal with the `oauth-app/` folder set as the current working directory and run the following command:
 
@@ -53,7 +53,7 @@ teams config add atk.oauth
 ```
 
 
-This will add relevant M365 Agents Toolkit files to your project.
+This will add relevant Agents Toolkit files to your project.
 
 :::tip
 See [App Setup](./setup#using-m365-agents-toolkit-with-the-teams-cli) to learn more about what this command does.

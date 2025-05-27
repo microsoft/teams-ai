@@ -10,7 +10,7 @@ Now that your agent is running locally, let's deploy it to Microsoft Teams for t
 
 M365 Agents Toolkit is a powerful tool that simplifies deploying and debugging Teams applications. It automates tasks like managing the Teams app manifest, configuring authentication, provisioning, and deployment. If you'd like to learn what it helps automate, check out [Teams core concepts](/teams/core-concepts).
 
-### Install M365 Agents Toolkit (ATK)
+### Install M365 Agents Toolkit
 
 First, you'll need to install the M365 Agents Toolkit IDE extension:
 
@@ -108,7 +108,7 @@ If you want to monitor the activities and events in your app, you can still use 
 
 ## Troubleshooting
 
-While Teams AI v2 SDK heavily endorses Teams Tookit (ATK), you can run your agent in Teams without it. However, using ATK saves time and effort.
+While Teams AI v2 SDK heavily endorses Agents Toolkit, you can run your agent in Teams without it. However, using ATK saves time and effort.
 
 :::warning
 Please note that ATK is not managed by the Teams AI team. For problems running ATK, please refer to the [M365 Agents Toolkit documentation](https://learn.microsoft.com/en-us/microsoft-365/developer/overview-m365-agents-toolkit?toc=%2Fmicrosoftteams%2Fplatform%2Ftoc.json&bc=%2Fmicrosoftteams%2Fplatform%2Fbreadcrumb%2Ftoc.json) or contact the [M365 Agents Toolkit team](https://github.com/OfficeDev/Teams-Toolkit).
