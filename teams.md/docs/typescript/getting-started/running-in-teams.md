@@ -38,7 +38,7 @@ This [CLI](/developer-tools/cli) command adds configuration files required by Mi
 - Environment setup in the `env` folder and root `.env` file
 - Teams app manifest in the `appPackage` folder (if not already present)
 - Debug instructions in `.vscode/launch.json` and `.vscode/tasks.json`
-- ATK automation files to your project (e.g. `teamsapp.local.yml`)
+- Agents Toolkit automation files to your project (e.g. `teamsapp.local.yml`)
 
 | Cmd name   | CLI name      | Description                                                                                                                                        |
 | ---------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -51,8 +51,8 @@ After installing Microsoft 365 Agents Toolkit and adding the configuration:
 
 1. **Open** your agent's project in your IDE.
 2. **Open the Microsoft 365 Agents Toolkit extension panel** (usually on the left sidebar). The extension icon is the Teams logo.
-3. **Log in** to your Microsoft 365 and Azure accounts in the ATK extension.
-4. **Select "Local"** under Environment Settings of the ATK extension.
+3. **Log in** to your Microsoft 365 and Azure accounts in the Agents Toolkit extension.
+4. **Select "Local"** under Environment Settings of the Agents Toolkit extension.
 5. **Click on Debug (Chrome) or Debug (Edge)** to start debugging via the 'play' button.
 
 ![Microsoft 365 Agents Toolkit local environment UI](/screenshots/agents-toolkit.png)
@@ -68,7 +68,7 @@ When debugging starts, the Microsoft 365 Agents Toolkit will:
 - **Launch Teams** in an incognito window your browser.
 - **Upload the package** to Teams and signal it to sideload the app (fancy word for installing this app just for your use)
 
-If you set up ATK via the Teams AI CLI, you should see something like the following in your terminal:
+If you set up Agents Toolkit via the Teams AI CLI, you should see something like the following in your terminal:
 
 
 ```sh

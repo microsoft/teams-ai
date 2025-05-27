@@ -51,8 +51,8 @@ After installing Agents Toolkit and adding the configuration:
 
 1. **Open** your agent's project in your IDE.
 2. **Open the Agents Toolkit extension panel** (usually on the left sidebar). The extension icon is the Teams logo.
-3. **Log in** to your Microsoft 365 and Azure accounts in the ATK extension.
-4. **Select "Local"** under Environment Settings of the ATK extension.
+3. **Log in** to your Microsoft 365 and Azure accounts in the Agents Toolkit extension.
+4. **Select "Local"** under Environment Settings of the Agents Toolkit extension.
 5. **Click on Debug (Chrome) or Debug (Edge)** to start debugging via the 'play' button.
 
 ![Agents Toolkit local environment UI](/screenshots/agents-toolkit.png)
@@ -68,7 +68,7 @@ When debugging starts, the Agents Toolkit will:
 - **Launch Teams** in an incognito window your browser.
 - **Upload the package** to Teams and signal it to sideload the app (fancy word for installing this app just for your use)
 
-If you set up ATK via the Teams AI CLI, you should see something like the following in your terminal:
+If you set up Agents Toolkit via the Teams AI CLI, you should see something like the following in your terminal:
 
 
 ```sh
@@ -99,12 +99,14 @@ If you want to monitor the activities and events in your app, you can still use 
 
 ## Troubleshooting
 
-:::warning
-Please note that ATK is not managed by the Teams AI team. For problems running ATK, please refer to the [Agents Toolkit documentation](https://learn.microsoft.com/en-us/microsoft-365/developer/overview-m365-agents-toolkit?toc=%2Fmicrosoftteams%2Fplatform%2Ftoc.json&bc=%2Fmicrosoftteams%2Fplatform%2Fbreadcrumb%2Ftoc.json) or contact the [Agents Toolkit team](https://github.com/OfficeDev/Teams-Toolkit).
+In general, we strongly recommend using Microsoft 365 Agents Toolkit for managing your resources, deployment, etc. If you have chosen to manually deploy and publish your resources, please refer to the [Teams app documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-publish-overview) for support. Because Teams AI library does not support resource management, please refer to the [Microsoft Teams deployment documentation](https://learn.microsoft.com/en-us/microsoftteams/deploy-overview).
+
+:::note
+For problems you may run into using Microsoft 365 Agent Toolkit please refer to the [Microsoft 365 Agent Toolkit documentation](https://learn.microsoft.com/en-us/microsoft-365/developer/overview-m365-agents-toolkit).
 :::
 
-:::warning
-Teams AI v2 library focuses on building agents and does not support manual resource management. If you are having trouble with provisioning or deployment, please refer to the Agents Toolkit documentation or the [Microsoft Teams deployment documentation](https://learn.microsoft.com/en-us/microsoftteams/deploy-overview).
+:::note
+Teams AI v2 library focuses on building agents and does not support manual resource management. If you are having trouble with provisioning or deployment, please refer to the Microsoft 365 Agents Toolkit documentation or the [Microsoft Teams deployment documentation](https://learn.microsoft.com/en-us/microsoftteams/deploy-overview).
 :::
 
 ## Next steps
