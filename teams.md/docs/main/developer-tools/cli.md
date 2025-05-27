@@ -32,7 +32,7 @@ If you prefer not to install globally, all commands below can replace `teams` wi
 ## Create an agent with one command line
 
 ```sh
-teams new <app-name> <optional>
+teams new <typscript | csharp> <app-name> <optional>
 ```
 
 The `new` token will create a brand new agent with `app-name` applied as the directory name and project name.
