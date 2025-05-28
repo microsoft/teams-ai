@@ -20,14 +20,14 @@ npm install -g @microsoft/teams.cli@preview
 Next, use the CLI to create your agent:
 
 ```sh
-teams new quote-agent --template echo
+teams new <typescript | csharp> quote-agent --template echo
 ```
 
-For more information, follow our [quick start guide](book/src/getting-started/quickstart.md).
+For more information, follow our quickstart guide: [C#](http://microsoft.github.io/teams-ai/csharp/getting-started/quickstart) or [Typescript](http://microsoft.github.io/teams-ai/typescript/getting-started/quickstart)
 
 ### SDK
 
-Microsoft Teams has a robust developer ecosystem with a broad suite of capabilities, now unified via Teams AI v2. Whether you are building [AI-powered agents](book/src/in-depth-guides/ai/README.md), [message extensions](book/src/in-depth-guides/message-extensions/README.md), embedded web applications, or Graph, Teams AI v2 has you covered.
+Microsoft Teams has a robust developer ecosystem with a broad suite of capabilities, now unified via Teams AI v2. Whether you are building AI-powered agents ([TS]https://microsoft.github.io/teams-ai/typescript/in-depth-guides/ai/), [C#](https://microsoft.github.io/teams-ai/csharp/in-depth-guides/ai/), Message Extensions ([TS](https://microsoft.github.io/teams-ai/typescript/in-depth-guides/message-extensions/), [C#][https://microsoft.github.io/teams-ai/csharp/in-depth-guides/message-extensions/]), embedded web applications, or Graph, Teams AI v2 has you covered.
 
 Here is a simple example, which responds to incoming messages with information retrieved from Graph.
 
@@ -60,7 +60,7 @@ app.on('message', async ({ api, isSignedIn, send, signin }) => {
 This repository contains submodules that point to dedicated repositories for different language implementations of the SDK:
 
 - [TypeScript/JavaScript](https://github.com/microsoft/teams.ts)
-- [.NET](https://github.com/microsoft/teams.net) (early stage)
+- [.NET](https://github.com/microsoft/teams.net)
 - Python (coming soon)
 
 For language-specific bugs or issues, please use the Issues tab in the respective language repository.
