@@ -27,7 +27,17 @@ export async function createDummyCards(searchQuery: string) {
       thumbnail: {
         title: item.title,
         text: item.description,
-      } as ThumbnailCard,
+        // When a user clicks on a list item in Teams:
+        // - If the thumbnail has a `tap` property: Teams will trigger the `message.ext.select-item` activity
+        // - If no `tap` property: Teams will insert the full adaptive card into the compose box
+        // tap: { 
+        //   type: "invoke",
+        //   title: item.title,
+        //   value: {
+        //     "option": index,
+        //   },
+        // },
+      } satisfies ThumbnailCard,
     };
   });
 
