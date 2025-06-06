@@ -65,19 +65,5 @@ Here, the client takes care of using the correct token, provides helpful hints v
 
 ## Currently exposed Graph clients
 
-The following clients are currently exposed:
+The Microsoft Graph API surface is vast, and this Graph API Client supports a subset of the full functionality to cover the most common scenarios. Details on precisely which endpoints are supported is available in the [Graph API Client In-Depth Guide](../in-depth-guides/graph/).
 
-| Client Name | Graph endpoint | Description |
-|-------------|----------------|-------------|
-| appCatalogs | [/appCatalogs](https://learn.microsoft.com/en-us/graph/api/appcatalogs-list-teamsapps?view=graph-rest-1.0) | Apps from Teams App Catalog |
-| appRoleAssignments | [/appRoleAssignments](https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-approleassignments?view=graph-rest-1.0) | List app role assignments |
-| applicationTemplates | [/applicationTemplates](https://learn.microsoft.com/en-us/graph/api/resources/applicationtemplate?view=graph-rest-1.0) | Application in the Microsoft Entra App Gallery |
-| applications | [/applications](https://learn.microsoft.com/en-us/graph/api/resources/application?view=graph-rest-1.0) | Application Resources |
-| chats | [/chats](https://learn.microsoft.com/en-us/graph/api/chat-list?view=graph-rest-1.0&tabs=http) | Chat resources between users |
-| communications | [/communications](https://learn.microsoft.com/en-us/graph/api/application-post-calls?view=graph-rest-1.0) | Calls and Online meetings |
-| employeeExperience | [/employeeExperience](https://learn.microsoft.com/en-us/graph/api/resources/engagement-api-overview?view=graph-rest-1.0) |  Employee Experience and Engagement |
-| me | [/me](https://learn.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http) | Same as `/users` but scoped to one user (who is making the request) |
-| teams | [/teams](https://learn.microsoft.com/en-us/graph/api/resources/team?view=graph-rest-1.0) | A Team resource  |
-| teamsTemplates | [/teamsTemplates](https://learn.microsoft.com/en-us/microsoftteams/get-started-with-teams-templates) | A Team Template resource |
-| teamwork | [/teamwork](https://learn.microsoft.com/en-us/graph/api/resources/teamwork?view=graph-rest-1.0) | A range of Microsoft Teams functionalities |
-| users | [/users](https://learn.microsoft.com/en-us/graph/api/resources/users?view=graph-rest-1.0) | A user resource |
