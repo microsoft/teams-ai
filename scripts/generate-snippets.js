@@ -9,7 +9,9 @@ const args = process.argv.slice(2);
 const possibleScriptArgs = ['--clear-existing-snips'];
 
 // Get the language parameter (first non-flag argument)
-const languageParam = args.find(arg => !arg.startsWith('--') && (arg === 'ts' || arg === 'dotnet'));
+const languageParam = args.find(
+  (arg) => !arg.startsWith('--') && (arg === 'ts' || arg === 'dotnet')
+);
 
 // Remove any script-related args from the command line arguments
 const extraArgs = args.filter((arg) => !possibleScriptArgs.includes(arg));
@@ -52,13 +54,6 @@ const findProjectRoot = () => {
 const projectRoot = findProjectRoot();
 process.chdir(projectRoot); // Ensure we're in project root
 
-<<<<<<< Updated upstream
-// Default arguments
-const defaultArgs = {
-  input: path.join(projectRoot, 'teams.ts'),
-  '--output': [path.join(projectRoot, 'teams.md/static/generated-snippets/ts')],
-  '--ignore': ['packages/graph/**', '!**/*.ts'],
-=======
 // Get default input and output based on language parameter
 const getDefaultConfig = (lang) => {
   switch (lang) {
@@ -82,7 +77,6 @@ const getDefaultConfig = (lang) => {
         '--ignore': ['packages/graph/**', '!**/*.ts'],
       };
   }
->>>>>>> Stashed changes
 };
 
 // Default arguments based on language parameter

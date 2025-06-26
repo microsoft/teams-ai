@@ -23,19 +23,11 @@ Next, use the CLI to create your agent:
 teams new <typescript | csharp> quote-agent --template echo
 ```
 
-<<<<<<< Updated upstream
 For more information, follow our quickstart guide: [C#](http://microsoft.github.io/teams-ai/csharp/getting-started/quickstart) or [Typescript](http://microsoft.github.io/teams-ai/typescript/getting-started/quickstart)
 
 ### SDK
 
 Microsoft Teams has a robust developer ecosystem with a broad suite of capabilities, now unified via Teams AI v2. Whether you are building AI-powered agents ([TS]https://microsoft.github.io/teams-ai/typescript/in-depth-guides/ai/), [C#](https://microsoft.github.io/teams-ai/csharp/in-depth-guides/ai/), Message Extensions ([TS](https://microsoft.github.io/teams-ai/typescript/in-depth-guides/message-extensions/), [C#][https://microsoft.github.io/teams-ai/csharp/in-depth-guides/message-extensions/]), embedded web applications, or Graph, Teams AI v2 has you covered.
-=======
-For more information, follow our [quick start guide](teams.md/docs/typescript/getting-started/quickstart.md).
-
-### SDK
-
-Microsoft Teams has a robust developer ecosystem with a broad suite of capabilities, now unified via Teams AI v2. Whether you are building [AI-powered agents](teams.md/docs/typescript/in-depth-guides/ai/README.md), [message extensions](teams.md/docs/typescript/in-depth-guides/message-extensions/README.md), embedded web applications, or Graph, Teams AI v2 has you covered.
->>>>>>> Stashed changes
 
 Here is a simple example, which responds to incoming messages with information retrieved from Graph.
 
