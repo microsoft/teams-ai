@@ -8,6 +8,9 @@ const args = process.argv.slice(2);
 // Check if there are any script args
 const possibleScriptArgs = ['--clear-existing-snips'];
 
+// Get the language parameter (first non-flag argument)
+const languageParam = args.find(arg => !arg.startsWith('--') && (arg === 'ts' || arg === 'dotnet'));
+
 // Remove any script-related args from the command line arguments
 const extraArgs = args.filter((arg) => !possibleScriptArgs.includes(arg));
 
@@ -49,12 +52,41 @@ const findProjectRoot = () => {
 const projectRoot = findProjectRoot();
 process.chdir(projectRoot); // Ensure we're in project root
 
+<<<<<<< Updated upstream
 // Default arguments
 const defaultArgs = {
   input: path.join(projectRoot, 'teams.ts'),
   '--output': [path.join(projectRoot, 'teams.md/static/generated-snippets/ts')],
   '--ignore': ['packages/graph/**', '!**/*.ts'],
+=======
+// Get default input and output based on language parameter
+const getDefaultConfig = (lang) => {
+  switch (lang) {
+    case 'ts':
+      return {
+        input: path.join(projectRoot, 'teams.ts'),
+        '--output': [path.join(projectRoot, 'teams.md/static/generated-snippets/ts')],
+        '--ignore': ['packages/graph/**', '!**/*.ts'],
+      };
+    case 'dotnet':
+      return {
+        input: path.join(projectRoot, 'teams.dotnet'), // Assuming dotnet input path
+        '--output': [path.join(projectRoot, 'teams.md/static/generated-snippets/dotnet')],
+        '--ignore': ['packages/graph/**', '!**/*.cs'], // Assuming C# files for dotnet
+      };
+    default:
+      // Default to ts if no parameter provided
+      return {
+        input: path.join(projectRoot, 'teams.ts'),
+        '--output': [path.join(projectRoot, 'teams.md/static/generated-snippets/ts')],
+        '--ignore': ['packages/graph/**', '!**/*.ts'],
+      };
+  }
+>>>>>>> Stashed changes
 };
+
+// Default arguments based on language parameter
+const defaultArgs = getDefaultConfig(languageParam);
 
 // Parse extra args
 const extraArgsMap = {};
@@ -67,8 +99,8 @@ for (let i = 0; i < extraArgs.length; i++) {
       values.push(extraArgs[++i]);
     }
     extraArgsMap[arg] = values;
-  } else {
-    // Accept only 1 non-flag argument (input)
+  } else if (arg !== 'ts' && arg !== 'dotnet') {
+    // Accept only 1 non-flag argument (input), but skip language parameters
     extraArgsMap.input = path.resolve(projectRoot, arg);
   }
 }
