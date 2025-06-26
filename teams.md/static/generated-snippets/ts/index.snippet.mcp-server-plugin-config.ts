@@ -13,6 +13,10 @@ const mcpServerPlugin = new McpPlugin({
   {
     input: z.string().describe('the text to echo back'),
   },
+  {
+    readOnlyHint: true,
+    idempotentHint: true
+  },
   async ({ input }) => {
     return {
       content: [

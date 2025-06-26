@@ -11,6 +11,10 @@ mcpServerPlugin.tool(
     input: z.string().describe('the text to echo back'),
     userAadObjectId: z.string().describe('the user to alert'),
   },
+  {
+    readOnlyHint: true,
+    idempotentHint: true
+  },
   async ({ input, userAadObjectId }, { authInfo }) => {
     if (!isAuthValid(authInfo)) {
       throw new Error('Not allowed to call this tool');
@@ -36,7 +40,7 @@ mcpServerPlugin.tool(
       content: [
         {
           type: 'text',
-          text: `User was notified`,
+          text: 'User was notified',
         },
       ],
     };

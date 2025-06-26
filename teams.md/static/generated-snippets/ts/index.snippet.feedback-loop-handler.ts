@@ -1,4 +1,4 @@
-app.on("message.submit.feedback", async ({ activity, log }) => {
+app.on('message.submit.feedback', async ({ activity, log }) => {
   const { reaction, feedback: feedbackJson } = activity.value.actionValue;
   if (activity.replyToId == null) {
     log.warn(`No replyToId found for messageId ${activity.id}`);
@@ -14,8 +14,8 @@ app.on("message.submit.feedback", async ({ activity, log }) => {
   } else {
     storedFeedbackByMessageId.set(activity.id, {
       ...existingFeedback,
-      likes: existingFeedback.likes + (reaction === "like" ? 1 : 0),
-      dislikes: existingFeedback.dislikes + (reaction === "dislike" ? 1 : 0),
+      likes: existingFeedback.likes + (reaction === 'like' ? 1 : 0),
+      dislikes: existingFeedback.dislikes + (reaction === 'dislike' ? 1 : 0),
       feedbacks: [...existingFeedback.feedbacks, feedbackJson],
     });
   }
