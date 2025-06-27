@@ -187,14 +187,8 @@ async function generateIndividualTxtFiles(processedFiles, outputDir, language, b
         
         const outputPath = path.join(docsDir, `${fileName}.txt`);
         
-        // Create plain text content with metadata header
-        let txtContent = `# ${file.title}\n\n`;
-        if (file.frontmatter.sidebar_position) {
-            txtContent += `Sidebar Position: ${file.frontmatter.sidebar_position}\n`;
-        }
-        txtContent += `Source File: ${path.basename(file.filePath)}\n\n`;
-        txtContent += '---\n\n';
-        txtContent += reprocessed.content || file.content; // Use reprocessed content with full URLs
+        // Use the reprocessed content directly without adding metadata header
+        let txtContent = reprocessed.content || file.content; // Use reprocessed content with full URLs
         
         fs.writeFileSync(outputPath, txtContent, 'utf8');
     }
