@@ -81,14 +81,14 @@ async function generateLanguageFiles(language, baseDir, outputDir, config) {
     const mainFiles = collectFiles(path.join(baseDir, 'docs', 'main'));
     const langFiles = collectFiles(path.join(baseDir, 'docs', language));
     
-    // Process all files to get metadata
-    const processedFiles = await processAllFiles([...mainFiles, ...langFiles], baseDir);
+    // Process all files to get metadata and file mapping
+    const { processedFiles, fileMapping } = await processAllFiles([...mainFiles, ...langFiles], baseDir);
     
     // Generate individual TXT files for each doc
-    await generateIndividualTxtFiles(processedFiles, outputDir, language);
+    await generateIndividualTxtFiles(processedFiles, outputDir, language, baseDir, config, fileMapping);
     
     // Process content for small version (navigation index)
-    const smallContent = await generateSmallVersionHierarchical(language, baseDir, config);
+    const smallContent = await generateSmallVersionHierarchical(language, baseDir, config, fileMapping);
     
     // Process content for full version (all documentation)
     const fullContent = await generateFullVersion(language, processedFiles, baseDir);
@@ -109,20 +109,36 @@ async function generateLanguageFiles(language, baseDir, outputDir, config) {
  * Processes all files and returns structured data
  * @param {Array<string>} allFiles - All file paths to process
  * @param {string} baseDir - Base directory path
- * @returns {Promise<Array>} Array of processed file objects
+ * @returns {Promise<Object>} Object with processedFiles array and fileMapping Map
  */
 async function processAllFiles(allFiles, baseDir) {
     const processedFiles = [];
     
+    // First pass: build file mapping
+    const fileMapping = new Map();
     for (const file of allFiles) {
-        const processed = await processContent(file, baseDir, true);
+        // Generate the same filename logic as used in generateIndividualTxtFiles
+        let fileName;
+        const tempProcessed = await processContent(file, baseDir, false); // Quick pass for title
+        if (path.basename(file) === 'README.md') {
+            const parentDir = path.basename(path.dirname(file));
+            fileName = generateSafeFileName(parentDir);
+        } else {
+            fileName = generateSafeFileName(tempProcessed.title || file);
+        }
+        fileMapping.set(file, fileName);
+    }
+    
+    // Second pass: process files with mapping for link resolution
+    for (const file of allFiles) {
+        const processed = await processContent(file, baseDir, true, fileMapping);
         if (processed.title || processed.content) {
             processedFiles.push(processed);
         }
     }
     
     // Sort by sidebar position, then by title
-    return processedFiles.sort((a, b) => {
+    const sortedFiles = processedFiles.sort((a, b) => {
         const posA = a.sidebarPosition || 999;
         const posB = b.sidebarPosition || 999;
         
@@ -132,6 +148,8 @@ async function processAllFiles(allFiles, baseDir) {
         
         return (a.title || '').localeCompare(b.title || '');
     });
+    
+    return { processedFiles: sortedFiles, fileMapping };
 }
 
 /**
@@ -139,8 +157,11 @@ async function processAllFiles(allFiles, baseDir) {
  * @param {Array} processedFiles - Array of processed file objects
  * @param {string} outputDir - Output directory path
  * @param {string} language - Language identifier
+ * @param {string} baseDir - Base directory path
+ * @param {Object} config - Docusaurus config object
+ * @param {Map} fileMapping - File mapping for link resolution
  */
-async function generateIndividualTxtFiles(processedFiles, outputDir, language) {
+async function generateIndividualTxtFiles(processedFiles, outputDir, language, baseDir, config, fileMapping) {
     const docsDir = path.join(outputDir, `docs_${language}`);
     
     // Create docs directory
@@ -151,8 +172,19 @@ async function generateIndividualTxtFiles(processedFiles, outputDir, language) {
     for (const file of processedFiles) {
         if (!file.content) continue;
         
-        // Generate safe filename from title or path
-        const fileName = generateSafeFileName(file.title || file.filePath);
+        // Re-process the file with full URL generation for individual files
+        const reprocessed = await processContent(file.filePath, baseDir, true, fileMapping, config, language);
+        
+        // Generate safe filename - use folder name for README.md files
+        let fileName;
+        if (path.basename(file.filePath) === 'README.md') {
+            // Use parent folder name for README files
+            const parentDir = path.basename(path.dirname(file.filePath));
+            fileName = generateSafeFileName(parentDir);
+        } else {
+            fileName = generateSafeFileName(file.title || file.filePath);
+        }
+        
         const outputPath = path.join(docsDir, `${fileName}.txt`);
         
         // Create plain text content with metadata header
@@ -162,7 +194,7 @@ async function generateIndividualTxtFiles(processedFiles, outputDir, language) {
         }
         txtContent += `Source File: ${path.basename(file.filePath)}\n\n`;
         txtContent += '---\n\n';
-        txtContent += file.content;
+        txtContent += reprocessed.content || file.content; // Use reprocessed content with full URLs
         
         fs.writeFileSync(outputPath, txtContent, 'utf8');
     }
@@ -171,12 +203,12 @@ async function generateIndividualTxtFiles(processedFiles, outputDir, language) {
 /**
  * Generates the small version of llms.txt (navigation index)
  * @param {string} language - Language identifier
- * @param {Array} processedFiles - Array of processed file objects
  * @param {string} baseDir - Base directory path
  * @param {Object} config - Docusaurus config object
+ * @param {Map} fileMapping - Mapping of source files to generated filenames
  * @returns {string} Generated navigation content
  */
-async function generateSmallVersionHierarchical(language, baseDir, config) {
+async function generateSmallVersionHierarchical(language, baseDir, config, fileMapping) {
     const langName = language === 'typescript' ? 'TypeScript' : 'C#';
     // Remove trailing slash from URL and ensure baseUrl starts with slash
     const cleanUrl = config.url.replace(/\/$/, '');
@@ -191,11 +223,11 @@ async function generateSmallVersionHierarchical(language, baseDir, config) {
     
     // Add Main Documentation
     content += `## Main Documentation\n\n`;
-    content += renderHierarchicalStructure(hierarchical.main, fullBaseUrl, language, 0);
+    content += renderHierarchicalStructure(hierarchical.main, fullBaseUrl, language, fileMapping);
     
     // Add Language-specific Documentation
     content += `## ${langName} Specific Documentation\n\n`;
-    content += renderHierarchicalStructure(hierarchical.language, fullBaseUrl, language, 1);
+    content += renderHierarchicalStructure(hierarchical.language, fullBaseUrl, language, fileMapping);
     
     return content;
 }
@@ -205,10 +237,10 @@ async function generateSmallVersionHierarchical(language, baseDir, config) {
  * @param {Object} structure - Hierarchical structure object
  * @param {string} baseUrl - Base URL for links
  * @param {string} language - Language identifier
- * @param {number} baseIndent - Base indentation level (0 for main, 1 for language-specific)
+ * @param {Map} fileMapping - Mapping of source files to generated filenames
  * @returns {string} Rendered content with proper hierarchy
  */
-function renderHierarchicalStructure(structure, baseUrl, language, baseIndent = 0) {
+function renderHierarchicalStructure(structure, baseUrl, language, fileMapping) {
     let content = '';
     
     // Convert structure to sorted array
@@ -222,33 +254,53 @@ function renderHierarchicalStructure(structure, baseUrl, language, baseIndent = 
         });
     
     for (const folder of folders) {
-        const indent = '  '.repeat(baseIndent);
-        const fileIndent = '  '.repeat(baseIndent + 1);
-        
         // Check if this folder has any content (files or children)
         const hasFiles = folder.files && folder.files.length > 0;
         const hasChildren = folder.children && Object.keys(folder.children).length > 0;
         const hasContent = hasFiles || hasChildren;
         
         if (hasContent) {
-            // Add folder header with proper title
+            // Check if this folder has a README file to make the header clickable
+            const readmeFile = hasFiles ? folder.files.find(f => path.basename(f.path) === 'README.md') : null;
             const displayTitle = folder.title && folder.title !== folder.key ? folder.title : formatFolderName(folder.key);
-            content += `${indent}### ${displayTitle}\n\n`;
             
-            // Add files in this folder (sorted by order)
+            if (readmeFile) {
+                // Make folder header clickable by linking to the README
+                let folderFileName;
+                if (fileMapping && fileMapping.has(readmeFile.path)) {
+                    folderFileName = fileMapping.get(readmeFile.path);
+                } else {
+                    folderFileName = generateSafeFileName(folder.key);
+                }
+                content += `### [${displayTitle}](${baseUrl}docs_${language}/${folderFileName}.txt)\n\n`;
+            } else {
+                // No README, just show header
+                content += `### ${displayTitle}\n\n`;
+            }
+            
+            // Add files in this folder (sorted by order), excluding README
             if (hasFiles) {
-                const sortedFiles = [...folder.files].sort((a, b) => {
-                    const orderA = a.order || 999;
-                    const orderB = b.order || 999;
-                    if (orderA !== orderB) return orderA - orderB;
-                    return a.name.localeCompare(b.name);
-                });
+                const sortedFiles = [...folder.files]
+                    .filter(f => path.basename(f.path) !== 'README.md') // Exclude README since it's now the header link
+                    .sort((a, b) => {
+                        const orderA = a.order || 999;
+                        const orderB = b.order || 999;
+                        if (orderA !== orderB) return orderA - orderB;
+                        return a.name.localeCompare(b.name);
+                    });
                 
                 for (const file of sortedFiles) {
-                    const fileName = generateSafeFileName(file.title || file.name);
+                    // Use file mapping to get the correct generated filename
+                    let fileName;
+                    if (fileMapping && fileMapping.has(file.path)) {
+                        fileName = fileMapping.get(file.path);
+                    } else {
+                        fileName = generateSafeFileName(file.title || file.name);
+                    }
+                    
                     const summary = extractSummaryFromFile(file.path);
                     
-                    content += `${fileIndent}- [${file.title}](${baseUrl}docs_${language}/${fileName}.txt)`;
+                    content += `- [${file.title}](${baseUrl}docs_${language}/${fileName}.txt)`;
                     if (summary) {
                         content += `: ${summary}`;
                     }
@@ -261,9 +313,9 @@ function renderHierarchicalStructure(structure, baseUrl, language, baseIndent = 
                 }
             }
             
-            // Recursively render children with increased indentation
+            // Recursively render children
             if (hasChildren) {
-                content += renderHierarchicalStructure(folder.children, baseUrl, language, baseIndent + 1);
+                content += renderHierarchicalStructure(folder.children, baseUrl, language, fileMapping);
             }
             
             content += '\n';

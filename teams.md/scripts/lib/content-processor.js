@@ -6,9 +6,12 @@ const path = require('path');
  * @param {string} filePath - Path to the file to process
  * @param {string} baseDir - Base directory for resolving relative paths
  * @param {boolean} includeCodeBlocks - Whether to include FileCodeBlock content
+ * @param {Map} fileMapping - Optional mapping of source files to generated filenames
+ * @param {Object} config - Optional Docusaurus config for full URL generation
+ * @param {string} language - Optional language identifier for URL generation
  * @returns {Promise<Object>} Processed content with title, content, and metadata
  */
-async function processContent(filePath, baseDir, includeCodeBlocks = false) {
+async function processContent(filePath, baseDir, includeCodeBlocks = false, fileMapping = null, config = null, language = null) {
     try {
         if (!fs.existsSync(filePath)) {
             console.warn(`⚠️ File not found: ${filePath}`);
@@ -16,7 +19,7 @@ async function processContent(filePath, baseDir, includeCodeBlocks = false) {
         }
 
         const rawContent = fs.readFileSync(filePath, 'utf8');
-        const { title, content, frontmatter } = await parseMarkdownContent(rawContent, baseDir, includeCodeBlocks);
+        const { title, content, frontmatter } = await parseMarkdownContent(rawContent, baseDir, includeCodeBlocks, filePath, fileMapping, config, language);
         
         return {
             title: title || generateTitleFromPath(filePath),
@@ -37,9 +40,13 @@ async function processContent(filePath, baseDir, includeCodeBlocks = false) {
  * @param {string} rawContent - Raw file content
  * @param {string} baseDir - Base directory for resolving paths
  * @param {boolean} includeCodeBlocks - Whether to process FileCodeBlocks
+ * @param {string} filePath - Current file path for resolving relative links
+ * @param {Map} fileMapping - Optional mapping of source files to generated filenames
+ * @param {Object} config - Optional Docusaurus config for full URL generation
+ * @param {string} language - Optional language identifier for URL generation
  * @returns {Promise<Object>} Parsed title, content, and frontmatter
  */
-async function parseMarkdownContent(rawContent, baseDir, includeCodeBlocks) {
+async function parseMarkdownContent(rawContent, baseDir, includeCodeBlocks, filePath, fileMapping, config, language) {
     let content = rawContent;
     let title = '';
     let frontmatter = {};
@@ -73,6 +80,9 @@ async function parseMarkdownContent(rawContent, baseDir, includeCodeBlocks) {
     
     // Clean up MDX-specific syntax while preserving markdown
     content = cleanMdxSyntax(content);
+    
+    // Fix internal relative links
+    content = fixInternalLinks(content, filePath, fileMapping, config, language);
     
     // Remove excessive whitespace
     content = content.replace(/\n{3,}/g, '\n\n').trim();
@@ -265,6 +275,91 @@ function generateRelativeUrl(filePath, baseDir) {
 }
 
 /**
+ * Fixes internal relative links to point to generated .txt files
+ * @param {string} content - Content containing markdown links
+ * @param {string} currentFilePath - Path of the current file being processed
+ * @param {Map} fileMapping - Optional mapping of source files to generated filenames
+ * @param {Object} config - Optional Docusaurus config for full URL generation
+ * @param {string} language - Optional language identifier for URL generation
+ * @returns {string} Content with fixed links
+ */
+function fixInternalLinks(content, currentFilePath, fileMapping, config, language) {
+    // Pattern to match markdown links: [text](link)
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    
+    return content.replace(linkRegex, (match, text, link) => {
+        // Skip external links (http/https/mailto/etc)
+        if (link.startsWith('http') || link.startsWith('mailto') || link.startsWith('#')) {
+            return match;
+        }
+        
+        // Skip absolute paths starting with /
+        if (link.startsWith('/') && !link.startsWith('//')) {
+            return match;
+        }
+        
+        // Handle relative links
+        if (!link.includes('://')) {
+            // Remove any file extensions and anchors
+            const cleanLink = link.split('#')[0].replace(/\.(md|mdx)$/, '');
+            
+            // If it's just a filename without path separators, it's likely a sibling file
+            if (!cleanLink.includes('/')) {
+                // Try to resolve using file mapping first
+                if (fileMapping) {
+                    const currentDir = path.dirname(currentFilePath);
+                    const possiblePath = path.join(currentDir, cleanLink + '.md');
+                    const possibleMdxPath = path.join(currentDir, cleanLink + '.mdx');
+                    
+                    // Look for the file in the mapping
+                    for (const [sourcePath, generatedName] of fileMapping.entries()) {
+                        // Check exact path match or basename match
+                        if (sourcePath === possiblePath || 
+                            sourcePath === possibleMdxPath ||
+                            path.basename(sourcePath, '.md') === cleanLink ||
+                            path.basename(sourcePath, '.mdx') === cleanLink) {
+                            
+                            // Generate full URL if config and language are provided
+                            if (config && language) {
+                                const cleanUrl = config.url.replace(/\/$/, '');
+                                const cleanBaseUrl = config.baseUrl.startsWith('/') ? config.baseUrl : '/' + config.baseUrl;
+                                const fullBaseUrl = `${cleanUrl}${cleanBaseUrl}`;
+                                return `[${text}](${fullBaseUrl}docs_${language}/${generatedName}.txt)`;
+                            } else {
+                                return `[${text}](${generatedName}.txt)`;
+                            }
+                        }
+                    }
+                }
+                
+                // Fallback to simple conversion
+                const safeFileName = cleanLink
+                    .toLowerCase()
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '')
+                    .substring(0, 50)
+                    || 'untitled';
+                
+                // Generate full URL if config and language are provided
+                if (config && language) {
+                    const cleanUrl = config.url.replace(/\/$/, '');
+                    const cleanBaseUrl = config.baseUrl.startsWith('/') ? config.baseUrl : '/' + config.baseUrl;
+                    const fullBaseUrl = `${cleanUrl}${cleanBaseUrl}`;
+                    return `[${text}](${fullBaseUrl}docs_${language}/${safeFileName}.txt)`;
+                } else {
+                    return `[${text}](${safeFileName}.txt)`;
+                }
+            }
+        }
+        
+        // Return original link if we can't process it
+        return match;
+    });
+}
+
+/**
  * Extracts a summary from content (first paragraph or section)
  * @param {string} content - Content to summarize
  * @param {number} maxLength - Maximum length of summary
@@ -299,5 +394,6 @@ module.exports = {
     extractSummary,
     generateTitleFromPath,
     formatTitle,
-    generateRelativeUrl
+    generateRelativeUrl,
+    fixInternalLinks
 };
