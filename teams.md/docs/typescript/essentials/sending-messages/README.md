@@ -1,5 +1,6 @@
 ---
 sidebar_position: 4
+summary: Guide to sending messages from your Teams AI agent, including replies, proactive messages, and different message types.
 ---
 
 # Sending Messages

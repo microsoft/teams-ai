@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+summary: Create middleware for logging, validation, and other cross-cutting concerns using the app.use method.
 ---
 
 # Middleware

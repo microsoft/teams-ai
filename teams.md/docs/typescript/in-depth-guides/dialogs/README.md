@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+summary: Overview of dialogs (task modules) in Teams for creating pop-up windows that improve user interactions and data collection.
 ---
 
 # Dialogs (Task Modules)

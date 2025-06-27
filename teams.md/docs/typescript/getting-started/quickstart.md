@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+summary: Step-by-step guide to quickly get started with Teams AI Library v2 using the Teams CLI to create your first agent.
 ---
 
 # Quickstart

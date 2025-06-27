@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+summary: Overview of dialogs (task modules) in C# Teams AI for creating interactive pop-up windows and multi-step forms in Teams.
 ---
 
 # Dialogs (Task Modules)

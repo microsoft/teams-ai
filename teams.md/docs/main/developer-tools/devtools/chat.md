@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+summary: Test chat functionality with your Teams agent using the lightweight DevTools without sideloading into Teams.
 ---
 
 # 💬 Devtools chat

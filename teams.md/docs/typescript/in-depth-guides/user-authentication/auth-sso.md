@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+summary: Comparison and explanation of OAuth and Single Sign-On (SSO) authentication methods in Teams applications.
 ---
 
 # How Auth Works

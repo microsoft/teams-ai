@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+summary: Inspect all incoming and outgoing activities with your agent using DevTools Activities page for debugging.
 ---
 
 # 🔍 Inspect activities

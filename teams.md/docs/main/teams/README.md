@@ -1,5 +1,6 @@
 ---
 sidebar_position: 3
+summary: Overview of Teams-specific features and SDK components that enable agent integration with the Microsoft Teams platform.
 ---
 
 # Teams Integration

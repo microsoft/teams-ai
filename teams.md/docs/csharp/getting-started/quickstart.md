@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+summary: Quick start guide for C# Teams AI Library v2 using the Teams CLI to create and run your first .NET agent.
 ---
 
 # Quickstart

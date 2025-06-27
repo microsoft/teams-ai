@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+summary: Comprehensive guide to the Teams CLI tool for creating, managing, and deploying Teams AI applications with simple command-line operations.
 ---
 
 # Teams CLI

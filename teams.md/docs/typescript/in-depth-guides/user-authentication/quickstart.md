@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+summary: Quickstart guide for enabling user authentication and Microsoft Graph API access in Teams AI applications.
 ---
 
 # Quickstart

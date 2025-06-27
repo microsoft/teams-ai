@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+summary: Understanding how to listen to and handle events in Teams AI applications, including user actions and application server events.
 ---
 
 # Listening To Events

@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+summary: Learn about Teams app manifest requirements, permissions, and sideloading process for app installation.
 ---
 
 # Teams Manifest
