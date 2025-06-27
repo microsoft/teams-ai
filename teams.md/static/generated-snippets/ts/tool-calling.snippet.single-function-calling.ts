@@ -20,7 +20,7 @@ const prompt = new ChatPrompt({
     },
     // The cooresponding function will be called
     // automatically if the LLM decides to call this function
-    async ({ pokemonName }: PokemonSearch) => {
+    async ({ pokemonName }: IPokemonSearch) => {
       log.info('Searching for pokemon', pokemonName);
       const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
       if (!response.ok) {

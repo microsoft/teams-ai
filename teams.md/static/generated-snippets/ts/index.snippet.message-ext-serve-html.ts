@@ -1,1 +1,1 @@
-app.tab(`settings`, path.resolve(__dirname));
+app.tab('settings', path.resolve(__dirname));
