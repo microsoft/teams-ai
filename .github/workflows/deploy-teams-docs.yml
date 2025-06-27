@@ -31,6 +31,10 @@ jobs:
         working-directory: teams.md
         run: npm install
 
+      - name: Generate llms.txt files
+        working-directory: teams.md
+        run: npm run generate:llms
+
       - name: Build static site
         working-directory: teams.md
         run: npm run build
