@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+summary: Initialize and use the Teams client App to call Graph APIs and remote agent functions.
 ---
 
 # Using The App

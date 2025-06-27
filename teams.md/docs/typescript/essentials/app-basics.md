@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+summary: Comprehensive guide to the App class, the main entry point for Teams AI agents that handles server hosting, request routing, authentication, and plugin management.
 ---
 
 # App Basics

@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+summary: Introduction to core concepts and paradigms for building C# Teams AI applications that handle events and activities.
 ---
 
 # Essentials

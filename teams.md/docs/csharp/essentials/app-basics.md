@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+summary: Overview of the App class in C# Teams AI, covering server hosting, request routing, authentication, and plugin management.
 ---
 
 # App Basics

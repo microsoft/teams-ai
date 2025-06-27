@@ -335,7 +335,23 @@ function extractSummaryFromFile(filePath) {
     try {
         const content = fs.readFileSync(filePath, 'utf8');
         
-        // Remove frontmatter
+        // First check for summary in frontmatter
+        const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---\s*\n/);
+        if (frontmatterMatch) {
+            const frontmatterText = frontmatterMatch[1];
+            const summaryMatch = frontmatterText.match(/^summary:\s*(.+)$/m);
+            if (summaryMatch) {
+                let summary = summaryMatch[1].trim();
+                // Remove quotes if present
+                if ((summary.startsWith('"') && summary.endsWith('"')) || 
+                    (summary.startsWith("'") && summary.endsWith("'"))) {
+                    summary = summary.slice(1, -1);
+                }
+                return summary;
+            }
+        }
+        
+        // Fallback to extracting first meaningful paragraph if no summary in frontmatter
         const withoutFrontmatter = content.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
         
         // Extract first meaningful paragraph

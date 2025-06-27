@@ -1,5 +1,6 @@
 ---
 sidebar_position: 3
+summary: Configure app settings for observability, MSAL authentication, and remote agent function calling.
 ---
 
 # App Options

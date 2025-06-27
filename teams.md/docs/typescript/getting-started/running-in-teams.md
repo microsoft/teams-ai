@@ -1,5 +1,6 @@
 ---
 sidebar_position: 3
+summary: Guide to deploying and testing your locally running agent in Microsoft Teams using the Microsoft 365 Agents Toolkit.
 ---
 
 # Running In Teams

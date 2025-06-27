@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+summary: Understanding the structure and key components of a Teams AI application including the App class, plugins, and project organization.
 ---
 
 # Code Basics

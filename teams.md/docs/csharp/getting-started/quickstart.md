@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+summary: Quick start guide for C# Teams AI Library v2 using the Teams CLI to create and run your first .NET agent.
 ---
 
 # Quickstart
@@ -11,6 +12,10 @@ Get started with Teams AI Library (v2) quickly using the Teams CLI.
 ### Prerequisites
 
 - **.NET** v.8 or higher. Install or upgrade from [dotnet.microsoft.com](https://dotnet.microsoft.com/en-us/download).
+
+:::note
+If you are using LLMs to aid you in using this library, consider using the [llms.txt files](./LLMs.md) to provide context about the library to your coding assistant.
+:::
 
 ## Instructions
 

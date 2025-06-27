@@ -1,5 +1,6 @@
 ---
 sidebar_position: 6
+summary: Overview of Tabs in C# Teams AI for building host-aware web apps with authentication, Graph integration, and agent function calls.
 ---
 
 # Tabs

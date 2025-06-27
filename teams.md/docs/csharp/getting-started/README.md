@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+summary: Getting started guide for C# Teams AI Library covering application setup, structure, and local development.
 ---
 
 # 🚀 Getting Started

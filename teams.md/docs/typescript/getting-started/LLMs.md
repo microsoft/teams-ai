@@ -1,3 +1,7 @@
+---
+summary: Links to LLM context files that provide coding assistants with documentation for the Teams AI TypeScript library.
+---
+
 # LLMs.txt
 
 Using Coding Assistants is a common practice now to help speed up development. To aid with this, you can provide your coding assistant sufficient context about this library by linking it to its llms.txt files:

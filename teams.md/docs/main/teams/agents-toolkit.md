@@ -1,5 +1,6 @@
 ---
 sidebar_position: 3
+summary: Automate Teams app development with Microsoft 365 Agents Toolkit for manifest management, sideloading, and deployment.
 ---
 
 # Microsoft 365 Agents Toolkit

@@ -1,5 +1,6 @@
 ---
 sidebar_position: 6
+summary: Overview of Model Context Protocol (MCP) integration in Teams AI Library for dynamic function and tool loading.
 ---
 
 # MCP

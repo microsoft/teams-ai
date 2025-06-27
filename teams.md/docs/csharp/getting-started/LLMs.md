@@ -1,3 +1,7 @@
+---
+summary: Links to LLM context files for coding assistants to access C# Teams AI documentation for development support.
+---
+
 # LLMs.txt
 
 Using Coding Assistants is a common practice now to help speed up development. To aid with this, you can provide your coding assistant sufficient context about this library by linking it to its llms.txt files:

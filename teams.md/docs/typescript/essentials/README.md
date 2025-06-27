@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+summary: Introduction to the core concepts of Teams AI applications including events, activities, handlers, and the reactive paradigm for building intelligent agents.
 ---
 
 # Essentials

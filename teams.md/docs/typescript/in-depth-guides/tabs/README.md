@@ -1,5 +1,6 @@
 ---
 sidebar_position: 6
+summary: Build Teams tab apps with Graph integration, authentication, and remote agent function calling capabilities.
 ---
 
 # Tabs
