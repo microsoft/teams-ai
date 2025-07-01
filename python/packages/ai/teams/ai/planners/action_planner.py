@@ -158,6 +158,7 @@ class ActionPlanner(Planner[StateT]):
                 start_streaming_message=self._options.start_streaming_message,
                 end_stream_handler=self._options.end_stream_handler,
                 enable_feedback_loop=self._enable_feedback_loop,
+                max_history_messages=self._options.prompts._options.max_history_messages
             )
         )
 
