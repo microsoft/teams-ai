@@ -323,8 +323,8 @@ export class OpenAIModel implements PromptCompletionModel {
 
         // Check for use of system messages
         // - 'user' messages tend to be followed better by the model then 'system' messages.
-        const isO1Model = model.startsWith('o1-');
-        const useSystemMessages = !isO1Model && this.options.useSystemMessages;
+        const isThinkingModel = model.startsWith('o1') || model.startsWith('o3');
+        const useSystemMessages = !isThinkingModel && this.options.useSystemMessages;
         if (!useSystemMessages && result.output.length > 0 && result.output[0].role == 'system') {
             result.output[0].role = 'user';
         }
@@ -344,7 +344,7 @@ export class OpenAIModel implements PromptCompletionModel {
         try {
             // Get the chat completion parameters
             const params = this.getChatCompletionParams(model, updatedMessages, template);
-            if (isO1Model) {
+            if (isThinkingModel) {
                 if (params.max_tokens) {
                     params.max_completion_tokens = params.max_tokens;
                     delete params.max_tokens;
@@ -356,7 +356,7 @@ export class OpenAIModel implements PromptCompletionModel {
 
             // Check for tools augmentation
             const isToolsAugmentation =
-            template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
+                template.config.augmentation && template.config.augmentation?.augmentation_type == 'tools';
 
             // Call chat completion API
             let message: Message<string>;
@@ -392,7 +392,11 @@ export class OpenAIModel implements PromptCompletionModel {
                             // - Note that a single tool call can span multiple chunks.
                             const index = toolCall.index;
                             if (index >= message.action_calls.length) {
-                                message.action_calls.push({ id: '', function: { name: '', arguments: '' }, type: '' } as any);
+                                message.action_calls.push({
+                                    id: '',
+                                    function: { name: '', arguments: '' },
+                                    type: ''
+                                } as any);
                             }
 
                             // Set ID if provided
@@ -412,7 +416,7 @@ export class OpenAIModel implements PromptCompletionModel {
 
                             // Append function arguments if provided
                             if (toolCall.function?.arguments) {
-                               message.action_calls[index].function.arguments += toolCall.function.arguments;
+                                message.action_calls[index].function.arguments += toolCall.function.arguments;
                             }
                         }
                     }

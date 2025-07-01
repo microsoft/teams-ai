@@ -53,7 +53,8 @@ describe('AssistantsPlanner', () => {
 
         const options: AssistantsPlannerOptions = {
             apiKey: 'test-key',
-            assistant_id: 'test-assistant-id'
+            assistant_id: 'test-assistant-id',
+            apiVersion: '2024-02-15'
         };
 
         planner = new AssistantsPlanner<TurnState>(options);

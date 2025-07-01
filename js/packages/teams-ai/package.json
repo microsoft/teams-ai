@@ -2,7 +2,7 @@
     "name": "@microsoft/teams-ai",
     "author": "Microsoft Corp.",
     "description": "SDK focused on building AI based applications for Microsoft Teams.",
-    "version": "1.7.0",
+    "version": "1.7.4",
     "license": "MIT",
     "keywords": [
         "botbuilder",
@@ -13,7 +13,7 @@
         "ai"
     ],
     "engines": {
-        "node": ">=18.x"
+        "node": ">=20.x"
     },
     "bugs": {
         "url": "https://github.com/microsoft/teams-ai/issues"
@@ -26,20 +26,20 @@
     "types": "./lib/index.d.ts",
     "peerDependencies": {
         "botbuilder": "^4.23.1",
-        "openai": "^4.68.2"
+        "openai": "4.77.4"
     },
     "dependencies": {
         "@azure/msal-node": "^2.16.1",
-        "axios": "^1.7.5",
-        "botbuilder-dialogs": "^4.23.1",
+        "axios": "^1.10.0",
+        "botbuilder-dialogs": "^4.23.2",
         "botframework-connector": "^4.23.1",
         "botframework-schema": "^4.23.1",
         "botframework-streaming": "^4.23.1",
-        "gpt-tokenizer": "^2.6.2",
+        "gpt-tokenizer": "^2.9.0",
         "json-colorizer": "^2.2.2",
-        "jsonschema": "1.4.1",
+        "jsonschema": "1.5.0",
         "uuid": "^9.0.1",
-        "yaml": "^2.6.0"
+        "yaml": "^2.8.0"
     },
     "resolutions": {
         "follow-redirects": "^1.15.0"
@@ -58,8 +58,8 @@
         "mocha": "10.8.2",
         "nyc": "^15.1.0",
         "rimraf": "5.0.10",
-        "shx": "^0.3.4",
-        "ts-mocha": "10.0.0",
+        "shx": "^0.4.0",
+        "ts-mocha": "10.1.0",
         "typescript": "~5.5.4"
     },
     "scripts": {

@@ -61,7 +61,8 @@ if (!process.env.ASSISTANT_ID) {
 const planner = new AssistantsPlanner({
     apiKey: apiKey,
     endpoint: endpoint,
-    assistant_id: process.env.ASSISTANT_ID ?? assistantId
+    assistant_id: process.env.ASSISTANT_ID ?? assistantId,
+    apiVersion: process.env.OPENAI_API_VERSION
 });
 
 // Define storage and application
@@ -85,9 +86,4 @@ app.ai.action<Order>('place_order', async (context: TurnContext, state: TurnStat
     const card = generateCardForOrder(order);
     await context.sendActivity(MessageFactory.attachment(CardFactory.adaptiveCard(card)));
     return `order placed`;
-});
-
-app.ai.action(AI.HttpErrorActionName, async (context: TurnContext, state: TurnState, _data: unknown) => {
-    await context.sendActivity('An AI request failed. Please try again later.');
-    return AI.StopCommandName;
 });

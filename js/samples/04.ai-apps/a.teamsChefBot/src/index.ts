@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 // Import required packages
-import { config } from 'dotenv';
 import * as path from 'path';
 import * as restify from 'restify';
 
@@ -11,21 +10,17 @@ import * as restify from 'restify';
 import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
 
 import {
+    ActionPlanner,
     AI,
     Application,
-    ActionPlanner,
     OpenAIModel,
     PromptManager,
-    TurnState,
-    TeamsAdapter
+    TeamsAdapter,
+    TurnState
 } from '@microsoft/teams-ai';
 
 import { addResponseFormatter } from './responseFormatter';
 import { VectraDataSource } from './VectraDataSource';
-
-// Read botFilePath and botFileSecret from .env file.
-const ENV_FILE = path.join(__dirname, '..', '.env');
-config({ path: ENV_FILE });
 
 // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about how bots work.

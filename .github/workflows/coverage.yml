@@ -7,34 +7,54 @@ name: Coverage
 on:
   workflow_dispatch:
   push:
-    branches: ['**']
-    paths: [
-        '.github/workflows/coverage.yml',
-        'js/**',
-        'dotnet/**',
-        'python/**'
-    ]
+    branches: ["**"]
+    paths: [".github/workflows/coverage.yml", "js/**", "dotnet/**", "python/**"]
 
 permissions: read-all
 
 jobs:
+  # JOB to run change detection
+  changes:
+    runs-on: ubuntu-latest
+    # Required permissions
+    permissions:
+      pull-requests: read
+    # Set job outputs to values from filter step
+    outputs:
+      js: ${{ steps.filter.outputs.js }}
+      dotnet: ${{ steps.filter.outputs.dotnet }}
+      python: ${{ steps.filter.outputs.python }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            js:
+              - 'js/**'
+            dotnet:
+              - 'dotnet/**'
+            python:
+              - 'python/**'
   javascript:
     name: Javascript
     runs-on: ubuntu-latest
     environment: main
     env:
-      node-version: 18.x
+      node-version: 20.x
     defaults:
       run:
         shell: bash
         working-directory: js/
     permissions:
       contents: read
+    needs: changes
+    if: ${{ needs.changes.outputs.js == 'true' }}
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Setup NodeJS ${{ env.node-version }}
-        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: ${{ env.node-version }}
       - name: Install Dependencies
@@ -61,21 +81,23 @@ jobs:
         working-directory: dotnet/packages/Microsoft.TeamsAI/
     permissions:
       contents: read
+    needs: changes
+    if: ${{ needs.changes.outputs.dotnet == 'true' }}
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Setup .NET ${{ env.dotnet-version }}
-        uses: actions/setup-dotnet@3e891b0cb619bf60e2c25674b222b8940e2c1c25 # v4.1.0
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
         with:
           dotnet-version: ${{ env.dotnet-version }}
       - name: Test
         run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.Teams.AI.Tests.csproj --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration Release
       - name: Coverage
-        uses: danielpalme/ReportGenerator-GitHub-Action@810356ce07a94200154301fb73d878e327b2dd58 # 5.4.1
+        uses: danielpalme/ReportGenerator-GitHub-Action@4c0f60daf67483745c34efdeadd4c4e78a19991e # 5.4.8
         with:
           reports: ${{ env.SOLUTION_DIR }}TestResults/*/coverage.cobertura.xml
           targetdir: ${{ env.SOLUTION_DIR }}TestResults/coverage
-          reporttypes: 'HtmlInline;lcov'
+          reporttypes: "HtmlInline;lcov"
           toolpath: ${{ env.SOLUTION_DIR }}report-generator-tool
       - name: Coveralls
         uses: coverallsapp/github-action@v2.2.3
@@ -84,7 +106,7 @@ jobs:
           parallel: true
           files: ${{ env.SOLUTION_DIR }}TestResults/coverage/lcov.info
       - name: Upload Tests
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: testresults-dotnet-${{ env.dotnet-version }}
           path: ${{ env.SOLUTION_DIR }}TestResults
@@ -94,17 +116,19 @@ jobs:
     runs-on: ubuntu-latest
     environment: main
     env:
-      python-version: 3.8
+      python-version: 3.9
     defaults:
       run:
         working-directory: python/packages/ai
     permissions:
       contents: read
+    needs: changes
+    if: ${{ needs.changes.outputs.python == 'true' }}
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Setup Python ${{ env.python-version }}
-        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: ${{ env.python-version }}
       - name: Install Dependencies
@@ -132,4 +156,4 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           parallel-finished: true
-          carryforward: 'javascript,dotnet,python'
+          carryforward: "javascript,dotnet,python"

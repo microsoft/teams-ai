@@ -91,22 +91,22 @@ class OpenAIModel(PromptCompletionModel):
     """
     A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
 
-    The model has been updated to support calling OpenAI's new o1 family of models. That currently
+    The model has been updated to support OpenAI's new o1/o3 family of models. That currently
     comes with a few constraints. These constraints are mostly handled for you but are worth noting:
 
-    - The o1 models introduce a new `max_completion_tokens` parameter and they've deprecated
+    - The models introduce a new `max_completion_tokens` parameter and they've deprecated
     the `max_tokens` parameter. The model will automatically convert the incoming `max_tokens
-    ` parameter to `max_completion_tokens` for you. But you should be aware that o1 has hidden
+    ` parameter to `max_completion_tokens` for you. But you should be aware that it has hidden
     token usage and costs that aren't constrained by the `max_completion_tokens` parameter.
-    This means that you may see an increase in token usage and costs when using the o1 models.
+    This means that you may see an increase in token usage and costs when using the models.
 
-    - The o1 models do not currently support the sending of system message so the model will
+    - The models do not currently support the sending of system message so the model will
     map them to user message in this case.
 
-    - The o1 models do not currently support setting the `temperature`, `top_p`, and
+    - The models do not currently support setting the `temperature`, `top_p`, and
     `presence_penalty` parameters so they will be ignored.
 
-    - The o1 models do not currently support the use of tools so you will need to use the
+    - The models do not currently support the use of tools so you will need to use the
     "monologue" augmentation to call actions.
     """
 
@@ -192,7 +192,7 @@ class OpenAIModel(PromptCompletionModel):
             if template.config.completion.model is not None
             else self._options.default_model
         )
-        is_o1_model = model.startswith("o1-")
+        is_thinking_model = model.startswith("o1") or model.startswith("o3")
 
         if self._options.stream and self.events is not None:
             # Signal start of completion
@@ -226,7 +226,7 @@ class OpenAIModel(PromptCompletionModel):
             self._options.logger.debug(f"PROMPT:\n{res.output}")
 
         messages: List[chat.ChatCompletionMessageParam]
-        messages = self._map_messages(res.output, is_o1_model)
+        messages = self._map_messages(res.output, is_thinking_model)
 
         try:
             extra_body = {}
@@ -238,13 +238,13 @@ class OpenAIModel(PromptCompletionModel):
                 messages=messages,
                 model=model,
                 presence_penalty=(
-                    template.config.completion.presence_penalty if not is_o1_model else 0
+                    template.config.completion.presence_penalty if not is_thinking_model else 0
                 ),
                 frequency_penalty=template.config.completion.frequency_penalty,
-                top_p=template.config.completion.top_p if not is_o1_model else 1,
-                temperature=template.config.completion.temperature if not is_o1_model else 1,
-                max_tokens=max_tokens if not is_o1_model else NOT_GIVEN,
-                max_completion_tokens=max_tokens if is_o1_model else NOT_GIVEN,
+                top_p=template.config.completion.top_p if not is_thinking_model else 1,
+                temperature=template.config.completion.temperature if not is_thinking_model else 1,
+                max_tokens=max_tokens if not is_thinking_model else NOT_GIVEN,
+                max_completion_tokens=max_tokens if is_thinking_model else NOT_GIVEN,
                 tools=tools if len(tools) > 0 else NOT_GIVEN,
                 tool_choice=tool_choice if len(tools) > 0 else NOT_GIVEN,
                 parallel_tool_calls=parallel_tool_calls if len(tools) > 0 else NOT_GIVEN,
@@ -271,7 +271,43 @@ class OpenAIModel(PromptCompletionModel):
                     if delta.content:
                         message_content += delta.content
 
-                    # TODO: Handle tool calls
+                    if is_tools_aug and delta.tool_calls:
+                        if not hasattr(message, "action_calls") or message.action_calls is None:
+                            message.action_calls = []
+
+                        for tool_call in delta.tool_calls:
+                            # Add empty tool call to message if new index
+                            # Note that a single tool call can span multiple chunks
+                            index = tool_call.index
+
+                            if index >= len(message.action_calls):
+                                message.action_calls.append(
+                                    ActionCall(
+                                        id="",
+                                        type="function",
+                                        function=ActionFunction(
+                                            name="",
+                                            arguments="",
+                                        ),
+                                    )
+                                )
+
+                            if tool_call.id:
+                                message.action_calls[index].id = tool_call.id
+
+                            if tool_call.type:
+                                message.action_calls[index].type = tool_call.type
+
+                            if tool_call.function:
+                                if tool_call.function.name:
+                                    message.action_calls[
+                                        index
+                                    ].function.name += tool_call.function.name
+
+                                if tool_call.function.arguments:
+                                    message.action_calls[
+                                        index
+                                    ].function.arguments += tool_call.function.arguments
 
                     if self._options.logger is not None:
                         self._options.logger.debug(f"CHUNK ${delta}")
@@ -376,7 +412,7 @@ class OpenAIModel(PromptCompletionModel):
                 """,
             )
 
-    def _map_messages(self, msgs: List[Message], is_o1_model: bool):
+    def _map_messages(self, msgs: List[Message], is_thinking_model: bool):
         output = []
         for msg in msgs:
             param: Union[
@@ -425,8 +461,8 @@ class OpenAIModel(PromptCompletionModel):
                     content=msg.content if msg.content else "",
                 )
             elif msg.role == "system":
-                # o1 models do not support system messages
-                if is_o1_model:
+                # o1 and o3 models do not support system messages
+                if is_thinking_model:
                     param = chat.ChatCompletionUserMessageParam(
                         role="user",
                         content=msg.content if msg.content is not None else "",

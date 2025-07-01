@@ -10,6 +10,9 @@ on:
   push:
     branches: ['**']
     paths: ['.github/workflows/dotnet-*.yml', 'dotnet/**']
+  pull_request:
+    branches: ['main']
+    paths: ['dotnet/**']
 
 permissions: read-all
 
@@ -19,7 +22,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        dotnet-version: ['6.0', '7.0']
+        dotnet-version: ['7.0', '8.0']
       fail-fast: false
     defaults:
       run:
@@ -33,7 +36,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Setup .NET ${{ matrix.dotnet-version }}
-        uses: actions/setup-dotnet@3e891b0cb619bf60e2c25674b222b8940e2c1c25 # v4.1.0
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Restore
@@ -43,18 +46,18 @@ jobs:
       - name: Test
         run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.Teams.AI.Tests.csproj --no-restore --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration Release
       - name: Coverage
-        uses: danielpalme/ReportGenerator-GitHub-Action@810356ce07a94200154301fb73d878e327b2dd58 # 5.4.1
+        uses: danielpalme/ReportGenerator-GitHub-Action@4c0f60daf67483745c34efdeadd4c4e78a19991e # 5.4.8
         with:
           reports: ${{ env.SOLUTION_DIR }}TestResults/*/coverage.cobertura.xml
           targetdir: ${{ env.SOLUTION_DIR }}TestResults/coverage
           reporttypes: 'HtmlInline;lcov'
           toolpath: ${{ env.SOLUTION_DIR }}report-generator-tool
       - name: Upload Tests
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: testresults-dotnet-${{ matrix.dotnet-version }}
           path: ${{ env.SOLUTION_DIR }}TestResults
       - name: Harden Runner
-        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
+        uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
         with:
           egress-policy: audit

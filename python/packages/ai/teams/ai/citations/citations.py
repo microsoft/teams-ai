@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Literal, Optional, Union
 
 from botbuilder.schema import Entity
 from msrest.serialization import Model
@@ -47,11 +47,11 @@ class ClientCitation(Model):
 
     _attribute_map = {
         "type_": {"key": "@type", "type": "str"},
-        "position": {"key": "position", "type": "str"},
+        "position": {"key": "position", "type": "int"},
         "appearance": {"key": "appearance", "type": "Appearance"},
     }
 
-    position: str
+    position: int
     appearance: Appearance
     type_: str = field(default="Claim", metadata={"alias": "@type"}, init=False, repr=False)
 
@@ -63,13 +63,13 @@ class Appearance(Model):
 
     Attributes:
         @type (str): Required; must be 'DigitalDocument'
-        name (str): The name of the document
-        text (str): Optional; ignored in Teams
+        name (str): The name of the document. (max length 80)
+        text (str): Optional; the appearance text of the citation.
         url (str): The url of the document
-        abstract (str): Content of the citation. Must be clipped if longer than 480 characters
-        encodingFormat (str): The encoding format of the citation
-        image (str): Used for icon; for not it is ignored
-        keywords (list[str]): The optional keywords to the citation
+        abstract (str): Extract of the referenced content. (max length 160)
+        encodingFormat (str): Encoding format of the `citation.appearance.text` field.
+        image (AppearanceImage): Information about the citation’s icon.
+        keywords (list[str]): Optional; set by developer. (max length 3) (max keyword length 28)
         usageInfo (SensitivityUsageInfo): The optional sensitivity content information
     """
 
@@ -82,7 +82,7 @@ class Appearance(Model):
         "text": {"key": "text", "type": "str"},
         "url": {"key": "url", "type": "str"},
         "encoding_format": {"key": "encodingFormat", "type": "str"},
-        "image": {"key": "image", "type": "str"},
+        "image": {"key": "image", "type": "AppearanceImage"},
     }
 
     name: str
@@ -90,10 +90,34 @@ class Appearance(Model):
     keywords: Optional[list[str]] = field(default=None)
     text: Optional[str] = field(default=None)
     url: Optional[str] = field(default=None)
-    image: Optional[str] = field(default=None)
-    encoding_format: Optional[str] = field(default=None)
+    image: Optional[AppearanceImage] = field(default=None)
+    encoding_format: Optional[
+        Union[
+            Literal["text/html"],
+            Literal["application/vnd.microsoft.card.adaptive"],
+        ]
+    ] = field(default=None)
     usage_info: Optional[SensitivityUsageInfo] = field(default=None)
     type_: str = field(default="DigitalDocument", metadata={"alias": "@type"})
+
+
+@dataclass
+class AppearanceImage(Model):
+    """
+    Represents how the citation will be rendered
+
+    Attributes:
+        @type (str): Required; must be 'ImageObject'
+        name (str): The image/icon name
+    """
+
+    _attribute_map = {
+        "type_": {"key": "@type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+    }
+
+    name: ClientCitationIconName
+    type_: str = field(default="ImageObject", metadata={"alias": "@type"})
 
 
 @dataclass
@@ -144,3 +168,26 @@ class Pattern(Model):
     name: str
     term_code: str
     type_: str = field(default="DefinedTerm", metadata={"alias": "@type"})
+
+
+ClientCitationIconName = Union[
+    Literal["Microsoft Workd"],
+    Literal["Microsoft Excel"],
+    Literal["Microsoft PowerPoint"],
+    Literal["Microsoft Visio"],
+    Literal["Microsoft Loop"],
+    Literal["Microsoft Whiteboard"],
+    Literal["Adobe Illustrator"],
+    Literal["Adobe Photoshop"],
+    Literal["Adobe InDesign"],
+    Literal["Adobe Flash"],
+    Literal["Sketch"],
+    Literal["Source Code"],
+    Literal["Image"],
+    Literal["GIF"],
+    Literal["Video"],
+    Literal["Sound"],
+    Literal["ZIP"],
+    Literal["Text"],
+    Literal["PDF"],
+]

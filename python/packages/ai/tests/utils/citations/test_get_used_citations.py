@@ -13,11 +13,11 @@ class TestGetUsedCitations(TestCase):
     def test_get_used_citations(self):
         citations = [
             ClientCitation(
-                position="1",
+                position=1,
                 appearance=Appearance(name="the title", abstract="some citation text..."),
             ),
             ClientCitation(
-                position="2",
+                position=2,
                 appearance=Appearance(name="the title", abstract="some citation other text..."),
             ),
         ]
@@ -31,19 +31,19 @@ class TestGetUsedCitations(TestCase):
     def test_get_used_citations_longer(self):
         citations = [
             ClientCitation(
-                position="1",
+                position=1,
                 appearance=Appearance(name="the title", abstract="some citation text..."),
             ),
             ClientCitation(
-                position="2",
+                position=2,
                 appearance=Appearance(name="the title", abstract="some citation other text..."),
             ),
             ClientCitation(
-                position="3",
+                position=3,
                 appearance=Appearance(name="the title", abstract="some citation text..."),
             ),
             ClientCitation(
-                position="4",
+                position=4,
                 appearance=Appearance(name="the title", abstract="some citation other text..."),
             ),
         ]

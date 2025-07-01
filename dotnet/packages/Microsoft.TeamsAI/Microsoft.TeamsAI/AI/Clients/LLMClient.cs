@@ -68,6 +68,7 @@ namespace Microsoft.Teams.AI.AI.Clients
         private readonly string? _startStreamingMessage;
         private ResponseReceivedHandler? _endStreamHandler;
         private bool? _enableFeedbackLoop;
+        private string? _feedbackLoopType;
 
         /// <summary>
         /// Creates a new `LLMClient` instance.
@@ -87,6 +88,7 @@ namespace Microsoft.Teams.AI.AI.Clients
             this._startStreamingMessage = Options.StartStreamingMessage;
             this._endStreamHandler = Options.EndStreamHandler;
             this._enableFeedbackLoop = Options.EnableFeedbackLoop;
+            this._feedbackLoopType = Options.FeedbackLoopType;
         }
 
         /// <summary>
@@ -180,6 +182,11 @@ namespace Microsoft.Teams.AI.AI.Clients
                         if (this._enableFeedbackLoop != null)
                         {
                             streamer.EnableFeedbackLoop = this._enableFeedbackLoop;
+
+                            if (streamer.EnableFeedbackLoop == true && this._feedbackLoopType != null)
+                            {
+                                streamer.FeedbackLoopType = this._feedbackLoopType;
+                            }
                         }
 
                         streamer.EnableGeneratedByAILabel = true;
@@ -199,6 +206,12 @@ namespace Microsoft.Teams.AI.AI.Clients
                     return;
                 }
 
+                IList<Citation>? citations = args.Chunk.delta?.Context?.Citations ?? null;
+
+                if (citations != null)
+                {
+                    streamer.SetCitations(citations);
+                }
 
                 // Ignore content without text
                 // - The chunk is likely for a Tool Call.
@@ -210,12 +223,10 @@ namespace Microsoft.Teams.AI.AI.Clients
 
                 // Send chunk to client
                 string text = args.Chunk.delta?.GetContent<string>() ?? "";
-                IList<Citation>? citations = args.Chunk.delta?.Context?.Citations ?? null;
-
 
                 if (text.Length > 0)
                 {
-                    streamer.QueueTextChunk(text, citations);
+                    streamer.QueueTextChunk(text);
                 }
             });
 

@@ -1,16 +1,16 @@
 # yaml-language-server: $schema=https://aka.ms/teams-toolkit/1.0.0/yaml.schema.json
 #
-# The teamsapp.yml composes automation tasks for Teams Toolkit when running other environment configurations.
-# This file is used when selecting the Provision, Deploy, or Publish menu items in the Teams Toolkit for Visual Studio Code window
+# The m365agents.yml composes automation tasks for Microsoft 365 Agents Toolkit when running other environment configurations.
+# This file is used when selecting the Provision, Deploy, or Publish menu items in the Microsoft 365 Agents Toolkit for Visual Studio Code window
 # or with the TeamsFx CLI commands.
 # i.e. `teamsfx provision --env {environment name}` or `teamsfx deploy --env {environment name}`.
 #
-# You can customize this file. Visit https://aka.ms/teamsfx-v5.0-guide for more info about Teams Toolkit project files.
+# You can customize this file. Visit https://aka.ms/teamsfx-v5.0-guide for more info about Microsoft 365 Agents Toolkit project files.
 version: 1.0.0
 
 environmentFolderPath: ./env
 
-# Defines what the `provision` lifecycle step does with Teams Toolkit.
+# Defines what the `provision` lifecycle step does with Microsoft 365 Agents Toolkit.
 # Runs with the Provision menu or CLI using `teamsfx provision --env {environment name}`.
 provision:
   # Automates the creation of a Teams app registration and saves the App ID to an environment file.
@@ -49,13 +49,13 @@ provision:
     with:
       appPackagePath: ./appPackage/build/appPackage.${{TEAMSFX_ENV}}.zip
 
-  # Automates updating the Teams app manifest in Teams Developer Portal using the App ID from the mainfest file.
+  # Automates updating the Teams app manifest in Developer Portal using the App ID from the mainfest file.
   # This action ensures that any manifest changes are reflected when launching the app again in Teams.
   - uses: teamsApp/update
     with:
       appPackagePath: ./appPackage/build/appPackage.${{TEAMSFX_ENV}}.zip
 
-# Defines what the `deploy` lifecycle step does with Teams Toolkit.
+# Defines what the `deploy` lifecycle step does with Microsoft 365 Agents Toolkit.
 # Runs with the Deploy menu or CLI using `teamsfx deploy --env {environment name}`.
 deploy:
   # Install any dependencies and build the web app using NPM
@@ -79,7 +79,7 @@ deploy:
       # custom environment variable.
       resourceId: ${{BOT_AZURE_APP_SERVICE_RESOURCE_ID}}
 
-# Defines what the `publish` lifecycle step does with Teams Toolkit.
+# Defines what the `publish` lifecycle step does with Microsoft 365 Agents Toolkit.
 # Runs with the Deploy menu or CLI using `teamsfx publish --env {environment name}`.
 publish:
   # Optional: Automates schema and error checking of the Teams app manifest and outputs the results in the console.
@@ -99,7 +99,7 @@ publish:
     with:
       appPackagePath: ./appPackage/build/appPackage.${{TEAMSFX_ENV}}.zip
 
-  # Automates updating the Teams app manifest in Teams Developer Portal using the App ID from the mainfest file.
+  # Automates updating the Teams app manifest in Developer Portal using the App ID from the mainfest file.
   # This action ensures that any manifest changes are reflected when launching the app again in Teams.
   - uses: teamsApp/update
     with:
