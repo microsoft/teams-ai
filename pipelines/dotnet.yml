@@ -5,7 +5,7 @@ trigger:
     - main
   paths:
     include:
-    - dotnet
+    - dotnet/**
     - pipelines/dotnet.yml
 
 pool:
