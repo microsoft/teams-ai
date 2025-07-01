@@ -7,7 +7,7 @@ readme = "README.md"
 requires-python = "<3.13,>=3.9"
 dependencies = [
     "python-dotenv (>=1.0.1,<2.0.0)",
-    "teams-ai (>=1.8.0,<2.0.0)",
+    "teams-ai (>=1.8.1,<2.0.0)",
     "autogen-agentchat (>=0.2.0,<0.3.0)"
 ]
 
