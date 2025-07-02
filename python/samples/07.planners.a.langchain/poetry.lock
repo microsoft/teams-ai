@@ -2678,14 +2678,14 @@ sqlcipher = ["sqlcipher3_binary"]
 
 [[package]]
 name = "teams-ai"
-version = "1.8.0"
+version = "1.8.1"
 description = "SDK focused on building AI based applications for Microsoft Teams."
 optional = false
 python-versions = "<4.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "teams_ai-1.8.0-py3-none-any.whl", hash = "sha256:91b07f4fc60c591a2f1b6426f81fe8e24014cb3d7da8982dd08a4b6d4858c249"},
-    {file = "teams_ai-1.8.0.tar.gz", hash = "sha256:4ea1e2363008fcb001c2ffd5e741e416433d89c9d88f3af0fc6ba33195c3deef"},
+    {file = "teams_ai-1.8.1-py3-none-any.whl", hash = "sha256:4b6060b95d7f67c8b93cd9d79086435cc52a1a95f919b940372608acc8c585e9"},
+    {file = "teams_ai-1.8.1.tar.gz", hash = "sha256:f01097b555f4778956ae773dca81ea3e664ecc659912f849be50f5be5a6d4423"},
 ]
 
 [package.dependencies]
@@ -3062,4 +3062,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<4.0"
-content-hash = "22a41f56462b5b6ca768b4521e6a580f7520c1a0c2f7b94177ae4ffe5e13bf27"
+content-hash = "38099eac1ef28e3ca1f9850acc7b0b5a3d4ce353dbea7a262cd6c668e8b755a7"

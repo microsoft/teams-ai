@@ -2361,14 +2361,14 @@ files = [
 
 [[package]]
 name = "teams-ai"
-version = "1.8.0"
+version = "1.8.1"
 description = "SDK focused on building AI based applications for Microsoft Teams."
 optional = false
 python-versions = "<4.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "teams_ai-1.8.0-py3-none-any.whl", hash = "sha256:91b07f4fc60c591a2f1b6426f81fe8e24014cb3d7da8982dd08a4b6d4858c249"},
-    {file = "teams_ai-1.8.0.tar.gz", hash = "sha256:4ea1e2363008fcb001c2ffd5e741e416433d89c9d88f3af0fc6ba33195c3deef"},
+    {file = "teams_ai-1.8.1-py3-none-any.whl", hash = "sha256:4b6060b95d7f67c8b93cd9d79086435cc52a1a95f919b940372608acc8c585e9"},
+    {file = "teams_ai-1.8.1.tar.gz", hash = "sha256:f01097b555f4778956ae773dca81ea3e664ecc659912f849be50f5be5a6d4423"},
 ]
 
 [package.dependencies]
@@ -2729,4 +2729,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<4.0"
-content-hash = "557efbb50e9d8b043a5361d59d3d5345f700a90895f6f5145dcdd07745abe4bb"
+content-hash = "16012d72be609d502e978cc8d26a42d6c2691f0149fe21d17b973016bc3981f4"
