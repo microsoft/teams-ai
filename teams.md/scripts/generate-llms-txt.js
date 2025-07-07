@@ -5,6 +5,10 @@ const path = require('path');
 const { collectFiles, getHierarchicalFiles } = require('./lib/file-collector');
 const { processContent, extractSummary } = require('./lib/content-processor');
 
+const COMMON_OVERALL_SUMMARY = (langName) =>
+  `> Microsoft Teams AI Library (v2) - A comprehensive framework for building AI-powered Teams applications using ${langName}. Using this Library, you can easily build and integrate a variety of features in Microsoft Teams by building Agents or Tools. The documentation here helps by giving background information and code samples on how best to do this.
+IMPORTANT: This Library is NOT based off of BotFramework (which the _previous_ version of the Teams AI Library was based on). This Library is a completely new framework.`;
+
 /**
  * Reads Docusaurus config to get base URL
  * @param {string} baseDir - Base directory path
@@ -242,7 +246,7 @@ async function generateSmallVersionHierarchical(language, baseDir, config, fileM
   const fullBaseUrl = `${cleanUrl}${cleanBaseUrl}`;
 
   let content = `# Teams AI Library - ${langName} Documentation\n\n`;
-  content += `> Microsoft Teams AI Library (v2) - A comprehensive framework for building AI-powered Teams applications using ${langName}. Using this Library, you can easily build and integrate a variety of features in Microsoft Teams by building Agents or Tools. The documentation here helps by giving background information and code samples on how best to do this.\n\n`;
+  content += COMMON_OVERALL_SUMMARY(langName) + '\n\n';
 
   // Get hierarchical structure
   const hierarchical = getHierarchicalFiles(baseDir, language);
@@ -465,7 +469,7 @@ async function generateFullVersion(language, processedFiles, baseDir) {
   const langName = language === 'typescript' ? 'TypeScript' : 'C#';
 
   let content = `# Teams AI Library - ${langName} Documentation (Complete)\n\n`;
-  content += `> Complete documentation for Microsoft Teams AI Library (v2) - A comprehensive framework for building AI-powered Teams applications using ${langName}. Using this Library, you can easily build and integrate a variety of features in Microsoft Teams by building Agents or Tools. The documentation here helps by giving background information and code samples on how best to do this.\n\n`;
+  content += COMMON_OVERALL_SUMMARY(langName) + '\n\n';
 
   // Group files by section
   const sections = groupFilesBySection(processedFiles, baseDir);
