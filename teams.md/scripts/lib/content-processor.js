@@ -2,6 +2,42 @@ const fs = require('fs');
 const path = require('path');
 
 /**
+ * Checks if a file should be ignored based on section-wide README filtering
+ * @param {string} filePath - Path to the file to check
+ * @returns {boolean} True if file should be ignored due to section filtering
+ */
+function shouldIgnoreFileBySection(filePath) {
+    // Get the directory path
+    let currentDir = path.dirname(filePath);
+    
+    // Walk up the directory tree looking for README.md files
+    while (currentDir && currentDir !== path.dirname(currentDir)) {
+        const readmePath = path.join(currentDir, 'README.md');
+        
+        if (fs.existsSync(readmePath)) {
+            try {
+                const readmeContent = fs.readFileSync(readmePath, 'utf8');
+                const frontmatterMatch = readmeContent.match(/^---\s*\n([\s\S]*?)\n---\s*\n/);
+                if (frontmatterMatch) {
+                    const frontmatter = parseFrontmatter(frontmatterMatch[1]);
+                    // If this README is marked to ignore, ignore the entire section
+                    if (frontmatter.llms === 'ignore' || frontmatter.llms === false) {
+                        return true;
+                    }
+                }
+            } catch (error) {
+                // Ignore errors reading README
+            }
+        }
+        
+        // Move up one directory
+        currentDir = path.dirname(currentDir);
+    }
+    
+    return false;
+}
+
+/**
  * Processes a markdown/MDX file and extracts its content
  * @param {string} filePath - Path to the file to process
  * @param {string} baseDir - Base directory for resolving relative paths
@@ -20,6 +56,16 @@ async function processContent(filePath, baseDir, includeCodeBlocks = false, file
 
         const rawContent = fs.readFileSync(filePath, 'utf8');
         const { title, content, frontmatter } = await parseMarkdownContent(rawContent, baseDir, includeCodeBlocks, filePath, fileMapping, config, language);
+        
+        // Check if this file should be excluded from LLM output
+        if (frontmatter.llms === 'ignore' || frontmatter.llms === false) {
+            return null; // Return null to indicate this file should be skipped
+        }
+        
+        // Check if this file should be ignored due to section-wide filtering
+        if (shouldIgnoreFileBySection(filePath)) {
+            return null; // Return null to indicate this file should be skipped
+        }
         
         return {
             title: title || generateTitleFromPath(filePath),
@@ -178,6 +224,13 @@ function parseFrontmatter(frontmatterText) {
             if ((value.startsWith('"') && value.endsWith('"')) || 
                 (value.startsWith("'") && value.endsWith("'"))) {
                 value = value.slice(1, -1);
+            }
+            
+            // Parse boolean values
+            if (value === 'true') {
+                value = true;
+            } else if (value === 'false') {
+                value = false;
             }
             
             frontmatter[key] = value;
@@ -395,5 +448,6 @@ module.exports = {
     generateTitleFromPath,
     formatTitle,
     generateRelativeUrl,
-    fixInternalLinks
+    fixInternalLinks,
+    shouldIgnoreFileBySection
 };

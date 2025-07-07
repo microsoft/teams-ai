@@ -123,6 +123,12 @@ function buildHierarchicalStructure(rootPath) {
                         const frontmatterMatch = readmeContent.match(/^---\s*\n([\s\S]*?)\n---/);
                         if (frontmatterMatch) {
                             const frontmatter = parseFrontmatter(frontmatterMatch[1]);
+                            
+                            // Skip this entire folder if README is marked to ignore
+                            if (frontmatter.llms === 'ignore' || frontmatter.llms === false) {
+                                continue; // Skip this folder entirely
+                            }
+                            
                             folderOrder = frontmatter.sidebar_position || 999;
                             folderTitle = frontmatter.title || frontmatter.sidebar_label || formatFolderName(item.name);
                         }
@@ -147,6 +153,12 @@ function buildHierarchicalStructure(rootPath) {
                     const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
                     if (frontmatterMatch) {
                         const frontmatter = parseFrontmatter(frontmatterMatch[1]);
+                        
+                        // Skip this file if marked to ignore
+                        if (frontmatter.llms === 'ignore' || frontmatter.llms === false) {
+                            continue; // Skip this file
+                        }
+                        
                         fileOrder = frontmatter.sidebar_position || 999;
                         fileTitle = frontmatter.title || frontmatter.sidebar_label || formatFileName(item.name);
                     }
@@ -224,8 +236,14 @@ function parseFrontmatter(frontmatterText) {
                 value = value.slice(1, -1);
             }
             
+            // Parse boolean values
+            if (value === 'true') {
+                value = true;
+            } else if (value === 'false') {
+                value = false;
+            }
             // Convert numbers
-            if (/^\d+$/.test(value)) {
+            else if (/^\d+$/.test(value)) {
                 value = parseInt(value, 10);
             }
             

@@ -1,6 +1,7 @@
 ---
 sidebar_position: 3
 summary: Design and test Adaptive Cards using the DevTools card designer with live preview and JSON editing.
+llms: ignore
 ---
 
 # 🪪 Cards

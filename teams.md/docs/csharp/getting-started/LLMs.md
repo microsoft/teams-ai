@@ -1,5 +1,6 @@
 ---
 summary: Links to LLM context files for coding assistants to access C# Teams AI documentation for development support.
+ignore: true
 ---
 
 # LLMs.txt

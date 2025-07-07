@@ -1,5 +1,6 @@
 ---
 summary: Links to LLM context files that provide coding assistants with documentation for the Teams AI TypeScript library.
+llms: ignore
 ---
 
 # LLMs.txt
