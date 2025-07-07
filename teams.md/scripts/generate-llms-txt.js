@@ -44,7 +44,7 @@ async function generateLlmsTxt() {
   console.log('🚀 Starting llms.txt generation...');
 
   const baseDir = path.join(__dirname, '..');
-  const outputDir = path.join(baseDir, 'static');
+  const outputDir = path.join(baseDir, 'static', 'llms_docs');
 
   // Get Docusaurus configuration
   const config = getDocusaurusConfig(baseDir);
@@ -334,7 +334,7 @@ function renderHierarchicalStructure(structure, baseUrl, language, fileMapping) 
         } else {
           folderFileName = generateSafeFileName(folder.key);
         }
-        content += `### [${displayTitle}](${baseUrl}docs_${language}/${folderFileName}.txt)\n\n`;
+        content += `### [${displayTitle}](${baseUrl}llms_docs/docs_${language}/${folderFileName}.txt)\n\n`;
 
         // Add summary from README if available
         try {
@@ -376,7 +376,7 @@ function renderHierarchicalStructure(structure, baseUrl, language, fileMapping) 
 
           const summary = extractSummaryFromFile(file.path);
 
-          content += `- [${file.title}](${baseUrl}docs_${language}/${fileName}.txt)`;
+          content += `- [${file.title}](${baseUrl}llms_docs/docs_${language}/${fileName}.txt)`;
           if (summary) {
             content += `: ${summary}`;
           }

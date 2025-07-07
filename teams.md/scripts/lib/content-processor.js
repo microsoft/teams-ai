@@ -377,7 +377,7 @@ function fixInternalLinks(content, currentFilePath, fileMapping, config, languag
                                 const cleanUrl = config.url.replace(/\/$/, '');
                                 const cleanBaseUrl = config.baseUrl.startsWith('/') ? config.baseUrl : '/' + config.baseUrl;
                                 const fullBaseUrl = `${cleanUrl}${cleanBaseUrl}`;
-                                return `[${text}](${fullBaseUrl}docs_${language}/${generatedName}.txt)`;
+                                return `[${text}](${fullBaseUrl}llms_docs/docs_${language}/${generatedName}.txt)`;
                             } else {
                                 return `[${text}](${generatedName}.txt)`;
                             }
@@ -400,7 +400,7 @@ function fixInternalLinks(content, currentFilePath, fileMapping, config, languag
                     const cleanUrl = config.url.replace(/\/$/, '');
                     const cleanBaseUrl = config.baseUrl.startsWith('/') ? config.baseUrl : '/' + config.baseUrl;
                     const fullBaseUrl = `${cleanUrl}${cleanBaseUrl}`;
-                    return `[${text}](${fullBaseUrl}docs_${language}/${safeFileName}.txt)`;
+                    return `[${text}](${fullBaseUrl}llms_docs/docs_${language}/${safeFileName}.txt)`;
                 } else {
                     return `[${text}](${safeFileName}.txt)`;
                 }
