@@ -242,7 +242,7 @@ async function generateSmallVersionHierarchical(language, baseDir, config, fileM
   const fullBaseUrl = `${cleanUrl}${cleanBaseUrl}`;
 
   let content = `# Teams AI Library - ${langName} Documentation\n\n`;
-  content += `> Microsoft Teams AI Library (v2) - A comprehensive framework for building AI-powered Teams applications using ${langName}.\n\n`;
+  content += `> Microsoft Teams AI Library (v2) - A comprehensive framework for building AI-powered Teams applications using ${langName}. Using this Library, you can easily build and integrate a variety of features in Microsoft Teams by building Agents or Tools. The documentation here helps by giving background information and code samples on how best to do this.\n\n`;
 
   // Get hierarchical structure
   const hierarchical = getHierarchicalFiles(baseDir, language);
@@ -266,22 +266,24 @@ async function generateSmallVersionHierarchical(language, baseDir, config, fileM
 function parseFrontmatterSimple(frontmatterText) {
   const frontmatter = {};
   const lines = frontmatterText.split('\n');
-  
+
   for (const line of lines) {
     const match = line.match(/^(\w+):\s*(.+)$/);
     if (match) {
       let value = match[2].trim();
-      
+
       // Remove quotes
-      if ((value.startsWith('"') && value.endsWith('"')) || 
-          (value.startsWith("'") && value.endsWith("'"))) {
+      if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
         value = value.slice(1, -1);
       }
-      
+
       frontmatter[match[1]] = value;
     }
   }
-  
+
   return frontmatter;
 }
 
@@ -329,7 +331,7 @@ function renderHierarchicalStructure(structure, baseUrl, language, fileMapping) 
           folderFileName = generateSafeFileName(folder.key);
         }
         content += `### [${displayTitle}](${baseUrl}docs_${language}/${folderFileName}.txt)\n\n`;
-        
+
         // Add summary from README if available
         try {
           const readmeContent = fs.readFileSync(readmeFile.path, 'utf8');
@@ -463,7 +465,7 @@ async function generateFullVersion(language, processedFiles, baseDir) {
   const langName = language === 'typescript' ? 'TypeScript' : 'C#';
 
   let content = `# Teams AI Library - ${langName} Documentation (Complete)\n\n`;
-  content += `> Complete documentation for Microsoft Teams AI Library (v2) - A comprehensive framework for building AI-powered Teams applications using ${langName}.\n\n`;
+  content += `> Complete documentation for Microsoft Teams AI Library (v2) - A comprehensive framework for building AI-powered Teams applications using ${langName}. Using this Library, you can easily build and integrate a variety of features in Microsoft Teams by building Agents or Tools. The documentation here helps by giving background information and code samples on how best to do this.\n\n`;
 
   // Group files by section
   const sections = groupFilesBySection(processedFiles, baseDir);
