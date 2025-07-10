@@ -105,7 +105,9 @@ class StreamingResponse:
         """
         self._enable_feedback_loop = enable_feedback_loop
 
-    def set_feedback_loop_type(self, feedback_loop_type: Literal["default", "custom"]) -> None:
+    def set_feedback_loop_type(
+        self, feedback_loop_type: Literal["default", "custom"]
+    ) -> None:
         """
         Sets the feedback loop to enable or disable.
         :param feedback_loop_type: The type of feedback loop ux to use
@@ -146,6 +148,7 @@ class StreamingResponse:
                         appearance=Appearance(
                             name=citation.title or f"Document {curr_pos + 1}",
                             abstract=snippet(citation.content, 477),
+                            url=citation.url or None,
                         ),
                     )
                 )
@@ -170,7 +173,9 @@ class StreamingResponse:
         self.queue_activity(lambda: activity)
         self._next_sequence += 1
 
-    def queue_text_chunk(self, text: str, citations: Optional[List[Citation]] = None) -> None:
+    def queue_text_chunk(
+        self, text: str, citations: Optional[List[Citation]] = None
+    ) -> None:
         # pylint: disable=unused-argument
         """
         Queues a chunk of partial message text to be sent to the client.

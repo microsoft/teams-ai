@@ -119,7 +119,8 @@ namespace Microsoft.Teams.AI.AI.Action
                         Appearance = new ClientCitationAppearance()
                         {
                             Name = citation.Title,
-                            Abstract = abs
+                            Abstract = abs,
+                            Url = citation.Url
                         }
                     });
                     i++;
