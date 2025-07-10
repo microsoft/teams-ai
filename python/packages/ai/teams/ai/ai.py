@@ -120,9 +120,7 @@ class AI(Generic[StateT]):
                     registered action named \"{action_name}\".
                     """)
 
-            self._actions[action_name] = ActionEntry[StateT](
-                action_name, allow_overrides, func
-            )
+            self._actions[action_name] = ActionEntry[StateT](action_name, allow_overrides, func)
             return func
 
         return __call__
@@ -187,9 +185,7 @@ class AI(Generic[StateT]):
                     context, state, command, ActionTypes.SAY_COMMAND
                 )
             else:
-                raise ApplicationError(
-                    f"unknown command of type {command.type} predicted"
-                )
+                raise ApplicationError(f"unknown command of type {command.type} predicted")
 
             if output == ActionTypes.STOP:
                 return False
@@ -214,8 +210,7 @@ class AI(Generic[StateT]):
         _state: StateT,
     ) -> str:
         self._logger.error(
-            'An AI action named "%s" was predicted but no handler was registered',
-            context.name,
+            'An AI action named "%s" was predicted but no handler was registered',context.name,
         )
         return ActionTypes.STOP
 
@@ -225,8 +220,7 @@ class AI(Generic[StateT]):
         _state: StateT,
     ) -> str:
         self._logger.error(
-            "The users input has been moderated but no handler was registered for %s",
-            context.name,
+            "The users input has been moderated but no handler was registered for %s",context.name,
         )
         return ActionTypes.STOP
 
@@ -236,8 +230,7 @@ class AI(Generic[StateT]):
         _state: StateT,
     ) -> str:
         self._logger.error(
-            "The apps output has been moderated but no handler was registered for %s",
-            context.name,
+            "The apps output has been moderated but no handler was registered for %s",context.name,
         )
         return ActionTypes.STOP
 
@@ -271,9 +264,7 @@ class AI(Generic[StateT]):
         if not action:
             return await self._on_unknown_action(ctx, state)
 
-        return await action.invoke(
-            context, state, context.data.parameters, context.name
-        )
+        return await action.invoke(context, state, context.data.parameters, context.name)
 
     async def _on_say_command(
         self,
@@ -328,16 +319,11 @@ class AI(Generic[StateT]):
         channel_data: Dict[str, Any] = {}
 
         if is_teams_channel:
-            if (
-                self._options.enable_feedback_loop
-                and not self._options.feedback_loop_type
-            ):
+            if self._options.enable_feedback_loop and not self._options.feedback_loop_type:
                 channel_data["feedbackLoopEnabled"] = self._options.enable_feedback_loop
 
             if self._options.feedback_loop_type:
-                channel_data["feedbackLoop"] = {
-                    "type": self._options.feedback_loop_type
-                }
+                channel_data["feedbackLoop"] = {"type": self._options.feedback_loop_type}
 
         await context.send_activity(
             Activity(
@@ -346,9 +332,7 @@ class AI(Generic[StateT]):
                 channel_data=channel_data,
                 entities=[
                     AIEntity(
-                        citation=(
-                            list(referenced_citations) if referenced_citations else []
-                        ),
+                        citation=(list(referenced_citations) if referenced_citations else []),
                         additional_type=["AIGeneratedContent"],
                     ),
                 ],
