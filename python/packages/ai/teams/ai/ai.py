@@ -210,7 +210,7 @@ class AI(Generic[StateT]):
         _state: StateT,
     ) -> str:
         self._logger.error(
-            'An AI action named "%s" was predicted but no handler was registered',context.name,
+            'An AI action named "%s" was predicted but no handler was registered', context.name
         )
         return ActionTypes.STOP
 
@@ -220,7 +220,7 @@ class AI(Generic[StateT]):
         _state: StateT,
     ) -> str:
         self._logger.error(
-            "The users input has been moderated but no handler was registered for %s",context.name,
+            "The users input has been moderated but no handler was registered for %s", context.name
         )
         return ActionTypes.STOP
 
@@ -230,7 +230,7 @@ class AI(Generic[StateT]):
         _state: StateT,
     ) -> str:
         self._logger.error(
-            "The apps output has been moderated but no handler was registered for %s",context.name,
+            "The apps output has been moderated but no handler was registered for %s", context.name
         )
         return ActionTypes.STOP
 
