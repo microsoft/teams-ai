@@ -160,10 +160,10 @@
     fast-xml-parser "^5.0.7"
     tslib "^2.8.1"
 
-"@azure/identity@^4.10.1", "@azure/identity@^4.4.1":
-  version "4.10.1"
-  resolved "https://registry.yarnpkg.com/@azure/identity/-/identity-4.10.1.tgz#6ce1e7b367d2eb6680d0efa5817382aafcd86f05"
-  integrity sha512-YM/z6RxRtFlXUH2egAYF/FDPes+MUE6ZoknjEdaq7ebJMMNUzn9zCJ3bd2ZZZlkP0r1xKa88kolhFH/FGV7JnA==
+"@azure/identity@^4.10.2", "@azure/identity@^4.4.1":
+  version "4.10.2"
+  resolved "https://registry.yarnpkg.com/@azure/identity/-/identity-4.10.2.tgz#6609ce398824ff0bb53f1ad1043a9f1cc93e56b8"
+  integrity sha512-Uth4vz0j+fkXCkbvutChUj03PDCokjbC6Wk9JT8hHEUtpy/EurNKAseb3+gO6Zi9VYBvwt61pgbzn1ovk942Qg==
   dependencies:
     "@azure/abort-controller" "^2.0.0"
     "@azure/core-auth" "^1.9.0"
@@ -730,10 +730,10 @@
   resolved "https://registry.yarnpkg.com/@microsoft/recognizers-text/-/recognizers-text-1.3.1.tgz#eda98a9148101ecdb04ed1424082d472b04aabd9"
   integrity sha512-HikLoRUgSzM4OKP3JVBzUUp3Q7L4wgI17p/3rERF01HVmopcujY3i6wgx8PenCwbenyTNxjr1AwSDSVuFlYedQ==
 
-"@microsoft/teams-js@^2.39.0":
-  version "2.39.0"
-  resolved "https://registry.yarnpkg.com/@microsoft/teams-js/-/teams-js-2.39.0.tgz#00e2b2af17449b4d6fcfe519dc3324b27f9ac043"
-  integrity sha512-6vH59DprzwqT2N2z81NV1zcfEqEsSxRParZBhIzriCtWoa4Z/CLY5BzktbnnH+lmPVLWUKCpsvW54ZqqTj86Mg==
+"@microsoft/teams-js@^2.40.0":
+  version "2.40.0"
+  resolved "https://registry.yarnpkg.com/@microsoft/teams-js/-/teams-js-2.40.0.tgz#f8cc4ed6f0bece9454c718b798199c604da5975c"
+  integrity sha512-Gp0BpAUYiQ86kQBOGirm2JzcfXc0zAsJtE8WRLBXnAsFeRYis1jbPpvbHkHJZDYhp/OZ2WplHRG7xD29Y2RYGA==
   dependencies:
     base64-js "^1.3.1"
     debug "^4.3.3"
@@ -3240,10 +3240,10 @@ dot-prop@^4.2.1:
   dependencies:
     is-obj "^1.0.0"
 
-dotenv@^16.5.0:
-  version "16.5.0"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.5.0.tgz#092b49f25f808f020050051d1ff258e404c78692"
-  integrity sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==
+dotenv@^16.5.0, dotenv@^16.6.1:
+  version "16.6.1"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.6.1.tgz#773f0e69527a8315c7285d5ee73c4459d20a8020"
+  integrity sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==
 
 dtrace-provider@~0.8:
   version "0.8.8"
