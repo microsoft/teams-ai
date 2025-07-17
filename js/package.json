@@ -21,7 +21,7 @@
     },
     "dependencies": {
         "botbuilder": "^4.23.2",
-        "openai": "4.77.4"
+        "openai": "^4.77.4"
     },
     "devDependencies": {
         "@azure/logger": "^1.2.0",
