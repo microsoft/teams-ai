@@ -45,7 +45,8 @@ export function sayCommand<TState extends TurnState = TurnState>(
                     appearance: {
                         '@type': 'DigitalDocument',
                         name: citation.title || `Document #${i + 1}`,
-                        abstract: Utilities.snippet(citation.content, 477)
+                        abstract: Utilities.snippet(citation.content, 477), 
+                        url: citation.url || undefined
                     }
                 };
 
