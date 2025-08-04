@@ -169,7 +169,8 @@ export class StreamingResponse {
                     appearance: {
                         '@type': 'DigitalDocument',
                         name: citation.title || `Document #${currPos + 1}`,
-                        abstract: Utilities.snippet(citation.content, 477)
+                        abstract: Utilities.snippet(citation.content, 477),
+                        url: citation.url || undefined
                     }
                 };
                 currPos++;

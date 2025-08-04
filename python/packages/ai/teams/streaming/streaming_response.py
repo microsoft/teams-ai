@@ -146,6 +146,7 @@ class StreamingResponse:
                         appearance=Appearance(
                             name=citation.title or f"Document {curr_pos + 1}",
                             abstract=snippet(citation.content, 477),
+                            url=citation.url or None,
                         ),
                     )
                 )

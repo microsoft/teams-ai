@@ -305,6 +305,7 @@ class AI(Generic[StateT]):
                         appearance=Appearance(
                             name=citation.title or f"Document {i + 1}",
                             abstract=snippet(citation.content, 477),
+                            url=citation.url or None,
                         ),
                     )
                 )
