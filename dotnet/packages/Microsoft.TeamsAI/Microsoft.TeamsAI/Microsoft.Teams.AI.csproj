@@ -48,7 +48,7 @@
     <PackageReference Include="Microsoft.Bot.Builder" Version="4.23.0" />
     <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.23.0" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.23.0" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.74.1" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.76.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Microsoft.ML.Tokenizers.Data.Cl100kBase" Version="1.0.2" /> <!-- This package is required to support gpt-3.x and gpt-4 models -->
     <PackageReference Include="Microsoft.ML.Tokenizers.Data.O200kBase" Version="1.0.2" />  <!-- This package is required to support gpt-4o models -->
