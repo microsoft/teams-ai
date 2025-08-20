@@ -23,7 +23,7 @@
     },
     "dependencies": {
         "@microsoft/teams-ai": "~1.7.4",
-        "axios": "^1.10.0",
+        "axios": "^1.11.0",
         "botbuilder": "^4.23.2",
         "dotenv": "^16.5.0",
         "openai": "4.77.4",
