@@ -30,7 +30,9 @@ app.on('message', async ({ activity, api }) => {
 It's also possible to access the api client from outside a handler via the app instance. Here we have the same example as above, but we're access the api client via the app instance.
 
 ```typescript
-const res = await app.api.graph.chats.getAllMessages.get();
+import * as endpoints from '@microsoft/teams.graph-endpoints';
+
+const res = await app.api.graph.call(endpoints.chats.getAllMessages.get);
 ```
 
 

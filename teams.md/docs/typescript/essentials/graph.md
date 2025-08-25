@@ -6,16 +6,22 @@ sidebar_position: 6
 
 [Microsoft Graph](https://docs.microsoft.com/en-us/graph/overview) gives you access to the wider Microsoft 365 ecosystem. You can enrich your application with data from across Microsoft 365.
 
-The library gives your application easy access to the Microsoft Graph API via the `@microsoft/teams.graph` package.
+The library gives your application easy access to the Microsoft Graph API via the `@microsoft/teams.graph` and `@microsoft/teams.graph-endpoints` packages.
+
+:::note
+If you're migrating from an earlier preview version of the Teams AI v2 library, please see the [migration guide](../migrations/preview/) for details on breaking changes.
+:::
 
 Microsoft Graph can be accessed by your application using its own application token, or by using the user's token. If you need access to resources that your application may not have, but your user does, you will need to use the user's scoped graph client. To grant explicit consent for your application to access resources on behalf of a user, follow the [auth guide](../in-depth-guides/user-authentication).
 
-To access the graph using the Graph using the app, you may use the `app.graph` object. 
+To access the graph using the Graph using the app, you may use the `app.graph` object to call the endpoint of your choice. 
 
 ```typescript
+import * as endpoints from '@microsoft/teams.graph-endpoints';
+
 // Equivalent of https://learn.microsoft.com/en-us/graph/api/user-get
 // Gets the details of the bot-user
-app.graph.me.get().then((user) => {
+app.graph.call(endpoints.me.get).then((user) => {
   console.log(`User ID: ${user.id}`);
   console.log(`User Display Name: ${user.displayName}`);
   console.log(`User Email: ${user.mail}`);
@@ -23,11 +29,14 @@ app.graph.me.get().then((user) => {
 });
 ```
 
-To access the graph using the user's token, you need to do this as part of a message handler:
+You can also access the graph using the user's token from within a message handler via the `userGraph` prop.
 
 ```typescript
+import * as endpoints from '@microsoft/teams.graph-endpoints';
+
+// Gets details of the current user
 app.on('message', async ({ activity, userGraph }) => {
-  const me = await userGraph.me.get();
+  const me = await userGraph.call(endpoints.me.get);
   console.log(`User ID: ${me.id}`);
   console.log(`User Display Name: ${me.displayName}`);
   console.log(`User Email: ${me.mail}`);
@@ -43,9 +52,9 @@ You also have access to the `appGraph` object in the activity handler. This is e
 
 ## The Graph Client
 
-The Graph Client is a wrapper around the Microsoft Graph API. It provides a fluent API for accessing the Graph API and is scoped to a specific user or application. Having an understanding of [how the graph API works](https://learn.microsoft.com/en-us/graph/use-the-api) will help you make the most of the library. Microsoft Graph exposes resources using the OData standard, and the graph client exposes type-safe access to these resources.
+The Graph Client provides a straight-forward `call` method to interact with Microsoft Graph and issue requests scoped to a specific user or application. Paired with the Graph Endpoints packages, it offers discoverable and type-safe access to the vast Microsoft Graph API surface.
 
-For example, to get the `id` of the chat instance between a user and an app, [Microsoft Graph](https://learn.microsoft.com/en-us/graph/api/userscopeteamsappinstallation-get-chat?view=graph-rest-1.0&tabs=http) exposes it via:
+Having an understanding of [how the graph API works](https://learn.microsoft.com/en-us/graph/use-the-api) will help you make the most of the library. For example, to get the `id` of the chat instance between a user and an app, [Microsoft Graph](https://learn.microsoft.com/en-us/graph/api/userscopeteamsappinstallation-get-chat?view=graph-rest-1.0&tabs=http) exposes it via:
 
 ```
 GET /users/{user-id | user-principal-name}/teamwork/installedApps/{app-installation-id}/chat
@@ -54,30 +63,36 @@ GET /users/{user-id | user-principal-name}/teamwork/installedApps/{app-installat
 The equivalent using the graph client would look like this:
 
 ```ts
-const chat = await userGraph.teamwork(user.id).installedApps.chat(appInstallationId).get({
+import { users } from '@microsoft/teams.graph-endpoints';
+
+const chat = await userGraph.call(users.teamwork.installedApps.chat.get, {
   "user-id": user.id,
   "userScopeTeamsAppInstallation-id": appInstallationId,
   "$select": ["id"],
-})
+});
 ```
 
 Here, the client takes care of using the correct token, provides helpful hints via intellisense, and performs the fetch request for you.
 
-## Currently exposed Graph clients
+## Additional resources
+Microsoft Graph offers an extensive and thoroughly documented API surface. These two essential resources will serve as your go-to references for any Graph development work:
+ - The [Microsoft Graph Rest API reference documentation](https://learn.microsoft.com/en-us/graph/api/overview) gives details for each API, including permissions requirements.
+ - The [Graph Explorer](https://developer.microsoft.com/en-us/graph/graph-explorer) lets you discover and test drive APIs.
 
-The following clients are currently exposed:
+In addition, the following endpoints may be especially interesting to Teams developers:
 
-| Client Name | Graph endpoint | Description |
-|-------------|----------------|-------------|
-| appCatalogs | [/appCatalogs](https://learn.microsoft.com/en-us/graph/api/appcatalogs-list-teamsapps?view=graph-rest-1.0) | Apps from Teams App Catalog |
-| appRoleAssignments | [/appRoleAssignments](https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-approleassignments?view=graph-rest-1.0) | List app role assignments |
-| applicationTemplates | [/applicationTemplates](https://learn.microsoft.com/en-us/graph/api/resources/applicationtemplate?view=graph-rest-1.0) | Application in the Microsoft Entra App Gallery |
-| applications | [/applications](https://learn.microsoft.com/en-us/graph/api/resources/application?view=graph-rest-1.0) | Application Resources |
-| chats | [/chats](https://learn.microsoft.com/en-us/graph/api/chat-list?view=graph-rest-1.0&tabs=http) | Chat resources between users |
-| communications | [/communications](https://learn.microsoft.com/en-us/graph/api/application-post-calls?view=graph-rest-1.0) | Calls and Online meetings |
-| employeeExperience | [/employeeExperience](https://learn.microsoft.com/en-us/graph/api/resources/engagement-api-overview?view=graph-rest-1.0) |  Employee Experience and Engagement |
-| me | [/me](https://learn.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http) | Same as `/users` but scoped to one user (who is making the request) |
-| teams | [/teams](https://learn.microsoft.com/en-us/graph/api/resources/team?view=graph-rest-1.0) | A Team resource  |
-| teamsTemplates | [/teamsTemplates](https://learn.microsoft.com/en-us/microsoftteams/get-started-with-teams-templates) | A Team Template resource |
-| teamwork | [/teamwork](https://learn.microsoft.com/en-us/graph/api/resources/teamwork?view=graph-rest-1.0) | A range of Microsoft Teams functionalities |
-| users | [/users](https://learn.microsoft.com/en-us/graph/api/resources/users?view=graph-rest-1.0) | A user resource |
+| Graph endpoints | Description |
+|----------------|-------------|
+| [appCatalogs](https://learn.microsoft.com/en-us/graph/api/appcatalogs-list-teamsapps?view=graph-rest-1.0) | Apps in the Teams App Catalog |
+| [appRoleAssignments](https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-approleassignments?view=graph-rest-1.0) | App role assignments |
+| [applicationTemplates](https://learn.microsoft.com/en-us/graph/api/resources/applicationtemplate?view=graph-rest-1.0) | Applications in the Microsoft Entra App Gallery |
+| [applications](https://learn.microsoft.com/en-us/graph/api/resources/application?view=graph-rest-1.0) | Application resources |
+| [chats](https://learn.microsoft.com/en-us/graph/api/chat-list?view=graph-rest-1.0&tabs=http) | Chat resources between users |
+| [communications](https://learn.microsoft.com/en-us/graph/api/application-post-calls?view=graph-rest-1.0) | Calls and Online meetings |
+| [employeeExperience](https://learn.microsoft.com/en-us/graph/api/resources/engagement-api-overview?view=graph-rest-1.0) | Employee Experience and Engagement |
+| [me](https://learn.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http) | Same as `/users` but scoped to one user (who is making the request) |
+| [teams](https://learn.microsoft.com/en-us/graph/api/resources/team?view=graph-rest-1.0) | Team resources in Microsoft Teams |
+| [teamsTemplates](https://learn.microsoft.com/en-us/microsoftteams/get-started-with-teams-templates) | Templates used to create teams |
+| [teamwork](https://learn.microsoft.com/en-us/graph/api/resources/teamwork?view=graph-rest-1.0) | A range of Microsoft Teams functionalities |
+| [users](https://learn.microsoft.com/en-us/graph/api/resources/users?view=graph-rest-1.0) | User resources |
+
