@@ -1,4 +1,4 @@
-app.on("message", async ({ send, activity, next }) => {
+app.on('message', async ({ send, activity, next }) => {
   const model = new OpenAIChatModel({
     apiKey: process.env.AZURE_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
     endpoint: process.env.AZURE_OPENAI_ENDPOINT,
@@ -7,7 +7,7 @@ app.on("message", async ({ send, activity, next }) => {
   });
 
   const prompt = new ChatPrompt({
-    instructions: "You are a friendly assistant who talks like a pirate",
+    instructions: 'You are a friendly assistant who talks like a pirate',
     model,
   });
 

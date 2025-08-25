@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+summary: Prerequisites and setup guide for integrating LLMs into C# Teams AI applications, including API keys and configuration.
 ---
 
 # Setup & Prerequisites

@@ -6,14 +6,14 @@ const prompt = new ChatPrompt(
     logger,
     model: new OpenAIChatModel({
       apiKey: process.env.OPENAI_API_KEY,
-      model: "gpt-4o-mini",
+      model: 'gpt-4o-mini',
     }),
   },
   // Add the A2AClientPlugin to the prompt
   [new A2AClientPlugin()]
 )
   // Provide the agent's server URL
-  .usePlugin("a2a", {
-    key: "my-weather-agent",
-    url: "http://localhost:4000/a2a",
+  .usePlugin('a2a', {
+    key: 'my-weather-agent',
+    url: 'http://localhost:4000/a2a',
   });

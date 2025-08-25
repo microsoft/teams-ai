@@ -1,5 +1,6 @@
 ---
 sidebar_position: 5
+summary: Overview of the Teams API Client and how to use it to interact with conversations, meetings, and teams in your application.
 ---
 
 # Teams API Client

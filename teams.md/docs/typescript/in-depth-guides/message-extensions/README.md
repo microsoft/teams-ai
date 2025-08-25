@@ -1,5 +1,6 @@
 ---
 sidebar_position: 3
+summary: Overview of message extensions (compose extensions) for enhancing user productivity with quick access to information and actions within Teams.
 ---
 
 # 📖 Message Extensions

@@ -1,26 +1,26 @@
-interface FormData {
+interface IFormData {
   title: string;
   subtitle: string;
   text: string;
 }
 
-export function createCard(data: FormData) {
+export function createCard(data: IFormData) {
   return new AdaptiveCard(
     new Image(IMAGE_URL),
     new TextBlock(data.title, {
-      size: "Large",
-      weight: "Bolder",
-      color: "Accent",
-      style: "heading",
+      size: 'Large',
+      weight: 'Bolder',
+      color: 'Accent',
+      style: 'heading',
     }),
     new TextBlock(data.subtitle, {
-      size: "Small",
-      weight: "Lighter",
-      color: "Good",
+      size: 'Small',
+      weight: 'Lighter',
+      color: 'Good',
     }),
     new TextBlock(data.text, {
       wrap: true,
-      spacing: "Medium",
+      spacing: 'Medium',
     })
   );
 }

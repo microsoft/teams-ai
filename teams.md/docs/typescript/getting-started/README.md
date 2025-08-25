@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+summary: Getting started guide for TypeScript Teams AI Library covering application setup, structure, and local development fundamentals.
 ---
 
 # 🚀 Getting Started

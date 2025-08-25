@@ -1,5 +1,7 @@
 ---
 sidebar_position: 5
+summary: Privacy policy detailing data collection practices using Microsoft Clarity for website analytics and user behavior tracking.
+llms: ignore
 ---
 
 # Privacy Policy

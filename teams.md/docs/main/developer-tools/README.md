@@ -1,5 +1,6 @@
 ---
 sidebar_position: 4
+summary: Overview of developer tools in Teams AI Library v2 including the CLI for project management and DevTools for testing and debugging agents.
 ---
 
 # Developer Tools

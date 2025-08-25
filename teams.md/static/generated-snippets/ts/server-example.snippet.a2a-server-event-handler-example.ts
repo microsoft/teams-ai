@@ -10,7 +10,7 @@ app.event('a2a:message', async ({ respond, taskContext }) => {
                     text: 'My agent currently only supports text input'
                 }
             ]
-        })
+        });
         return;
     }
     const result: string | TaskUpdate = await myEventHandler(textInput);

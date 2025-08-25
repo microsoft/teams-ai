@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+summary: Create a Teams app with Microsoft Graph authentication using the Agents Toolkit and SSO flow.
 ---
 
 # Quickstart

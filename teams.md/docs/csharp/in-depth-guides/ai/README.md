@@ -1,5 +1,6 @@
 ---
 sidebar_position: 5
+summary: Overview of AI components in C# Teams AI, including Prompts for orchestration and Models for LLM interfaces.
 ---
 
 # 🤖 AI

@@ -10,8 +10,8 @@
     "lint:fix": "npx turbo lint:fix",
     "test": "npx turbo test --concurrency=100%",
     "fmt": "npx prettier --write \"**/*.{js,ts,tsx,md,json}\"",
-    "docs:build": "node ./scripts/build-docs.js",
-    "docs:serve": "node ./scripts/serve-docs.js",
+    "docs:build": "npm -w teams-md build",
+    "docs:serve": "npm -w teams-md serve",
     "gen:snips": "node ./scripts/generate-snippets.js",
     "check:links": "node ./scripts/check-links.js"
   },
@@ -26,7 +26,6 @@
   },
   "packageManager": "npm@10.9.2",
   "workspaces": [
-    "apps/*",
     "packages/*",
     "teams.md"
   ],

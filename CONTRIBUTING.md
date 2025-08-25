@@ -41,7 +41,7 @@ You may visit https://cla.azure.com to sign digitally.
 
 ### Documentation
 
-Please note that we place high importance on documentation, which we host as [Teams AI v2 github pages](https://microsoft.github.io/teams-ai/). To learn how to add documentation to your contributions, please see the [mdbook's readme](./book/README.md).
+Please note that we place high importance on documentation, which we host as [Teams AI v2 github pages](https://microsoft.github.io/teams-ai/).
 
 ### Testing changes
 

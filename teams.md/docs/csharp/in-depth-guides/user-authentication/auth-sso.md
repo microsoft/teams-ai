@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+summary: Compare OAuth and SSO authentication methods in Teams apps and understand their implementation differences.
 ---
 
 # How Auth Works

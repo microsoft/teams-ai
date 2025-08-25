@@ -1,5 +1,6 @@
 ---
 sidebar_position: 4
+summary: Call remote agent functions from tab apps with authentication and custom headers using the exec() method.
 ---
 
 # Functions

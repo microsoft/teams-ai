@@ -1,3 +1,7 @@
+---
+summary: Overview of the experimental A2A (Agent-to-Agent) protocol for enabling programmatic communication between AI agents.
+---
+
 # A2A (Agent-to-Agent) Protocol
 
 :::caution

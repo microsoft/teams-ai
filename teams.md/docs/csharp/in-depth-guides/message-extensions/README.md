@@ -1,5 +1,6 @@
 ---
 sidebar_position: 3
+summary: Overview of message extensions in C# Teams AI for enhancing productivity with custom actions and search in Teams messages.
 ---
 
 # 📖 Message Extensions

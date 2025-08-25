@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+summary: Configure custom loggers in your Teams app to control log levels and output destinations.
 ---
 
 # 🗃️ Custom Logger

@@ -1,26 +1,26 @@
-app.on("dialog.submit", async ({ activity, send, next }) => {
+app.on('dialog.submit', async ({ activity, send, next }) => {
   const dialogType = activity.value.data.submissiondialogtype;
 
-  if (dialogType === "webpage_dialog_step_1") {
+  if (dialogType === 'webpage_dialog_step_1') {
     // This is data from the form that was submitted
     const name = activity.value.data.name;
     const nextStepCard = new AdaptiveCard(
       {
-        type: "TextBlock",
-        text: "Email",
-        size: "Large",
-        weight: "Bolder",
+        type: 'TextBlock',
+        text: 'Email',
+        size: 'Large',
+        weight: 'Bolder',
       },
       new TextInput()
-        .withLabel("Email")
+        .withLabel('Email')
         .withIsRequired()
-        .withId("email")
-        .withPlaceholder("Enter your email")
+        .withId('email')
+        .withPlaceholder('Enter your email')
     ).withActions(
-      new SubmitAction().withTitle("Submit").withData({
+      new SubmitAction().withTitle('Submit').withData({
         // This same handler will get called, so we need to identify the step
         // in the returned data
-        submissiondialogtype: "webpage_dialog_step_2",
+        submissiondialogtype: 'webpage_dialog_step_2',
         // Carry forward data from previous step
         name,
       })
@@ -28,15 +28,15 @@ app.on("dialog.submit", async ({ activity, send, next }) => {
     return {
       task: {
         // This indicates that the dialog flow should continue
-        type: "continue",
+        type: 'continue',
         value: {
           // Here we customize the title based on the previous response
           title: `Thanks ${name} - Get Email`,
-          card: cardAttachment("adaptive", nextStepCard),
+          card: cardAttachment('adaptive', nextStepCard),
         },
       },
     };
-  } else if (dialogType === "webpage_dialog_step_2") {
+  } else if (dialogType === 'webpage_dialog_step_2') {
     const name = activity.value.data.name;
     const email = activity.value.data.email;
     await send(

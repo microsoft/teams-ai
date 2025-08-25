@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+summary: Guide to handling and responding to events in C# Teams AI applications, including user and server-originated events.
 ---
 
 # Listening To Events

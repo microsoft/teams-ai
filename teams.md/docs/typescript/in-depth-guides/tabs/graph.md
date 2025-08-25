@@ -1,5 +1,6 @@
 ---
 sidebar_position: 5
+summary: Access Microsoft Graph APIs with type-safe client and manage user consent for permissions.
 ---
 
 # Microsoft Graph Client

@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+summary: Set up new tab app projects or add Teams client capabilities to existing tab applications.
 ---
 
 # Getting started
