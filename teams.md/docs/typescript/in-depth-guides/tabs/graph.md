@@ -13,11 +13,12 @@ After constructing and starting an App instance, you can invoke any graph functi
 
 ```typescript
 import { App } from '@microsoft/teams.client';
+import * as endpoints from '@microsoft/teams.graph-endpoints';
 
 const app = new App(clientId);
 await app.start();
 
-const top10Chats = await app.graph.chats.list( { $top: 10 });
+const top10Chats = await app.graph.call(endpoints.chats.list, { $top: 10 });
 ```
 
 
@@ -42,6 +43,7 @@ This method is useful for building an incremental, just-in-time, consent model, 
 
 ```typescript
 import { App } from '@microsoft/teams.client';
+import * as endpoints from '@microsoft/teams.graph-endpoints';
 
 const app = new App(clientId, {
   msalOptions: { prewarmScopes: ['User.Read'] },
@@ -56,7 +58,7 @@ const canReadChat = await app.ensureConsentForScopes(
   );
 
 if (canReadChat) {
-  const top10Chats = await app.graph.chats.list( { $top: 10 });
+  const top10Chats = await app.graph.call(endpoints.chats.list, { $top: 10 });
   // ... do something useful ...
 }
 ```
@@ -69,6 +71,7 @@ The app also provides a `hasConsentForScopes` method to test for consent without
 
 ```typescript
 import { App } from '@microsoft/teams.client';
+import * as endpoints from '@microsoft/teams.graph-endpoints';
 
 const app = new App(clientId);
 
@@ -82,7 +85,7 @@ const canReadChat = await app.hasConsentForScopes(
   );
 
 if (canReadChat) {
-  const top10Chats = await app.graph.chats.list( { $top: 10 });
+  const top10Chats = await app.graph.call(endpoints.chats.list, { $top: 10 });
   // ... do something useful ...
 }
 ```

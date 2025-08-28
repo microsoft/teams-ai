@@ -47,6 +47,7 @@ When the `app.start()` call has completed, you can use the app instance to call 
 ```typescript
 import * as teamsJs from '@microsoft/teams-js';
 import { App } from '@microsoft/teams.client';
+import * as endpoints from '@microsoft/teams.graph-endpoints';
 
 const app = new App(clientId);
 await app.start();
@@ -55,7 +56,7 @@ await app.start();
 const context = await teamsJs.app.getContext();
 
 // ...call Graph end points...
-const presenceResult = await app.graph.me.presence.get();
+const presenceResult = await app.graph.call(endpoints.me.presence.get);
 
 // ...end call remote agent functions...
 const agentResult = await app.exec<string>('hello-world');

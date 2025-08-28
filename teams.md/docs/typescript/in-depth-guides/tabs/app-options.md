@@ -209,6 +209,7 @@ Scope pre-warming can be disabled if needed. This is useful if your app doesn't 
 
 ```typescript
 import { App } from '@microsoft/teams.client';
+import * as endpoints from '@microsoft/teams.graph-endpoints';
 
 const app = new App(clientId, {
   msalOptions: { prewarmScopes: false },
@@ -219,7 +220,7 @@ await app.start();
 
 // this will prompt for the '.default' scope if the user hasn't already
 // consented to any scope
-const top10Chats = await app.graph.chats.list( { $top: 10 });
+const top10Chats = await app.graph.call(endpoints.chats.list, { $top: 10 });
 ```
 
 
