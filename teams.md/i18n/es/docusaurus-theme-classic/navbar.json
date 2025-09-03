@@ -14,5 +14,9 @@
   "item.label.C#": {
     "message": "C#",
     "description": "Navbar item with label C#"
+  },
+  "item.label.Python": {
+    "message": "Python",
+    "description": "Navbar item with label Python"
   }
 }

@@ -66,6 +66,10 @@ async function generateLlmsTxt() {
     console.log('📝 Generating C# llms.txt files...');
     await generateLanguageFiles('csharp', baseDir, outputDir, config);
 
+    // Generate Python version (main + python)
+    console.log('📝 Generating Python llms.txt files...');
+    await generateLanguageFiles('python', baseDir, outputDir, config);
+
     console.log('✅ Successfully generated all llms.txt files!');
   } catch (error) {
     console.error('❌ Error generating llms.txt files:', error);

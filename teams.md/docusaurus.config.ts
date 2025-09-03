@@ -80,6 +80,17 @@ const config: Config = {
         editUrl: 'https://github.com/microsoft/teams-ai/tree/v2-preview/teams.md/',
       } satisfies Partial<DocsPlugin.PluginOptions>,
     ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'python',
+        path: 'docs/python',
+        routeBasePath: '/python',
+        sidebarPath: './sidebars.ts',
+        sidebarCollapsed: true,
+        editUrl: 'https://github.com/microsoft/teams-ai/tree/v2-preview/teams.md/',
+      } satisfies Partial<DocsPlugin.PluginOptions>,
+    ],
   ],
   themes: [
     '@docusaurus/theme-mermaid',
@@ -88,7 +99,7 @@ const config: Config = {
     ({
       hashed: true,
       language: ['en'],
-      docsRouteBasePath: ['/', '/typescript', '/csharp'],
+      docsRouteBasePath: ['/', '/typescript', '/csharp', '/python'],
       indexDocs: true,
       indexPages: true,
       highlightSearchTermsOnTargetPage: true
@@ -123,6 +134,11 @@ const config: Config = {
           label: 'C#',
         },
         {
+          to: 'python',
+          position: 'left',
+          label: 'Python',
+        },
+        {
           type: 'localeDropdown',
           position: 'right',
         },
@@ -150,6 +166,10 @@ const config: Config = {
             {
               label: 'C#',
               to: '/csharp/getting-started',
+            },
+            {
+              label: 'Python',
+              to: '/python/getting-started',
             },
             {
               label: 'Privacy policy',
