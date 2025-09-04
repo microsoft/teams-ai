@@ -31,7 +31,7 @@ Here are the events that you can start building handlers for:
 | **Event Name**      | **Description**                                                                |
 | ------------------- | ------------------------------------------------------------------------------ |
 | `start`             | Triggered when your application starts. Useful for setup or boot-time logging. |
-| `signin`            | Triggered during a sign-in flow via Teams.                                     |
+| `sign_in`            | Triggered during a sign-in flow via Teams.                                     |
 | `error`             | Triggered when an unhandled error occurs in your app. Great for diagnostics.   |
 | `activity`          | A catch-all for incoming Teams activities (messages, commands, etc.).          |
 | `activity_response` | Triggered when your app sends a response to an activity. Useful for logging.   |

@@ -37,7 +37,7 @@ After installation, you can run `teams --version` to verify the installation.
 
 :::warning
 Our Python SDK is currently in Public Preview. As a result, we have the CLI under a feature flag.
-Please run the below command to enable this feature.
+Please run the below command to enable this language.
 :::
 
 ```sh

@@ -25,7 +25,7 @@ async def handle_sign_in(event: SignInEvent):
 You are not restricted to only replying to `message` activities. In the above example, the handler is listening to `sign_in` events, which are sent when a user successfully signs in. 
 
 :::tip
-This shows an example of sending a text message. Additionally, you are able to send back things like [adaptive cards](../../in-depth-guides/adaptive-cards) by using the same `send` method. Look at the [adaptive card](../../in-depth-guides/adaptive-cards) section for more details.
+This shows an example of sending a text message. Additionally, you are able to send back things like Adaptive Cards by using the same `send` method. Look at the [Adaptive Card](../../in-depth-guides/adaptive-cards) section for more details.
 :::
 
 ## Streaming
@@ -54,7 +54,7 @@ Streaming is currently only supported in 1:1 conversations, not group chats or c
 
 ## @Mention
 
-Sending a message at `@mentions` a user is as simple including the details of the user using the `addMention` method
+Sending a message at `@mentions` a user is as simple including the details of the user using the `add_mention` method
 
 
 ```python

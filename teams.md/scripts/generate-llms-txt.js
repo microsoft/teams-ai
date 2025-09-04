@@ -243,7 +243,7 @@ async function generateIndividualTxtFiles(
  * @returns {string} Generated navigation content
  */
 async function generateSmallVersionHierarchical(language, baseDir, config, fileMapping) {
-  const langName = language === 'typescript' ? 'TypeScript' : 'C#';
+  const langName = language === 'typescript' ? 'TypeScript' : language === 'csharp' ? 'C#' : 'Python';
   // Remove trailing slash from URL and ensure baseUrl starts with slash
   const cleanUrl = config.url.replace(/\/$/, '');
   const cleanBaseUrl = config.baseUrl.startsWith('/') ? config.baseUrl : '/' + config.baseUrl;
@@ -470,7 +470,7 @@ function extractSummaryFromFile(filePath) {
  * @returns {string} Generated content
  */
 async function generateFullVersion(language, processedFiles, baseDir) {
-  const langName = language === 'typescript' ? 'TypeScript' : 'C#';
+  const langName = language === 'typescript' ? 'TypeScript' : language === 'csharp' ? 'C#' : 'Python';
 
   let content = `# Teams AI Library - ${langName} Documentation (Complete)\n\n`;
   content += COMMON_OVERALL_SUMMARY(langName) + '\n\n';
