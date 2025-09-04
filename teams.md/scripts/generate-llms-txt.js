@@ -79,7 +79,7 @@ async function generateLlmsTxt() {
 
 /**
  * Generates llms.txt files for a specific language
- * @param {string} language - 'typescript' or 'csharp'
+ * @param {string} language - 'typescript' or 'csharp' or 'python'
  * @param {string} baseDir - Base directory path
  * @param {string} outputDir - Output directory path
  * @param {Object} config - Docusaurus config object

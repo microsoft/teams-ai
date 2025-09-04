@@ -20,14 +20,14 @@ npm install -g @microsoft/teams.cli@preview
 Next, use the CLI to create your agent:
 
 ```sh
-teams new <typescript | csharp> quote-agent --template echo
+teams new <typescript | csharp | python> quote-agent --template echo
 ```
 
-For more information, follow our quickstart guide: [C#](http://microsoft.github.io/teams-ai/csharp/getting-started/quickstart) or [Typescript](http://microsoft.github.io/teams-ai/typescript/getting-started/quickstart)
+For more information, follow our quickstart guide: [C#](http://microsoft.github.io/teams-ai/csharp/getting-started/quickstart), [Typescript](http://microsoft.github.io/teams-ai/typescript/getting-started/quickstart), [Python](http://microsoft.github.io/teams-ai/python/getting-started/quickstart)
 
 ### SDK
 
-Microsoft Teams has a robust developer ecosystem with a broad suite of capabilities, now unified via Teams AI v2. Whether you are building AI-powered agents ([TS]https://microsoft.github.io/teams-ai/typescript/in-depth-guides/ai/), [C#](https://microsoft.github.io/teams-ai/csharp/in-depth-guides/ai/), Message Extensions ([TS](https://microsoft.github.io/teams-ai/typescript/in-depth-guides/message-extensions/), [C#][https://microsoft.github.io/teams-ai/csharp/in-depth-guides/message-extensions/]), embedded web applications, or Graph, Teams AI v2 has you covered.
+Microsoft Teams has a robust developer ecosystem with a broad suite of capabilities, now unified via Teams AI v2. Whether you are building AI-powered agents ([TS]https://microsoft.github.io/teams-ai/typescript/in-depth-guides/ai/), [C#](https://microsoft.github.io/teams-ai/csharp/in-depth-guides/ai/), [Python](https://microsoft.github.io/teams-ai/python/in-depth-guides/ai/), Message Extensions ([TS](https://microsoft.github.io/teams-ai/typescript/in-depth-guides/message-extensions/), [C#][https://microsoft.github.io/teams-ai/csharp/in-depth-guides/message-extensions/]), [Python][https://microsoft.github.io/teams-ai/python/in-depth-guides/message-extensions/], embedded web applications, or Graph, Teams AI v2 has you covered.
 
 Here is a simple example, which responds to incoming messages with information retrieved from Graph.
 
@@ -61,7 +61,7 @@ This repository contains submodules that point to dedicated repositories for dif
 
 - [TypeScript/JavaScript](https://github.com/microsoft/teams.ts)
 - [.NET](https://github.com/microsoft/teams.net)
-- Python (coming soon)
+- [Python](https://github.com/microsoft/teams.py)
 
 For language-specific bugs or issues, please use the Issues tab in the respective language repository.
 
