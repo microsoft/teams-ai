@@ -14,10 +14,6 @@ Get started with Teams AI Library (v2) quickly using the Teams CLI.
 - **Python** v3.12 or higher. Install or upgrade from [python.org/downloads](https://www.python.org/downloads/).
 - **UV** v0.8.11 or higher. Install or upgrade from [https://docs.astral.sh/uv/getting-started/installation/](https://docs.astral.sh/uv/getting-started/installation/)
 
-:::note
-If you are using LLMs to aid you in using this library, consider using the [llms.txt files](./LLMs.md) to provide context about the library to your coding assistant.
-:::
-
 ## Instructions
 
 ### Install the Teams CLI

@@ -36,7 +36,7 @@ from microsoft.teams.api import MessageActivity, TypingActivityInput
 from microsoft.teams.apps import ActivityContext, App, AppOptions
 from microsoft.teams.devtools import DevToolsPlugin
 
-app = App(AppOptions(plugins=[DevToolsPlugin()]))
+app = App(plugins=[DevToolsPlugin()])
 
 ```
 
@@ -74,7 +74,7 @@ This code:
 3. Responds by echoing back the received message if any other text aside from "reply" is sent.
 
 :::info
-Type safety is a core tenet of this version of the SDK. You can change the `activity decorator` to a different supported value, and the type system will automatically adjust the type of activity to match the new value.
+Type safety is a core tenet of this version of the SDK. You can change the activity decorator to a different supported value, and the type system will automatically adjust the type of activity to match the new value.
 :::
 
 ### Application Lifecycle

@@ -66,10 +66,6 @@ async function generateLlmsTxt() {
     console.log('📝 Generating C# llms.txt files...');
     await generateLanguageFiles('csharp', baseDir, outputDir, config);
 
-    // Generate Python version (main + python)
-    console.log('📝 Generating Python llms.txt files...');
-    await generateLanguageFiles('python', baseDir, outputDir, config);
-
     console.log('✅ Successfully generated all llms.txt files!');
   } catch (error) {
     console.error('❌ Error generating llms.txt files:', error);
@@ -79,7 +75,7 @@ async function generateLlmsTxt() {
 
 /**
  * Generates llms.txt files for a specific language
- * @param {string} language - 'typescript' or 'csharp' or 'python'
+ * @param {string} language - 'typescript' or 'csharp'
  * @param {string} baseDir - Base directory path
  * @param {string} outputDir - Output directory path
  * @param {Object} config - Docusaurus config object
@@ -243,7 +239,7 @@ async function generateIndividualTxtFiles(
  * @returns {string} Generated navigation content
  */
 async function generateSmallVersionHierarchical(language, baseDir, config, fileMapping) {
-  const langName = language === 'typescript' ? 'TypeScript' : language === 'csharp' ? 'C#' : 'Python';
+  const langName = language === 'typescript' ? 'TypeScript' : 'C#';
   // Remove trailing slash from URL and ensure baseUrl starts with slash
   const cleanUrl = config.url.replace(/\/$/, '');
   const cleanBaseUrl = config.baseUrl.startsWith('/') ? config.baseUrl : '/' + config.baseUrl;
@@ -470,7 +466,7 @@ function extractSummaryFromFile(filePath) {
  * @returns {string} Generated content
  */
 async function generateFullVersion(language, processedFiles, baseDir) {
-  const langName = language === 'typescript' ? 'TypeScript' : language === 'csharp' ? 'C#' : 'Python';
+  const langName = language === 'typescript' ? 'TypeScript' : 'C#';
 
   let content = `# Teams AI Library - ${langName} Documentation (Complete)\n\n`;
   content += COMMON_OVERALL_SUMMARY(langName) + '\n\n';

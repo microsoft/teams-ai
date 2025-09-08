@@ -20,7 +20,8 @@ async def handle_install_add(ctx: ActivityContext[InstalledActivity]):
     # Save the conversation_id
     storage[ctx.activity.from_.aad_object_id] = ctx.activity.conversation.id
     await ctx.send("Hi! I am going to remind you to say something to me soon!")
-    notication_queue.add_reminder(ctx.activity.from_.aad_object_id, send_proactive_notification, 1000)
+    # This queues up the proactive notifaction to be sent in 1 minute
+    notication_queue.add_reminder(ctx.activity.from_.aad_object_id, send_proactive_notification, 60000)
 ```
 
 Then, when you want to send a proactive message, you can retrieve the `conversation_id` from storage and use it to send the message.
