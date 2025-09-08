@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-summary: Overview of Adaptive Cards in C# Teams AI for building rich, interactive user experiences in Teams applications.
+summary: Overview of Adaptive Cards in Python Teams AI for building rich, interactive user experiences in Teams applications.
 ---
 
 # Adaptive Cards

@@ -1,6 +1,6 @@
 ---
 sidebar_position: 6
-summary: Overview of Model Context Protocol (MCP) integration in C# Teams AI for dynamic function and tool loading.
+summary: Overview of Model Context Protocol (MCP) integration in Python Teams AI for dynamic function and tool loading.
 ---
 
 # MCP
