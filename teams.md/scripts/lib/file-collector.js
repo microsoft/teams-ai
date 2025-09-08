@@ -68,7 +68,7 @@ function shouldSkipDirectory(dirName) {
 /**
  * Gets files organized hierarchically based on folder structure and sidebar_position
  * @param {string} basePath - Base documentation path
- * @param {string} language - Language identifier ('typescript' or 'csharp')
+ * @param {string} language - Language identifier ('typescript' or 'csharp' or 'python')
  * @returns {Object} Hierarchically organized file structure
  */
 function getHierarchicalFiles(basePath, language) {
