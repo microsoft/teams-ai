@@ -67,19 +67,6 @@ Navigate to your new agent's directory:
 cd quote-agent
 ```
 
-Activate the environment:
-
-```sh
-uv venv
-```
-
-Install the dependencies:
-
-
-```sh
-uv sync
-```
-
 Start the development server:
 
 
