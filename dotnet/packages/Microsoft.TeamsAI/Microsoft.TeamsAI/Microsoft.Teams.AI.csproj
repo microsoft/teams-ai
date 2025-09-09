@@ -52,7 +52,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Microsoft.ML.Tokenizers.Data.Cl100kBase" Version="1.0.2" /> <!-- This package is required to support gpt-3.x and gpt-4 models -->
     <PackageReference Include="Microsoft.ML.Tokenizers.Data.O200kBase" Version="1.0.2" />  <!-- This package is required to support gpt-4o models -->
-    <PackageReference Include="OpenAI" Version="2.3.0" />
+    <PackageReference Include="OpenAI" Version="2.4.0" />
     <PackageReference Include="System.Text.Json" Version="8.0.6" />
   </ItemGroup>
 
