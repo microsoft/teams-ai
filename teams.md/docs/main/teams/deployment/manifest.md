@@ -9,7 +9,7 @@ Every app or agent installed on Teams requires an app manifest json file, which 
 
 ## Manifest
 
-There are many permissions and details that an app manifest may have added to the `manifest.json`, including the app ID, url, and much more. Please review the comprehensive documentation on the [manifest schema](https://learn.microsoft.com/en-us/microsoftteams/platform/resources/schema/manifest-schema).
+There are many permissions and details that an app manifest may have added to the `manifest.json`, including the app ID, url, and much more. Please review the comprehensive documentation on the [manifest schema](https://learn.microsoft.com/microsoft-365/extensibility/schema/).
 
 ## Sideloading
 
