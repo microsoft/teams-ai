@@ -6,7 +6,7 @@ llms: ignore
 
 # 🔍 Inspect activities
 
-Inspect incoming and outgoing activities on DevTools' Activities page. All interactions with your agent are logged here, including messages, reactions, and more.
+Inspect incoming and outgoing activities on DevTools Activities page. All interactions with your agent are logged here, including messages, reactions, and more.
 ![Inspect Activities view](https://github.com/microsoft/teams.ts/blob/main/assets/screenshots/inspect_activity.png?raw=true)
 
 ## View all activity
@@ -17,7 +17,7 @@ The Activities page displays all activities sent to and from your agent in a gri
 2. Direction via down arrow (incoming) or up arrow (outgoing)
 3. Conversation type (for now, only personal chat is supported)
 4. Sender
-5. Timestamp.
+5. Timestamp
 
 ### Monitor activity while testing Teams in browser
 
@@ -27,7 +27,7 @@ You can filter activities by type using the filter icon in the Type column heade
 
 ### View activity details
 
-Selecting an activity in the grid opens a detailed view in Preview mode, showing the full payload as a tree with expandable and collapsible sections.
+Selecting an activity in the grid opens a detailed view in the Preview mode, showing the full payload as a tree with expandable and collapsible sections.
 
 ### View activity JSON
 
@@ -39,6 +39,6 @@ Press the Copy button in the top right corner of the Activity details view to co
 
 ### Inspect activities by ID
 
-When in [Chat](chat), you can inspect activities by ID by clicking the magnifying glass icon in the message actions menu. This opens the Activities page with the activity ID filtered in the list, which is useful for inspecting streamed messages, which have multiple activities.
+When in [Chat](chat), you can inspect activities by ID by clicking the magnifying glass icon in the message actions menu. This opens the Activities page with the activity ID filtered in the list, which is useful for inspecting streamed messages that have multiple activities.
 
 To reset the filter, use the filter button in the Type column header and de-select the activity ID to show all activities again.
