@@ -12,8 +12,8 @@ It is responsible for:
 1. Hosting and running the server (via plugins)
 2. Serving incoming requests and routing them to your handlers
 3. Handling authentication for your agent to the Teams backend
-4. Providing helpful utilities which simplify the ability for your application to interact with the Teams platform
-5. Managing plugins which can extend the functionality of your agent
+4. Providing helpful utilities, which simplify the ability for your application to interact with the Teams platform
+5. Managing plugins, which can extend the functionality of your agent
 
 ```mermaid
 flowchart LR
@@ -58,7 +58,7 @@ flowchart LR
 
 **Events**
 
-- Listens to events from core plugins
+- Listen to events from core plugins
 - Emit interesting events to the application
 
 **Activity Routing**
@@ -81,4 +81,4 @@ flowchart LR
 
 ## Plugins
 
-You'll notice that plugins are present in the front, which exposes your application as a server, and also in the back after the app does some processing to the incoming message. The plugin architecture allows the application to be built in an extremely modular way. Each plugin can be swapped out to change or augment the functionality of the application. The plugins can listen to various events that happen (e.g. the server starting or ending, an error occuring, etc), activities being sent to or from the application and more. This allows the application to be extremely flexible and extensible.
+You'll notice that plugins are present in the front, which expose your application as a server, and also in the back after the app does some processing to the incoming message. The plugin architecture allows the application to be built in an extremely modular way. Each plugin can be swapped out to change or augment the functionality of the application. The plugins can listen to various events that happen (for example, the server starting or ending, an error occurring, etc.), activities being sent to or from the application and more. This allows the application to be extremely flexible and extensible.
