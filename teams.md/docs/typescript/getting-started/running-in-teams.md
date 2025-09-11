@@ -67,8 +67,8 @@ When debugging starts, the Microsoft 365 Agents Toolkit will:
 - **Set up the local variables** necessary for your agent to run in Teams in `env/.env.local` and `env/env.local.user`. This includes propagating the app manifest with your newly provisioned resources.
 - **Start** the local server.
 - **Package your app manifest** into a Teams application zip package and the manifest json with variables inserted in `appPackage/build`.
-- **Launch Teams** in an incognito window your browser.
-- **Upload the package** to Teams and signal it to sideload the app (fancy word for installing this app just for your use)
+- **Launch Teams** in an incognito window in your browser.
+- **Upload the package** to Teams and signal it to sideload the app (a fancy word for installing this app just for your use)
 
 If you set up Agents Toolkit via the Teams AI CLI, you should see something like the following in your terminal:
 
