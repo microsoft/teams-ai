@@ -11,7 +11,7 @@ The `@microsoft/teams.ai` package has two main components:
 ## 📦 Prompts
 
 A `Prompt` is the component that orchestrates everything, it handles state management,
-function definitions, and invokes the model/template when needed. This layer abstracts many of
+function definitions, and invokes the model or template, when needed. This layer abstracts many of
 the complexities of the Models to provide a common interface.
 
 ## 🧠 Models
@@ -19,7 +19,7 @@ the complexities of the Models to provide a common interface.
 A `Model` is the component that interfaces with the LLM, being given some `input` and returning the `output`.
 This layer deals with any of the nuances of the particular Models being used.
 
-It is in the model implementation that the individual LLM features (i.e. streaming/tools etc.)
+It is in the model implementation that the individual LLM features (that is, streaming, tools etc.)
 are made compatible with the more general features of the `@microsoft/teams.ai` package.
 
 :::note
