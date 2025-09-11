@@ -33,10 +33,10 @@ The Teams AI Library supports several action types for different interaction pat
 The SDK provides builder helpers that abstract the underlying JSON. For example:
 
 ```python
-from microsoft.teams.cards.core import ExecuteAction, SubmitActionData
+from microsoft.teams.cards.core import ExecuteAction
 
 action = ExecuteAction(title="Submit Feedback")
-                    .with_data(SubmitActionData(ms_teams={"action": "submit_feedback"}))
+                    .with_data({"action": "submit_feedback"})
                     .with_associated_inputs("auto")
 ```
 ### Action Sets
@@ -44,12 +44,12 @@ action = ExecuteAction(title="Submit Feedback")
 Group actions together using `ActionSet`:
 
 ```python
-from microsoft.teams.cards.core import ActionSet, ExecuteAction, SubmitActionData, OpenUrlAction
+from microsoft.teams.cards.core import ActionSet, ExecuteAction, OpenUrlAction
 
 action_set = ActionSet(
                 actions=[
                     ExecuteAction(title="Submit Feedback")
-                    .with_data(SubmitActionData(ms_teams={"action": "submit_feedback"})),
+                    .with_data({"action": "submit_feedback"}),
                     OpenUrlAction(url="https://adaptivecards.microsoft.com").with_title("Learn More")
                 ]
             ),
@@ -61,9 +61,9 @@ Just like when building cards, if you prefer to work with raw JSON, you can do j
 
 ```python
 json = {
-  "type": 'Action.OpenUrl',
-  "url": 'https://adaptivecards.microsoft.com',
-  "title": 'Learn More',
+  "type": "Action.OpenUrl",
+  "url": "https://adaptivecards.microsoft.com",
+  "title": "Learn More",
 }
 ```
 
@@ -86,7 +86,7 @@ profile_card = AdaptiveCard(
                 actions=[
                     ExecuteAction(title="Save")
                     # entity_id will come back after the user submits
-                    .with_data(SubmitActionData(ms_teams={"action": "save_profile", "entity_id": "12345"})),
+                    .with_data({"action": "save_profile", "entity_id": "12345"}),
                     OpenUrlAction(url="https://adaptivecards.microsoft.com").with_title("Learn More")
                 ]
             ),
@@ -115,7 +115,7 @@ def create_profile_card_input_validation():
                 actions=[
                     ExecuteAction(title="Save")
                     # All inputs should be validated
-                    .with_data(SubmitActionData(ms_teams={"action": "save_profile"}))
+                    .with_data({"action": "save_profile"})
                     .with_associated_inputs("auto")
                 ]
             ),
