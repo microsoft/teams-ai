@@ -3,8 +3,6 @@ sidebar_position: 3
 summary: Guide to configuring user authentication in Python Teams AI applications, including OAuth setup and secure API access.
 ---
 
-import FileCodeBlock from '@site/src/components/FileCodeBlock';
-
 # App Setup
 
 There are a few ways you can enable your application to access secured external services on the user's behalf.
@@ -57,10 +55,13 @@ You can follow the [Add authentication to bot app](https://learn.microsoft.com/e
 
 In the [Using Agents Toolkit with `teams` CLI](#using-m365-agents-toolkit-with-the-teams-cli) guide, you will notice that the OAuth Connection Name that was created in the Azure Bot configuration is `graph`. This is arbitrary and you can even create more than one configuration. You can specify which configuration to use by defining it in the app options on intialization:
 
-<FileCodeBlock
-    lang="typescript"
-    src="/generated-snippets/ts/index.snippet.auth-config.ts"
-/>
+```python
+app = App(
+    # The name of the auth connection to use.
+    # It should be the same as the Oauth connection name defined in the Azure Bot configuration.
+    default_connection_name="graph", 
+    logger=ConsoleLogger().create_logger("tests/auth", options=ConsoleLoggerOptions(level="debug")))
+```
 
 ## Resources
 

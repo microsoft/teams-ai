@@ -9,10 +9,52 @@ import FileCodeBlock from '@site/src/components/FileCodeBlock';
 
 It's possible to hook up functions that the LLM can decide to call if it thinks it can help with the task at hand. This is done by adding a `function` to the `ChatPrompt`.
 
-<FileCodeBlock
-    lang="typescript"
-    src="/generated-snippets/ts/tool-calling.snippet.single-function-calling.ts"
-/>
+```python
+class SearchPokemonParams(BaseModel):
+    pokemon_name: str
+    """The name of the pokemon."""
+
+async def pokemon_search_handler(params: SearchPokemonParams) -> Dict[str, Any]:
+    logger.info("Searching for pokemon", params.pokemon_name)
+    response = await http.get(f"https://pokeapi.co/api/v2/pokemon/${params.pokemon_name}")
+    if not "ok" in response:
+        raise ValueError("Pokemon not found")
+
+    data = await response.json()
+
+    return {
+        "name": data["name"],
+        "height": data["height"],
+        "weight": data["weight"],
+        "types": [type["type"]["name"] for type in data["types"]],
+    }
+
+@app.on_message
+async def handle_message(ctx: ActivityContext[MessageActivity]):
+    openai_model = OpenAICompletionsAIModel(
+            key=AZURE_OPENAI_API_KEY,
+            model=AZURE_OPENAI_MODEL,
+            azure_endpoint=AZURE_OPENAI_ENDPOINT,
+            api_version=AZURE_OPENAI_API_VERSION,
+        )
+    agent = Agent(model=openai_model)
+    agent.with_function(
+        Function(
+            name="pokemon_search",
+            description="Search for pokemon",
+            # Include the schema of the parameters
+            # the LLM needs to return to call the function
+            parameter_schema=SearchPokemonParams,
+            handler=pokemon_search_handler,
+        )
+    )
+
+    chat_result = await agent.send(
+            input=UserMessage(content=ctx.activity.text),
+            system_message=SystemMessage(content="You are a friendly assistant that can look up Pokemon for the user."),
+        )
+    await ctx.send(chat_result.response.content or "Sorry I could not find that pokemon")
+```
 
 ## Multiple functions
 

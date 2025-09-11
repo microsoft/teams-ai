@@ -7,27 +7,29 @@ summary: Guide to implementing custom logging in Python Teams AI applications us
 
 The `App` will provide a default logger, but you can also provide your own.
 The default `Logger` instance will be set to `ConsoleLogger` from the
-`@microsoft/teams.common` package.
+`microsoft-teams-common` package.
 
 
-```typescript
-import { App } from '@microsoft/teams.apps';
-import { ConsoleLogger } from '@microsoft/teams.common';
+```python
+import asyncio
 
-// initialize app with custom console logger
-// set to debug log level
-const app = new App({
-  logger: new ConsoleLogger('echo', { level: 'debug' }),
-});
+from microsoft.teams.api import MessageActivity
+from microsoft.teams.api.activities.typing import TypingActivityInput
+from microsoft.teams.apps import ActivityContext, App
+from microsoft.teams.common import ConsoleLogger, ConsoleLoggerOptions
 
-app.on('message', async ({ send, activity, log }) => {
-  log.debug(activity);
-  await send({ type: 'typing' });
-  await send(`you said "${activity.text}"`);
-});
+logger = ConsoleLogger().create_logger("echo", ConsoleLoggerOptions(level="debug"))
+app = App(logger=logger)
 
-(async () => {
-  await app.start();
-})();
+@app.on_message
+async def handle_message(ctx: ActivityContext[MessageActivity]):
+    logger.debug(ctx.activity)
+    await ctx.reply(TypingActivityInput())
+    await ctx.send(f"You said '{ctx.activity.text}'")
+
+
+if __name__ == "__main__":
+    asyncio.run(app.start())
+
 ```
 

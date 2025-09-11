@@ -16,7 +16,7 @@ There are a few prerequisites to getting started with integrating LLMs into your
 my-app/
 |── appPackage/       # Teams app package files
 ├── src/
-│   └── index.ts      # Main application code
+│   └── main.py      # Main application code
 |── .env              # Environment variables
 ```
 
