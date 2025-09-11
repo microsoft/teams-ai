@@ -9,11 +9,11 @@ Dialogs are a helpful paradigm in Teams which improve interactions between your 
 
 ## Key benefits
 
-1. Dialogs pop open for a user in the Teams client. This means in group-settings, dialog actions are not visible to other users in the channel, reducing clutter.
+- Dialogs pop open for a user in the Teams client. This means in group-settings, dialog actions are not visible to other users in the channel, reducing clutter.
 
-2. Interactions like filling out complex forms, or multi-step forms where each step depends on the previous step are excellent use cases for dialogs.
+- Interactions like filling out complex forms or multi-step forms where each step depends on the previous step are excellent use cases for dialogs.
 
-3. The content for the dialog can be hard-coded in, or fetched at runtime. This makes them extremely flexible and powerful.
+- The content for the dialog can be hard-coded in or fetched at runtime. This makes them extremely flexible and powerful.
 
 ## Resources
 

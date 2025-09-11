@@ -54,7 +54,7 @@ This command:
 
 ## Running your agent
 
-Navigate to your new agent's directory:
+1. Navigate to your new agent's directory:
 
 
 ```sh
@@ -62,7 +62,7 @@ cd Quote.Agent/Quote.Agent
 ```
 
 
-Install the dependencies:
+2. Install the dependencies:
 
 
 ```sh
@@ -70,7 +70,7 @@ dotnet restore
 ```
 
 
-Start the development server:
+3. Start the development server:
 
 
 ```sh
@@ -78,7 +78,7 @@ dotnet run
 ```
 
 
-In the console, you should see a similar output:
+4. In the console, you should see a similar output:
 
 
 ```sh
@@ -92,7 +92,7 @@ In the console, you should see a similar output:
 
 When the application starts, you'll see:
 
-1. An http server starting up (on port 3978). This is the main server which handles incoming requests and serves the agent application.
+1. An HTTP server starting up (on port 3978). This is the main server which handles incoming requests and serves the agent application.
 2. A devtools server starting up. This is a developer server that provides a web interface for debugging and testing your agent quickly, without having to deploy it to Teams.
 
 Let's navigate to the devtools server. Open your browser and head to [http://localhost:3978/devtools](http://localhost:3978/devtools). You should see a simple interface where you can interact with your agent. Send it a message!

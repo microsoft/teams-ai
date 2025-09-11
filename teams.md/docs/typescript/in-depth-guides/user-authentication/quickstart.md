@@ -5,10 +5,10 @@ summary: Quickstart guide for enabling user authentication and Microsoft Graph A
 
 # Quickstart
 
-In this section we will walk through creating an app that can access the [Microsoft Graph APIs](https://learn.microsoft.com/en-us/graph/overview) on behalf of the user by authenticating them with the [Microsoft Entra ID](https://www.microsoft.com/en-us/security/business/identity-access/microsoft-entra-id) oauth provider. 
+In this section, we will walk through creating an app that can access the [Microsoft Graph APIs](https://learn.microsoft.com/en-us/graph/overview) on behalf of the user by authenticating them with the [Microsoft Entra ID](https://www.microsoft.com/en-us/security/business/identity-access/microsoft-entra-id) OAuth provider. 
 
 :::info
-It is possible to authenticate the user into [other auth providers](https://learn.microsoft.com/en-us/azure/bot-service/bot-builder-concept-identity-providers?view=azure-bot-service-4.0&tabs=adv2%2Cga2#other-identity-providers) like Facebook, Github, Google, Dropbox, and so on.
+It is possible to authenticate the user into [other auth providers](https://learn.microsoft.com/en-us/azure/bot-service/bot-builder-concept-identity-providers?view=azure-bot-service-4.0&tabs=adv2%2Cga2#other-identity-providers) like Facebook, GitHub, Google, Dropbox, and so on.
 :::
 
 :::info
@@ -62,12 +62,12 @@ See [App Setup](./setup#using-m365-agents-toolkit-with-the-teams-cli) to learn m
 
 ## Interacting with the app in Teams
 
-Once you have successfully sideloaded the app into Teams you can now interact with it and sign the user in. 
+Once you have successfully sideloaded the app into Teams, you can now interact with it and sign the user in. 
 
 ### Signing the user in
 
 :::note
-This is the Single Sign-On (SSO) authentication flow. To learn more about all the available flows and their differences see the [How Auth Works](auth-sso) guide.
+This is the Single Sign-On (SSO) authentication flow. To learn more about all the available flows and their differences, see the [How Auth Works](auth-sso) guide.
 :::
 
 When the user sends a message to the user a consent form will popup:
@@ -86,6 +86,6 @@ Once the user signs in and grants the app access, they will be redirected back t
 
 ![Graph message](/screenshots/auth-graph-message.png)
 
-The user can then signout by sending the `signout` command to the app:
+The user can then SignOut by sending the `signout` command to the app:
 
 ![Signout message](/screenshots/auth-signout-message.png)

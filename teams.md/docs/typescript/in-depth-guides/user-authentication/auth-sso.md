@@ -19,7 +19,7 @@ When an access token expires, the app automatically initiates a token exchange f
 3. This exchange happens silently without requiring user interaction
 
 :::tip
-Always use SSO if you authenticating the user with Microsoft Entra ID.
+Always use SSO if you're authenticating the user with Microsoft Entra ID.
 :::
 
 ### The SSO Signin Flow
@@ -71,8 +71,8 @@ This is what the OAuth card looks like in Teams:
 | Feature | OAuth | SSO |
 |---------|-------|-----|
 | Identity Provider | Works with any OAuth provider (Microsoft Entra ID, Google, Facebook, GitHub, etc.) | Only works with Microsoft Entra ID |
-| Authentication Flow | User is sent a card with a sign-in link | If user has already consent to the requested scopes in the past they will "silently" login through the token exchange flow. Otherwise user is shown a consent form |
-| User Experience | Requires explicit sign-in, and consent to scopes | Re-use existing Teams credential, Only requires consent to scopes |
+| Authentication Flow | User is sent a card with a sign-in link | If the user has already consented to the requested scopes in the past they will "silently" login through the token exchange flow. Otherwise user is shown a consent form |
+| User Experience | Requires explicit signin, and consent to scopes | Re-use existing Teams credential. Only requires consent to scopes |
 | Conversation scopes (`personal`, `groupChat`, `teams`) | `personal` scope only | `personal` scope only |
 | Azure Configuration differences | Same configuration except `Token Exchange URL` is blank | Same configuration except `Token Exchange URL` is set
 
