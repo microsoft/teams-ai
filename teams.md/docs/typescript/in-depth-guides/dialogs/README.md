@@ -13,7 +13,7 @@ Dialogs are a helpful paradigm in Teams which improve interactions between your 
 
 2. Interactions like filling out complex forms, or multi-step forms where each step depends on the previous step are excellent use cases for dialogs.
 
-3. The content for the dialog can be hard-coded in, or fetched at runtime. This makes them extremely flexible and powerful.
+3. The content for the dialog can be hard-coded or fetched at runtime. This makes dialogs extremely flexible and powerful.
 
 ## Resources
 
