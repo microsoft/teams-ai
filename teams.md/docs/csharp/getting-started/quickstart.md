@@ -36,7 +36,7 @@ After installation, you can run `teams --version` to verify the installation.
 
 ## Creating Your First Agent
 
-Let's being by creating a simple echo agent that responds to messages. Run:
+Let's begin by creating a simple echo agent that responds to messages. Run:
 
 
 ```sh
