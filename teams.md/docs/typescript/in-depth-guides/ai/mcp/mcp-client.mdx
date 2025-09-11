@@ -21,7 +21,7 @@ Take a look at [Function calling](../function-calling) to understand how the `Ch
 
 ## Remote MCP Server
 
-The first thing that's needed is access to a **remote** MCP server. MCP Servers (at present) come using two main types protocols:
+The first thing that's needed is access to a **remote** MCP server. MCP Servers (at present) come using two main types of protocols:
 
 1. StandardIO - This is a _local_ MCP server, which runs on your machine. An MCP client may connect to this server, and use standard input and outputs to communicate with it. Since our application is running remotely, this is not something that we want to use
 2. Streamable HTTP/SSE - This is a _remote_ MCP server. An MCP client may send it requests and the server responds in the expected MCP protocol.
