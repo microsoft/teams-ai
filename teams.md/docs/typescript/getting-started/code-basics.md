@@ -24,7 +24,7 @@ quote-agent/
 
 ## Core Components
 
-Let's break down the simple application we created in the [quickstart](quickstart) into its core components.:
+Let's break down the simple application we created in the [quickstart](quickstart) into its core components:
 
 ### The App Class
 
@@ -46,7 +46,7 @@ The app configuration includes a variety of options that allow you to customize 
 
 ### Plugins
 
-Plugins are a core part of the Teams AI v2 SDK. They allow you to hook into various lifecycles of the application. The lifecycles include server events (start, stop, initialize etc.), and also Teams Activity events (onActivity, onActivitySent, etc.). In fact, the [DevTools](/developer-tools/devtools) application you already have running is a plugin too. It allows you to inspect and debug your application in real-time.
+Plugins are a core part of the Teams AI v2 SDK. They allow you to hook into various lifecycles of the application. The lifecycles include server events (start, stop, initialize, etc.), and also Teams Activity events (onActivity, onActivitySent, etc.). In fact, the [DevTools](/developer-tools/devtools) application you already have running is a plugin too. It allows you to inspect and debug your application in real-time.
 
 :::warning
 DevTools is a plugin that should only be used in development mode. It should not be used in production applications since it offers no authentication and allows your application to be accessed by anyone.\
