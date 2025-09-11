@@ -22,7 +22,7 @@ See [How Auth Works](auth-sso) to learn more about how authentication works.
 
 ### Manual Setup
 
-In this step you will have to tweak your Azure Bot service and App registration to add authentication configurations and enable Single Sign-On (SSO).
+In this step, you will have to tweak your Azure Bot service and App registration to add authentication configurations and enable Single Sign-On (SSO).
 
 :::info
 [Single Sign-On (SSO)](./auth-sso#single-sign-on-sso) in Teams allows users to access your app seamlessly by using their existing Teams account credentials for authentication. A user who has logged into Teams doesn't need to log in again to your app within the Teams environment.
@@ -32,7 +32,7 @@ You can follow the [Enable SSO for bot and message extension app using Entra ID]
 
 ### Using Microsoft 365 Agents Toolkit with the `teams` CLI
 
-Open your terminal and navigate to the root folder of your app and run the following command:
+Open your terminal, navigate to the root folder of your app, and run the following command:
 
 ```sh
 teams config add atk.oauth
@@ -46,7 +46,7 @@ This [CLI](/developer-tools/cli) command adds configuration files required by Ag
 - Azure bicep files to provision Azure bot in `infra/` folder.
 
 :::info
-Agents Toolkit, in the debugging flow, will deploy the `aad.manifest.json` and `infra/azure.local.bicep` file to provision the Application Entra ID and Azure bot with oauth configurations.
+Agents Toolkit, in the debugging flow, will deploy the `aad.manifest.json` and `infra/azure.local.bicep` file to provision the Application Entra ID and Azure bot with OAuth configurations.
 :::
 
 ## Authenticate the user to third-party identity provider
