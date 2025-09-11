@@ -17,11 +17,11 @@ Teams has a number of areas that your application has access to via its API. The
 | `Teams` | Gives your application access to team or channel details |
 
 
-An instance of the Api Client is passed to handlers that can be used to fetch details:
+An instance of the API Client is passed to handlers that can be used to fetch details:
 
 ## Example
 
-In this example, we use the api client to fetch the members in a conversation. The `Api` object is passed to the activity handler in this case.
+In this example, we use the API client to fetch the members in a conversation. The `Api` object is passed to the activity handler in this case.
 
 <Tabs>
   <TabItem label="Controller" value="controller" default>
@@ -45,7 +45,7 @@ In this example, we use the api client to fetch the members in a conversation. T
 
 ## Proactive API
 
-It's also possible to access the api client from outside a handler via the app instance. Here we have the same example as above, but we're access the api client via the app instance.
+It's also possible to access the API client from outside a handler via the app instance. Here we have the same example as above, but we're accessing the API client via the app instance.
 
 ```csharp
 const members = await app.Api.Conversations.Members.Get("...");
