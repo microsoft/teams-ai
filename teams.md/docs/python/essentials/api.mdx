@@ -14,11 +14,11 @@ Teams has a number of areas that your application has access to via its API. The
 | `teams` | Gives your application access to team or channel details |
 
 
-An instance of the api client is passed to handlers that can be used to fetch details:
+An instance of the API client is passed to handlers that can be used to fetch details:
 
 ## Example
 
-In this example, we use the api client to fetch the members in a conversation. The `Api` object is passed to the activity handler in this case.
+In this example, we use the API client to fetch the members in a conversation. The `Api` object is passed to the activity handler in this case.
 
 ```python
 @app.on_message

@@ -14,11 +14,11 @@ Teams has a number of areas that your application has access to via its API. The
 | `teams` | Gives your application access to team or channel details |
 
 
-An instance of the Api Client is passed to handlers that can be used to fetch details:
+An instance of the API client is passed to handlers that can be used to fetch details:
 
 ## Example
 
-In this example, we use the api client to fetch the members in a conversation. The `api` object is passed to the activity handler in this case.
+In this example, we use the API client to fetch the members in a conversation. The `api` object is passed to the activity handler in this case.
 
 ```typescript
 app.on('message', async ({ activity, api }) => {
@@ -28,7 +28,7 @@ app.on('message', async ({ activity, api }) => {
 
 ## Proactive API
 
-It's also possible to access the api client from outside a handler via the app instance. Here we have the same example as above, but we're access the api client via the app instance.
+It's also possible to access the API client from outside a handler via the app instance. Here we have the same example as above, but we're access the API client via the app instance.
 
 ```typescript
 import * as endpoints from '@microsoft/teams.graph-endpoints';

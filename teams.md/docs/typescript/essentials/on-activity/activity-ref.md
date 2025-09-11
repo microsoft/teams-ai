@@ -5,7 +5,7 @@ summary: Complete reference guide for all activity types and routes available in
 
 # Activity Type Reference
 
-The application supports a number of activity types, 
+The application supports a number of activity types:
 
 ## Core Activity Routes
 
