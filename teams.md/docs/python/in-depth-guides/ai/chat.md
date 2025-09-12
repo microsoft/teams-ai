@@ -44,6 +44,9 @@ Chat generation is the the most basic way of interacting with an LLM model. It i
 Import the relevant objects:
 
 ```python
+from microsoft.teams.ai import ChatPrompt
+from microsoft.teams.api import MessageActivity, MessageActivityInput
+from microsoft.teams.apps import ActivityContext
 from microsoft.teams.openai import OpenAICompletionsAIModel
 ```
 
@@ -51,17 +54,12 @@ from microsoft.teams.openai import OpenAICompletionsAIModel
 
 @app.on_message
 async def handle_message(ctx: ActivityContext[MessageActivity]):
-    openai_model = OpenAICompletionsAIModel(
-        key=AZURE_OPENAI_API_KEY,
-        model=AZURE_OPENAI_MODEL,
-        azure_endpoint=AZURE_OPENAI_ENDPOINT,
-        api_version=AZURE_OPENAI_API_VERSION,
-    )
-    agent = Agent(model=openai_model)
+    openai_model = OpenAICompletionsAIModel(model=AZURE_OPENAI_MODEL)
+    agent = ChatPrompt(model=openai_model)
 
     chat_result = await agent.send(
-        input=UserMessage(content=ctx.activity.text),
-        system_message=SystemMessage(content="You are a friendly assistant who talks like a pirate."),
+        input=ctx.activity.text,
+        instructions="You are a friendly assistant who talks like a pirate."
     )
     result = chat_result.response
     if result.content:
@@ -72,6 +70,10 @@ async def handle_message(ctx: ActivityContext[MessageActivity]):
 :::note
 The current `OpenAICompletionsAIModel` implementation uses Chat Completions API. The Responses API is also available.
 :::
+
+## Agent
+
+Instead of `ChatPrompt`, you may also use `Agent`. The `Agent` class is a derivation from `ChatPrompt` but it differs in that it's stateful. The `memory` object passed to the `Agent` object will be reused for subsequent calls to `send`, whereas for `ChatPrompt`, each call to `send` is independent.
 
 ## Streaming chat responses
 
@@ -84,17 +86,12 @@ Streaming is only currently supported for single 1:1 chats, and not for groups o
 ```python
 @app.on_message
 async def handle_message(ctx: ActivityContext[MessageActivity]):
-    openai_model = OpenAICompletionsAIModel(
-        key=AZURE_OPENAI_API_KEY,
-        model=AZURE_OPENAI_MODEL,
-        azure_endpoint=AZURE_OPENAI_ENDPOINT,
-        api_version=AZURE_OPENAI_API_VERSION,
-    )
-    agent = Agent(model=openai_model)
+    openai_model = OpenAICompletionsAIModel(model=AZURE_OPENAI_MODEL)
+    agent = ChatPrompt(model=openai_model)
 
     chat_result = await agent.send(
-        input=UserMessage(content=ctx.activity.text),
-        system_message=SystemMessage(content="You are a friendly assistant who responds in terse language."),
+        input=ctx.activity.text,
+        instructions="You are a friendly assistant who responds in terse language.",
         on_chunk=lambda chunk: ctx.stream.emit(chunk)
     )
     result = chat_result.response
