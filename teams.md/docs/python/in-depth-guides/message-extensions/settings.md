@@ -3,9 +3,6 @@ sidebar_position: 3
 summary: Add configurable settings pages to your message extensions to allow users to customize app behavior.
 ---
 
-import FileCodeBlock from '@site/src/components/FileCodeBlock';
-import SettingsImgUrl from '@site/static/screenshots/settings.png';
-
 # ⚙️ Settings
 
 You can add a settings page that allows users to configure settings for your app.
@@ -95,7 +92,7 @@ app.page("settings", str(Path(__file__).parent), "/tabs/settings")
 ```
 
 :::note
-This will serve the HTML page to the `${BOT_ENDPOINT}/tabs/settings` endpoint as a tab. See [Tabs Guide](../tabs/README.md) to learn more.
+This will serve the HTML page to the `${BOT_ENDPOINT}/tabs/settings` endpoint as a tab. 
 :::
 
 ## 3. Specify the URL to the settings page
