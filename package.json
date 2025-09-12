@@ -11,7 +11,8 @@
     "test": "npx turbo test --concurrency=100%",
     "fmt": "npx prettier --write \"**/*.{js,ts,tsx,md,json}\"",
     "docs:build": "npm -w teams-md build",
-    "docs:serve": "npm -w teams-md serve",
+    "docs:dev": "npm -w teams-md start",
+    "docs:serve": "npm -w teams-md run serve",
     "gen:snips": "node ./scripts/generate-snippets.js",
     "check:links": "node ./scripts/check-links.js"
   },

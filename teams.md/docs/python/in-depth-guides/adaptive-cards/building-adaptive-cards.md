@@ -16,7 +16,7 @@ With `microsoft-teams-cards` you can build these cards entirely in Python while 
 Each helper wraps raw JSON and provides fluent, chainable methods that keep your code concise and readable.
 
 ```python
-from microsoft.teams.cards import AdaptiveCard, TextBlock, ToggleInput, ActionSet, ExecuteAction, SubmitActionData
+from microsoft.teams.cards import AdaptiveCard, TextBlock, ToggleInput, ActionSet, ExecuteAction
 
 card = AdaptiveCard(
         schema="http://adaptivecards.io/schemas/adaptive-card.json",
@@ -26,7 +26,7 @@ card = AdaptiveCard(
             ActionSet(
                 actions=[
                     ExecuteAction(title="Submit")
-                    .with_data(SubmitActionData(ms_teams={"action": "submit_basic"}))
+                    .with_data({"action": "submit_basic"})
                     .with_associated_inputs("auto")
                 ]
             ),
@@ -69,45 +69,57 @@ Prefer a drag‑and‑drop approach? Use [Microsoft's Adaptive Card Designer](ht
 3. Paste the JSON into your project **or** convert it to builder calls:
 
 ```python
-    card = AdaptiveCard.model_validate(
-        {
-            "type": "AdaptiveCard",
-            "version": "1.4",
-            "body": [
-                {
-                    "type": "TextBlock",
-                    "text": "Select the examples you want to see!",
-                    "size": "Large",
-                    "weight": "Bolder",
-                }
-            ],
-            "actions": [
-                {
-                    "type": "Action.Submit",
-                    "title": "Simple form test",
-                    "data": {"msteams": {"type": "task/fetch"}, "opendialogtype": "simple_form"},
-                },
-                {
-                    "type": "Action.Submit",
-                    "title": "Webpage Dialog",
-                    "data": {"msteams": {"type": "task/fetch"}, "opendialogtype": "webpage_dialog"},
-                },
-                {
-                    "type": "Action.Submit",
-                    "title": "Multi-step Form",
-                    "data": {"msteams": {"type": "task/fetch"}, "opendialogtype": "multi_step_form"},
-                },
-                {
-                    "type": "Action.Submit",
-                    "title": "Mixed Example",
-                    "data": {"msteams": {"type": "task/fetch"}, "opendialogtype": "mixed_example"},
-                },
-            ],
-        }
-    )
 
-    # Send the card as an attachment
-    message = MessageActivityInput(text="Enter this form").add_card(card)
+card = AdaptiveCard.model_validate(
+    {
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "ColumnSet",
+                "columns": [
+                    {
+                        "type": "Column",
+                        "verticalContentAlignment": "center",
+                        "items": [
+                            {
+                                "type": "Image",
+                                "style": "Person",
+                                "url": "https://aka.ms/AAp9xo4",
+                                "size": "Small",
+                                "altText": "Portrait of David Claux",
+                            }
+                        ],
+                        "width": "auto",
+                    },
+                    {
+                        "type": "Column",
+                        "spacing": "medium",
+                        "verticalContentAlignment": "center",
+                        "items": [{"type": "TextBlock", "weight": "Bolder", "text": "David Claux", "wrap": True}],
+                        "width": "auto",
+                    },
+                    {
+                        "type": "Column",
+                        "spacing": "medium",
+                        "verticalContentAlignment": "center",
+                        "items": [
+                            {
+                                "type": "TextBlock",
+                                "text": "Principal Platform Architect at Microsoft",
+                                "isSubtle": True,
+                                "wrap": True,
+                            }
+                        ],
+                        "width": "stretch",
+                    },
+                ],
+            }
+        ],
+        "version": "1.5",
+    }
+)
+# Send the card as an attachment
+message = MessageActivityInput(text="Hello text!").add_card(card)
 ```
 
 This method leverages the full Adaptive Card schema and ensures that the payload adheres strictly to `AdaptiveCard`.
@@ -142,7 +154,7 @@ async def handle_message(ctx: ActivityContext[MessageActivity]):
             ActionSet(
                 actions=[
                     ExecuteAction(title="Create Task")
-                    .with_data(SubmitActionData(ms_teams={"action": "create_task"}))
+                    .with_data({"action": "create_task"})
                     .with_associated_inputs("auto")
                     .with_style("positive")
                 ]
