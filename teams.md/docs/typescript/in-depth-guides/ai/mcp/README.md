@@ -11,7 +11,7 @@ MCP servers and MCP clients dynamically load function definitions and tools.
 
 When building Servers, this could mean that you can introduce new tools as part of your application, and the MCP clients that are connected to it will automatically start consuming those tools.
 
-When building Clients, this could mean that you can connect to other MCP servers and your application has the flexibility to improve as the MCP servers its connected to evolve over time.
+When building Clients, this could mean that you can connect to other MCP servers and your application has the flexibility to improve as the MCP servers it's connected to evolve over time.
 
 :::tip
 The guides here can be used to build a server and a client that can leverage each other. That means you can build a server that has the ability to do complex things for the client agent.

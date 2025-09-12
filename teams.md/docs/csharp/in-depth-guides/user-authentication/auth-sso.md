@@ -19,7 +19,7 @@ When an access token expires, the app automatically initiates a token exchange f
 3. This exchange happens silently without requiring user interaction
 
 :::tip
-Always use SSO if you authenticating the user with Microsoft Entra ID.
+Always use SSO if you are authenticating the user with Microsoft Entra ID.
 :::
 
 ### The SSO Signin Flow

@@ -75,7 +75,7 @@ When working with Teams, these are the key concepts. Keep in mind, this is a sim
 - Azure Bot Service: This is the service that handles all the bot-related operations, including routing messages from Teams to your agent and vice versa. This holds the URL to your agent application.
 - DevTunnel: This is a service that creates a public facing URL to your locally running application. Azure Bot Service requires that you have a public facing https URL to your agent application.
 - Local Agent Application: This is your agent application running on your local machine.
-- Deployed Agent Application: This is your deployed agent which probably has a public facing URL.
+- Deployed Agent Application: This is your deployed agent, which probably has a public facing URL.
 
 ## DevTunnel
 
@@ -95,15 +95,15 @@ Before your agent can interact with Teams, it needs to be properly registered an
 
 ### App Registration
 
-- Creates an App ID (i.e. Client ID) in the Teams platform
-- Sets up a bot registration with the Bot Framework
+- Creates an App ID (that is, Client ID) in the Teams platform
+- Sets up bot registration with the Bot Framework
 - Creates a client secret that your agent can use to authenticate to be able to send and receive messages. Agents Toolkit will automatically get this value and store it in the `.env` file for you.
 
 ### Azure Bot
 
 - Creates an Azure Bot resource
 - Associates the bot with your App Registration
-- Configures the messaging endpoint to point to your DevTunnel (or public URL if deployed)
+- Configures the messaging endpoint to point to your DevTunnel (or public URL, if deployed)
 
 ## Sideloading Process
 
@@ -115,4 +115,4 @@ Sideloading needs to be enabled in your tenant. If this is not the case, then yo
 
 ## Provisioning and Deployment
 
-To test your app in Teams, you will at minimum need to have a provisioned Azure bot. You are likely to have other provisionied resources such as storage. Please see the Microsoft Learn [Provision cloud resources](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/provision) documentation for provisioning and deployment using Visual Studio Code and to a container service.
+To test your app in Teams, you will at minimum need to have a provisioned Azure bot. You are likely to have other provisioned resources such as storage. Please see the Microsoft Learn [Provision cloud resources](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/provision) documentation for provisioning and deployment using Visual Studio Code and to a container service.
