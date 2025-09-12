@@ -53,8 +53,8 @@ app.event('error', ({ err, log }) => {
 When a user signs in using `OAuth` or `SSO`, use the graph api to fetch their profile and say hello.
 
 ```typescript
-app.event('signin', async ({ activity, send, api }) => {
-  const me = await api.user.me.get();
+app.event('signin', async ({ activity, send, userGraph }) => {
+  const me = await userGraph.me.get();
   await send(`👋 Hello ${me.name}`);
 });
 ```
