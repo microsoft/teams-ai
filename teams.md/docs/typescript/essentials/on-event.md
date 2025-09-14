@@ -53,8 +53,10 @@ app.event('error', ({ err, log }) => {
 When a user signs in using `OAuth` or `SSO`, use the graph api to fetch their profile and say hello.
 
 ```typescript
+
+import * as endpoints from '@microsoft/teams.graph-endpoints';
 app.event('signin', async ({ activity, send, userGraph }) => {
-  const me = await userGraph.me.get();
+  const me = await userGraph.call(endpoints.me.get);
   await send(`👋 Hello ${me.name}`);
 });
 ```

@@ -34,6 +34,7 @@ Here is a simple example, which responds to incoming messages with information r
 ```typescript
 import { App } from '@microsoft/teams.apps';
 import { DevtoolsPlugin } from '@microsoft/teams.dev';
+import * as endpoints from '@microsoft/teams.graph-endpoints';
 
 const app = new App({
   plugins: [new DevtoolsPlugin()],
@@ -45,7 +46,7 @@ app.on('message', async ({ userGraph, isSignedIn, send, signin }) => {
     await signin(); // initiates Entra login flow
     return;
   }
-  const me = await userGraph.me.get();
+  const me = await userGraph.call(endpoints.me.get); 
   await send(`Hello, ${me.displayName} from Earth!`);
 });
 
