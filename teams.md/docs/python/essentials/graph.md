@@ -14,10 +14,14 @@ The Teams AI SDK for Python provides easy access to the Microsoft Graph API via 
 The Graph functionality is available as an optional dependency. Install it using one of the following methods:
 
 ```bash
-# Install with pip
-pip install microsoft-teams-graph
+# Install with uv (recommended)
+uv add microsoft-teams-graph
 
 # Or install the Teams AI library with Graph support
+uv add microsoft-teams-apps[graph]
+
+# Alternative: Install with pip
+pip install microsoft-teams-graph
 pip install microsoft-teams-apps[graph]
 ```
 
