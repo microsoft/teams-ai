@@ -144,6 +144,42 @@ async def handle_message(ctx: ActivityContext[MessageActivity]):
         await ctx.send(f"Error getting teams: {str(e)}")
 ```
 
+### Using Parameters
+
+Many Graph API calls accept parameters for filtering, selecting specific fields, or pagination:
+
+```python
+from msgraph_core import QueryParameters
+
+@app.on_message
+async def handle_message_with_params(ctx: ActivityContext[MessageActivity]):
+    if not ctx.is_signed_in:
+        await ctx.sign_in()
+        return
+
+    try:
+        # Get user's messages with specific parameters
+        query_params = QueryParameters(
+            select=["subject", "from", "receivedDateTime"],
+            filter="isRead eq false",
+            top=10,
+            orderby=["receivedDateTime desc"]
+        )
+        
+        messages = await ctx.user_graph.me.messages.get(request_configuration=query_params)
+        
+        if messages and messages.value:
+            message_list = "\n".join([
+                f"• {msg.subject} (from: {msg.from_.email_address.name})" 
+                for msg in messages.value
+            ])
+            await ctx.send(f"**Recent Unread Messages:**\n{message_list}")
+        else:
+            await ctx.send("No unread messages found.")
+    except Exception as e:
+        await ctx.send(f"Error getting messages: {str(e)}")
+```
+
 ## Error Handling
 
 The Graph properties handle most errors automatically, but you should still implement proper error handling:
