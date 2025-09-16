@@ -43,7 +43,19 @@ flowchart LR
 
 Chat generation is the the most basic way of interacting with an LLM model. It involves setting up your ChatPrompt, the Model, and sending it the message.
 
-Import the relevant namespaces:
+ Import the relevant namespaces:
+ ```csharp
+// AI
+using Microsoft.Teams.AI.Models.OpenAI;
+using Microsoft.Teams.AI.Prompts;
+// Teams
+using Microsoft.Teams.Api.Activities;
+using Microsoft.Teams.Apps;
+using Microsoft.Teams.Apps.Activities;
+using Microsoft.Teams.Apps.Annotations;
+```
+
+Create a ChatModel, ChatPrompt, and handle user - LLM interactions:
 
 ```csharp
 [TeamsController("main")]
@@ -54,17 +66,17 @@ public class MainController
     {
         // Create the OpenAI chat model
         var model = new OpenAIChatModel(
-            model: "gpt-3.5-turbo",
+            model: "gpt-4o",
             apiKey: Environment.GetEnvironmentVariable("OPENAI_API_KEY")!
         );
 
         // Create a chat prompt
         var prompt = new OpenAIChatPrompt(
-            model, new ChatPromptOptions
-            {
-                Description = "You are a friendly assistant who talks like a pirate",
-            });
+            model, 
+            new ChatPromptOptions().WithInstructions("You are a friendly assistant who talks like a pirate.")
+        );
 
+        // Send the user's message to the prompt and get a response
         var response = await prompt.Send(activity.Text);
         if (!string.IsNullOrEmpty(response.Content))
         {
@@ -89,7 +101,10 @@ Streaming is only currently supported for single 1:1 chats, and not for groups o
 :::
 
 ```csharp
-// Enable streaming responses
+        // Send the user's message to the prompt and stream the response back
+        var response = await prompt.Send(activity.Text, null, 
+            (chunk) => Task.Run(() => context.Stream.Emit(chunk)), 
+            context.CancellationToken);
 ```
-
+### User experience
 ![Streaming the response](/screenshots/streaming-chat.gif)
