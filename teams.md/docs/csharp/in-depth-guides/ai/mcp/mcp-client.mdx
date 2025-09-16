@@ -10,17 +10,17 @@ import FileCodeBlock from '@site/src/components/FileCodeBlock';
 You are able to leverage other MCP servers that expose tools via the SSE protocol as part of your application. This allows your AI agent to use remote tools to accomplish tasks.
 
 :::info
-Take a look at [Function calling](../function-calling) to understand how the `ChatPrompt` leverages tools to enhance the LLM's capabilities. MCP extends this functionality by allowing remote tools, that may or may not be developed or maintained by you, to be used by your application.
+Take a look at [Function calling](../function-calling) to understand how `ChatPrompt` leverages tools to enhance the LLM's capabilities. MCP extends this functionality by allowing remote tools, that may or may not be developed or maintained by you, to be used by your application.
 :::
 
 ## Remote MCP Server
 
-The first thing that's needed is access to a **remote** MCP server. MCP Servers (at present) come using two main types protocols:
+The first thing that's needed is access to a **remote** MCP server. MCP Servers (at present) come using two main types of protocols:
 
-1. StandardIO - This is a _local_ MCP server, which runs on your machine. An MCP client may connect to this server, and use standard input and outputs to communicate with it. Since our application is running remotely, this is not something that we want to use
+1. StandardIO - This is a _local_ MCP server, which runs on your machine. An MCP client may connect to this server, and use standard input and outputs to communicate with it. Since our application is running remotely, this is not something that we want to use.
 2. SSE - This is a _remote_ MCP server. An MCP client may send it requests and the server responds in the expected MCP protocol.
 
-For hooking up to your a valid SSE server, you will need to know the URL of the server, and if applicable, and keys that must be included as part of the header.
+For hooking up to a valid SSE server, you will need to know the URL of the server, and if applicable, and keys that must be included as part of the header.
 
 ## MCP Client Plugin
 

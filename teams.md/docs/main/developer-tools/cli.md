@@ -11,7 +11,7 @@ The Teams CLI was created with the intent of supporting developers by making com
 |---------|-------------|
 | `new` | Create a new Teams AI v2 agent by choosing a template that will be ready to run with one command line. |
 | `config` | Add Microsoft 365 Agents Toolkit configuration files to your existing Teams AI v2 agent project. |
-| `environment` | Manage multiple environments (e.g. dev, prod) and their keys for your agent. |
+| `environment` | Manage multiple environments (for example, dev, prod) and their keys for your agent. |
 
 :::tip
 With the CLI installed, you can enter `teams <token-arguments> --help` at any command level to access information about the command, tokens, or required arguments.
@@ -70,7 +70,7 @@ teams config add <config-name>
 | `atk.embed` | Configuration for embedded Teams applications |
 | `atk.oauth` | Configuration for OAuth-enabled applications |
 
-Using this command will include
+Using this command will include:
 - `env`: folders for managing multiple environments
 - `infra`: files for deployment and provisioning
 - `.yml` files for tasks, launch, deployment, etc.

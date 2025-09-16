@@ -5,7 +5,7 @@ summary: Understanding how to listen to and handle events in Teams AI applicatio
 
 # Listening To Events
 
-An **event** is a foundational concept in building agents — it represents something noteworthy happening either on Microsoft Teams or within your application. These events can originate from the user (e.g. installing or uninstalling your app, sending a message, submitting a form), or from your application server (e.g. startup, error in a handler).
+An **event** is a foundational concept in building agents — it represents something noteworthy happening either on Microsoft Teams or within your application. These events can originate from the user (for example, installing or uninstalling your app, sending a message, submitting a form), or from your application server (for example, startup, error in a handler).
 
 ```mermaid
 flowchart LR
@@ -50,7 +50,7 @@ app.event('error', ({ err, log }) => {
 
 ### Example 2
 
-When a user signs in using `OAuth` or `SSO`, use the graph api to fetch their profile and say hello.
+When a user signs in using `OAuth` or `SSO`, use the Graph API to fetch their profile and say hello.
 
 ```typescript
 
