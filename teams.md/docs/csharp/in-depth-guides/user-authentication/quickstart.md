@@ -35,7 +35,7 @@ Use your terminal to run the following command:
 
 
 ```sh
-teams new oauth-app --template graph
+teams new csharp oauth-app --template graph
 ```
 
 

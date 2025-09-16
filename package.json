@@ -14,7 +14,8 @@
     "docs:dev": "npm -w teams-md start",
     "docs:serve": "npm -w teams-md run serve",
     "gen:snips": "node ./scripts/generate-snippets.js",
-    "check:links": "node ./scripts/check-links.js"
+    "check:links": "node ./scripts/check-links.js",
+    "submodules:sync": "git submodule update --init --recursive --remote"
   },
   "devDependencies": {
     "bluehawk": "^1.6.0",
