@@ -17,10 +17,21 @@ npm install @microsoft/teams.apps
 
 ## Migrate Application class
 
-Below is some fairly standard boilerplate for setting up Teams AI v1:
+First, migrate your `Application` class from v1 to the new `App` class.
+
+<table>
+<tr>
+<td> <strong>Teams AI v1</strong> </td> <td> <strong>Teams AI v2</strong> </td>
+</tr>
+<tr>
+<td>
 
 ```ts
-import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
+import {
+  ConfigurationServiceClientCredentialFactory,
+  MemoryStorage,
+  TurnContext,
+} from 'botbuilder';
 import { Application, TeamsAdapter } from '@microsoft/teams-ai';
 import * as restify from 'restify';
 
@@ -37,11 +48,7 @@ const adapter = new TeamsAdapter(
 
 // Catch-all for errors.
 const onTurnErrorHandler = async (context: TurnContext, error: any) => {
-    // This check writes out errors to console log .vs. app insights.
-    // NOTE: In production environment, you should consider logging this to Azure application insights.
     console.error(`\n [onTurnError] unhandled error: ${error}`);
-    console.log(error);
-
     // Send a message to the user
     await context.sendActivity('The bot encountered an error or bug.');
 };
@@ -55,7 +62,6 @@ server.use(restify.plugins.bodyParser());
 
 server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log(`\n${server.name} listening to ${server.url}`);
-    console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
 // Define storage and application
@@ -73,7 +79,8 @@ server.post('/api/messages', async (req, res) => {
 });
 ```
 
-Here is the comparable code in Teams AI v2:
+</td>
+<td>
 
 ```ts
 import { App } from '@microsoft/teams.apps';
@@ -93,18 +100,25 @@ const storage = new LocalStorage();
 app.event('error', async (client) => {
   console.error('Error event received:', client.error);
   if (client.activity) {
-    await app.send(client.activity.conversation.id, 'An error occurred while processing your message.');
+    await app.send(
+      client.activity.conversation.id,
+      'An error occurred while processing your message.',
+    );
   }
 });
 
-// App by default will start a local server with a route for /api/messages
-// If you want to reuse your restify or other server,
-// create a custom `HttpPlugin` and pass into new App({ plugins: [plugin] })
+// App creates local server with route for /api/messages
+// To reuse your restify or other server,
+// create a custom `HttpPlugin`.
 (async () => {
   // starts the server
   await app.start();
 })();
 ```
+
+</td>
+</tr>
+</table>
 
 ## Migrate activity handlers
 
@@ -112,42 +126,61 @@ Both Teams AI v1 and v2 are built atop incoming `Activity` requests, which trigg
 
 ### Message handlers
 
-Here is an example of a message handler in Teams AI v1:
+<table>
+<tr>
+<td> <strong>Teams AI v1</strong> </td> <td> <strong>Teams AI v2</strong> </td>
+</tr>
+<tr>
+<td>
 
 ```ts
-// will be triggered when user sends "/hello" or "@yourbot /hello"
-app.message(
-  "/hello",
-  async (context: IConversationContext) => {
-    await context.sendActivity("Hello!");
+// triggers when user sends "/hi" or "@bot /hi"
+app.message("/hi", async (context) => {
+  await context.sendActivity("Hi!");
+});
+// listen for ANY message to be received
+app.activity(
+  ActivityTypes.Message,
+  async (context) => {
+    // echo back users request
+    await context.sendActivity(
+      `you said: ${context.activity.text}`
+    );
   }
 );
-// listen for ANY message to be received
-app.activity(ActivityTypes.Message, async (context: TurnContext) => {
-    // echo back users request
-    await context.sendActivity(`you said: ${context.activity.text}`);
-});
 ```
 
-Here is the equivalent code in Teams AI v2:
+</td>
+<td>
 
 ```ts
-// will be triggered when user sends "/hello" or "@yourbot /hello"
-app.message('/hello', async (client) => {
-  // Teams AI v2 does not automatically send typing indicators
+// triggers when user sends "/hi" or "@bot /hi"
+app.message('/hi', async (client) => {
+  // SDK does not auto send typing indicators
   await client.send({ type: 'typing' });
-  await client.send("Hello!");
+  await client.send("Hi!");
 });
 // listen for ANY message to be received
 app.on('message', async (client) => {
   await client.send({ type: 'typing' });
-  await client.send(`you said "${client.activity.text}"`);
+  await client.send(
+    `you said "${client.activity.text}"`
+  );
 });
 ```
 
+</td>
+</tr>
+</table>
+
 ### Task modules
 
-Here is an example of task modules in Teams AI v1:
+<table>
+<tr>
+<td> <strong>Teams AI v1</strong> </td> <td> <strong>Teams AI v2</strong> </td>
+</tr>
+<tr>
+<td>
 
 ```ts
 app.taskModules.fetch("connect-account", async (context, state, data) => {
@@ -171,7 +204,8 @@ app.taskModules.submit("connect-account", async (context, state, data) => {
 });
 ```
 
-Here is the corresponding code in Teams AI v2:
+</td>
+<td>
 
 ```ts
 app.on("dialog.open", (client) => {
@@ -203,13 +237,22 @@ app.on("dialog.submit", async (client) => {
 });
 ```
 
+</td>
+</tr>
+</table>
+
 Learn more [here](../../in-depth-guides/dialogs/README.md).
 
 ## Adaptive cards
 
 In Teams AI v2, cards have much more rich type validation than existed in v1. However, assuming your cards were valid, it should be easy to migrate to v2.
 
-Here is an example of sending a card in Teams AI v1:
+<table>
+<tr>
+<td> <strong>Teams AI v1</strong> </td> <td> <strong>Teams AI v2 (Option 1)</strong> </td> <td> <strong>Teams AI v2 (Option 2)</strong> </td>
+</tr>
+<tr>
+<td>
 
 ```ts
 app.message("/card", async (context: TurnContext) => {
@@ -235,6 +278,9 @@ app.message("/card", async (context: TurnContext) => {
 });
 ```
 
+</td>
+<td>
+
 For existing cards like this, the simplest way to convert that to Teams AI v2 is this:
 
 ```ts
@@ -258,7 +304,11 @@ app.message("/card", async (client) => {
 });
 ```
 
-For a more thorough port, however, you could also do the following:
+</td>
+
+<td>
+
+For a more thorough port, you could also do the following:
 
 ```ts
 import { Card, TextBlock } from "@microsoft/teams.cards";
@@ -266,11 +316,18 @@ import { Card, TextBlock } from "@microsoft/teams.cards";
 app.message("/card", async (client) => {
   await client.send(
     new Card(
-      new TextBlock("Hello, world!", { wrap: true, isSubtle: false })
+      new TextBlock(
+        "Hello, world!",
+        { wrap: true, isSubtle: false },
+      )
     ).withOptions({ width: "Full" })
   );
 });
 ```
+
+</td>
+</tr>
+</table>
 
 Learn more [here](../../in-depth-guides/adaptive-cards/README.md).
 
@@ -278,14 +335,19 @@ Learn more [here](../../in-depth-guides/adaptive-cards/README.md).
 
 Most agents feature authentication for user identification, interacting with APIs, etc. Whether your Teams AI v1 app used Entra SSO or custom OAuth, porting to v2 should be simple.
 
-Here is an example of auth in Teams AI v1:
+<table>
+<tr>
+<td> <strong>Teams AI v1</strong> </td> <td> <strong>Teams AI v2</strong> </td>
+</tr>
+<tr>
+<td>
 
 ```ts
 const storage = new MemoryStorage();
 const app = new Application({
     storage: new MemoryStorage(),
     authentication: {
-        autoSignIn: (context: TurnContext) => {
+        autoSignIn: (context) => {
             const activity = context.activity;
             // No auth when user wants to sign in
             if (activity.text === "/signout") {
@@ -317,7 +379,7 @@ const app = new Application({
 
 app.message(
     "/signout",
-    async (context: TurnContext, state: TurnState) => {
+    async (context, state) => {
         await app.authentication.signOutUser(context, state);
 
         // Echo back users request
@@ -327,7 +389,7 @@ app.message(
 
 app.message(
     "/signin",
-    async (context: TurnContext, state: TurnState) => {
+    async (context, state) => {
         let token = state.temp.authTokens['graph'];
         if (!token) {
             const res = await app.authentication.signInUser(context, state);
@@ -350,28 +412,32 @@ app.message(
 
 app.message(
     "/help",
-    async (context: TurnContext, state: TurnState) => {
+    async (context, state) => {
         await context.sendActivity(`your help text`);
     }
 );
 
 app.authentication.get('graph')
-    .onUserSignInSuccess(async (context: TurnContext, state: TurnState) => {
+    .onUserSignInSuccess(async (context, state) => {
         // Successfully logged in
         await context.sendActivity('Successfully logged in');
-        await context.sendActivity(`Token string length: ${state.temp.authTokens['graph']!.length}`);
-        await context.sendActivity(`This is what you said before the AuthFlow started: ${context.activity.text}`);
+        await context.sendActivity(
+          `Token string length: ${state.temp.authTokens['graph']!.length}`,
+        );
     });
 
 app.authentication
     .get('graph')
-    .onUserSignInFailure(async (context: TurnContext, _state: TurnState, error: AuthError) => {
+    .onUserSignInFailure(async (context, _state, error) => {
         // Failed to login
-        await context.sendActivity(`Failed to login with error: ${error.message}`);
+        await context.sendActivity(
+          `Failed to login with error: ${error.message}`,
+        );
     });
 ```
 
-Here is the equivalent in Teams AI v2:
+</td>
+<td>
 
 ```ts
 const app = new App({ 
@@ -416,13 +482,22 @@ app.event('signin', async (client) => {
 });
 ```
 
+</td>
+</tr>
+</table>
+
 ## AI
 
 ### Action planner
 
 When we created Teams AI v1, LLM's didn't natively support tool calling or orchestration. A lot has changed since then, which is why we decided to deprecate `ActionPlanner` from Teams AI v1, and replace it with something a bit more lightweight. Notably, Teams AI v1 had two similar concepts: functions and actions. In Teams AI v2, these are consolidated into functions.
 
-Here is an of planner actions in Teams AI v1:
+<table>
+<tr>
+<td> <strong>Teams AI v1</strong> </td> <td> <strong>Teams AI v2</strong> </td>
+</tr>
+<tr>
+<td>
 
 ```ts
 // Create AI components
@@ -446,7 +521,7 @@ const prompts = new PromptManager({
 });
 
 // Define a prompt function for getting the current status of the lights
-prompts.addFunction('getLightStatus', async (context: TurnContext, memory: Memory) => {
+prompts.addFunction('getLightStatus', async (context, memory) => {
     return memory.getValue('conversation.lightsOn') ? 'on' : 'off';
 });
 
@@ -466,7 +541,7 @@ const app = new Application<ApplicationTurnState>({
 });
 
 // Register action handlers
-app.ai.action('ToggleLights', async (context: TurnContext, state: ApplicationTurnState) => {
+app.ai.action('ToggleLights', async (context, state) => {
     state.conversation.lightsOn = !state.conversation.lightsOn;
     const lightStatusText = state.conversation.lightsOn ? "on" : "off";
     await context.sendActivity(`[lights ${lightStatusText}]`);
@@ -477,11 +552,15 @@ interface PauseParameters {
     time: number;
 }
 
-app.ai.action('Pause', async (context: TurnContext, state: ApplicationTurnState, parameters: PauseParameters) => {
-    await context.sendActivity(`[pausing for ${parameters.time / 1000} seconds]`);
+app.ai.action('Pause',
+  async (context, state, parameters: PauseParameters) => {
+    await context.sendActivity(
+      `[pausing for ${parameters.time / 1000} seconds]`,
+    );
     await new Promise((resolve) => setTimeout(resolve, parameters.time));
     return `done pausing`;
-});
+  },
+);
 
 // Listen for incoming server requests.
 server.post('/api/messages', async (req, res) => {
@@ -520,7 +599,10 @@ And the corresponding `actions.json` file:
 ]
 ```
 
-In Teams AI v2, there is no `actions.json` file. Here is the code you need to achieve the same result in Teams AI v2:
+</td>
+<td>
+
+In Teams AI v2, there is no `actions.json` file. Instead, function prompts, parameters, etc. are declared in your code.
 
 ```ts
 import '@azure/openai/types';
@@ -597,6 +679,10 @@ app.on('message', async (client) => {
   await app.start();
 })();
 ```
+
+</td>
+</tr>
+</table>
 
 ### Feedback
 
