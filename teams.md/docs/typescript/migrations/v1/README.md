@@ -90,10 +90,10 @@ const app = new App({
 const storage = new LocalStorage();
 
 // Listen for errors
-app.event('error', async ({ error, activity }) => {
-  console.error('Error event received:', error);
-  if (activity) {
-    await app.send(activity.conversation.id, 'An error occurred while processing your message.');
+app.event('error', async (client) => {
+  console.error('Error event received:', client.error);
+  if (client.activity) {
+    await app.send(client.activity.conversation.id, 'An error occurred while processing your message.');
   }
 });
 
@@ -133,15 +133,15 @@ Here is the equivalent code in Teams AI v2:
 
 ```ts
 // will be triggered when user sends "/hello" or "@yourbot /hello"
-app.message('/hello', async ({ send }) => {
+app.message('/hello', async (client) => {
   // Teams AI v2 does not automatically send typing indicators
-  await send({ type: 'typing' });
-  await send("Hello!");
+  await client.send({ type: 'typing' });
+  await client.send("Hello!");
 });
 // listen for ANY message to be received
-app.on('message', async ({ send, activity }) => {
-  await send({ type: 'typing' });
-  await send(`you said "${activity.text}"`);
+app.on('message', async (client) => {
+  await client.send({ type: 'typing' });
+  await client.send(`you said "${client.activity.text}"`);
 });
 ```
 
@@ -174,8 +174,8 @@ app.taskModules.submit("connect-account", async (context, state, data) => {
 Here is the corresponding code in Teams AI v2:
 
 ```ts
-app.on("dialog.open", ({ activity }) => {
-  const dialogType = activity.value.data?.opendialogtype;
+app.on("dialog.open", (client) => {
+  const dialogType = client.activity.value.data?.opendialogtype;
   if (dialogType === "some-type") {
     return {
       task: {
@@ -193,11 +193,11 @@ app.on("dialog.open", ({ activity }) => {
   }
 });
 
-app.on("dialog.submit", async ({ activity, send }) => {
-  const dialogType = activity.value.data?.submissiondialogtype;
+app.on("dialog.submit", async (client) => {
+  const dialogType = client.activity.value.data?.submissiondialogtype;
   if (dialogType === "some-type") {
-    const { data } = activity.value;
-    await send(JSON.stringify(data));
+    const { data } = client.activity.value;
+    await client.send(JSON.stringify(data));
   }
   return undefined;
 });
@@ -238,8 +238,8 @@ app.message("/card", async (context: TurnContext) => {
 For existing cards like this, the simplest way to convert that to Teams AI v2 is this:
 
 ```ts
-app.message("/card", async ({ send }) => {
-  await send({
+app.message("/card", async (client) => {
+  await client.send({
     $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
     version: "1.5",
     type: "AdaptiveCard",
@@ -263,8 +263,8 @@ For a more thorough port, however, you could also do the following:
 ```ts
 import { Card, TextBlock } from "@microsoft/teams.cards";
 
-app.message("/card", async ({ send }) => {
-  await send(
+app.message("/card", async (client) => {
+  await client.send(
     new Card(
       new TextBlock("Hello, world!", { wrap: true, isSubtle: false })
     ).withOptions({ width: "Full" })
@@ -385,19 +385,19 @@ const app = new App({
   logger: new ConsoleLogger('@tests/auth', { level: 'debug' })
 });
 
-app.message('/signout', async ({ send, signout, isSignedIn }) => {
-  if (!isSignedIn) return;
-  await signout(); // call signout for your auth connection...
-  await send('you have been signed out!');
+app.message('/signout', async (client) => {
+  if (!client.isSignedIn) return;
+  await client.signout(); // call signout for your auth connection...
+  await client.send('you have been signed out!');
 });
 
-app.message('/help', async ({ send }) => {
-    await send("your help text")
+app.message('/help', async (client) => {
+    await client.send("your help text")
 });
 
-app.on('message', async ({ log, signin, userGraph, isSignedIn }) => {
-  if (!isSignedIn) {
-    await signin({
+app.on('message', async (client) => {
+  if (!client.isSignedIn) {
+    await client.signin({
       // Customize the OAuth card text (only renders in OAuth flow, not SSO)
       oauthCardText: 'Sign in to your account',
       signInButtonText: 'Sign in' 
@@ -405,14 +405,14 @@ app.on('message', async ({ log, signin, userGraph, isSignedIn }) => {
     return;
   }
 
-  const me = await userGraph.me.get();
+  const me = await client.userGraph.me.get();
   log.info(`user "${me.displayName}" already signed in!`);
 });
 
-app.event('signin', async ({ send, userGraph, token }) => {
-  const me = await userGraph.me.get();
-  await send(`user "${me.displayName}" signed in.`);
-  await send(`Token string length: ${token.token.length}`);
+app.event('signin', async (client) => {
+  const me = await client.userGraph.me.get();
+  await client.send(`user "${me.displayName}" signed in.`);
+  await client.send(`Token string length: ${client.token.token.length}`);
 });
 ```
 
@@ -420,7 +420,7 @@ app.event('signin', async ({ send, userGraph, token }) => {
 
 ### Action planner
 
-When we created Teams AI v1, LLM's didn't natively support tool calling or orchestration. A lot has changed since then, which is why we decided to deprecate `ActionPlanner` from Teams AI v1, and replace it with something a bit more lightweight.
+When we created Teams AI v1, LLM's didn't natively support tool calling or orchestration. A lot has changed since then, which is why we decided to deprecate `ActionPlanner` from Teams AI v1, and replace it with something a bit more lightweight. Notably, Teams AI v1 had two similar concepts: functions and actions. In Teams AI v2, these are consolidated into functions.
 
 Here is an of planner actions in Teams AI v1:
 
@@ -465,22 +465,12 @@ const app = new Application<ApplicationTurnState>({
     }
 });
 
-app.ai.action('LightStatus', async (context: TurnContext, state: ApplicationTurnState) => {
-    const status = state.conversation.lightsOn ? 'on' : 'off';
-    return `the lights are ${status}`;
-});
-
 // Register action handlers
-app.ai.action('LightsOn', async (context: TurnContext, state: ApplicationTurnState) => {
-    state.conversation.lightsOn = true;
-    await context.sendActivity(`[lights on]`);
-    return `the lights are now on`;
-});
-
-app.ai.action('LightsOff', async (context: TurnContext, state: ApplicationTurnState) => {
-    state.conversation.lightsOn = false;
-    await context.sendActivity(`[lights off]`);
-    return `the lights are now off`;
+app.ai.action('ToggleLights', async (context: TurnContext, state: ApplicationTurnState) => {
+    state.conversation.lightsOn = !state.conversation.lightsOn;
+    const lightStatusText = state.conversation.lightsOn ? "on" : "off";
+    await context.sendActivity(`[lights ${lightStatusText}]`);
+    return `the lights are now ${lightStatusText}$`;
 });
 
 interface PauseParameters {
@@ -508,12 +498,8 @@ And the corresponding `actions.json` file:
 ```json
 [
     {
-        "name": "LightsOn",
-        "description": "Turns on the lights"
-    },
-    {
-        "name": "LightsOff",
-        "description": "Turns off the lights"
+        "name": "ToggleLights",
+        "description": "Turns on/off the lights"
     },
     {
         "name": "Pause",
@@ -553,8 +539,8 @@ const storage = new LocalStorage<IStorageState>();
 
 const app = new App();
 
-app.on('message', async ({ send, stream, activity }) => {
-  let state = storage.get(activity.from.id);
+app.on('message', async (client) => {
+  let state = storage.get(client.activity.from.id);
 
   if (!state) {
     state = {
@@ -562,11 +548,11 @@ app.on('message', async ({ send, stream, activity }) => {
       messages: [],
     };
 
-    storage.set(activity.from.id, state);
+    storage.set(client.activity.from.id, state);
   }
 
   const prompt = new ChatPrompt({
-    messages: storage.get(activity.from.id)?.messages,
+    messages: state.messages,
     instructions: `The following is a conversation with an AI assistant.
   The assistant can turn a light on or off.
   The lights are currently off.`,
@@ -578,18 +564,31 @@ app.on('message', async ({ send, stream, activity }) => {
     .function('get_light_status', 'get the current light status', () => {
       return state.status;
     })
-    .function('lights_on', 'turn the lights on', () => {
-      state.status = true;
-      storage.set(activity.from.id, state);
+    .function('toggle_lights', 'toggles the lights on/off', () => {
+      state.status = !state.status;
+      storage.set(client.activity.from.id, state);
     })
-    .function('lights_off', 'turn the lights off', () => {
-      state.status = false;
-      storage.set(activity.from.id, state);
-    });
+    .function(
+      'pause',
+      'delays for a period of time',
+      {
+      type: 'object',
+      properties: {
+          time: {
+            type: 'number',
+            description: 'the amount of time to delay in milliseconds',
+          },
+        },
+        required: ['time'],
+      },
+      async ({ time }: { time: number }) => {
+        await new Promise((resolve) => setTimeout(resolve, time));
+      }
+    );
 
-  await prompt.send(activity.text, {
+  await prompt.send(client.activity.text, {
     onChunk: (chunk) => {
-      stream.emit(new MessageActivity(chunk));
+      client.stream.emit(new MessageActivity(chunk));
     },
   });
 });
