@@ -19,10 +19,6 @@ uv add microsoft-teams-graph
 
 # Or install the Teams AI library with Graph support
 uv add microsoft-teams-apps[graph]
-
-# Alternative: Install with pip
-pip install microsoft-teams-graph
-pip install microsoft-teams-apps[graph]
 ```
 
 :::note
