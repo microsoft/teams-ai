@@ -35,10 +35,13 @@ Microsoft Graph can be accessed by your application using its own application to
 
 ## Basic Usage
 
-To access Microsoft Graph using a user's token, use the `get_graph_client()` function with the user's token from the activity context:
+The Teams AI SDK provides convenient properties on the activity context to access Microsoft Graph:
+
+### User Graph Client
+
+To access Microsoft Graph using a user's token, use the `user_graph` property:
 
 ```python
-from microsoft.teams.graph import get_graph_client
 from microsoft.teams.apps import App, ActivityContext
 from microsoft.teams.api import MessageActivity
 
@@ -50,101 +53,51 @@ async def handle_message(ctx: ActivityContext[MessageActivity]):
         await ctx.sign_in()
         return
 
-    # Create Graph client using user's token
-    graph = get_graph_client(ctx.user_token)
+    try:
+        # Access user's Graph data directly
+        me = await ctx.user_graph.me.get()
+        await ctx.send(f"Hello {me.display_name}!")
 
-    # Get user profile
-    me = await graph.me.get()
-    await ctx.send(f"Hello {me.display_name}!")
+        # Get user's Teams
+        teams = await ctx.user_graph.me.joined_teams.get()
+        if teams and teams.value:
+            team_names = [team.display_name for team in teams.value]
+            await ctx.send(f"You're in {len(team_names)} teams: {', '.join(team_names)}")
 
-    # Get user's Teams
-    teams = await graph.me.joined_teams.get()
-    if teams and teams.value:
-        team_names = [team.display_name for team in teams.value]
-        await ctx.send(f"You're in {len(team_names)} teams: {', '.join(team_names)}")
-```
-
-For application-level access using the app's own token, you can access the application token from the context:
-
-```python
-@app.on_message
-async def handle_message(ctx: ActivityContext[MessageActivity]):
-    # Access Graph using application token
-    app_graph = get_graph_client(ctx._app_token)
-
-    # Get application details (requires appropriate app permissions)
-    app_info = await app_graph.applications.get()
-```
-
-## Token Types
-
-The `get_graph_client()` function accepts various token formats through the flexible `Token` type:
-
-### String Token
-
-The simplest approach is passing a token string directly:
-
-```python
-from microsoft.teams.graph import get_graph_client
-
-# Direct string token
-graph = get_graph_client("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIs...")
-
-# Make Graph API calls
-me = await graph.me.get()
-```
-
-### Callable Token (Dynamic)
-
-For scenarios where tokens need to be refreshed dynamically:
-
-```python
-def get_token():
-    """Callable that returns a fresh token string."""
-    # Fetch token from your token cache, API, etc.
-    return get_access_token_from_somewhere()
-
-# Use callable with get_graph_client
-graph = get_graph_client(get_token)
-```
-
-### Async Callable Token
-
-For asynchronous token retrieval:
-
-```python
-async def get_token_async():
-    """Async callable that returns a fresh token string."""
-    # Fetch token asynchronously
-    token_response = await some_api_call()
-    return token_response.access_token
-
-# Use async callable
-graph = get_graph_client(get_token_async)
-```
-
-### Teams Context Token
-
-The most common pattern in Teams applications:
-
-```python
-@app.on_message
-async def handle_message(ctx: ActivityContext[MessageActivity]):
-    if not ctx.is_signed_in:
+    except ValueError as e:
+        await ctx.send("Please sign in to access your Microsoft Graph data.")
         await ctx.sign_in()
-        return
+    except Exception as e:
+        await ctx.send(f"An error occurred: {str(e)}")
+```
 
-    # Use the user token from context
-    graph = get_graph_client(ctx.user_token)
-    
-    # Make Graph API calls
-    me = await graph.me.get()
-    await ctx.send(f"Hello {me.display_name}!")
+### App Graph Client
+
+For application-level access using the app's own token, use the `app_graph` property:
+
+```python
+@app.on_message
+async def handle_message(ctx: ActivityContext[MessageActivity]):
+    try:
+        # Access Graph using application token
+        # (requires appropriate app permissions)
+        app_info = await ctx.app_graph.applications.get()
+        await ctx.send(f"App information retrieved successfully")
+    except ValueError as e:
+        await ctx.send("App Graph access not available")
+    except Exception as e:
+        await ctx.send(f"An error occurred: {str(e)}")
 ```
 
 ## Authentication
 
 The package uses Token-based authentication with automatic resolution through the Teams AI common library. Teams tokens are pre-authorized through the OAuth connection configured in your Azure Bot registration. The SDK handles all the authentication complexity for you.
+
+When you access `ctx.user_graph` or `ctx.app_graph`, the SDK automatically:
+- Checks for valid tokens
+- Creates the appropriate Graph client
+- Handles token refresh as needed
+- Provides proper error handling
 
 ## API Usage Examples
 
@@ -153,31 +106,53 @@ Here are some common Microsoft Graph API operations:
 ### User Profile
 
 ```python
-# Get current user profile
-me = await graph.me.get()
-print(f"User: {me.display_name}")
-print(f"Email: {me.user_principal_name}")
-print(f"Job Title: {me.job_title}")
+@app.on_message
+async def handle_message(ctx: ActivityContext[MessageActivity]):
+    if not ctx.is_signed_in:
+        await ctx.sign_in()
+        return
+
+    try:
+        # Get current user profile
+        me = await ctx.user_graph.me.get()
+        profile_info = f"""
+**Your Profile**
+Name: {me.display_name or 'N/A'}
+Email: {me.user_principal_name or 'N/A'}
+Job Title: {me.job_title or 'N/A'}
+"""
+        await ctx.send(profile_info)
+    except Exception as e:
+        await ctx.send(f"Error getting profile: {str(e)}")
 ```
 
 ### Teams Membership
 
 ```python
-# Get user's joined teams
-teams = await graph.me.joined_teams.get()
+@app.on_message
+async def handle_message(ctx: ActivityContext[MessageActivity]):
+    if not ctx.is_signed_in:
+        await ctx.sign_in()
+        return
 
-if teams and teams.value:
-    for team in teams.value:
-        print(f"Team: {team.display_name}")
+    try:
+        # Get user's joined teams
+        teams = await ctx.user_graph.me.joined_teams.get()
+        
+        if teams and teams.value:
+            team_list = "\n".join([f"• {team.display_name}" for team in teams.value])
+            await ctx.send(f"**Your Teams:**\n{team_list}")
+        else:
+            await ctx.send("You're not a member of any teams.")
+    except Exception as e:
+        await ctx.send(f"Error getting teams: {str(e)}")
 ```
 
 ## Error Handling
 
-Always handle authentication and API errors appropriately:
+The Graph properties handle most errors automatically, but you should still implement proper error handling:
 
 ```python
-from azure.core.exceptions import ClientAuthenticationError
-
 @app.on_message
 async def handle_message(ctx: ActivityContext[MessageActivity]):
     try:
@@ -185,14 +160,18 @@ async def handle_message(ctx: ActivityContext[MessageActivity]):
             await ctx.sign_in()
             return
 
-        graph = get_graph_client(ctx.user_token)
-        me = await graph.me.get()
+        me = await ctx.user_graph.me.get()
         await ctx.send(f"Hello {me.display_name}!")
 
-    except ClientAuthenticationError:
-        await ctx.send("Authentication failed. Please try signing in again.")
+    except ValueError as e:
+        # User not signed in or no token available
+        await ctx.send("Please sign in to access Microsoft Graph.")
         await ctx.sign_in()
+    except ImportError as e:
+        # Graph dependencies not installed
+        await ctx.send("Graph functionality not available. Please install the graph package.")
     except Exception as e:
+        # Other errors (API errors, network issues, etc.)
         await ctx.send(f"An error occurred: {str(e)}")
 ```
 
