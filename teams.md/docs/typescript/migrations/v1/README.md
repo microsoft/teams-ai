@@ -686,9 +686,68 @@ app.on('message', async (client) => {
 
 ### Feedback
 
-:::info
-Comparison code coming soon!
-:::
+If you supported feedback for AI generated messages, migrating is simple.
+
+<table>
+<tr>
+<td> <strong>Teams AI v1</strong> </td> <td> <strong>Teams AI v2</strong> </td>
+</tr>
+<tr>
+<td>
+
+```ts
+export const app = new Application({
+  ai: {
+    // opts into feedback loop
+    enable_feedback_loop: true
+  },
+});
+
+// Reply with message including feedback buttons
+app.activity(ActivityTypes.Message, async (context) => {
+  await context.sendActivity({
+    type: ActivityTypes.Message,
+    text: `Hey, give me feedback!`,
+    channelData: {
+      feedbackLoop: {
+          type: "custom"
+      },
+    },
+  });
+});
+
+// Handle feedback submit
+app.feedbackLoop(async (context, state, feedbackLoopData) => {
+  // custom logic here...
+});
+```
+
+</td>
+<td>
+
+```ts
+import { MessageActivity } from "@microsoft/teams.api";
+
+// Reply with message including feedback buttons
+app.on('message', async (client) => {
+  await client.send(
+    new MessageActivity("Hey, give me feedback!")
+        .addAiGenerated() // AI generated label
+        .addFeedback() // Feedback buttons
+  );
+});
+
+// Listen for feedback submissions
+app.on('message.submit.feedback', async ({ activity, log }) => {
+  // custom logic here...
+});
+```
+
+*Note:* In Teams AI v2, you do not need to opt into feedback at the `App` level.
+
+</td>
+</tr>
+</table>
 
 You can learn more about feedback in Teams AI v2 [here](../../in-depth-guides/feedback.mdx).
 
