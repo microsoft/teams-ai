@@ -97,7 +97,7 @@ teams.OnMessage("/signout", async context =>
         return;
     }
 
-    await context.SignOut(); // call `SignOut()` for your auth connection...
+    await context.SignOut();
     await context.Send("you have been signed out!");
 });
 ```
