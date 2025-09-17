@@ -89,8 +89,7 @@ const chat = await userGraph.call(users.teamwork.installedApps.chat.get, {
   "$select": ["id"],
 });
 ```
-
-Here, the client takes care of using the correct token, provides helpful hints via intellisense, and performs the fetch request for you.
+Graph APIs often accept arguments that may go into the URL path, the query string, or the request body. As illustrated in this example, all arguments are provided as a second parameter to the `graph.call` method. The graph client puts each value in its place and attaches an authentication token as the request is constructed, and performs the fetch request for you.
 
 ## Graph Preview APIs
 The Graph Preview APIs are not recommended for production use. However, if you have a need to explore preview APIs, the `@microsoft/teams.graph-endpoints-beta` package makes it easy. 
@@ -119,7 +118,7 @@ For instance, this will `GET https://graph.microsoft.com/beta/me?$select=display
 ```ts
 import { type EndpointRequest } from '@microsoft/teams.graph';
 
-const getMyaDisplayName = (): EndpointRequest<{ displayName: string }> => ({
+const getMyDisplayName = (): EndpointRequest<{ displayName: string }> => ({
   ver: 'beta',                  // use the beta endpoint; defaults to 'v1.0' if omitted
   method: 'get',                // HTTP method to use
   path: '/me',                  // endpoint path
