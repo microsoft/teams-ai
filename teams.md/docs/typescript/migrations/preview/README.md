@@ -18,7 +18,7 @@ The first step in the migration is to install the `@microsoft/teams.graph-endpoi
 This package is installed just like any other NPM package, using your package manager of choice. For instance:
 
 ```sh
-npm install @microsoft/teams.graph-endpoints@preview
+npm install @microsoft/teams.graph-endpoints
 ```
 
 ### Updating code
