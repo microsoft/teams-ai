@@ -84,7 +84,7 @@ teams.OnMessage(async context =>
 });
 ```
 
-## Singing Out
+## Signing Out
 
 You can signout by calling the `signout` method, this will remove the token from the User Token service cache
 
