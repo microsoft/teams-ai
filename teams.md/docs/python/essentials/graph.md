@@ -60,9 +60,6 @@ async def handle_message(ctx: ActivityContext[MessageActivity]):
             team_names = [team.display_name for team in teams.value]
             await ctx.send(f"You're in {len(team_names)} teams: {', '.join(team_names)}")
 
-    except ValueError as e:
-        await ctx.send("Please sign in to access your Microsoft Graph data.")
-        await ctx.sign_in()
     except Exception as e:
         await ctx.send(f"An error occurred: {str(e)}")
 ```
