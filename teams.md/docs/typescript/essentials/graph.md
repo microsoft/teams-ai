@@ -131,7 +131,7 @@ const getMyaDisplayName = (): EndpointRequest<{ displayName: string }> => ({
   },
 });
 
-const { displayName } = await graph.call(getMyDisplayName);
+const { displayName } = await app.graph.call(getMyDisplayName);
 ```
 
 
