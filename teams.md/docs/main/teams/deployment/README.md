@@ -10,7 +10,7 @@ As described in the [Core Concepts](../core-concepts) article, the first step yo
 ## Requirements
 
 1. An Azure subscription
-2. Permissions to create Entra ID App registrations. (If you don't have permissions in your tenant, ask your admin to create the App Registration)
+2. Permissions to create Entra ID App registrations. (If you don't have permissions in your tenant, ask your admin to create the App Registration and share the `Application Id`)
 3. Permissions to create Azure Bot Service resources
 4. (Optional) The [Azure CLI](https://aka.ms/azcli) installed and authenticated to your Azure subscription
 
@@ -24,13 +24,14 @@ After a successful App Registration you should have the `TenantId`, `ClientId` a
 
 #### Create the Entra App Id Registration using the Azure CLI
 
-```sh
+```bash
 #!/bin/bash
+
 botName="My App"
 appId=$(az ad app create --display-name $botName --sign-in-audience "AzureADMyOrg" --query appId -o tsv)
 appCred=$(az ad app credential reset --id $appId)
 tenantId=$(echo $appCred | jq -r '.tenant')
-appSecret=$(echo $appCred | jq -r '.password')
+clientSecret=$(echo $appCred | jq -r '.password')
 ```
 
 ### Create the Azure Bot Service resource
@@ -53,6 +54,7 @@ To run this script, make sure you initialize the variables `resourceGroup`, `ten
 
 ```bash
 #!/bin/bash
+
 az bot create \
    --name $botName \
    --app-type SingleTenant \
