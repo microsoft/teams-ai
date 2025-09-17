@@ -4,8 +4,6 @@
 
 Teams AI Library v2 represents a fundamental reimagining of how Teams apps and AI agents are built, while maintaining compatibility with existing botframework-based agents. This new version focuses on developer experience, simplified architecture, and enhanced AI capabilities.
 
-For a detailed explanation of the motivations and architectural decisions behind v2, please see our [WHY.md](./WHY.md) document.
-
 ### Quick start
 
 The Teams CLI makes it easy to bootstrap your first agent. First, install the CLI via NPM:
@@ -62,6 +60,14 @@ This repository contains submodules that point to dedicated repositories for dif
 - [Python](https://github.com/microsoft/teams.py)
 
 For language-specific bugs or issues, please use the Issues tab in the respective language repository.
+
+## Important: v1 to v2 Transition Notice
+
+**This repository has transitioned from v1 to v2 as the main branch.**
+
+- **v1 code location:** Preserved on [`release/v1`](https://github.com/microsoft/teams-ai/tree/release/v1) branch
+
+
 
 ## Documentation
 
