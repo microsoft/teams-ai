@@ -57,7 +57,7 @@ teams config add atk.oauth
 This will add relevant Agents Toolkit files to your project.
 
 :::tip
-See [App Setup](./setup#using-m365-agents-toolkit-with-the-teams-cli) to learn more about what this command does.
+See [App Setup](./setup#using-microsoft-365-agents-toolkit-with-the-teams-cli) to learn more about what this command does.
 :::
 
 ## Interacting with the app in Teams

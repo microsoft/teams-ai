@@ -24,7 +24,7 @@ teams new (typescript|csharp) quote-agent --template echo
 
 ## Overview
 
-Microsoft Teams has a robust developer ecosystem with a broad suite of capabilities, now unified via Teams AI v2. Whether you are building [AI-powered agents](/typescript/in-depth-guides/ai), [message extensions](/typescript/in-depth-guides/message-extensions), embedded web applications, or Graph, Teams AI v2 has you covered.
+Microsoft Teams has a robust developer ecosystem with a broad suite of capabilities, now unified via Teams AI library v2. Whether you are building [AI-powered agents](/typescript/in-depth-guides/ai), [message extensions](/typescript/in-depth-guides/message-extensions), embedded web applications, or Graph, Teams AI library v2 has you covered.
 
 ## ⭐ What's new?
 

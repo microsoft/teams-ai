@@ -1,7 +1,14 @@
 # Welcome to the Teams AI Library v2
 
+<<<<<<< HEAD
 > \[!CAUTION]
 > **PREVIEW VERSION** This is a preview version of the Teams AI Library v2. While we will do our best to avoid breaking changes, some breaking changes should be expected until the first major version.
+=======
+> [!IMPORTANT] 
+> **V2 PREVIEW:** We recently released a preview of our Teams AI Library v2 in Typescript! Navigate to [branch main](https://github.com/microsoft/teams-ai/tree/main) and view our [blog post](https://devblogs.microsoft.com/microsoft365dev/announcing-the-updated-teams-ai-library-and-mcp-support/) for more information.
+
+[![Coverage Status](https://coveralls.io/repos/github/microsoft/teams-ai/badge.svg?branch=main)](https://coveralls.io/github/microsoft/teams-ai?branch=main)
+>>>>>>> main
 
 ## Overview
 
@@ -34,18 +41,19 @@ Here is a simple example, which responds to incoming messages with information r
 ```typescript
 import { App } from '@microsoft/teams.apps';
 import { DevtoolsPlugin } from '@microsoft/teams.dev';
+import * as endpoints from '@microsoft/teams.graph-endpoints';
 
 const app = new App({
   plugins: [new DevtoolsPlugin()],
 });
 
 // Listen for incoming messages
-app.on('message', async ({ api, isSignedIn, send, signin }) => {
+app.on('message', async ({ userGraph, isSignedIn, send, signin }) => {
   if (!isSignedIn) {
     await signin(); // initiates Entra login flow
     return;
   }
-  const me = await api.user.me.get();
+  const me = await userGraph.call(endpoints.me.get); 
   await send(`Hello, ${me.displayName} from Earth!`);
 });
 

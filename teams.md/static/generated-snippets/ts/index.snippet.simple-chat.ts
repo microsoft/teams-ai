@@ -1,4 +1,4 @@
-app.on('message', async ({ send, activity, next }) => {
+app.on('message', async ({ send, activity, next, log }) => {
   const model = new OpenAIChatModel({
     apiKey: process.env.AZURE_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
     endpoint: process.env.AZURE_OPENAI_ENDPOINT,

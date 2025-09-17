@@ -6,3 +6,7 @@
 	path = teams.ts
 	url = https://github.com/microsoft/teams.ts
 	branch = main
+[submodule "teams.py"]
+	path = teams.py
+	url = https://github.com/microsoft/teams.py
+	branch = main

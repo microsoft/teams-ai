@@ -23,14 +23,100 @@ To avoid this, you need to get messages from your persistent (or in-memory) stor
 The `ChatPrompt` class will modify the messages object that's passed into it. So if you want to manually manage it, you need to make a copy of the messages object before passing it in.
 :::
 
-<FileCodeBlock
-    lang="typescript"
-    src="/generated-snippets/ts/stateful-prompts.snippet.stateful-prompts-state-initialization.ts"
-/>
+```csharp
+using Microsoft.Teams.AI;
+using Microsoft.Teams.AI.State;
+using Microsoft.Bot.Schema;
 
-<FileCodeBlock
-    lang="typescript"
-    src="/generated-snippets/ts/stateful-prompts.snippet.stateful-prompts-example.ts"
-/>
+// State initialization - Define your conversation state
+public class ConversationState
+{
+    public List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
+    public string ConversationId { get; set; } = string.Empty;
+}
+
+// Initialize state management
+public class StateManager
+{
+    private readonly Dictionary<string, ConversationState> _conversations = new();
+
+    public ConversationState GetOrCreateConversation(string conversationId)
+    {
+        if (!_conversations.ContainsKey(conversationId))
+        {
+            _conversations[conversationId] = new ConversationState
+            {
+                ConversationId = conversationId
+            };
+        }
+        return _conversations[conversationId];
+    }
+
+    public void SaveConversation(ConversationState state)
+    {
+        _conversations[state.ConversationId] = state;
+    }
+}
+```
+
+```csharp
+using Microsoft.Teams.AI;
+using Microsoft.Teams.AI.Models.OpenAI;
+
+// Stateful conversation management example
+public class StatefulChatHandler
+{
+    private readonly StateManager _stateManager;
+    private readonly OpenAIChatModel _model;
+
+    public StatefulChatHandler(StateManager stateManager, OpenAIChatModel model)
+    {
+        _stateManager = stateManager;
+        _model = model;
+    }
+
+    public async Task<string> HandleMessageAsync(string conversationId, string userMessage)
+    {
+        // Get conversation state
+        var conversationState = _stateManager.GetOrCreateConversation(conversationId);
+
+        // Add user message to conversation history
+        conversationState.Messages.Add(new ChatMessage
+        {
+            Role = "user",
+            Content = userMessage
+        });
+
+        // Create a copy of messages for the prompt (to avoid modification)
+        var messagesCopy = conversationState.Messages.ToList();
+
+        // Create prompt with conversation history
+        var prompt = new ChatPrompt(
+            systemMessage: "You are a helpful assistant that remembers our conversation.",
+            messages: messagesCopy
+        );
+
+        // Generate response
+        var response = await _model.CompletePromptAsync(context, memory, functions, tokenizer, template);
+
+        // Add assistant response to conversation history
+        if (response.Message?.Content != null)
+        {
+            conversationState.Messages.Add(new ChatMessage
+            {
+                Role = "assistant",
+                Content = response.Message.Content
+            });
+
+            // Save updated state
+            _stateManager.SaveConversation(conversationState);
+
+            return response.Message.Content;
+        }
+
+        return "I'm sorry, I couldn't generate a response.";
+    }
+}
+```
 
 ![Stateful Chat Example](/screenshots/stateful-chat-example.png)
