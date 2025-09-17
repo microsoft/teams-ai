@@ -27,8 +27,10 @@ After a successful App Registration you should have the `TenantId`, `ClientId` a
 ```sh
 #!/bin/bash
 botName="My App"
-appId=(az ad app create --display-name $botName --sign-in-audience "AzureADMyOrg" --query appId)
-appSecret=az ad app credential reset --id $appId
+appId=$(az ad app create --display-name $botName --sign-in-audience "AzureADMyOrg" --query appId -o tsv)
+appCred=$(az ad app credential reset --id $appId)
+tenantId=$(echo $appCred | jq -r '.tenant')
+appSecret=$(echo $appCred | jq -r '.password')
 ```
 
 ### Create the Azure Bot Service resource
