@@ -1,0 +1,144 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - dotnet
+    - pipelines/dotnet.yml
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  package: 'dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/Microsoft.Teams.AI.csproj'
+  folderPath: 'dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI'
+  appRegistrationTenantId: 'cdc5aeea-15c5-4db6-b079-fcadd2505dc2'
+  authenticodeSignId: '2d5c4ab9-0b7e-4f60-bb92-70322df77b94'
+  nugetSignId: 'a94a770a-9a7b-4888-a3ea-24584b851e49'
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    version: '8.x'
+    includePreviewVersions: true
+
+- task: DotNetCoreCLI@2
+  displayName: 'Restore'
+  inputs:
+    command: restore
+    projects: '$(package)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build'
+  inputs:
+    command: build
+    projects: '$(package)'
+    arguments: '--configuration $(buildConfiguration) --no-incremental --no-restore'
+
+- task: EsrpCodeSigning@5
+  displayName: "Authenticode Sign dll"
+  inputs:
+    ConnectedServiceName: 'TeamsESRP-CP-230012'
+    AppRegistrationTenantId: '$(appRegistrationTenantId)'
+    AppRegistrationClientId: '$(authenticodeSignId)'
+    AuthSignCertName: '$(authenticodeSignId)'
+    EsrpClientId: '$(authenticodeSignId)'
+    AuthAKVName: esrp-teams
+    UseMSIAuthentication: true
+    FolderPath: '$(folderPath)'
+    Pattern: |
+      bin/Release/**/Microsoft*Teams*AI*.dll
+    UseMinimatch: true
+    signConfigType: 'inlineSignParams'
+    inlineOperation: |
+      [
+        {
+            "KeyCode": "CP-230012",
+            "OperationCode": "SigntoolSign",
+            "Parameters": {
+                "OpusName": "Microsoft",
+                "OpusInfo": "http://www.microsoft.com",
+                "FileDigest": "/fd \"SHA256\"",
+                "PageHash": "/NPH",
+                "TimeStamp": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
+            },
+            "ToolName": "sign",
+            "ToolVersion": "1.0"
+        },
+        {
+          "KeyCode": "CP-230012",
+          "OperationCode": "SigntoolVerify",
+          "Parameters": {},
+          "ToolName": "sign",
+          "ToolVersion": "1.0"
+        }
+      ]
+    SessionTimeout: '60'
+    MaxConcurrency: '50'
+    MaxRetryAttempts: '5'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Pack'
+  inputs:
+    command: pack
+    packagesToPack: '$(package)'
+    packDestination: '$(Build.ArtifactStagingDirectory)'
+    includeSymbols: true
+    nobuild: true
+    configuration: '$(buildConfiguration)'
+
+- task: EsrpCodeSigning@5
+  displayName: 'Sign Nuget package'
+  inputs:
+    ConnectedServiceName: 'TeamsESRP-CP-401405'
+    AppRegistrationTenantId: '$(appRegistrationTenantId)'
+    AppRegistrationClientId: '$(nugetSignId)'
+    AuthSignCertName: '$(nugetSignId)'
+    EsrpClientId: '$(nugetSignId)'
+    AuthAKVName: esrp-teams
+    UseMSIAuthentication: true
+    FolderPath: '$(Build.ArtifactStagingDirectory)'
+    Pattern: '*.nupkg'
+    UseMinimatch: true
+    signConfigType: 'inlineSignParams'
+    inlineOperation: |
+      [
+          {
+            "KeyCode": "CP-401405",
+            "OperationCode": "NuGetSign",
+            "ToolName": "sign",
+            "ToolVersion": "1.0",
+            "Parameters": {}
+          },
+          {
+              "KeyCode": "CP-401405",
+              "OperationCode": "NuGetVerify",
+              "Parameters": {},
+              "ToolName": "sign",
+              "ToolVersion": "1.0"
+          }
+      ]
+    SessionTimeout: '20'
+    MaxConcurrency: '50'
+    MaxRetryAttempts: '5'
+    PendingAnalysisWaitTimeoutMinutes: '5'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    PathToPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: Packages
+
+- task: NuGetAuthenticate@1
+  displayName: 'Azure NuGet Authenticate'
+
+- task: NuGetCommand@2
+  displayName: 'Azure NuGet Push'
+  inputs:
+    command: push
+    publishVstsFeed: 'Github_Pipelines/Teams'
+    allowPackageConflicts: true
+    includeNugetOrg: true
