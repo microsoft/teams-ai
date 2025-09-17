@@ -5,7 +5,7 @@
 > **PREVIEW VERSION** This is a preview version of the Teams AI Library v2. While we will do our best to avoid breaking changes, some breaking changes should be expected until the first major version.
 =======
 > [!IMPORTANT] 
-> **V2 PREVIEW:** We recently released a preview of our Teams AI Library v2 in Typescript! Navigate to [branch v2-preview](https://github.com/microsoft/teams-ai/tree/v2-preview) and view our [blog post](https://devblogs.microsoft.com/microsoft365dev/announcing-the-updated-teams-ai-library-and-mcp-support/) for more information.
+> **V2 PREVIEW:** We recently released a preview of our Teams AI Library v2 in Typescript! Navigate to [branch main](https://github.com/microsoft/teams-ai/tree/main) and view our [blog post](https://devblogs.microsoft.com/microsoft365dev/announcing-the-updated-teams-ai-library-and-mcp-support/) for more information.
 
 [![Coverage Status](https://coveralls.io/repos/github/microsoft/teams-ai/badge.svg?branch=main)](https://coveralls.io/github/microsoft/teams-ai?branch=main)
 >>>>>>> main

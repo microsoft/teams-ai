@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - v2-preview
+      - main
     paths:
       - 'teams.md/**'
       - .github/workflows/deploy-teams-docs.yml

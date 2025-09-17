@@ -48,7 +48,7 @@ const config: Config = {
                     path: 'docs/main',
                     sidebarPath: './sidebars.ts',
                     sidebarCollapsed: false,
-                    editUrl: 'https://github.com/microsoft/teams-ai/tree/v2-preview/teams.md/',
+                    editUrl: 'https://github.com/microsoft/teams-ai/tree/main/teams.md/',
                 },
                 theme: {
                     customCss: ['./src/css/custom.css', './src/css/code-blocks.css'],
@@ -66,7 +66,7 @@ const config: Config = {
                 routeBasePath: '/typescript',
                 sidebarPath: './sidebars.ts',
                 sidebarCollapsed: true,
-                editUrl: 'https://github.com/microsoft/teams-ai/tree/v2-preview/teams.md/',
+                editUrl: 'https://github.com/microsoft/teams-ai/tree/main/teams.md/',
             } satisfies Partial<DocsPlugin.PluginOptions>,
         ],
         [
@@ -77,7 +77,7 @@ const config: Config = {
                 routeBasePath: '/csharp',
                 sidebarPath: './sidebars.ts',
                 sidebarCollapsed: true,
-                editUrl: 'https://github.com/microsoft/teams-ai/tree/v2-preview/teams.md/',
+                editUrl: 'https://github.com/microsoft/teams-ai/tree/main/teams.md/',
             } satisfies Partial<DocsPlugin.PluginOptions>,
         ],
         [
@@ -88,7 +88,7 @@ const config: Config = {
                 routeBasePath: '/python',
                 sidebarPath: './sidebars.ts',
                 sidebarCollapsed: true,
-                editUrl: 'https://github.com/microsoft/teams-ai/tree/v2-preview/teams.md/',
+                editUrl: 'https://github.com/microsoft/teams-ai/tree/main/teams.md/',
             } satisfies Partial<DocsPlugin.PluginOptions>,
         ],
     ],
@@ -143,7 +143,7 @@ const config: Config = {
                     position: 'right',
                 },
                 {
-                    href: 'https://github.com/microsoft/teams-ai/tree/v2-preview',
+                    href: 'https://github.com/microsoft/teams-ai/tree/main',
                     position: 'right',
                     className: 'header-github-link',
                 },
@@ -182,11 +182,11 @@ const config: Config = {
                     items: [
                         {
                             label: 'GitHub',
-                            href: 'https://github.com/microsoft/teams-ai/tree/v2-preview',
+                            href: 'https://github.com/microsoft/teams-ai/tree/main',
                         },
                         {
                             label: 'Contributing',
-                            href: 'https://github.com/microsoft/teams-ai/blob/v2-preview/CONTRIBUTING.md',
+                            href: 'https://github.com/microsoft/teams-ai/blob/main/CONTRIBUTING.md',
                         },
                         {
                             label: 'Blog',
