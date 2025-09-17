@@ -31,7 +31,7 @@ Microsoft Graph can be accessed by your application using its own application to
 
 ## Basic Usage
 
-The Teams AI SDK provides convenient properties on the activity context to access Microsoft Graph. Under the hood, these properties wrap the official [Microsoft Graph SDK for Python](https://github.com/microsoftgraph/msgraph-sdk-python), handling authentication and providing easy access to Graph APIs.
+The Teams AI SDK provides convenient properties on the activity context to access Microsoft Graph. We wrap the official [Microsoft Graph SDK for Python](https://github.com/microsoftgraph/msgraph-sdk-python), handling authentication and providing easy access to Graph APIs.
 
 ### User Graph Client
 
