@@ -90,8 +90,15 @@ Save it in the `index.html` file in the same folder as where your app is initial
 
 You can serve it by adding the following code to your app:
 
-```python
-app.page("settings", str(Path(__file__).parent), "/tabs/settings")
+```csharp
+// In your startup configuration (Program.cs or Startup.cs)
+app.UseStaticFiles();
+app.MapGet("/tabs/settings", async context =>
+{
+    var html = await File.ReadAllTextAsync("wwwroot/settings.html");
+    context.Response.ContentType = "text/html";
+    await context.Response.WriteAsync(html);
+});
 ```
 
 :::note
@@ -102,48 +109,92 @@ This will serve the HTML page to the `${BOT_ENDPOINT}/tabs/settings` endpoint as
 
 To enable the settings page, your app needs to handle the `message.ext.query-settings-url` activity that Teams sends when a user right-clicks the app in the compose box. Your app must respond with the URL to your settings page. Here's how to implement this:
 
-```python
-@app.on_message_ext_query_settings_url
-async def handle_message_ext_query_settings_url(ctx: ActivityContext[MessageExtensionQuerySettingUrlInvokeActivity]):
-    user_settings = {"selectedOption": ""}
-    escaped_selected_option = user_settings["selectedOption"]
+```csharp
+using Microsoft.Teams.Api.Cards;
+using Microsoft.Teams.Cards;
 
-    bot_endpoint = os.environ.get("BOT_ENDPOINT", "")
+[MessageExtension.QuerySettingsUrl]
+public Microsoft.Teams.Api.MessageExtensions.Response OnMessageExtensionQuerySettingsUrl(
+    [Context] Microsoft.Teams.Api.Activities.Invokes.MessageExtensions.QuerySettingsUrlActivity activity,
+    [Context] IContext.Client client,
+    [Context] Microsoft.Teams.Common.Logging.ILogger log)
+{
+    log.Info("[MESSAGE_EXT_QUERY_SETTINGS_URL] Settings URL query received");
 
-    settings_action = CardAction(
-        type=CardActionType.OPEN_URL,
-        title="Settings",
-        value=f"{bot_endpoint}/tabs/settings?selectedOption={escaped_selected_option}",
-    )
+    // Get user settings (this could come from a database or user store)
+    var selectedOption = ""; // Default or retrieve from user preferences
+    
+    var botEndpoint = Environment.GetEnvironmentVariable("BOT_ENDPOINT") ?? "https://your-bot-endpoint.com";
+    var settingsUrl = $"{botEndpoint}/tabs/settings?selectedOption={Uri.EscapeDataString(selectedOption)}";
 
-    suggested_actions = MessagingExtensionSuggestedAction(actions=[settings_action])
+    var settingsAction = new CardAction
+    {
+        Type = CardActionType.OpenUrl,
+        Title = "Settings",
+        Value = settingsUrl
+    };
 
-    result = MessagingExtensionResult(type=MessagingExtensionResultType.CONFIG, suggested_actions=suggested_actions)
+    var suggestedActions = new Microsoft.Teams.Api.MessageExtensions.SuggestedActions
+    {
+        Actions = new List<CardAction> { settingsAction }
+    };
 
-    return MessagingExtensionInvokeResponse(compose_extension=result)
+    var result = new Microsoft.Teams.Api.MessageExtensions.Result
+    {
+        Type = Microsoft.Teams.Api.MessageExtensions.ResultType.Config,
+        SuggestedActions = suggestedActions
+    };
+
+    return new Microsoft.Teams.Api.MessageExtensions.Response
+    {
+        ComposeExtension = result
+    };
+}
 ```
 
 ## 4. Handle Form Submission
 
 When a user submits the settings form, Teams sends a `message_ext_setting` activity with the selected option in the `activity.value.state` property. Handle it to save the user's selection:
 
-```python
-@app.on_message_ext_setting
-async def handle_message_ext_setting(ctx: ActivityContext[MessageExtensionSettingInvokeActivity]):
-    state = getattr(ctx.activity.value, "state", None)
+```csharp
+[MessageExtension.Setting]
+public Microsoft.Teams.Api.MessageExtensions.Response OnMessageExtensionSetting(
+    [Context] Microsoft.Teams.Api.Activities.Invokes.MessageExtensions.SettingActivity activity,
+    [Context] IContext.Client client,
+    [Context] Microsoft.Teams.Common.Logging.ILogger log)
+{
+    log.Info("[MESSAGE_EXT_SETTING] Settings submission received");
 
-    if state == "CancelledByUser":
-        result = MessagingExtensionResult(
-            type=MessagingExtensionResultType.RESULT, attachment_layout=AttachmentLayout.LIST, attachments=[]
-        )
-        return MessagingExtensionInvokeResponse(compose_extension=result)
+    var state = activity.Value?.State;
+    log.Info($"[MESSAGE_EXT_SETTING] State: {state}");
 
-    selected_option = state
-    await ctx.send(f"Selected option: {selected_option}")
+    if (state == "CancelledByUser")
+    {
+        log.Info("[MESSAGE_EXT_SETTING] User cancelled settings");
+        return CreateEmptyResult();
+    }
 
-    result = MessagingExtensionResult(
-        type=MessagingExtensionResultType.RESULT, attachment_layout=AttachmentLayout.LIST, attachments=[]
-    )
+    var selectedOption = state;
+    log.Info($"[MESSAGE_EXT_SETTING] Selected option: {selectedOption}");
 
-    return MessagingExtensionInvokeResponse(compose_extension=result)
+    // Here you would typically save the user's settings to a database or user store
+    // SaveUserSettings(activity.From.Id, selectedOption);
+
+    // Return empty result to close the settings dialog
+    return CreateEmptyResult();
+}
+
+// Helper method to create empty result
+private static Microsoft.Teams.Api.MessageExtensions.Response CreateEmptyResult()
+{
+    return new Microsoft.Teams.Api.MessageExtensions.Response
+    {
+        ComposeExtension = new Microsoft.Teams.Api.MessageExtensions.Result
+        {
+            Type = Microsoft.Teams.Api.MessageExtensions.ResultType.Result,
+            AttachmentLayout = Microsoft.Teams.Api.Attachment.Layout.List,
+            Attachments = new List<Microsoft.Teams.Api.MessageExtensions.Attachment>()
+        }
+    };
+}
 ```
