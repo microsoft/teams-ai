@@ -23,7 +23,7 @@ Use the Teams AI v2 dev package as a plugin.
 Add the dev package to your Teams app.
 
 ```bash
-$: npm install @microsoft/teams.dev@preview
+$: npm install @microsoft/teams.dev
 ```
 
 ### Usage

@@ -22,7 +22,7 @@ Use your terminal to install the Teams CLI globally using npm:
 
 
 ```sh
-npm install -g @microsoft/teams.cli@preview
+npm install -g @microsoft/teams.cli
 ```
 
 
