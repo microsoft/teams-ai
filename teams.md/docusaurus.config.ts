@@ -113,7 +113,7 @@ const config: Config = {
             backgroundColor: '#515cc6',
             isCloseable: true,
             textColor: '#fff',
-            content: '🎉️ Teams AI v2.0.0 is out! 🥳️',
+            content: '🎉️ Teams AI v2 is out! 🥳️',
         },
         navbar: {
             title: 'Teams AI (v2)',
