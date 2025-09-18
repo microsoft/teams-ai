@@ -104,11 +104,12 @@ If you want to monitor the activities and events in your app, you can still use 
 
 ## Troubleshooting
 
-For deployment and resource management we recommend the Microsoft 365 Agents Toolkit. If you prefer to set everything up by hand, follow the standard [Teams app documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-publish-overview). The Teams AI library itself doesn't handle deployment or Azure resources, so you'll need to rely on the general [Microsoft Teams deployment documentation](https://learn.microsoft.com/en-us/microsoftteams/deploy-overview).
+For deployment and resource management we recommend the Microsoft 365 Agents Toolkit. Refer to our [Deployment guide](./deployment-guide.md) for common scenarios and potential issues. 
+If you prefer to set everything up by hand, follow the standard [Teams app documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-publish-overview). The Teams AI library itself doesn't handle deployment or Azure resources, so you'll need to rely on the general [Microsoft Teams deployment documentation](https://learn.microsoft.com/en-us/microsoftteams/deploy-overview) for in-depth help.
 
 ## Next steps
 
-Now that your agent is running in Teams, you can learn more [essential concepts](../essentials) to understand how to build more complex agents. Explore the [in-depth guides](../in-depth-guides) for advanced topics like authentication, message extensions, and more.
+Now that your agent is running in Teams, you can learn more [essential concepts](../../essentials) to understand how to build more complex agents. Explore the [in-depth guides](../../in-depth-guides) for advanced topics like authentication, message extensions, and more.
 
 ## Resources
 
