@@ -10,49 +10,42 @@ We cover the most common setup and deployment steps for testing in teams, includ
 
 ### User Assigned Managed Identity
 
-This section demonstrates how to configure authentication in your application using a **User Assigned Managed Identity** in Azure. If you are using `msaAppType: 'UserAssignedMSI'` for the Azure Bot Service, for example the C# atk.basic configuration while deploying in Azure.
+This section demonstrates how to configure authentication in your application using a **User Assigned Managed Identity** in Azure. You will require this setup if you have `msaAppType: 'UserAssignedMSI'` for the Azure Bot Service (required in dev env generally).
 
-Replace
-```typescript
-const app = new App({
-  plugins: [new DevtoolsPlugin()],
-});
+In your `main.py`, replace the initialization:
+```python
+app = App(plugins=[DevToolsPlugin()])
 ```
-with in your index.ts .
+with the following code to enable User Assigned Managed Identity authentication: 
+```python
+# Create token factory function for Azure Identity
+def create_token_factory():
+    def get_token(scopes, tenant_id=None):
+        credential = ManagedIdentityCredential(client_id=os.environ.get("CLIENT_ID"))
+        if isinstance(scopes, str):
+            scopes_list = [scopes]
+        else:
+            scopes_list = scopes
+        token = credential.get_token(*scopes_list)
+        return token.token
+    return get_token
 
-```typescript
-// Create token factory function for Azure Identity
-const createTokenFactory = () => {
-  return async (scope: string | string[], tenantId?: string): Promise<string> => {
-    const managedIdentityCredential = new ManagedIdentityCredential({
-        clientId: process.env.CLIENT_ID
-      });
-    const scopes = Array.isArray(scope) ? scope : [scope];
-    const tokenResponse = await managedIdentityCredential.getToken(scopes, {
-      tenantId: tenantId
-    });
-   
-    return tokenResponse.token;
-  };
-};
-
-// Configure authentication using TokenCredentials
-const tokenCredentials: TokenCredentials = {
-  clientId: process.env.CLIENT_ID || '',
-  token: createTokenFactory()
-};
-
-const app = new App({
-  ...tokenCredentials,
-  plugins: [new DevtoolsPlugin()],
-});
+app = App(
+    token=create_token_factory(),
+    plugins=[DevtoolsPlugin()]
+)
 ```
+The `create_token_factory` function provides a method to retrieve access tokens from Azure on demand, and `token_credentials` passes this method to the app.  
 
 ### Missing Service Principal in the Tenant
 
-This error occurs when the application has a single-tenant Azure Bot Service instance, but your app registration has not yet been linked to a Service Principal in the tenant.  
+This error occurs when the application has a single-tenant Azure Bot Service (`msaAppType: 'SingleTenant'`) instance, but your app registration has not yet been linked to a Service Principal in the tenant.  
 
-![Service Principal Error](/screenshots/service-principal-error.png)  
+```sh
+```
+[ERROR] @teams/app Failed to refresh bot token: Client error '401 Unauthorized' for url 'https://login.microsoftonline.com/50612dbb-0237-4969-b378-8d42590f9c00/oauth2/v2.0/token'
+[ERROR] @teams/app For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+```
 
 1. **Sign in to Azure Portal**  
    Go to [https://portal.azure.com](https://portal.azure.com) and log in with your Azure account.
@@ -66,7 +59,7 @@ This error occurs when the application has a single-tenant Azure Bot Service ins
    Open the app registration and verify if a Service Principal is created. If it exists already, you should see an entry for a **Managed Application in your local directory** if it exists.
     ![Existing Service Principal](/screenshots/existing-service-principal.png)
 5. **Create a Service Principal if missing**  
-   If it doesn’t exist, click **Create Service Principal** . Wait for the page to load.
+   If it doesn’t exist, click **Create Service Principal** . Wait for the page to finish loading.
    ![Create Service Principal](/screenshots/create-service-principal.png)
 6. **Restart your app**  
    Once the Service Principal is created, restart your application.
