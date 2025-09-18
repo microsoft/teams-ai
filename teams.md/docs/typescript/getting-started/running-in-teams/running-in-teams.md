@@ -6,7 +6,7 @@ llms: ignore
 
 # Running In Teams
 
-Now that you completed [the quickstart](quickstart) and your agent is running locally, let's deploy it to Microsoft Teams for testing. This guide will walk you through the process.
+Now that you completed [the quickstart](../quickstart) and your agent is running locally, let's deploy it to Microsoft Teams for testing. This guide will walk you through the process.
 
 ## Microsoft 365 Agents Toolkit
 
