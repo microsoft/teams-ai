@@ -22,7 +22,7 @@ Use your terminal to install the Teams CLI globally using npm:
 
 
 ```sh
-npm install -g @microsoft/teams.cli@preview
+npm install -g @microsoft/teams.cli
 ```
 
 
@@ -30,15 +30,6 @@ npm install -g @microsoft/teams.cli@preview
 _The [Teams CLI](/developer-tools/cli) is a command-line tool that helps you create and manage Teams applications. It provides a set of commands to simplify the development process._<br /><br />
 After installation, you can run `teams --version` to verify the installation.
 :::
-
-:::warning
-Our Python SDK is currently in Public Preview. As a result, we have the CLI under a feature flag.
-Please run the below command to enable this language.
-:::
-
-```sh
-$env:ENABLE_EXPERIMENTAL_PYTHON_OPTIONS = 1
-```
 
 ## Creating Your First Agent
 
@@ -48,7 +39,6 @@ Let's create a simple echo agent that responds to messages. Run:
 ```sh
 teams new python quote-agent --template echo
 ```
-
 
 This command:
 
@@ -61,7 +51,6 @@ This command:
 ## Running your agent
 
 Navigate to your new agent's directory:
-
 
 ```sh
 cd quote-agent

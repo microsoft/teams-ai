@@ -72,13 +72,14 @@ public class WeatherPrompt(IContext.Accessor accessor)
 ```csharp
 using Microsoft.Teams.AI.Models.OpenAI.Extensions;
 using Microsoft.Teams.Apps.Extensions;
+using Microsoft.Teams.Plugins.AspNetCore.DevTools.Extensions;
 using Microsoft.Teams.Plugins.AspNetCore.Extensions;
 
 using WeatherApp;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSingleton<Controller>();
-builder.AddTeams().AddOpenAI<WeatherPrompt>();
+builder.Services.AddTransient<Controller>();
+builder.AddTeams().AddTeamsDevTools().AddOpenAI<WeatherPrompt>();
 
 var app = builder.Build();
 
@@ -98,18 +99,15 @@ using Microsoft.Teams.Apps.Annotations;
 
 namespace WeatherApp;
 
-[TeamsController]
-public class Controller(OpenAIChatPrompt<WeatherPrompt> prompt)
+[TeamsController("main")]
+public class Controller(Func<OpenAIChatPrompt> prompt)
 {
     [Message]
     public async Task OnMessage(IContext<MessageActivity> context)
     {
-        var state = State.From(context);
-
-        await prompt.Send(context.Activity.Text, new() { Messages = state.Messages },
-            cancellationToken: context.CancellationToken);
-
-        state.Save(context);
+        // Send the user's message to the prompt and stream the response back
+        await prompt().Send(context.Activity.Text, null, 
+            (chunk) => Task.Run(() => context.Stream.Emit(chunk)));
     }
 }
 ```

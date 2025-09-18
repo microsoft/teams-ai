@@ -78,6 +78,7 @@ const config: Config = {
                 sidebarPath: './sidebars.ts',
                 sidebarCollapsed: true,
                 editUrl: 'https://github.com/microsoft/teams-ai/tree/main/teams.md/',
+                exclude: ["**/observability/*", "**/tabs/*"]
             } satisfies Partial<DocsPlugin.PluginOptions>,
         ],
         [
@@ -113,7 +114,7 @@ const config: Config = {
             backgroundColor: '#515cc6',
             isCloseable: true,
             textColor: '#fff',
-            content: '🎉️ Teams AI v2.0.0-preview is out! 🥳️',
+            content: '🎉️ Teams AI v2 is out! 🥳️',
         },
         navbar: {
             title: 'Teams AI (v2)',
