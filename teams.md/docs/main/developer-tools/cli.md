@@ -22,12 +22,12 @@ With the CLI installed, you can enter `teams <token-arguments> --help` at any co
 Install the Teams CLI globally using npm:
 
 ```sh
-npm install -g @microsoft/teams.cli@preview
+npm install -g @microsoft/teams.cli
 ```
 
 :::tip
 If you prefer not to install globally, all commands below can replace `teams` with npx:
-`npx @microsoft/teams.cli@preview <arguments>`
+`npx @microsoft/teams.cli <arguments>`
 :::
 
 ## Create an agent with one command line
