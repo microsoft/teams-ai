@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-summary: Guide to deploying and testing your locally running Python agent in Microsoft Teams using the Microsoft 365 Agents Toolkit.
+summary: Guide to deploying and testing your locally running C# agent in Microsoft Teams using the Microsoft 365 Agents Toolkit.
 ignore: true
 ---
 
@@ -67,21 +67,18 @@ When debugging starts, the Agents Toolkit will:
 - **Set up the local variables** necessary for your agent to run in Teams in `env/.env.local` and `env/env.local.user`. This includes propagating the app manifest with your newly provisioned resources.
 - **Start** the local server.
 - **Package your app manifest** into a Teams application zip package and the manifest json with variables inserted in `appPackage/build`.
-- **Launch Teams** in an incognito window your browser.
-- **Upload the package** to Teams and signal it to sideload the app (fancy word for installing this app just for your use)
+- **Launch Teams** in an incognito window in your browser.
+- **Upload the package** to Teams and signal it to sideload the app (a fancy word for installing this app just for your use)
 
 If you set up Agents Toolkit via the Teams AI CLI, you should see something like the following in your terminal:
 
 
 ```sh
-[INFO] @teams/app Successfully initialized all plugins
-[INFO] @teams/app.HttpPlugin Starting HTTP server on port 3978
-INFO:     Started server process [6436]
-INFO:     Waiting for application startup.
-[INFO] @teams/app.HttpPlugin listening on port 3978 🚀
-[INFO] @teams/app Teams app started successfully
-INFO:     Application startup complete..
-INFO:     Uvicorn running on http://0.0.0.0:3979 (Press CTRL+C to quit)
+[INFO] Microsoft.Hosting.Lifetime Now listening on: http://localhost:3978
+[WARN] Echo.Microsoft.Teams.Plugins.AspNetCore.DevTools ⚠️  Devtools are not secure and should not be used production environments ⚠️
+[INFO] Echo.Microsoft.Teams.Plugins.AspNetCore.DevTools Available at http://localhost:3978/devtools
+[INFO] Microsoft.Hosting.Lifetime Application started. Press Ctrl+C to shut down.
+[INFO] Microsoft.Hosting.Lifetime Hosting environment: Development
 ```
 
 
@@ -104,11 +101,13 @@ If you want to monitor the activities and events in your app, you can still use 
 
 ## Troubleshooting
 
-For deployment and resource management we recommend the Microsoft 365 Agents Toolkit. If you prefer to set everything up by hand, follow the standard [Teams app documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-publish-overview). The Teams AI library itself doesn't handle deployment or Azure resources, so you'll need to rely on the general [Microsoft Teams deployment documentation](https://learn.microsoft.com/en-us/microsoftteams/deploy-overview).
+For deployment and resource management we recommend the Microsoft 365 Agents Toolkit. Refer to our [Deployment guide](./deployment-guide.md) for common scenarios and potential issues. 
+
+If you prefer to set everything up by hand, follow the standard [Teams app documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-publish-overview). The Teams AI library itself doesn't handle deployment or Azure resources, so you'll need to rely on the general [Microsoft Teams deployment documentation](https://learn.microsoft.com/en-us/microsoftteams/deploy-overview) for in-depth help.
 
 ## Next steps
 
-Now that your agent is running in Teams, you can learn more [essential concepts](../essentials) to understand how to build more complex agents. Explore the [in-depth guides](../in-depth-guides) for advanced topics like authentication, message extensions, and more.
+Now that your agent is running in Teams, you can learn more [essential concepts](../../essentials) to understand how to build more complex agents. Explore the [in-depth guides](../../in-depth-guides) for advanced topics like authentication, message extensions, and more.
 
 ## Resources
 
