@@ -119,11 +119,11 @@ For instance, this will `GET https://graph.microsoft.com/beta/me?$select=display
 import { type EndpointRequest } from '@microsoft/teams.graph';
 
 const getMyDisplayName = (): EndpointRequest<{ displayName: string }> => ({
-  ver: 'beta',                  // use the beta endpoint; defaults to 'v1.0' if omitted
-  method: 'get',                // HTTP method to use
-  path: '/me',                  // endpoint path
+  ver: 'beta', // use the beta endpoint; defaults to 'v1.0' if omitted
+  method: 'get', // HTTP method to use
+  path: '/me', // endpoint path
   paramDefs: { 
-    query: ['$select'],         // the $select parameter goes in the query string
+    query: ['$select'], // the $select parameter goes in the query string
   },
   params: {
     "$select": ["displayName"], // the attribute(s) to select
