@@ -67,7 +67,6 @@ const config: Config = {
                 sidebarPath: './sidebars.ts',
                 sidebarCollapsed: true,
                 editUrl: 'https://github.com/microsoft/teams-ai/tree/main/teams.md/',
-                exclude: ["**/message-extensions/settings.{md,mdx}"]
             } satisfies Partial<DocsPlugin.PluginOptions>,
         ],
         [
@@ -79,7 +78,7 @@ const config: Config = {
                 sidebarPath: './sidebars.ts',
                 sidebarCollapsed: true,
                 editUrl: 'https://github.com/microsoft/teams-ai/tree/main/teams.md/',
-                exclude: ["**/observability/*"]
+                exclude: ["**/observability/*", "**/tabs/*"]
             } satisfies Partial<DocsPlugin.PluginOptions>,
         ],
         [
