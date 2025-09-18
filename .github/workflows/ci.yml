@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  pull_request:
+      branches:
+        - main
+      paths:
+        - 'teams.md/**'
+
+jobs:
+  build-teams-md:
+    name: Build teams.md
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies (teams.md)
+        run: npm ci
+        working-directory: teams.md
+
+      - name: Build (teams.md)
+        run: npm run build
+        working-directory: teams.md
