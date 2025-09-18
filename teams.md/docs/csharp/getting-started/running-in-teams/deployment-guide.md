@@ -6,7 +6,7 @@ llms: ignore
 
 # Deployment Guide
 
-We cover the most common setup and deployment steps for testing in teams, including configuration instructions, and references for handling potential issues during deployment.
+We cover the most common setup and deployment steps for testing in Teams, including configuration instructions, and references for handling potential issues during deployment.
 
 ### User Assigned Managed Identity
 
