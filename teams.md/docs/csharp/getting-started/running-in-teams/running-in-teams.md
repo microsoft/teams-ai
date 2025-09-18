@@ -105,7 +105,7 @@ For deployment and resource management we recommend the Microsoft 365 Agents Too
 
 ## Next steps
 
-Now that your agent is running in Teams, you can learn more [essential concepts](../essentials) to understand how to build more complex agents. Explore the [in-depth guides](../in-depth-guides) for advanced topics like authentication, message extensions, and more.
+Now that your agent is running in Teams, you can learn more [essential concepts](../../essentials) to understand how to build more complex agents. Explore the [in-depth guides](../../in-depth-guides) for advanced topics like authentication, message extensions, and more.
 
 ## Resources
 
