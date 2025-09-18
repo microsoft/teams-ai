@@ -29,6 +29,7 @@ After a successful App Registration you should have the `TenantId`, `ClientId` a
 
 botName="My App"
 appId=$(az ad app create --display-name $botName --sign-in-audience "AzureADMyOrg" --query appId -o tsv)
+az ad sp create --id $appId
 appCred=$(az ad app credential reset --id $appId)
 tenantId=$(echo $appCred | jq -r '.tenant')
 clientSecret=$(echo $appCred | jq -r '.password')
@@ -77,6 +78,8 @@ Once the Azure Bot Service resource has been created you can configure it
 
 ```bash
 #!/bin/bash
+
+endpointUrl=<your-devtunnels-public-url>
 az bot update \
    --name $botName \
    --resource-group $resourceGroup \
@@ -85,4 +88,15 @@ az bot update \
 az bot msteams create \
     --name $botName \
     --resource-group $resourceGroup 
+```
+
+## Save the credentials to use as configuration
+
+```bash
+#!/bin/bash
+
+echo "TENANT_ID=$tenantId" > "$botName.env"
+echo "CLIENT_ID=$appId" >> "$botName.env"
+echo "CLIENT_SECRET=$clientSecret" >> "$botName.env"
+
 ```
