@@ -6,17 +6,23 @@ summary: Guide to using middleware in C# Teams AI for logging, validation, and e
 # Middleware
 
 Middleware is a useful tool for logging, validation, and more.
-You can easily register your own middleware using the `app.use` method.
+You can easily register your own middleware using the `app.Use` method.
 
-Below is an example of a middleware that will log the elapse time of all handers
-that come after it.
+Below is an example of a middleware that will capture exceptions and log the elapse time of all handlers that come after it.
 
 
-```typescript
-app.use(async ({ log, next }) => {
-  const startedAt = new Date();
-  await next();
-  log.debug(new Date().getTime() - startedAt.getTime());
+```csharp
+app.Use(async context =>
+{
+    var start = DateTime.UtcNow;
+    try
+    {
+        await context.Next();
+    } catch
+    {
+        context.Log.Error("error occurred during activity processing");
+    }
+    context.Log.Debug($"request took {(DateTime.UtcNow - start).TotalMilliseconds}ms");
 });
 ```
 
