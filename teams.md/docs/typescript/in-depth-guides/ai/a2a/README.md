@@ -15,7 +15,7 @@ A2A (Agent-to-Agent) is a protocol designed to enable agents to communicate and 
 Install the package:
 
 ```bash
-npm install @microsoft/teams.a2a@preview
+npm install @microsoft/teams.a2a
 ```
 
 ## What does this package do?
