@@ -1,17 +1,17 @@
-# Welcome to the Teams AI Library v2
+# Welcome to the Teams AI Library v2 ([Docs](https://microsoft.github.io/teams-ai/))
 
 ## Overview
 
 Teams AI Library v2 represents a fundamental reimagining of how Teams apps and AI agents are built, while maintaining compatibility with existing botframework-based agents. This new version focuses on developer experience, simplified architecture, and enhanced AI capabilities.
 
-For a detailed explanation of the motivations and architectural decisions behind v2, please see our [WHY.md](./WHY.md) document.
+For a detailed explanation of the motivations and architectural decisions behind v2, please see our [WHY.md](https://microsoft.github.io/teams-ai/why) document.
 
 ### Quick start
 
 The Teams CLI makes it easy to bootstrap your first agent. First, install the CLI via NPM:
 
 ```sh
-npm install -g @microsoft/teams.cli@preview
+npm install -g @microsoft/teams.cli
 ```
 
 Next, use the CLI to create your agent:
@@ -24,7 +24,7 @@ For more information, follow our quickstart guide: [C#](http://microsoft.github.
 
 ### SDK
 
-Microsoft Teams has a robust developer ecosystem with a broad suite of capabilities, now unified via Teams AI v2. Whether you are building AI-powered agents ([TS]https://microsoft.github.io/teams-ai/typescript/in-depth-guides/ai/), [C#](https://microsoft.github.io/teams-ai/csharp/in-depth-guides/ai/), [Python](https://microsoft.github.io/teams-ai/python/in-depth-guides/ai/), Message Extensions ([TS](https://microsoft.github.io/teams-ai/typescript/in-depth-guides/message-extensions/), [C#][https://microsoft.github.io/teams-ai/csharp/in-depth-guides/message-extensions/]), [Python][https://microsoft.github.io/teams-ai/python/in-depth-guides/message-extensions/], embedded web applications, or Graph, Teams AI v2 has you covered.
+Microsoft Teams has a robust developer ecosystem with a broad suite of capabilities, now unified via Teams AI v2. Whether you are building AI-powered agents ([TS](https://microsoft.github.io/teams-ai/typescript/in-depth-guides/ai/), [C#](https://microsoft.github.io/teams-ai/csharp/in-depth-guides/ai/), [Python](https://microsoft.github.io/teams-ai/python/in-depth-guides/ai/)), Message Extensions ([TS](https://microsoft.github.io/teams-ai/typescript/in-depth-guides/message-extensions/), [C#](https://microsoft.github.io/teams-ai/csharp/in-depth-guides/message-extensions/), [Python](https://microsoft.github.io/teams-ai/python/in-depth-guides/message-extensions/)), embedded web applications, or Graph, Teams AI v2 has you covered.
 
 Here is a simple example, which responds to incoming messages with information retrieved from Graph.
 
@@ -62,6 +62,15 @@ This repository contains submodules that point to dedicated repositories for dif
 - [Python](https://github.com/microsoft/teams.py)
 
 For language-specific bugs or issues, please use the Issues tab in the respective language repository.
+
+## Important: v1 to v2 Transition Notice
+
+**This repository has transitioned from v1 to v2 as the main branch.**
+
+- The `main` branch now contains v2 code, which was previously developed on the `v2-preview` branch.
+- The previous `main` branch (v1) has been moved to the [`release/v1`](https://github.com/microsoft/teams-ai/tree/release/v1) branch.  We will continue to provide critical bug fixes and security patches for v1 on this branch.
+
+
 
 ## Documentation
 

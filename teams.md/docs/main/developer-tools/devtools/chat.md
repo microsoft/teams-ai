@@ -6,9 +6,9 @@ llms: ignore
 
 # 💬 Devtools chat
 
-![Empty DevTools chat](https://github.com/microsoft/teams.ts/blob/main/assets/screenshots/devtools_blank_chat.png?raw=true)
-
 Use the lightweight DevTools app that allows you to test chat functionality with your agent without the need to sideload into Teams. This is useful for testing and debugging.
+
+![Empty DevTools chat](https://github.com/microsoft/teams.ts/blob/main/assets/screenshots/devtools_blank_chat.png?raw=true)
 
 :::note
 We plan to add more features to DevTools for a wider variety of testing. Stay tuned!
@@ -23,7 +23,7 @@ Use the Teams AI v2 dev package as a plugin.
 Add the dev package to your Teams app.
 
 ```bash
-$: npm install @microsoft/teams.dev@preview
+$: npm install @microsoft/teams.dev
 ```
 
 ### Usage
@@ -55,7 +55,7 @@ When you run your app, for example `npm run dev`, devtools will be running on po
 ```
 
 :::info
-If you used the [CLI](../cli) to create a atk configuration for your app, DevTools will run on port 3979 when you launch the debugger.
+If you used the [CLI](../cli) to create an `atk` configuration for your app, DevTools will run on port 3979 when you launch the debugger.
 :::
 
 When you open the page, you will see a Teams-like chat window and you can immediately interact with your agent.
@@ -86,7 +86,7 @@ You can send messages to your agent just like in Teams. In the compose box, type
 Attach up to 10 files to your message using the Attach (paperclip) button. DevTools supports pasting an Adaptive Card JSON or attaching a card from the card designer. See the [Cards page](./cards) for more.
 
 :::note
-More attachments support is coming soon!
+Further support for attachments is coming soon!
 :::
 
 ### Connectivity
