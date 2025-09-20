@@ -15,25 +15,91 @@ User feedback is essential for the improvement of any application. Teams provide
 
 Once you receive a feedback event, you can choose to store it in some persistent storage. In the example below, we are storing it in an in-memory store.
 
-<FileCodeBlock
-    lang="typescript"
-    src="/generated-snippets/ts/feedback.snippet.feedback-loop-store.ts"
-/>
+```csharp
+// This store would ideally be persisted in a database
+public static class FeedbackStore
+{
+    public static readonly Dictionary<string, FeedbackData> StoredFeedbackByMessageId = new();
+
+    public class FeedbackData
+    {
+        public string IncomingMessage { get; set; } = string.Empty;
+        public string OutgoingMessage { get; set; } = string.Empty;
+        public int Likes { get; set; }
+        public int Dislikes { get; set; }
+        public List<string> Feedbacks { get; set; } = new();
+    }
+}
+```
+
+<!-- FileCodeBlock: feedback-loop-store -->
 
 ## Including Feedback Buttons
 
-When sending a message that you want feedback in, simply `addFeedback()` to the message you are sending.
+When sending a message that you want feedback in, simply `AddFeedback()` to the message you are sending.
 
-<FileCodeBlock
-    lang="typescript"
-    src="/generated-snippets/ts/feedback.snippet.feedback-loop.ts"
-/>
+```csharp
+var sentMessageId = await context.Send(
+    result.Content != null
+        ? new MessageActivity(result.Content)
+            .AddAiGenerated()
+            /** Add feedback buttons via this method */
+            .AddFeedback()
+        : "I did not generate a response."
+);
+
+FeedbackStore.StoredFeedbackByMessageId[sentMessageId] = new FeedbackStore.FeedbackData
+{
+    IncomingMessage = activity.Text,
+    OutgoingMessage = result.Content ?? string.Empty,
+    Likes = 0,
+    Dislikes = 0,
+    Feedbacks = new List<string>()
+};
+```
+
+<!-- FileCodeBlock: feedback-loop -->
 
 ## Handling the feedback
 
 Once the user decides to like/dislike the message, you can handle the feedback in a received event. Once received, you can choose to include it in your persistent store.
 
-<FileCodeBlock
-    lang="typescript"
-    src="/generated-snippets/ts/index.snippet.feedback-loop-handler.ts"
-/>
+```csharp
+[Microsoft.Teams.Apps.Activities.Invokes.Message.SubmitAction]
+public async Task OnFeedbackReceived([Context] FeedbackActivity activity, [Context] ILogger log)
+{
+    var reaction = activity.Value?.ActionValue?.Reaction;
+    var feedbackJson = activity.Value?.ActionValue?.Feedback;
+    
+    if (activity.ReplyToId == null)
+    {
+        log.LogWarning("No replyToId found for messageId {ActivityId}", activity.Id);
+        return;
+    }
+    
+    var existingFeedback = FeedbackStore.StoredFeedbackByMessageId.GetValueOrDefault(activity.ReplyToId);
+    /**
+     * feedbackJson looks like:
+     * {"feedbackText":"Nice!"}
+     */
+    if (existingFeedback == null)
+    {
+        log.LogWarning("No feedback found for messageId {ActivityId}", activity.Id);
+    }
+    else
+    {
+        var updatedFeedback = new FeedbackStore.FeedbackData
+        {
+            IncomingMessage = existingFeedback.IncomingMessage,
+            OutgoingMessage = existingFeedback.OutgoingMessage,
+            Likes = existingFeedback.Likes + (reaction == "like" ? 1 : 0),
+            Dislikes = existingFeedback.Dislikes + (reaction == "dislike" ? 1 : 0),
+            Feedbacks = existingFeedback.Feedbacks.Concat(new[] { feedbackJson ?? string.Empty }).ToList()
+        };
+        
+        FeedbackStore.StoredFeedbackByMessageId[activity.Id] = updatedFeedback;
+    }
+}
+```
+
+<!-- FileCodeBlock: feedback-loop-handler -->
