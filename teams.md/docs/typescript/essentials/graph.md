@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 7
 summary: Guide to using the Microsoft Graph API client to access Microsoft 365 data and services from your Teams AI application.
 ---
 
