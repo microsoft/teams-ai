@@ -5,7 +5,7 @@ summary: Understanding the structure and key components of a Teams AI applicatio
 
 # Code Basics
 
-After creating your first Teams application, let's understand its structure and key components. This will help you build more complex applications as you progress.
+After following the guidance in [the quickstart](quickstart) to create your first Teams application, let's review its structure and key components. This knowledge can help you build more complex applications as you progress.
 
 ## Project Structure
 
@@ -24,11 +24,11 @@ quote-agent/
 
 ## Core Components
 
-Let's break down the simple application we created in the [quickstart](quickstart) into its core components:
+Let's break down the simple application from the [quickstart](quickstart) into its core components.
 
 ### The App Class
 
-The heart of your application is the `App` class. This class handles all incoming activities and manages your application's lifecycle. It also acts as a way to host your application service.
+The heart of an application is the `App` class. This class handles all incoming activities and manages the application's lifecycle. It also acts as a way to host your application service.
 
 
 ```typescript title="src/index.ts"
@@ -42,7 +42,7 @@ const app = new App({
 ```
 
 
-The app configuration includes a variety of options that allow you to customize its behavior, including controlling the underlying server, authentication, and other settings. For simplicity's sake, let's focus on plugins.
+The app configuration includes a variety of options that allow you to customize its behavior, including controlling the underlying server, authentication, and other settings.
 
 ### Plugins
 
@@ -88,7 +88,7 @@ Your application starts when you run:
 ```
 
 
-This part initializes your application server and, when configured for Teams, also authenticates it to be ready for sending and receiving messages.
+This code initializes your application server and, when configured for Teams, also authenticates it to be ready for sending and receiving messages.
 
 ## Next Steps
 
@@ -98,7 +98,7 @@ After that, you can:
 
 - Add more activity handlers for different types of interactions. See [Listening to Activities](../essentials/on-activity) for more details.
 - Integrate with external services using the [API Client](../essentials/api).
-- Add interactive [cards](../in-depth-guides/adaptive-cards) and [dialogs](../in-depth-guides/dialogs). See and for more information.
+- Add interactive [cards](../in-depth-guides/adaptive-cards) and [dialogs](../in-depth-guides/dialogs).
 - Implement [AI](../in-depth-guides/ai).
 
 Continue on to the next page to learn about these advanced features.

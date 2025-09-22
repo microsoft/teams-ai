@@ -6,7 +6,7 @@ llms: ignore
 
 # Running In Teams
 
-Now that your agent is running locally, let's deploy it to Microsoft Teams for testing. This guide will walk you through the process.
+Now that you completed [the quickstart](../quickstart) and your agent is running locally, let's deploy it to Microsoft Teams for testing. This guide will walk you through the process.
 
 ## Microsoft 365 Agents Toolkit
 
@@ -14,7 +14,7 @@ Microsoft 365 Agents Toolkit is a powerful tool that simplifies deploying and de
 
 ### Install Microsoft 365 Agents Toolkit
 
-First, you'll need to install the Microsoft 365 Agents Toolkit IDE extension:
+First, you'll need to install the Agents Toolkit IDE extension:
 
 - Visit the [Microsoft 365 Agents Toolkit installation guide](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/install-teams-toolkit) to install on your preferred IDE.
 
@@ -31,11 +31,11 @@ npx @microsoft/teams.cli config add atk.basic
 ```
 
 :::tip
-The `atk.basic` configuration is a basic setup for Microsoft 365 Agents Toolkit. It includes the necessary files and configuration to get started with Teams development.<br/>
+The `atk.basic` configuration is a basic setup for Agents Toolkit. It includes the necessary files and configuration to get started with Teams development.<br/>
 Explore more advanced configurations as needed with teams config --help.<br />
 :::
 
-This [CLI](/developer-tools/cli) command adds configuration files required by Microsoft 365 Agents Toolkit, including:
+This [CLI](/developer-tools/cli) command adds configuration files required by Agents Toolkit, including:
 
 - Environment setup in the `env` folder and root `.env` file
 - Teams app manifest in the `appPackage` folder (if not already present)
@@ -49,7 +49,7 @@ This [CLI](/developer-tools/cli) command adds configuration files required by Mi
 
 ## Debugging in Teams
 
-After installing Microsoft 365 Agents Toolkit and adding the configuration:
+After installing Agents Toolkit and adding the configuration:
 
 1. **Open** your agent's project in your IDE.
 2. **Open the Microsoft 365 Agents Toolkit extension panel** (usually on the left sidebar). The extension icon is the Teams logo.
@@ -59,16 +59,16 @@ After installing Microsoft 365 Agents Toolkit and adding the configuration:
 
 ![Microsoft 365 Agents Toolkit local environment UI](/screenshots/agents-toolkit.png)
 
-When debugging starts, the Microsoft 365 Agents Toolkit will:
+When debugging starts, the Agents Toolkit will:
 
 - **Build** your application
-- **Start a [devtunnel](/teams/core-concepts#devtunnel)** which will assign a temporary public URL to your local server
+- **Start a [devtunnel](/teams/core-concepts#devtunnel)** that will assign a temporary public URL to your local server
 - **Provision the Teams app** for your tenant so that it can be installed and be authenticated on Teams
 - **Set up the local variables** necessary for your agent to run in Teams in `env/.env.local` and `env/env.local.user`. This includes propagating the app manifest with your newly provisioned resources.
 - **Start** the local server.
 - **Package your app manifest** into a Teams application zip package and the manifest json with variables inserted in `appPackage/build`.
 - **Launch Teams** in an incognito window in your browser.
-- **Upload the package** to Teams and signal it to sideload the app (a fancy word for installing this app just for your use)
+- **Upload the package** to Teams and signal it to sideload (install) the app just for your use.
 
 If you set up Agents Toolkit via the Teams AI CLI, you should see something like the following in your terminal:
 
@@ -99,7 +99,7 @@ After the debugging session starts:
 Congratulations! Now you have a fully functional agent running in Microsoft Teams. Interact with it just like any other Teams app and explore the rest of the documentation to build more complex agents.
 
 :::tip
-If you want to monitor the activities and events in your app, you can still use the [DevTools plugin](/developer-tools/devtools)! Note that the DevTools server is running on port 3979. You can open it in your browser to interact with your agent and monitor activities in real time.
+If you want to monitor the activities and events in your app, you can still use the [DevTools plugin](/developer-tools/devtools)! Note that the DevTools server is running on port 3979. You can open it in your browser to interact with your agent and monitor activities in real time. 
 :::
 
 ## Troubleshooting

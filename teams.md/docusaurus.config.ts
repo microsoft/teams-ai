@@ -67,6 +67,7 @@ const config: Config = {
                 sidebarPath: './sidebars.ts',
                 sidebarCollapsed: true,
                 editUrl: 'https://github.com/microsoft/teams-ai/tree/main/teams.md/',
+                exclude: ["**/LLMs.md"],
             } satisfies Partial<DocsPlugin.PluginOptions>,
         ],
         [
@@ -78,7 +79,7 @@ const config: Config = {
                 sidebarPath: './sidebars.ts',
                 sidebarCollapsed: true,
                 editUrl: 'https://github.com/microsoft/teams-ai/tree/main/teams.md/',
-                exclude: ["**/observability/*", "**/tabs/*"]
+                exclude: ["**/observability/*", "**/LLMs.md"]
             } satisfies Partial<DocsPlugin.PluginOptions>,
         ],
         [
@@ -90,6 +91,7 @@ const config: Config = {
                 sidebarPath: './sidebars.ts',
                 sidebarCollapsed: true,
                 editUrl: 'https://github.com/microsoft/teams-ai/tree/main/teams.md/',
+                exclude: ["**/LLMs.md"],
             } satisfies Partial<DocsPlugin.PluginOptions>,
         ],
     ],
