@@ -40,7 +40,7 @@ When sending a message that you want feedback in, simply `AddFeedback()` to the 
 var sentMessageId = await context.Send(
     result.Content != null
         ? new MessageActivity(result.Content)
-        .AddAiGenerated()
+            .AddAiGenerated()
             /** Add feedback buttons via this method */
             .AddFeedback()
         : "I did not generate a response."
