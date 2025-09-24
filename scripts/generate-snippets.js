@@ -65,7 +65,7 @@ const getDefaultConfig = (lang) => {
       };
     case 'dotnet':
       return {
-        input: path.join(projectRoot, 'teams.dotnet'), // Assuming dotnet input path
+        input: path.join(projectRoot, 'teams.dotnet/Samples'),
         '--output': [path.join(projectRoot, 'teams.md/static/generated-snippets/dotnet')],
         '--ignore': ['packages/graph/**', '!**/*.cs'], // Assuming C# files for dotnet
       };
@@ -120,7 +120,7 @@ for (const [key, values] of Object.entries(finalArgs)) {
 try {
   console.log('✂️  Generating snippets...');
   console.log(`Running: bluehawk ${allArgs.join(' ')}`);
-  execSync(`bluehawk ${allArgs.join(' ')}`, { stdio: 'inherit', shell: true });
+  execSync(`npx bluehawk ${allArgs.join(' ')}`, { stdio: 'inherit', shell: true });
   console.log('✅ Snippets generated.');
   process.exit(0);
 } catch (err) {
