@@ -18,8 +18,19 @@ npm install -g @microsoft/teams.cli
 
 Next, use the CLI to create your agent:
 
+**TypeScript:**
 ```bash
-teams new (typescript|csharp) quote-agent --template echo
+teams new typescript quote-agent --template echo
+```
+
+**C#:**
+```bash
+teams new csharp quote-agent --template echo
+```
+
+**Python:**
+```bash
+teams new python quote-agent --template echo
 ```
 
 ## Overview
