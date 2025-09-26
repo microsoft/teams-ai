@@ -14,6 +14,10 @@ Get started with Teams AI Library (v2) quickly using the Teams CLI.
 - **Python** v3.12 or higher. Install or upgrade from [python.org/downloads](https://www.python.org/downloads/).
 - **UV** v0.8.11 or higher. Install or upgrade from [https://docs.astral.sh/uv/getting-started/installation/](https://docs.astral.sh/uv/getting-started/installation/)
 
+:::info
+UV is a fast Python package installer and resolver. While you can use other package managers like pip, UV provides better performance and dependency resolution for Teams AI Library projects.
+:::
+
 ## Instructions
 
 ### Install the Teams CLI
