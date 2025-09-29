@@ -97,7 +97,11 @@ When the application starts, you'll see:
 1. An HTTP server starting up (on port 3978). This is the main server which handles incoming requests and serves the agent application.
 2. A devtools server starting up (on port 3979). This is a developer server that provides a web interface for debugging and testing your agent quickly, without having to deploy it to Teams.
 
-Now, navigate to the devtools server by opening your browser and navigating to [http://localhost:3978/devtools](http://localhost:3978/devtools). You should see a simple interface where you can interact with your agent. Try sending it a message!
+:::info
+The DevTools server runs on a separate port to avoid conflicts with your main application server. This allows you to test your agent locally while keeping the main server available for Teams integration.
+:::
+
+Now, navigate to the devtools server by opening your browser and navigating to [http://localhost:3979/devtools](http://localhost:3979/devtools). You should see a simple interface where you can interact with your agent. Try sending it a message!
 
 ![devtools](/screenshots/devtools-echo-chat.png)
 

@@ -12,7 +12,7 @@ It is possible to authenticate the user into [other auth providers](https://lear
 :::
 
 :::info
-This is an advanced guide. It is highly recommended that you are familiar with [creating an app](https://microsoft.github.io/teams-ai/2.getting-started/1.quickstart.html) and [running it in Teams](https://microsoft.github.io/teams-ai/2.getting-started/3.running-in-teams.html) before attempting to follow this guide.
+This is an advanced guide. It is highly recommended that you are familiar with [creating an app](../../getting-started/quickstart) and [running it in Teams](../../getting-started/running-in-teams) before attempting to follow this guide.
 :::
 
 :::warning

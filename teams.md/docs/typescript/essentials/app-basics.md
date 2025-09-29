@@ -25,7 +25,7 @@ flowchart LR
     subgraph AppClass
         CorePlugins["Plugins"]
         Events["Events"]
-        subgraph AppResponsbilities
+        subgraph AppResponsibilities
             direction TB
             ActivityRouting["Activity Routing"]
             Utilities["Utilities"]
