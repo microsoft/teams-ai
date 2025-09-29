@@ -42,10 +42,10 @@ This [CLI](/developer-tools/cli) command adds configuration files required by Ag
 - Debug instructions in `.vscode/launch.json` and `.vscode/tasks.json`
 - Agents Toolkit automation files to your project (e.g. `teamsapp.local.yml`)
 
-| Cmd name   | CLI name      | Description                                                                                                                                        |
-| ---------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `teams`    | Teams AI v2   | A tool for setting up and utilizing the Teams AI v2 library including integration with Agents Toolkit, if desired.                                            |
-| `atk` | Agents Toolkit | A tool for managing provisioning, deployment, and in-client debugging for Teams. |
+| Tool Name | Command | Description                                                                                                                                        |
+| --------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Teams CLI | `teams` | A command-line tool for setting up and utilizing the Teams AI v2 library, including integration with Microsoft 365 Agents Toolkit when desired. |
+| Microsoft 365 Agents Toolkit | `atk`   | A tool for managing provisioning, deployment, and in-client debugging for Teams applications. |
 
 ## Debugging in Teams
 
