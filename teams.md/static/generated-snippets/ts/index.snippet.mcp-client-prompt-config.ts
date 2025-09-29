@@ -29,4 +29,4 @@ app.on('message', async ({ send, activity }) => {
     await send(result.content);
   }
 });
-app.start();
+app.start().catch(console.error);
