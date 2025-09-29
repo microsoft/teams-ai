@@ -41,6 +41,21 @@ Once loaded, it treats these tools like any functions that are available to the 
 
 In this example, we augment the `ChatPrompt` with a few remote MCP Servers.
 
+### Customize Headers
+
+Some MCP servers may require custom headers to be sent as part of the request. You can customize the headers when calling the `usePlugin` function:
+
+```typescript
+.usePlugin('mcpClient', {
+    url: 'https://<your-mcp-server>/mcp'
+    params: {
+      headers: {
+        'x-header-functions-key': '<custom-headers>',
+      }
+    }
+});
+```
+
 :::note
 Feel free to build an MCP Server in a different agent using the [MCP Server Guide](./mcp-server). Or you can quickly set up an MCP server using [Azure Functions](https://techcommunity.microsoft.com/blog/appsonazureblog/build-ai-agent-tools-using-remote-mcp-with-azure-functions/4401059).
 :::

@@ -132,7 +132,20 @@ Once loaded, it treats these tools like any functions that are available to the 
   </TabItem>
 </Tabs>
 
+### Custom Headers
 
+Some MCP servers may require custom headers to be sent as part of the request. You can customize the headers when calling the `UseMcpServer` function:
+
+```csharp
+new McpClientPlugin()
+    .UseMcpServer("https://learn.microsoft.com/api/mcp", 
+        new McpClientPluginParams() 
+        { 
+               HeadersFactory = () => new Dictionary<string, string>() 
+               { { "HEADER_KEY", "HEADER_VALUE" } } 
+        }
+    );
+```
 
 In this example, we augment the `ChatPrompt` with a a remote MCP Server.
 
