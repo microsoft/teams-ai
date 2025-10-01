@@ -113,14 +113,6 @@ public static async Task HandleStatefulConversation(OpenAIChatModel model, ICont
 ### Usage in your application
 
 ```csharp
-// Memory clear handler
-teamsApp.OnMessage(@"^memory\s+clear\b", async (context) =>
-{
-    await ClearConversationMemory(context.Activity.Conversation.Id);
-    await context.Reply("🧠 Memory cleared!");
-});
-
-// Fallback stateful conversation handler
 teamsApp.OnMessage(async (context) =>
 {
     await HandleStatefulConversation(aiModel, context);

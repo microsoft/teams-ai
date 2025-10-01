@@ -41,8 +41,10 @@ flowchart LR
 
 Chat generation is the the most basic way of interacting with an LLM model. It involves setting up your ChatPrompt, the Model, and sending it the message.
 
- Import the relevant namespaces:
- ```csharp
+### Imperative Approach
+
+Import the relevant namespaces:
+```csharp
 // AI
 using Microsoft.Teams.AI.Models.OpenAI;
 using Microsoft.Teams.AI.Prompts;
@@ -94,6 +96,49 @@ teamsApp.OnMessage(async (context) =>
         }.AddAIGenerated();
         await context.Send(messageActivity);
         // Ahoy, matey! 🏴‍☠️ How be ye doin' this fine day on th' high seas? What can this ol' salty sea dog help ye with? 🚢☠️
+    }
+});
+```
+
+### Declarative Approach
+
+This approach uses attributes to declare prompts, providing clean separation of concerns.
+
+**Create a Prompt Class:**
+
+```csharp
+using Microsoft.Teams.AI.Annotations;
+
+namespace Samples.AI.Prompts;
+
+[Prompt]
+[Prompt.Description("A friendly pirate assistant")]
+[Prompt.Instructions("You are a friendly assistant who talks like a pirate")]
+public class PiratePrompt
+{
+}
+```
+
+**Usage in Program.cs:**
+
+```csharp
+using Microsoft.Teams.AI.Models.OpenAI;
+using Microsoft.Teams.Api.Activities;
+
+// Create the AI model
+var aiModel = new OpenAIChatModel(azureOpenAIModel, azureOpenAI);
+
+// Use the prompt with OpenAIChatPrompt.From()
+teamsApp.OnMessage(async (context) =>
+{
+    var prompt = OpenAIChatPrompt.From(aiModel, new Samples.AI.Prompts.PiratePrompt());
+
+    var result = await prompt.Send(context.Activity.Text);
+
+    if (!string.IsNullOrEmpty(result.Content))
+    {
+        await context.Send(new MessageActivity { Text = result.Content }.AddAIGenerated());
+        // Ahoy, matey! 🏴‍☠️ How be ye doin' this fine day on th' high seas?
     }
 });
 ```
