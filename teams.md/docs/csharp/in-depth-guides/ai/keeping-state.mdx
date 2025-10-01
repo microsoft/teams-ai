@@ -23,100 +23,126 @@ To avoid this, you need to get messages from your persistent (or in-memory) stor
 The `ChatPrompt` class will modify the messages object that's passed into it. So if you want to manually manage it, you need to make a copy of the messages object before passing it in.
 :::
 
-```csharp
-using Microsoft.Teams.AI;
-using Microsoft.Teams.AI.State;
-using Microsoft.Bot.Schema;
+## State Initialization
 
-// State initialization - Define your conversation state
-public class ConversationState
-{
-    public List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
-    public string ConversationId { get; set; } = string.Empty;
-}
-
-// Initialize state management
-public class StateManager
-{
-    private readonly Dictionary<string, ConversationState> _conversations = new();
-
-    public ConversationState GetOrCreateConversation(string conversationId)
-    {
-        if (!_conversations.ContainsKey(conversationId))
-        {
-            _conversations[conversationId] = new ConversationState
-            {
-                ConversationId = conversationId
-            };
-        }
-        return _conversations[conversationId];
-    }
-
-    public void SaveConversation(ConversationState state)
-    {
-        _conversations[state.ConversationId] = state;
-    }
-}
-```
+Here's how to initialize and manage conversation state for multiple conversations:
 
 ```csharp
 using Microsoft.Teams.AI;
+using Microsoft.Teams.AI.Messages;
 using Microsoft.Teams.AI.Models.OpenAI;
+using Microsoft.Teams.AI.Prompts;
+using Microsoft.Teams.AI.Templates;
+using Microsoft.Teams.Api.Activities;
+using Microsoft.Teams.Apps;
 
-// Stateful conversation management example
-public class StatefulChatHandler
+// Simple in-memory store for conversation histories
+// In your application, it may be a good idea to use a more
+// persistent store backed by a database or other storage solution
+private static readonly Dictionary<string, List<IMessage>> ConversationStore = new();
+
+/// <summary>
+/// Get or create conversation memory for a specific conversation
+/// </summary>
+public static List<IMessage> GetOrCreateConversationMemory(string conversationId)
 {
-    private readonly StateManager _stateManager;
-    private readonly OpenAIChatModel _model;
-
-    public StatefulChatHandler(StateManager stateManager, OpenAIChatModel model)
+    if (!ConversationStore.ContainsKey(conversationId))
     {
-        _stateManager = stateManager;
-        _model = model;
+        ConversationStore[conversationId] = new List<IMessage>();
     }
 
-    public async Task<string> HandleMessageAsync(string conversationId, string userMessage)
+    return ConversationStore[conversationId];
+}
+
+/// <summary>
+/// Clear memory for a specific conversation
+/// </summary>
+public static Task ClearConversationMemory(string conversationId)
+{
+    if (ConversationStore.TryGetValue(conversationId, out var messages))
     {
-        // Get conversation state
-        var conversationState = _stateManager.GetOrCreateConversation(conversationId);
+        var messageCount = messages.Count;
+        messages.Clear();
+    }
 
-        // Add user message to conversation history
-        conversationState.Messages.Add(new ChatMessage
+    return Task.CompletedTask;
+}
+```
+
+## Stateful Chat Example
+
+```csharp
+/// <summary>
+/// Example of stateful conversation handler that maintains conversation history
+/// </summary>
+public static async Task HandleStatefulConversation(OpenAIChatModel model, IContext<MessageActivity> context)
+{
+    // Retrieve existing conversation memory or initialize new one
+    var messages = GetOrCreateConversationMemory(context.Activity.Conversation.Id);
+
+    // Create prompt with conversation-specific memory
+    var prompt = new OpenAIChatPrompt(model, new ChatPromptOptions
+    {
+        Instructions = new StringTemplate("You are a helpful assistant that remembers our previous conversation.")
+    });
+
+    // Send with existing messages as context
+    var options = new IChatPrompt<OpenAI.Chat.ChatCompletionOptions>.RequestOptions
+    {
+        Messages = messages
+    };
+    var result = await prompt.Send(context.Activity.Text, options);
+
+    if (result.Content != null)
+    {
+        var message = new MessageActivity
         {
-            Role = "user",
-            Content = userMessage
-        });
+            Text = result.Content,
+        }.AddAIGenerated();
+        await context.Send(message);
 
-        // Create a copy of messages for the prompt (to avoid modification)
-        var messagesCopy = conversationState.Messages.ToList();
-
-        // Create prompt with conversation history
-        var prompt = new ChatPrompt(
-            systemMessage: "You are a helpful assistant that remembers our conversation.",
-            messages: messagesCopy
-        );
-
-        // Generate response
-        var response = await _model.CompletePromptAsync(context, memory, functions, tokenizer, template);
-
-        // Add assistant response to conversation history
-        if (response.Message?.Content != null)
-        {
-            conversationState.Messages.Add(new ChatMessage
-            {
-                Role = "assistant",
-                Content = response.Message.Content
-            });
-
-            // Save updated state
-            _stateManager.SaveConversation(conversationState);
-
-            return response.Message.Content;
-        }
-
-        return "I'm sorry, I couldn't generate a response.";
+        // Update conversation history
+        messages.Add(UserMessage.Text(context.Activity.Text));
+        messages.Add(new ModelMessage<string>(result.Content));
+    }
+    else
+    {
+        await context.Reply("I did not generate a response.");
     }
 }
 ```
+
+### Usage in your application
+
+```csharp
+// Memory clear handler
+teamsApp.OnMessage(@"^memory\s+clear\b", async (context) =>
+{
+    await ClearConversationMemory(context.Activity.Conversation.Id);
+    await context.Reply("🧠 Memory cleared!");
+});
+
+// Fallback stateful conversation handler
+teamsApp.OnMessage(async (context) =>
+{
+    await HandleStatefulConversation(aiModel, context);
+});
+```
+
+## How It Works
+
+1. **Conversation Store**: A dictionary maps conversation IDs to their message histories
+2. **Per-Conversation Memory**: Each conversation gets its own isolated message list
+3. **Request Options**: Pass the message history via `RequestOptions.Messages` when calling `Send()`
+4. **Automatic Updates**: After receiving a response, manually add both the user message and AI response to the store
+5. **Persistence**: The conversation history persists across multiple user interactions within the same conversation
+
+:::tip
+The `ChatPrompt.Send()` method does **not** automatically update the messages you pass in via `RequestOptions`. You must manually add the user message and AI response to your conversation store after each interaction.
+:::
+
+:::note
+In a production application, consider using a more robust storage solution like Azure Cosmos DB, SQL Server, or Redis instead of an in-memory dictionary. This ensures conversation history persists across application restarts and scales across multiple instances.
+:::
 
 ![Stateful Chat Example](/screenshots/stateful-chat-example.png)

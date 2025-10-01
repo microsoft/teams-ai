@@ -5,23 +5,23 @@ summary: Guide to implementing function calling in LLMs, showing how to integrat
 
 # Functions
 
-It's possible to hook up functions that the LLM can decide to call if it thinks it can help with the task at hand. This is done by creating a class with the [`[Prompt]`](https://github.com/microsoft/teams.net/blob/main/Libraries/Microsoft.Teams.AI/Annotations/PromptAttribute.cs) attribute and adding functions with the [`[Function]`](https://github.com/microsoft/teams.net/blob/main/Libraries/Microsoft.Teams.AI/Annotations/FunctionAttribute.cs) attribute.
+It's possible to hook up functions that the LLM can decide to call if it thinks it can help with the task at hand. This is done by registering functions with a `ChatPrompt` using the `.Function()` method.
 
 ```mermaid
 sequenceDiagram
   participant User
   participant ChatPrompt
   participant LLM
-  participant Function-GetWeather
+  participant Function-PokemonSearch
   participant ExternalAPI
 
-  User->>ChatPrompt: send(activity.text)
+  User->>ChatPrompt: send("Tell me about Pikachu")
   ChatPrompt->>LLM: Provide instructions, message, and available functions
-    LLM->>ChatPrompt: Decide to call `GetWeather` with parameters
-    ChatPrompt->>Function-GetWeather: Execute with location
-    Function-GetWeather->>ExternalAPI: fetch weather data
-    ExternalAPI-->>Function-GetWeather: return weather info
-    Function-GetWeather-->>ChatPrompt: return result
+    LLM->>ChatPrompt: Decide to call `pokemon_search` with pokemon_name="Pikachu"
+    ChatPrompt->>Function-PokemonSearch: Execute with pokemon_name
+    Function-PokemonSearch->>ExternalAPI: fetch Pokemon data
+    ExternalAPI-->>Function-PokemonSearch: return Pokemon info
+    Function-PokemonSearch-->>ChatPrompt: return result
   ChatPrompt->>LLM: Send function result(s)
   LLM-->>ChatPrompt: Final user-facing response
   ChatPrompt-->>User: send(result.content)
@@ -29,308 +29,187 @@ sequenceDiagram
 
 ## Single Function Example
 
-Here's a complete example showing how to create a weather function that the LLM can call:
+Here's a complete example showing how to create a Pokemon search function that the LLM can call:
 
-**WeatherPrompt.cs**
 ```csharp
+using System.Text.Json;
 using Microsoft.Teams.AI.Annotations;
-using Microsoft.Teams.Api.Activities;
-using Microsoft.Teams.Apps;
-
-namespace WeatherApp;
-
-[Prompt]
-[Prompt.Description("Provide weather information for locations")]
-[Prompt.Instructions(
-    "You are a helpful weather assistant.",
-    "You can get current weather information for any location.",
-    "Always provide temperature in both Celsius and Fahrenheit."
-)]
-public class WeatherPrompt(IContext.Accessor accessor)
-{
-    private IContext<IActivity> context => accessor.Value!;
-
-    [Function]
-    [Function.Description("Get the current weather for a specific location")]
-    public async Task<string> GetWeather(
-        [Param("The city and state/country, e.g. 'San Francisco, CA' or 'London, UK'")]
-        string location)
-    {
-        // In a real implementation, you would call a weather API
-        // For demo purposes, we'll return mock data
-        await Task.Delay(100); // Simulate API call
-        
-        return $"The weather in {location} is sunny with a temperature of 22°C (72°F). " +
-               $"Humidity is 65% with light winds from the west at 10 km/h.";
-    }
-}
-```
-
-### Program Setup {#program-setup}
-
-**Program.cs**
-```csharp
-using Microsoft.Teams.AI.Models.OpenAI.Extensions;
-using Microsoft.Teams.Apps.Extensions;
-using Microsoft.Teams.Plugins.AspNetCore.DevTools.Extensions;
-using Microsoft.Teams.Plugins.AspNetCore.Extensions;
-
-using WeatherApp;
-
-var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddTransient<Controller>();
-builder.AddTeams().AddTeamsDevTools().AddOpenAI<WeatherPrompt>();
-
-var app = builder.Build();
-
-app.UseTeams();
-app.Run();
-```
-
-### Controller Implementation {#controller-implementation}
-
-**Controller.cs**
-```csharp
 using Microsoft.Teams.AI.Models.OpenAI;
+using Microsoft.Teams.AI.Prompts;
+using Microsoft.Teams.AI.Templates;
 using Microsoft.Teams.Api.Activities;
 using Microsoft.Teams.Apps;
-using Microsoft.Teams.Apps.Activities;
-using Microsoft.Teams.Apps.Annotations;
 
-namespace WeatherApp;
-
-[TeamsController("main")]
-public class Controller(Func<OpenAIChatPrompt> prompt)
+/// <summary>
+/// Handle Pokemon search using PokeAPI
+/// </summary>
+public static async Task<string> PokemonSearchFunction([Param("pokemon_name")] string pokemonName)
 {
-    [Message]
-    public async Task OnMessage(IContext<MessageActivity> context)
+    try
     {
-        // Send the user's message to the prompt and stream the response back
-        await prompt().Send(context.Activity.Text, null, 
-            (chunk) => Task.Run(() => context.Stream.Emit(chunk)));
+        using var client = new HttpClient();
+        var response = await client.GetAsync($"https://pokeapi.co/api/v2/pokemon/{pokemonName.ToLower()}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return $"Pokemon '{pokemonName}' not found";
+        }
+
+        var json = await response.Content.ReadAsStringAsync();
+        var data = JsonDocument.Parse(json);
+        var root = data.RootElement;
+
+        var name = root.GetProperty("name").GetString();
+        var height = root.GetProperty("height").GetInt32();
+        var weight = root.GetProperty("weight").GetInt32();
+        var types = root.GetProperty("types")
+            .EnumerateArray()
+            .Select(t => t.GetProperty("type").GetProperty("name").GetString())
+            .ToList();
+
+        return $"Pokemon {name}: height={height}, weight={weight}, types={string.Join(", ", types)}";
+    }
+    catch (Exception ex)
+    {
+        return $"Error searching for Pokemon: {ex.Message}";
+    }
+}
+
+/// <summary>
+/// Handle single function calling - Pokemon search
+/// </summary>
+public static async Task HandlePokemonSearch(OpenAIChatModel model, IContext<MessageActivity> context)
+{
+    var prompt = new OpenAIChatPrompt(model, new ChatPromptOptions
+    {
+        Instructions = new StringTemplate("You are a helpful assistant that can look up Pokemon for the user.")
+    });
+
+    // Register the pokemon search function
+    prompt.Function(
+        "pokemon_search",
+        "Search for pokemon information including height, weight, and types",
+        PokemonSearchFunction
+    );
+
+    var result = await prompt.Send(context.Activity.Text);
+
+    if (result.Content != null)
+    {
+        var message = new MessageActivity
+        {
+            Text = result.Content,
+        }.AddAIGenerated();
+        await context.Send(message);
+    }
+    else
+    {
+        await context.Reply("Sorry I could not find that pokemon");
     }
 }
 ```
 
-### How Dependency Injection Works
+### How It Works
 
-The dependency injection flow connects the prompt class with functions to the controller:
+1. **Function Definition**: The function is defined as a regular C# method with parameters decorated with the `[Param]` attribute
+2. **Automatic Schema Generation**: The library automatically generates the JSON schema for the function parameters using reflection
+3. **Function Registration**: The `.Function()` method registers the function with the prompt, providing:
+   - The function name (used by the LLM)
+   - A description of what the function does
+   - The delegate/handler to execute
+4. **Automatic Invocation**: When the LLM decides to call the function, it automatically:
+   - Parses the function call arguments
+   - Validates them against the schema
+   - Invokes the handler
+   - Returns the result back to the LLM
 
-1. **Registration**: [`AddOpenAI<WeatherPrompt>()`](#program-setup) in `Program.cs` registers the `WeatherPrompt` class and creates an `OpenAIChatPrompt<WeatherPrompt>` instance
-2. **Injection**: The controller constructor receives [`OpenAIChatPrompt<WeatherPrompt>`](#controller-implementation) which is automatically configured with the functions from `WeatherPrompt`
-3. **Usage**: When [`prompt.Send()`](#controller-implementation) is called, the LLM has access to all functions defined in the `WeatherPrompt` class
+## Multiple Functions
 
-The generic type parameter `<WeatherPrompt>` ensures type safety and connects the specific prompt class (with its functions) to the chat prompt instance used in the controller.
+Additionally, for complex scenarios, you can add multiple functions to the `ChatPrompt`. The LLM will then decide which function(s) to call based on the context of the conversation.
 
-## Multiple functions
-
-Additionally, for complex scenarios, you can add multiple functions to a single prompt class. The LLM will then decide which function to call based on the context of the conversation. The LLM can pick one or more functions to call before returning the final response.
-
-**UtilityPrompt.cs**
 ```csharp
-using Microsoft.Teams.AI.Annotations;
-using Microsoft.Teams.Api.Activities;
-using Microsoft.Teams.Apps;
-using System.Data;
-
-namespace UtilityApp;
-
-[Prompt]
-[Prompt.Description("Multi-purpose assistant with weather, time, and calculator functions")]
-[Prompt.Instructions(
-    "You are a helpful assistant with access to multiple utilities.",
-    "You can get weather information, current time, and perform calculations.",
-    "Use the appropriate function based on what the user is asking for."
-)]
-public class UtilityPrompt(IContext.Accessor accessor)
+/// <summary>
+/// Get user location (mock)
+/// </summary>
+public static string GetLocationFunction()
 {
-    private IContext<IActivity> context => accessor.Value!;
+    var locations = new[] { "Seattle", "San Francisco", "New York" };
+    var random = new Random();
+    var location = locations[random.Next(locations.Length)];
+    return location;
+}
 
-    [Function]
-    [Function.Description("Get the current weather for a specific location")]
-    public async Task<string> GetWeather(
-        [Param("The city and state/country")] string location)
+/// <summary>
+/// Get weather for location (mock)
+/// </summary>
+public static string GetWeatherFunction([Param] string location)
+{
+    var weatherByLocation = new Dictionary<string, (int Temperature, string Condition)>
     {
-        await Task.Delay(100); // Simulate API call
-        return $"Weather in {location}: Sunny, 22°C (72°F), 65% humidity";
+        ["Seattle"] = (65, "sunny"),
+        ["San Francisco"] = (60, "foggy"),
+        ["New York"] = (75, "rainy")
+    };
+
+    if (!weatherByLocation.TryGetValue(location, out var weather))
+    {
+        return "Sorry, I could not find the weather for that location";
     }
 
-    [Function]
-    [Function.Description("Get the current date and time")]
-    public string GetCurrentTime(
-        [Param("Optional timezone, e.g. 'UTC', 'EST', 'PST'")] string? timezone = null)
-    {
-        var now = DateTime.Now;
-        if (!string.IsNullOrEmpty(timezone))
-        {
-            // In a real implementation, you would handle timezone conversion
-            return $"Current time ({timezone}): {now:yyyy-MM-dd HH:mm:ss}";
-        }
-        return $"Current time: {now:yyyy-MM-dd HH:mm:ss}";
-    }
+    return $"The weather in {location} is {weather.Condition} with a temperature of {weather.Temperature}°F";
+}
 
-    [Function]
-    [Function.Description("Calculate the result of a mathematical expression")]
-    public string Calculate(
-        [Param("Mathematical expression to evaluate, e.g. '2 + 2' or '10 * 5'")] 
-        string expression)
+/// <summary>
+/// Handle multiple function calling - location then weather
+/// </summary>
+public static async Task HandleMultipleFunctions(OpenAIChatModel model, IContext<MessageActivity> context)
+{
+    var prompt = new OpenAIChatPrompt(model, new ChatPromptOptions
     {
-        try
-        {
-            // Simple calculator using DataTable.Compute
-            var result = new DataTable().Compute(expression, null);
-            return $"Result: {expression} = {result}";
-        }
-        catch (Exception ex)
-        {
-            return $"Error calculating '{expression}': {ex.Message}";
-        }
-    }
+        Instructions = new StringTemplate("You are a helpful assistant that can help the user get the weather. First get their location, then get the weather for that location.")
+    });
 
-    [Function]
-    [Function.Description("Convert temperature between Celsius and Fahrenheit")]
-    public string ConvertTemperature(
-        [Param("Temperature value to convert")] double temperature,
-        [Param("Source unit: 'C' for Celsius or 'F' for Fahrenheit")] string fromUnit)
+    // Register both functions
+    prompt.Function(
+        "get_user_location",
+        "Gets the location of the user",
+        GetLocationFunction
+    );
+
+    prompt.Function(
+        "weather_search",
+        "Search for weather at a specific location",
+        GetWeatherFunction
+    );
+
+    var result = await prompt.Send(context.Activity.Text);
+
+    if (result.Content != null)
     {
-        if (fromUnit.ToUpper() == "C")
+        var message = new MessageActivity
         {
-            var fahrenheit = (temperature * 9 / 5) + 32;
-            return $"{temperature}°C = {fahrenheit:F1}°F";
-        }
-        else if (fromUnit.ToUpper() == "F")
-        {
-            var celsius = (temperature - 32) * 5 / 9;
-            return $"{temperature}°F = {celsius:F1}°C";
-        }
-        else
-        {
-            return "Invalid unit. Use 'C' for Celsius or 'F' for Fahrenheit.";
-        }
+            Text = result.Content,
+        }.AddAIGenerated();
+        await context.Send(message);
+    }
+    else
+    {
+        await context.Reply("Sorry I could not figure it out");
     }
 }
 ```
 
-**Program.cs**
-```csharp
-using Microsoft.Teams.AI.Models.OpenAI.Extensions;
-using Microsoft.Teams.Apps.Extensions;
-using Microsoft.Teams.Plugins.AspNetCore.Extensions;
+### Multiple Function Execution Flow
 
-using UtilityApp;
+When you register multiple functions:
 
-var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSingleton<Controller>();
-builder.AddTeams().AddOpenAI<UtilityPrompt>();
+1. The LLM receives information about all available functions
+2. Based on the user's query, it decides which function(s) to call and in what order
+3. For example, asking "What's the weather?" might trigger:
+   - First: `get_user_location()` to determine where the user is
+   - Then: `weather_search(location)` to get the weather for that location
+4. The LLM combines all function results to generate the final response
 
-var app = builder.Build();
-
-app.UseTeams();
-app.Run();
-```
-
-**Controller.cs**
-```csharp
-using Microsoft.Teams.AI.Models.OpenAI;
-using Microsoft.Teams.Api.Activities;
-using Microsoft.Teams.Apps;
-using Microsoft.Teams.Apps.Activities;
-using Microsoft.Teams.Apps.Annotations;
-
-namespace UtilityApp;
-
-[TeamsController]
-public class Controller(OpenAIChatPrompt<UtilityPrompt> prompt)
-{
-    [Message]
-    public async Task OnMessage(IContext<MessageActivity> context)
-    {
-        var state = State.From(context);
-
-        await prompt.Send(context.Activity.Text, new() { Messages = state.Messages },
-            cancellationToken: context.CancellationToken);
-
-        state.Save(context);
-    }
-}
-```
-
-## Stopping Functions Early
-
-You'll notice that after the function responds, [`ChatPrompt`](https://github.com/microsoft/teams.net/blob/main/Libraries/Microsoft.Teams.AI/Prompts/ChatPrompt/ChatPrompt.cs) re-sends the response from the function invocation back to the LLM which responds back with the user-facing message. It's possible to prevent this "automatic" function calling by implementing an [`IChatPlugin`](https://github.com/microsoft/teams.net/blob/main/Libraries/Microsoft.Teams.AI/ChatPlugin.cs) and using the [`OnBeforeFunctionCall()`](https://github.com/microsoft/teams.net/blob/main/Libraries/Microsoft.Teams.AI/ChatPlugin.cs#L42) method to manually control function execution.
-
-**FunctionControlPlugin.cs**
-```csharp
-using Microsoft.Teams.AI;
-using Microsoft.Teams.AI.Functions;
-
-namespace FunctionControlApp;
-
-public class FunctionControlPlugin : IChatPlugin
-{
-    public Task<IMessage> OnBeforeSend<TOptions>(IChatPrompt<TOptions> prompt, IMessage message, TOptions? options = default, CancellationToken cancellationToken = default)
-    {
-        // Pass through without modification
-        return Task.FromResult(message);
-    }
-
-    public Task<IMessage> OnAfterSend<TOptions>(IChatPrompt<TOptions> prompt, IMessage message, TOptions? options = default, CancellationToken cancellationToken = default)
-    {
-        // Pass through without modification
-        return Task.FromResult(message);
-    }
-
-    public Task<FunctionCall> OnBeforeFunctionCall<TOptions>(IChatPrompt<TOptions> prompt, IFunction function, FunctionCall call, CancellationToken cancellationToken = default)
-    {
-        // You can modify the function call here or prevent it from executing
-        // For example, add logging, validation, or conditional execution
-        Console.WriteLine($"About to call function: {function.Name} with parameters: {call.Arguments}");
-        
-        // You could return null or throw an exception to prevent the function from being called
-        // return Task.FromResult<FunctionCall>(null!); // This would stop the function from executing
-        
-        // Or modify the call parameters
-        // call.Arguments = ModifyArguments(call.Arguments);
-        
-        return Task.FromResult(call);
-    }
-
-    public Task<object?> OnAfterFunctionCall<TOptions>(IChatPrompt<TOptions> prompt, IFunction function, FunctionCall call, object? output, CancellationToken cancellationToken = default)
-    {
-        // You can modify the function output here or handle the result
-        Console.WriteLine($"Function {function.Name} returned: {output}");
-        
-        // You could modify the output before it's sent back to the LLM
-        // return Task.FromResult<object?>(ModifyOutput(output));
-        
-        return Task.FromResult(output);
-    }
-}
-```
-
-**Program.cs with Plugin**
-```csharp
-using Microsoft.Teams.AI.Models.OpenAI.Extensions;
-using Microsoft.Teams.Apps.Extensions;
-using Microsoft.Teams.Plugins.AspNetCore.Extensions;
-
-using FunctionControlApp;
-
-var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSingleton<Controller>();
-builder.Services.AddSingleton<FunctionControlPlugin>();
-builder.AddTeams().AddOpenAI<WeatherPrompt>();
-
-var app = builder.Build();
-
-// Register the plugin with the prompt
-var serviceProvider = app.Services;
-var prompt = serviceProvider.GetRequiredService<OpenAIChatPrompt<WeatherPrompt>>();
-var plugin = serviceProvider.GetRequiredService<FunctionControlPlugin>();
-prompt.Plugin(plugin);
-
-app.UseTeams();
-app.Run();
-```
-
-This approach gives you fine-grained control over function execution, allowing you to implement custom logic for validation, logging, conditional execution, or result modification before the response is sent back to the LLM.
+:::tip
+The LLM can call functions sequentially - using the output of one function as input to another - without any additional configuration. This makes it powerful for complex, multi-step workflows.
+:::
