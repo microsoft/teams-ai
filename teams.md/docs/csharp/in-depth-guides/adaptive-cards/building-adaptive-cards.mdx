@@ -3,6 +3,9 @@ sidebar_position: 1
 summary: Learn to create Adaptive Cards in C# using builder helpers, enabling type-safe, maintainable UI development with IntelliSense support, visual designer integration, and end-to-end examples for interactive forms.
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Building Adaptive Cards
 
 Adaptive Cards are JSON payloads that describe rich, interactive UI fragments.
@@ -149,7 +152,7 @@ var cardJson = """
 """;
 
 // Deserialize the JSON into an AdaptiveCard object
-var card = System.Text.Json.JsonSerializer.Deserialize<AdaptiveCard>(cardJson);
+var card = AdaptiveCard.Deserialize(cardJson);
 
 // Send the card
 await client.Send(card);
@@ -165,22 +168,43 @@ You can use a combination of raw JSON and builder helpers depending on whatever 
 
 ## End‑to‑end Example – Task Form Card
 
-Below is a complete example showing a task management form. Notice how the builder pattern keeps the file readable and maintainable:
-
-```csharp
-[Message]
-public async Task OnMessage([Context] MessageActivity activity, [Context] IContext.Client client)
-{
-    var text = activity.Text?.ToLowerInvariant() ?? "";
-
-    if (text.Contains("form"))
+Below is a complete example showing a task management form.
+<Tabs>
+  <TabItem label="Controller" value="controller" default>
+    ```csharp
+    [Message]
+    public async Task OnMessage([Context] MessageActivity activity, [Context] IContext.Client client)
     {
-        await client.Typing();
-        var card = CreateTaskFormCard();
-        await client.Send(card);
-    }
-}
+        var text = activity.Text?.ToLowerInvariant() ?? "";
 
+        if (text.Contains("form"))
+        {
+            await client.Typing();
+            var card = CreateTaskFormCard();
+            await client.Send(card);
+        }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Minimal" value="minimal">
+    ```csharp
+    teams.OnMessage(async context =>
+    {
+        var text = context.Activity.Text?.ToLowerInvariant() ?? "";
+
+        if (text.Contains("form"))
+        {
+            await context.Typing();
+            var card = CreateTaskFormCard();
+            await context.Send(card);
+        }
+    });
+    ```
+  </TabItem>
+</Tabs>
+
+The definition for `CreateTaskFormCard` is as follows
+```csharp
 private static AdaptiveCard CreateTaskFormCard()
 {
     return new AdaptiveCard
@@ -244,7 +268,6 @@ private static AdaptiveCard CreateTaskFormCard()
     };
 }
 ```
-
 
 ## Additional Resources
 
