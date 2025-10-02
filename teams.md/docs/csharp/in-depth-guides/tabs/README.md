@@ -10,6 +10,5 @@ Tabs are host-aware webpages embedded in Microsoft Teams, Outlook, and Microsoft
 This library does not offer features for implementing Tab apps in C#. It does however let you host tab apps and implement functions that can be called by Tab apps.
 
 ## Additional resources
-- [Hosting Web Apps](../../essentials/hosting-web-apps.md)
-- [Handling Functions](../../essentials/handling-functions.md)
+- [Hosting Apps/Static Pages](../../essentials/hosting-static-pages.md)
 - [Typescript Tabs in-depth guide](../../../typescript/in-depth-guides/tabs)
