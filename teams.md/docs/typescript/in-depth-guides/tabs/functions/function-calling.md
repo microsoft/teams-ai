@@ -3,7 +3,7 @@ sidebar_position: 4
 summary: Call remote agent functions from tab apps with authentication and custom headers using the exec() method.
 ---
 
-# Functions
+# Executing Functions 
 
 The client App exposes an `exec()` method that can be used to call functions implemented in an agent created with this library. The function call uses the `app.http` client to make a request, attaching a bearer token created from the `app.msalInstance` MSAL public client application, so that the remote function can authenticate and authorize the caller.
 
