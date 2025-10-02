@@ -24,7 +24,7 @@ await app.start();
 const result = await app.exec<string>('my-function');
 ```
 
-If the deployment is more complex, the [AppOptions](./app-options.md) can be used to influence the URL as well as the scope in the token.
+If the deployment is more complex, the [AppOptions](../app-options) can be used to influence the URL as well as the scope in the token.
 
 ## Function arguments
 Any argument for the remote function can be provided as an object.
@@ -57,7 +57,7 @@ const result = await app.exec('my-other-function', args, { requestHeaders} );
 
 
 ## Request bearer token
-By default, the HTTP request will include a header with a bearer token acquired by requesting an `access_as_user` permission. The resource used for the request depends on the `remoteApiOptions.remoteAppResource` [AppOption](../app-options.md). If this app option is not provided, the token is requested for the scope `api://<clientId>/access_as_user`. If this option is provided, the token is requested for the scope `<remoteApiOptions.remoteAppResource>/access_as_user`.
+By default, the HTTP request will include a header with a bearer token acquired by requesting an `access_as_user` permission. The resource used for the request depends on the `remoteApiOptions.remoteAppResource` [AppOption](../app-options). If this app option is not provided, the token is requested for the scope `api://<clientId>/access_as_user`. If this option is provided, the token is requested for the scope `<remoteApiOptions.remoteAppResource>/access_as_user`.
 
 When calling a function that requires a different permission or scope, the `exec` options let you override the behavior. 
 
