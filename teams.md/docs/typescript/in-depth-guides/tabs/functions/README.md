@@ -3,7 +3,7 @@ sidebar_position: 6
 summary: Details on how to register REST endpoints that can be called from Tab apps.
 ---
 
-# Handling Functions
+# Functions
 Agents may want to expose REST APIs that client applications can call. This library makes it easy to implement those APIs through the `app.function()` method. The function takes a name and a callback that implements the function.
 
 ```typescript
@@ -81,5 +81,4 @@ To simplify two common scenarios, the context provides the `getCurrentConversati
   - The `send` method relies on `getCurrentConversationId` to find the conversation where the app is hosted and posts an activity. 
 
 ## Additional resources
- - For details on how to Tab apps can invoke these functions, see the [Tab Functions](../in-depth-guides/tabs/function-calling.md) in-depth guide.
- - For more information about the teams-js getContext() API, see the [Teams JavaScript client library](https://learn.microsoft.com/en-us/microsoftteams/platform/tabs/how-to/using-teams-client-library) documentation.
+ - For details on how to Tab apps can invoke these functions, see the [Executing Functions](./function-calling.md) in-depth guide.
