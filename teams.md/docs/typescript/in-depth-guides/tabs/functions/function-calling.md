@@ -44,7 +44,7 @@ If needed, you can add additional headers to the `requestHeaders` option field. 
 
 ```typescript
 const requestHeaders = {
-  'x-custom-correlation-id': 'bf12aa3c-7460-4644-a22e-fb890af2ff41',
+  'x-custom-correlation-id': 'aaaa0000-bb11-2222-33cc-444444dddddd',
 };
 
 // custom headers when the function does not take arguments

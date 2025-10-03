@@ -21,7 +21,7 @@ function editProfileCard() {
     action: "save_profile",
     entityId: "12345",     // From action data
     name: "John Doe",      // From name input
-    email: "john@doe.com", // From email input
+    email: "john@contoso.com", // From email input
     subscribe: "true"      // From toggle input (as string)
   }
   */
