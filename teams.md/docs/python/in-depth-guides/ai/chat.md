@@ -104,4 +104,4 @@ async def handle_message(ctx: ActivityContext[MessageActivity]):
         ctx.stream.emit(MessageActivityInput().add_ai_generated())
 ```
 
-![Streaming the response](/screenshots/streaming-chat.gif)
+![Animated image showing agent response text incrementally appearing in the chat window.](/screenshots/streaming-chat.gif)

@@ -60,7 +60,7 @@ If you used the [CLI](../cli) to create an `atk` configuration for your app, Dev
 
 When you open the page, you will see a Teams-like chat window and you can immediately interact with your agent.
 
-![Devtools chat](/screenshots/devtools-echo-chat.png)
+![Screenshot of DevTools showing user prompt 'hello!' and agent response 'you said hello!'.](/screenshots/devtools-echo-chat.png)
 
 ## Teams chat terminology
 
