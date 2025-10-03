@@ -56,13 +56,13 @@ This error occurs when the application has a single-tenant Azure Bot Service (`m
 [ERROR] Echobot Failed to get bot token on app startup.
 [ERROR] Echobot {
 [ERROR] Echobot   "error": "invalid_client",
-[ERROR] Echobot   "error_description": "AADSTS7000229: The client application 78b9b9b6-6a3d-4c8f-9a53-95701700b726 is missing service principal in the tenant 50612dbb-0237-4969-b378-8d42590f9c00. See instructions here: https://go.microsoft.com/fwlink/?linkid=2225119 Trace ID: 2965b26b-acdd-4cd7-8943-728a92074900 Correlation ID: 5a27b7c5-4754-4f0d-ac66-0bf9eec02fd9 Timestamp: 2025-09-18 02:26:20Z",
+[ERROR] Echobot   "error_description": "AADSTS7000229: The client application 00001111-aaaa-2222-bbbb-3333cccc4444 is missing service principal in the tenant aaaabbbb-0000-cccc-1111-dddd2222eeee. See instructions here: https://go.microsoft.com/fwlink/?linkid=2225119 Trace ID: 0000aaaa-11bb-cccc-dd22-eeeeee333333 Correlation ID: aaaa0000-bb11-2222-33cc-444444dddddd Timestamp: 2025-09-18 02:26:20Z",
 [ERROR] Echobot   "error_codes": [
 [ERROR] Echobot     7000229
 [ERROR] Echobot   ],
 [ERROR] Echobot   "timestamp": "2025-09-18 02:26:20Z",
-[ERROR] Echobot   "trace_id": "2965b26b-acdd-4cd7-8943-728a92074900",
-[ERROR] Echobot   "correlation_id": "5a27b7c5-4754-4f0d-ac66-0bf9eec02fd9",
+[ERROR] Echobot   "trace_id": "0000aaaa-11bb-cccc-dd22-eeeeee333333",
+[ERROR] Echobot   "correlation_id": "aaaa0000-bb11-2222-33cc-444444dddddd",
 [ERROR] Echobot   "error_uri": "https://login.microsoftonline.com/error?code=7000229"
 [ERROR] Echobot }
 ```
