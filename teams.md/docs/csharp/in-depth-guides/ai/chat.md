@@ -105,4 +105,4 @@ Streaming is only currently supported for single 1:1 chats, and not for groups o
             context.CancellationToken);
 ```
 ### User experience
-![Streaming the response](/screenshots/streaming-chat.gif)
+![Animated image showing agent response text incrementally appearing in the chat window.](/screenshots/streaming-chat.gif)

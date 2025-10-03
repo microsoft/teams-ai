@@ -16,7 +16,7 @@ There are three different areas search commands can be invoked from:
 
 ### Compose Area and Box
 
-![compose area and box](/screenshots/compose-area.png)
+![Screenshot of Teams with outlines around the 'Compose Box' (for typing messages) and the 'Compose Area' (the menu option next to the compose box that provides a search bar for actions and apps).](/screenshots/compose-area.png)
 
 ## Setting up your Teams app manifest
 
@@ -137,11 +137,11 @@ async def create_dummy_cards(search_query: str) -> List[Dict[str, Any]]:
 
 The search results include both a full adaptive card and a preview card. The preview card appears as a list item in the search command area:
 
-![Search command preview card](/screenshots/preview-card.png)
+![Screenshot of Teams showing a message extensions search menu open with list of search results displayed as preview cards.](/screenshots/preview-card.png)
 
 When a user clicks on a list item the dummy adaptive card is added to the compose box:
 
-![Card in compose box](/screenshots/card-in-compose.png)
+![Screenshot of Teams showing the selected adaptive card added to the compose box.](/screenshots/card-in-compose.png)
 
 To implement custom actions when a user clicks on a search result item, you can add the `tap` property to the preview card. This allows you to handle the click event with custom logic:
 

@@ -78,9 +78,9 @@ This error occurs when the application has a single-tenant Azure Bot Service (`m
    - Azure deployment → `env/.env.dev`
 4. **Check if a Service Principal exists**  
    Open the app registration and verify if a Service Principal is created. If it exists already, you should see an entry for a **Managed Application in your local directory** if it exists.
-  ![Existing Service Principal](/screenshots/existing-service-principal.png)
+  ![Screenshot of App Registrations pane in Azure Portal showing value of 'Graphlocal' under the 'Managed application in local directory' field.](/screenshots/existing-service-principal.png)
 5. **Create a Service Principal if missing**  
    If it doesn’t exist, click **Create Service Principal** . Wait for the page to finish loading.
-   ![Create Service Principal](/screenshots/create-service-principal.png)
+   ![Screenshot of App Registrations pane in Azure Portal showing value of 'Create Service Principal' under the 'Managed application in local directory' field.](/screenshots/create-service-principal.png)
 6. **Restart your app**  
    Once the Service Principal is created, restart your application.

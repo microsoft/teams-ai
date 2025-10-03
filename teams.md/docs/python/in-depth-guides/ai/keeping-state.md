@@ -94,4 +94,4 @@ async def handle_message(ctx: ActivityContext[MessageActivity]):
     await handle_stateful_conversation(ai_model, ctx)
 ```
 
-![Stateful Chat Example](/screenshots/stateful-chat-example.png)
+![Screenshot of chat between user and agent, user first states 'My dinosaur's name is Barnie' and later asks What's my pet's name and the agent responds correctly with 'Barnie'.](/screenshots/stateful-chat-example.png)
