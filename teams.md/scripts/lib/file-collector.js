@@ -9,22 +9,22 @@ const path = require('path');
  */
 function collectFiles(dirPath, extensions = ['.md', '.mdx']) {
     const files = [];
-    
+
     if (!fs.existsSync(dirPath)) {
         console.warn(`⚠️ Directory not found: ${dirPath}`);
         return files;
     }
-    
+
     /**
      * Recursively traverse directory
      * @param {string} currentPath - Current directory path
      */
     function traverse(currentPath) {
         const items = fs.readdirSync(currentPath, { withFileTypes: true });
-        
+
         for (const item of items) {
             const fullPath = path.join(currentPath, item.name);
-            
+
             if (item.isDirectory()) {
                 // Skip common directories that don't contain docs
                 if (!shouldSkipDirectory(item.name)) {
@@ -38,9 +38,9 @@ function collectFiles(dirPath, extensions = ['.md', '.mdx']) {
             }
         }
     }
-    
+
     traverse(dirPath);
-    
+
     // Sort files for consistent ordering
     return files.sort();
 }
@@ -61,7 +61,7 @@ function shouldSkipDirectory(dirName) {
         'coverage',
         '__pycache__'
     ];
-    
+
     return skipDirs.includes(dirName) || dirName.startsWith('.');
 }
 
@@ -74,12 +74,13 @@ function shouldSkipDirectory(dirName) {
 function getHierarchicalFiles(basePath, language) {
     const mainPath = path.join(basePath, 'docs', 'main');
     const langPath = path.join(basePath, 'docs', language);
-    
+
     const structure = {
-        main: buildHierarchicalStructure(mainPath),
+        // Removing putting "main" in llmstxt since it doesn't help LLMs much
+        // main: buildHierarchicalStructure(mainPath),
         language: buildHierarchicalStructure(langPath)
     };
-    
+
     return structure;
 }
 
@@ -92,9 +93,10 @@ function buildHierarchicalStructure(rootPath) {
     if (!fs.existsSync(rootPath)) {
         return {};
     }
-    
+
     const structure = {};
-    
+    const seenTitles = new Map(); // Track titles and their file paths for duplicate detection
+
     /**
      * Recursively processes a directory
      * @param {string} dirPath - Current directory path
@@ -102,20 +104,20 @@ function buildHierarchicalStructure(rootPath) {
      */
     function processDirectory(dirPath, currentLevel) {
         const items = fs.readdirSync(dirPath, { withFileTypes: true });
-        
+
         // Collect folders and files separately
         const folders = [];
         const files = [];
-        
+
         for (const item of items) {
             const fullPath = path.join(dirPath, item.name);
-            
+
             if (item.isDirectory() && !shouldSkipDirectory(item.name)) {
                 // Process subdirectory
                 const readmePath = path.join(fullPath, 'README.md');
                 let folderOrder = 999;
                 let folderTitle = item.name;
-                
+
                 // Get folder ordering from README.md
                 if (fs.existsSync(readmePath)) {
                     try {
@@ -123,20 +125,34 @@ function buildHierarchicalStructure(rootPath) {
                         const frontmatterMatch = readmeContent.match(/^---\s*\n([\s\S]*?)\n---/);
                         if (frontmatterMatch) {
                             const frontmatter = parseFrontmatter(frontmatterMatch[1]);
-                            
+
                             // Skip this entire folder if README is marked to ignore
                             if (frontmatter.llms === 'ignore' || frontmatter.llms === false) {
                                 continue; // Skip this folder entirely
                             }
-                            
+
+                            // If README is marked ignore-file, skip just the README but process folder
+                            // (folderOrder and folderTitle will use defaults)
+
                             folderOrder = frontmatter.sidebar_position || 999;
-                            folderTitle = frontmatter.title || frontmatter.sidebar_label || formatFolderName(item.name);
+
+                            // Extract title from frontmatter or first # header
+                            if (frontmatter.title || frontmatter.sidebar_label) {
+                                folderTitle = frontmatter.title || frontmatter.sidebar_label;
+                            } else {
+                                // Extract from first # header
+                                const contentWithoutFrontmatter = readmeContent.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
+                                const headerMatch = contentWithoutFrontmatter.match(/^#\s+(.+)$/m);
+                                if (headerMatch) {
+                                    folderTitle = headerMatch[1].trim();
+                                }
+                            }
                         }
                     } catch (error) {
                         // Ignore errors reading README
                     }
                 }
-                
+
                 folders.push({
                     name: item.name,
                     title: folderTitle,
@@ -147,25 +163,45 @@ function buildHierarchicalStructure(rootPath) {
                 // Process file
                 let fileOrder = 999;
                 let fileTitle = item.name;
-                
+
                 try {
                     const content = fs.readFileSync(fullPath, 'utf8');
+                    let contentWithoutFrontmatter = content;
+
                     const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
                     if (frontmatterMatch) {
                         const frontmatter = parseFrontmatter(frontmatterMatch[1]);
-                        
-                        // Skip this file if marked to ignore
-                        if (frontmatter.llms === 'ignore' || frontmatter.llms === false) {
+
+                        // Skip this file if marked to ignore (including ignore-file)
+                        if (frontmatter.llms === 'ignore' || frontmatter.llms === 'ignore-file' || frontmatter.llms === false) {
                             continue; // Skip this file
                         }
-                        
+
                         fileOrder = frontmatter.sidebar_position || 999;
-                        fileTitle = frontmatter.title || frontmatter.sidebar_label || formatFileName(item.name);
+                        contentWithoutFrontmatter = content.replace(frontmatterMatch[0], '');
                     }
+
+                    // Extract title from first # header
+                    const headerMatch = contentWithoutFrontmatter.match(/^#\s+(.+)$/m);
+                    if (headerMatch) {
+                        fileTitle = headerMatch[1].trim();
+                    }
+
+                    // Check for duplicate titles
+                    if (seenTitles.has(fileTitle)) {
+                        const existingPath = seenTitles.get(fileTitle);
+                        throw new Error(
+                            `Duplicate title found: "${fileTitle}"\n` +
+                            `  First occurrence: ${existingPath}\n` +
+                            `  Duplicate found in: ${fullPath}`
+                        );
+                    }
+                    seenTitles.set(fileTitle, fullPath);
                 } catch (error) {
-                    // Ignore errors reading file
+                    // Re-throw to fail the build
+                    throw error;
                 }
-                
+
                 files.push({
                     name: item.name,
                     title: fileTitle,
@@ -174,26 +210,26 @@ function buildHierarchicalStructure(rootPath) {
                 });
             }
         }
-        
+
         // Sort files by order and add to current level
         files.sort((a, b) => {
             if (a.order !== b.order) return a.order - b.order;
             return a.name.localeCompare(b.name);
         });
-        
+
         if (files.length > 0) {
             if (!currentLevel.files) currentLevel.files = [];
             currentLevel.files.push(...files);
         }
-        
+
         // Sort folders by order and process each one
         folders.sort((a, b) => {
             if (a.order !== b.order) return a.order - b.order;
             return a.name.localeCompare(b.name);
         });
-        
+
         if (!currentLevel.children) currentLevel.children = {};
-        
+
         for (const folder of folders) {
             currentLevel.children[folder.name] = {
                 title: folder.title,
@@ -202,16 +238,16 @@ function buildHierarchicalStructure(rootPath) {
                 files: [],
                 children: {}
             };
-            
+
             // Recursively process subdirectory
             processDirectory(folder.path, currentLevel.children[folder.name]);
         }
     }
-    
+
     // Create a temporary wrapper to handle the root properly
     const tempWrapper = { files: [], children: {} };
     processDirectory(rootPath, tempWrapper);
-    
+
     // Return the children (which contain the actual folder structure)
     return tempWrapper.children;
 }
@@ -224,18 +260,18 @@ function buildHierarchicalStructure(rootPath) {
 function parseFrontmatter(frontmatterText) {
     const frontmatter = {};
     const lines = frontmatterText.split('\n');
-    
+
     for (const line of lines) {
         const match = line.match(/^(\w+):\s*(.+)$/);
         if (match) {
             let value = match[2].trim();
-            
+
             // Remove quotes
-            if ((value.startsWith('"') && value.endsWith('"')) || 
+            if ((value.startsWith('"') && value.endsWith('"')) ||
                 (value.startsWith("'") && value.endsWith("'"))) {
                 value = value.slice(1, -1);
             }
-            
+
             // Parse boolean values
             if (value === 'true') {
                 value = true;
@@ -246,35 +282,14 @@ function parseFrontmatter(frontmatterText) {
             else if (/^\d+$/.test(value)) {
                 value = parseInt(value, 10);
             }
-            
+
             frontmatter[match[1]] = value;
         }
     }
-    
+
     return frontmatter;
 }
 
-/**
- * Formats folder name for display
- * @param {string} folderName - Raw folder name
- * @returns {string} Formatted folder name
- */
-function formatFolderName(folderName) {
-    return folderName
-        .replace(/[-_]/g, ' ')
-        .replace(/\b\w/g, l => l.toUpperCase());
-}
-
-/**
- * Formats file name for display
- * @param {string} fileName - Raw file name
- * @returns {string} Formatted file name
- */
-function formatFileName(fileName) {
-    return path.basename(fileName, path.extname(fileName))
-        .replace(/[-_]/g, ' ')
-        .replace(/\b\w/g, l => l.toUpperCase());
-}
 
 /**
  * Gets priority files for small version generation
@@ -283,27 +298,27 @@ function formatFileName(fileName) {
  */
 function getPriorityFiles(organized) {
     const priorityFiles = [];
-    
+
     // Add welcome/overview files
     priorityFiles.push(...organized.main.welcome);
-    
+
     // Add key team concepts
-    const keyTeamFiles = organized.main.teams.filter(file => 
-        file.includes('core-concepts') || 
+    const keyTeamFiles = organized.main.teams.filter(file =>
+        file.includes('core-concepts') ||
         file.includes('README.md')
     );
     priorityFiles.push(...keyTeamFiles);
-    
+
     // Add getting started files
     priorityFiles.push(...organized.language.gettingStarted);
-    
+
     // Add essential README files
-    const essentialReadmes = organized.language.essentials.filter(file => 
-        file.includes('README.md') || 
+    const essentialReadmes = organized.language.essentials.filter(file =>
+        file.includes('README.md') ||
         file.includes('app-basics')
     );
     priorityFiles.push(...essentialReadmes);
-    
+
     return priorityFiles;
 }
 

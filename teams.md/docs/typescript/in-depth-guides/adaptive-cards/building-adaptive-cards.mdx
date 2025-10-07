@@ -17,10 +17,25 @@ With `@microsoft/teams.cards` you can build these cards entirely in TypeScript /
 `@microsoft/teams.cards` exposes small **builder helpers** (`Card`, `TextBlock`, `ToggleInput`, `ExecuteAction`, _etc._).
 Each helper wraps raw JSON and provides fluent, chainable methods that keep your code concise and readable.
 
-<FileCodeBlock
-    lang="typescript"
-    src="/generated-snippets/ts/index.snippet.basic-card-building.ts"
-/>
+```ts
+import {
+    AdaptiveCard,
+    TextBlock,
+    ToggleInput,
+    ExecuteAction,
+    ActionSet,
+} from "@microsoft/teams.cards";
+
+const card = new AdaptiveCard(
+    new TextBlock('Hello world', { wrap: true, weight: 'Bolder' }),
+    new ToggleInput('Notify me').withId('notify'),
+    new ActionSet(
+        new ExecuteAction({ title: 'Submit' })
+            .withData({ action: 'submit_basic' })
+            .withAssociatedInputs('auto')
+    )
+);
+```
 
 Benefits:
 
@@ -62,11 +77,51 @@ Prefer a drag‑and‑drop approach? Use [Microsoft's Adaptive Card Designer](ht
 const cardJson = /* copied JSON */;
 const card = new AdaptiveCard().withBody(cardJson);
 ```
-
-<FileCodeBlock
-    lang="typescript"
-    src="/generated-snippets/ts/index.snippet.raw-card-json.ts"
-/>
+```ts
+const rawCard: IAdaptiveCard = {
+  type: 'AdaptiveCard',
+  body: [
+    {
+      text: 'Please fill out the below form to send a game purchase request.',
+      wrap: true,
+      type: 'TextBlock',
+      style: 'heading',
+    },
+    {
+      columns: [
+        {
+          width: 'stretch',
+          items: [
+            {
+              choices: [
+                { title: 'Call of Duty', value: 'call_of_duty' },
+                { title: 'Death\'s Door', value: 'deaths_door' },
+                { title: 'Grand Theft Auto V', value: 'grand_theft' },
+                { title: 'Minecraft', value: 'minecraft' },
+              ],
+              style: 'filtered',
+              placeholder: 'Search for a game',
+              id: 'choiceGameSingle',
+              type: 'Input.ChoiceSet',
+              label: 'Game:',
+            },
+          ],
+          type: 'Column',
+        },
+      ],
+      type: 'ColumnSet',
+    },
+  ],
+  actions: [
+    {
+      title: 'Request purchase',
+      type: 'Action.Execute',
+      data: { action: 'purchase_item' },
+    },
+  ],
+  version: '1.5',
+};
+```
 
 This method leverages the full Adaptive Card schema and ensures that the payload adheres strictly to `IAdaptiveCard`.
 
@@ -80,11 +135,54 @@ You can use a combination of raw JSON and builder helpers depending on whatever 
 
 Below is a complete example showing a task management form. Notice how the builder pattern keeps the file readable and maintainable:
 
-<FileCodeBlock
-    lang="typescript"
-    src="/generated-snippets/ts/index.snippet.sending-adaptive-card-e2e.ts"
-/>
+```ts
+import { MessageActivity } from '@microsoft/teams.api';
+import { TextBlock,
+  TextInput,
+  ChoiceSetInput,
+  DateInput,
+  ActionSet,
+  ExecuteAction
+} from '@microsoft/teams.cards';
 
+app.on('message', async ({ send, activity }) => {
+  await send({ type: 'typing' });
+  const card = new AdaptiveCard(
+    new TextBlock('Create New Task', {
+      size: 'Large',
+      weight: 'Bolder',
+    }),
+    new TextInput({ id: 'title' })
+      .withLabel('Task Title')
+      .withPlaceholder('Enter task title'),
+    new TextInput({ id: 'description' })
+      .withLabel('Description')
+      .withPlaceholder('Enter task details')
+      .withIsMultiline(true),
+    new ChoiceSetInput(
+      { title: 'High', value: 'high' },
+      { title: 'Medium', value: 'medium' },
+      { title: 'Low', value: 'low' }
+    )
+      .withId('priority')
+      .withLabel('Priority')
+      .withValue('medium'),
+    new DateInput({ id: 'due_date' })
+      .withLabel('Due Date')
+      .withValue(new Date().toISOString().split('T')[0]),
+    new ActionSet(
+      new ExecuteAction({ title: 'Create Task' })
+        .withData({ action: 'create_task' })
+        .withAssociatedInputs('auto')
+        .withStyle('positive')
+    )
+  );
+  await send(card);
+  // Or build a complex activity out that includes the card:
+  // const message  = new MessageActivity('Enter this form').addCard('adaptive', card);
+  // await send(message);
+});
+```
 ---
 
 ## Additional Resources

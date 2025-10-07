@@ -20,19 +20,19 @@ UV is a fast Python package installer and resolver. While you can use other pack
 
 ## Instructions
 
-### Install the Teams CLI
+### Use the Teams CLI
 
-Use your terminal to install the Teams CLI globally using npm:
+Use your terminal to run the Teams CLI using npx:
 
 
 ```sh
-npm install -g @microsoft/teams.cli
+npx @microsoft/teams.cli --version
 ```
 
 
 :::info
 _The [Teams CLI](/developer-tools/cli) is a command-line tool that helps you create and manage Teams applications. It provides a set of commands to simplify the development process._<br /><br />
-After installation, you can run `teams --version` to verify the installation.
+Using `npx` allows you to run the Teams CLI without installing it globally. You can verify it works by running the version command above.
 :::
 
 ## Creating Your First Agent
@@ -41,7 +41,7 @@ Let's begin by creating a simple echo agent that responds to messages. Run:
 
 
 ```sh
-teams new python quote-agent --template echo
+npx @microsoft/teams.cli new python quote-agent --template echo
 ```
 
 This command:
