@@ -71,6 +71,10 @@ async function generateLlmsTxt() {
         console.log('📝 Generating C# llms.txt files...');
         await generateLanguageFiles('csharp', baseDir, outputDir, config);
 
+        // Generate Python version (main + csharp)
+        console.log('📝 Generating Python llms.txt files...');
+        await generateLanguageFiles('python', baseDir, outputDir, config);
+
         console.log('✅ Successfully generated all llms.txt files!');
     } catch (error) {
         console.error('❌ Error generating llms.txt files:', error);
@@ -245,7 +249,7 @@ async function generateIndividualTxtFiles(
  * @returns {string} Generated navigation content
  */
 async function generateSmallVersionHierarchical(language, baseDir, config, fileMapping) {
-    const langName = language === 'typescript' ? 'TypeScript' : 'C#';
+    const langName = language === 'typescript' ? 'TypeScript' : language === 'python' ? "Python" : 'C#';
     // Remove trailing slash from URL and ensure baseUrl starts with slash
     const cleanUrl = config.url.replace(/\/$/, '');
     const cleanBaseUrl = config.baseUrl.startsWith('/') ? config.baseUrl : '/' + config.baseUrl;
