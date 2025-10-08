@@ -3,7 +3,6 @@ sidebar_position: 7
 summary: Guide to implementing user feedback functionality in Teams applications, covering feedback UI components, event handling, and storage mechanisms for gathering and managing user responses to improve application performance.
 ---
 
-import FileCodeBlock from '@site/src/components/FileCodeBlock';
 
 # Feedback
 

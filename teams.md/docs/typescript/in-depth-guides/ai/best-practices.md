@@ -3,8 +3,6 @@ sidebar_position: 5
 summary: Best practices for AI integration in Teams applications, including AI-generated indicators and user experience guidelines.
 ---
 
-import FileCodeBlock from '@site/src/components/FileCodeBlock';
-
 # Best Practices
 
 When sending messages using AI, Teams recommends a number of best practices to help with both user and developer experience.
@@ -33,9 +31,20 @@ AI generated messages can hallucinate even if messages are grounded in real data
 Citations are added with a `position` property. This property value needs to also be included in the message text as `[<position>]`. If there is a citation that's added without the associated value in the message text, Teams will not render the citation
 :::
 
-<FileCodeBlock
-    lang="typescript"
-    src="/generated-snippets/ts/simple-rag.snippet.citation-example.ts"
-/>
+```typescript
+import { MessageActivity } from '@microsoft/teams.api';
+// ...
+
+const messageActivity = new MessageActivity(result.content).addAiGenerated();
+for (let i = 0; i < citedDocs.length; i++) {
+  const doc = citedDocs[i];
+  // The corresponding citation needs to be added in the message content
+  messageActivity.text += `[${i + 1}]`;
+  messageActivity.addCitation(i + 1, {
+    name: doc.title,
+    abstract: doc.content,
+  });
+}
+```
 
 ![Animated screenshot showing user hovering over a footnote citation in agent response, and a pop-up showing explanatory text.](/screenshots/citation.gif)

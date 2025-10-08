@@ -3,8 +3,6 @@ sidebar_position: 2
 summary: How to implement an MCP client to leverage remote MCP servers and their tools in your AI agent application.
 ---
 
-import FileCodeBlock from '@site/src/components/FileCodeBlock';
-
 # MCP Client
 
 You are able to leverage other MCP servers that expose tools via the Streamable HTTP protocol as part of your application. This allows your AI agent to use remote tools to accomplish tasks.
@@ -34,10 +32,41 @@ The `MCPClientPlugin` (from `@microsoft/teams.mcpclient` package) integrates dir
 
 Once loaded, it treats these tools like any functions that are available to the `ChatPrompt` object. If the LLM then decides to call one of these remote MCP tools, the MCP Client plugin will call the remote MCP server and return the result back to the LLM. The LLM can then use this result in its response.
 
-<FileCodeBlock
-    lang="typescript"
-    src="/generated-snippets/ts/index.snippet.mcp-client-prompt-config.ts"
-/>
+```typescript
+import { ChatPrompt } from '@microsoft/teams.ai';
+import { App } from '@microsoft/teams.apps';
+import { ConsoleLogger } from '@microsoft/teams.common';
+import { McpClientPlugin } from '@microsoft/teams.mcpclient';
+import { OpenAIChatModel } from '@microsoft/teams.openai';
+// ...
+
+const logger = new ConsoleLogger('mcp-client', { level: 'debug' });
+const prompt = new ChatPrompt(
+  {
+    instructions:
+      'You are a helpful assistant. You MUST use tool calls to do all your work.',
+    model: new OpenAIChatModel({
+      model: 'gpt-4o-mini',
+      apiKey: process.env.OPENAI_API_KEY,
+    })
+  },
+  [new McpClientPlugin({ logger })],
+).usePlugin('mcpClient', {
+    url: 'https://learn.microsoft.com/api/mcp',
+  });
+
+const app = new App();
+
+app.on('message', async ({ send, activity }) => {
+  await send({ type: 'typing' });
+
+  const result = await prompt.send(activity.text);
+  if (result.content) {
+    await send(result.content);
+  }
+});
+app.start().catch(console.error);
+```
 
 In this example, we augment the `ChatPrompt` with a few remote MCP Servers.
 
@@ -46,6 +75,10 @@ In this example, we augment the `ChatPrompt` with a few remote MCP Servers.
 Some MCP servers may require custom headers to be sent as part of the request. You can customize the headers when calling the `usePlugin` function:
 
 ```typescript
+import { ChatPrompt } from '@microsoft/teams.ai';
+import { McpClientPlugin } from '@microsoft/teams.mcpclient';
+// ...
+
 .usePlugin('mcpClient', {
     url: 'https://<your-mcp-server>/mcp'
     params: {
