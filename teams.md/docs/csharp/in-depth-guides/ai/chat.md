@@ -177,4 +177,4 @@ teamsApp.OnMessage(async (context) =>
 });
 ```
 ### User experience
-![Streaming the response](/screenshots/streaming-chat.gif)
+![Animated image showing agent response text incrementally appearing in the chat window.](/screenshots/streaming-chat.gif)

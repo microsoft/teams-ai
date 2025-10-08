@@ -81,5 +81,5 @@ The `Send` method does not validate that the chat ID or conversation ID provided
 :::
 
 ## Additional resources
- - For details on how to Tab apps can call these functions, see the Typescript [Tab Functions](../../typescript/in-depth-guides/tabs/function-calling) in-depth guide.
+ - For details on how to Tab apps can call these functions, see the Typescript [Executing Functions](../../../../typescript/in-depth-guides/tabs/functions/function-calling) in-depth guide.
  - For more information about the teams-js getContext() API, see the [Teams JavaScript client library](https://learn.microsoft.com/en-us/microsoftteams/platform/tabs/how-to/using-teams-client-library) documentation.
