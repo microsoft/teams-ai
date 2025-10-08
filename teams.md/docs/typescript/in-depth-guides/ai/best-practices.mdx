@@ -39,3 +39,19 @@ Citations are added with a `position` property. This property value needs to als
 />
 
 ![Animated screenshot showing user hovering over a footnote citation in agent response, and a pop-up showing explanatory text.](/screenshots/citation.gif)
+
+## Suggested actions
+
+Suggested actions help users with ideas of what to ask next, based on the previous response or conversation. Teams recommends including suggested actions in your messages. You can do that by using the `withSuggestedActions` method on the message. See [Suggested actions](https://learn.microsoft.com/microsoftteams/platform/bots/how-to/conversations/prompt-suggestions) for more information on suggested actions.
+
+```typescript
+message.withSuggestedActions({
+to: [activity.from.id],
+actions: [
+    {
+        type: 'imBack',
+        title: 'Suggested action title',
+        value: 'Suggested action text that is going to be sent',
+    }
+]});
+```
