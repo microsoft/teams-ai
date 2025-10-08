@@ -111,6 +111,11 @@ Here we are defining three different commands:
 Handle submission when the `createCard` or `getMessageDetails` actions commands are invoked.
 
 ```python
+from microsoft.teams.api import AdaptiveCardAttachment, MessageExtensionSubmitActionInvokeActivity, card_attachment
+from microsoft.teams.api.models import AttachmentLayout, MessagingExtensionActionInvokeResponse
+from microsoft.teams.api.models import MessagingExtensionAttachment, MessagingExtensionResult, MessagingExtensionResultType
+from microsoft.teams.apps import ActivityContext
+# ...
 
 @app.on_message_ext_submit
 async def handle_message_ext_submit(ctx: ActivityContext[MessageExtensionSubmitActionInvokeActivity]):
@@ -138,6 +143,10 @@ async def handle_message_ext_submit(ctx: ActivityContext[MessageExtensionSubmitA
 `create_card()` method
 
 ```python
+from typing import Dict
+from microsoft.teams.cards import AdaptiveCard
+# ...
+
 def create_card(data: Dict[str, str]) -> AdaptiveCard:
     """Create an adaptive card from form data."""
     return AdaptiveCard.model_validate(
@@ -171,6 +180,11 @@ def create_card(data: Dict[str, str]) -> AdaptiveCard:
 `create_message_details_card()` method
 
 ```python
+from typing import Dict, List, Union
+from microsoft.teams.api.models.message import Message
+from microsoft.teams.cards import AdaptiveCard
+# ...
+
 def create_message_details_card(message_payload: Message) -> AdaptiveCard:
     """Create a card showing message details."""
     body: List[Dict[str, Union[str, bool]]] = [
@@ -229,6 +243,10 @@ def create_message_details_card(message_payload: Message) -> AdaptiveCard:
 Handle opening adaptive card dialog when the `fetchConversationMembers` command is invoked.
 
 ```python
+from microsoft.teams.api import AdaptiveCardAttachment, MessageExtensionFetchTaskInvokeActivity, card_attachment
+from microsoft.teams.api.models import CardTaskModuleTaskInfo, MessagingExtensionActionInvokeResponse, TaskModuleContinueResponse
+from microsoft.teams.apps import ActivityContext
+# ...
 
 @app.on_message_ext_open
 async def handle_message_ext_open(ctx: ActivityContext[MessageExtensionFetchTaskInvokeActivity]):
@@ -251,6 +269,11 @@ async def handle_message_ext_open(ctx: ActivityContext[MessageExtensionFetchTask
 `create_conversation_members_card()` method
 
 ```python
+from typing import List
+from microsoft.teams.api.models.account import Account
+from microsoft.teams.cards import AdaptiveCard
+# ...
+
 def create_conversation_members_card(members: List[Account]) -> AdaptiveCard:
     """Create a card showing conversation members."""
     members_list = ", ".join(member.name for member in members if member.name)

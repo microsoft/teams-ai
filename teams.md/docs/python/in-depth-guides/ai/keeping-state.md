@@ -56,8 +56,11 @@ async def clear_conversation_memory(conversation_id: str) -> None:
 ## Stateful Chat Example
 
 ```python
+from microsoft.teams.ai import ChatPrompt, ListMemory
+from microsoft.teams.ai.ai_model import AIModel
 from microsoft.teams.api import MessageActivity, MessageActivityInput
 from microsoft.teams.apps import ActivityContext
+# ...
 
 async def handle_stateful_conversation(model: AIModel, ctx: ActivityContext[MessageActivity]) -> None:
     """Example of stateful conversation handler that maintains conversation history"""

@@ -3,8 +3,6 @@ sidebar_position: 1
 summary: Guide to building Adaptive Cards using TypeScript/JavaScript with full IntelliSense and compiler safety for rich, interactive UI fragments.
 ---
 
-import FileCodeBlock from '@site/src/components/FileCodeBlock';
-
 # Building Adaptive Cards
 
 Adaptive Cards are JSON payloads that describe rich, interactive UI fragments.
@@ -58,10 +56,10 @@ While coding you get:
 - **In‑editor validation**—invalid enum values or missing required properties produce build errors.
 - Automatic upgrades when the schema evolves; simply update the package.
 
-<FileCodeBlock
-    lang="typescript"
-    src="/generated-snippets/ts/index.snippet.improved-type-checking.ts"
-/>
+```typescript
+// @ts-expect-error: "huge" is not a valid size for TextBlock
+const textBlock = new TextBlock('Valid', { size: 'huge' });
+```
 
 ---
 
@@ -136,14 +134,9 @@ You can use a combination of raw JSON and builder helpers depending on whatever 
 Below is a complete example showing a task management form. Notice how the builder pattern keeps the file readable and maintainable:
 
 ```ts
-import { MessageActivity } from '@microsoft/teams.api';
-import { TextBlock,
-  TextInput,
-  ChoiceSetInput,
-  DateInput,
-  ActionSet,
-  ExecuteAction
-} from '@microsoft/teams.cards';
+import { AdaptiveCard, TextBlock, TextInput, ChoiceSetInput, DateInput, ActionSet, ExecuteAction } from '@microsoft/teams.cards';
+import { App } from '@microsoft/teams.apps';
+// ...
 
 app.on('message', async ({ send, activity }) => {
   await send({ type: 'typing' });
