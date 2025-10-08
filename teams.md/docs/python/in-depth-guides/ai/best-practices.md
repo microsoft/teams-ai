@@ -39,3 +39,7 @@ for i, doc in enumerate(cited_docs):
 ```
 
 ![Animated screenshot showing user hovering over a footnote citation in agent response, and a pop-up showing explanatory text.](/screenshots/citation.gif)
+
+## Suggested actions
+
+Suggested actions help users with ideas of what to ask next, based on the previous response or conversation. Teams recommends including suggested actions in your messages. You can do that by using the `with_suggested_actions` method on the message. See [Suggested actions](https://learn.microsoft.com/microsoftteams/platform/bots/how-to/conversations/prompt-suggestions) for more information on suggested actions.
