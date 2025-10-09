@@ -9,11 +9,11 @@ const path = require('path');
 function shouldIgnoreFileBySection(filePath) {
     // Get the directory path
     let currentDir = path.dirname(filePath);
-    
+
     // Walk up the directory tree looking for README.md files
     while (currentDir && currentDir !== path.dirname(currentDir)) {
         const readmePath = path.join(currentDir, 'README.md');
-        
+
         if (fs.existsSync(readmePath)) {
             try {
                 const readmeContent = fs.readFileSync(readmePath, 'utf8');
@@ -29,11 +29,11 @@ function shouldIgnoreFileBySection(filePath) {
                 // Ignore errors reading README
             }
         }
-        
+
         // Move up one directory
         currentDir = path.dirname(currentDir);
     }
-    
+
     return false;
 }
 
@@ -56,19 +56,19 @@ async function processContent(filePath, baseDir, includeCodeBlocks = false, file
 
         const rawContent = fs.readFileSync(filePath, 'utf8');
         const { title, content, frontmatter } = await parseMarkdownContent(rawContent, baseDir, includeCodeBlocks, filePath, fileMapping, config, language);
-        
+
         // Check if this file should be excluded from LLM output
-        if (frontmatter.llms === 'ignore' || frontmatter.llms === false) {
+        if (frontmatter.llms === 'ignore' || frontmatter.llms === 'ignore-file' || frontmatter.llms === false) {
             return null; // Return null to indicate this file should be skipped
         }
-        
+
         // Check if this file should be ignored due to section-wide filtering
         if (shouldIgnoreFileBySection(filePath)) {
             return null; // Return null to indicate this file should be skipped
         }
-        
+
         return {
-            title: title || generateTitleFromPath(filePath),
+            title: title,
             content: content || '',
             frontmatter: frontmatter || {},
             filePath,
@@ -77,7 +77,7 @@ async function processContent(filePath, baseDir, includeCodeBlocks = false, file
         };
     } catch (error) {
         console.error(`❌ Error processing file ${filePath}:`, error.message);
-        return { title: generateTitleFromPath(filePath), content: '', frontmatter: {}, filePath };
+        throw error; // Re-throw to fail the build
     }
 }
 
@@ -96,7 +96,7 @@ async function parseMarkdownContent(rawContent, baseDir, includeCodeBlocks, file
     let content = rawContent;
     let title = '';
     let frontmatter = {};
-    
+
     // Extract and remove frontmatter
     const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---\s*\n/);
     if (frontmatterMatch) {
@@ -104,18 +104,17 @@ async function parseMarkdownContent(rawContent, baseDir, includeCodeBlocks, file
         title = frontmatter.title || frontmatter.sidebar_label || '';
         content = content.replace(frontmatterMatch[0], '');
     }
-    
-    // Extract title from first H1 if not found in frontmatter
-    if (!title) {
-        const h1Match = content.match(/^#\s+(.+)$/m);
-        if (h1Match) {
-            title = h1Match[1].trim();
-        }
+
+    // Extract title from first H1 (always required)
+    const h1Match = content.match(/^#\s+(.+)$/m);
+    if (!h1Match) {
+        throw new Error(`No # header found in file: ${filePath}`);
     }
-    
+    title = h1Match[1].trim();
+
     // Remove import statements
     content = content.replace(/^import\s+.*$/gm, '');
-    
+
     // Process FileCodeBlock components if requested
     if (includeCodeBlocks) {
         content = await processFileCodeBlocks(content, baseDir);
@@ -123,16 +122,16 @@ async function parseMarkdownContent(rawContent, baseDir, includeCodeBlocks, file
         // Remove FileCodeBlock components for small version
         content = content.replace(/<FileCodeBlock[\s\S]*?\/>/g, '[Code example removed for brevity]');
     }
-    
+
     // Clean up MDX-specific syntax while preserving markdown
     content = cleanMdxSyntax(content);
-    
+
     // Fix internal relative links
     content = fixInternalLinks(content, filePath, fileMapping, config, language);
-    
+
     // Remove excessive whitespace
     content = content.replace(/\n{3,}/g, '\n\n').trim();
-    
+
     return { title, content, frontmatter };
 }
 
@@ -146,11 +145,11 @@ async function processFileCodeBlocks(content, baseDir) {
     const fileCodeBlockRegex = /<FileCodeBlock\s+([^>]+)\/>/g;
     let processedContent = content;
     let match;
-    
+
     while ((match = fileCodeBlockRegex.exec(content)) !== null) {
         const attributes = parseAttributes(match[1]);
         const { src, lang } = attributes;
-        
+
         if (src) {
             try {
                 const codeContent = await loadCodeFile(src, baseDir);
@@ -162,7 +161,7 @@ async function processFileCodeBlocks(content, baseDir) {
             }
         }
     }
-    
+
     return processedContent;
 }
 
@@ -180,7 +179,7 @@ async function loadCodeFile(src, baseDir) {
     } else {
         filePath = path.join(baseDir, 'static', src);
     }
-    
+
     if (fs.existsSync(filePath)) {
         return fs.readFileSync(filePath, 'utf8').trim();
     } else {
@@ -197,11 +196,11 @@ function parseAttributes(attributeString) {
     const attributes = {};
     const regex = /(\w+)=["']([^"']+)["']/g;
     let match;
-    
+
     while ((match = regex.exec(attributeString)) !== null) {
         attributes[match[1]] = match[2];
     }
-    
+
     return attributes;
 }
 
@@ -213,30 +212,30 @@ function parseAttributes(attributeString) {
 function parseFrontmatter(frontmatterText) {
     const frontmatter = {};
     const lines = frontmatterText.split('\n');
-    
+
     for (const line of lines) {
         const match = line.match(/^(\w+):\s*(.+)$/);
         if (match) {
             const key = match[1];
             let value = match[2].trim();
-            
+
             // Remove quotes if present
-            if ((value.startsWith('"') && value.endsWith('"')) || 
+            if ((value.startsWith('"') && value.endsWith('"')) ||
                 (value.startsWith("'") && value.endsWith("'"))) {
                 value = value.slice(1, -1);
             }
-            
+
             // Parse boolean values
             if (value === 'true') {
                 value = true;
             } else if (value === 'false') {
                 value = false;
             }
-            
+
             frontmatter[key] = value;
         }
     }
-    
+
     return frontmatter;
 }
 
@@ -247,14 +246,25 @@ function parseFrontmatter(frontmatterText) {
  */
 function cleanMdxSyntax(content) {
     let cleaned = content;
-    
+
     // Remove JSX components (except code blocks which are handled separately)
     cleaned = cleaned.replace(/<\/?[A-Z][^>]*>/g, '');
-    
+
     // Remove empty JSX fragments
     cleaned = cleaned.replace(/<>\s*<\/>/g, '');
-    
+
     // Remove JSX expressions but keep the content if it's simple text
+    // IMPORTANT: Don't process content inside code blocks (```)
+    const codeBlockRegex = /```[\s\S]*?```/g;
+    const codeBlocks = [];
+
+    // Extract code blocks temporarily
+    cleaned = cleaned.replace(codeBlockRegex, (match) => {
+        codeBlocks.push(match);
+        return `___CODE_BLOCK_${codeBlocks.length - 1}___`;
+    });
+
+    // Now remove JSX expressions outside code blocks
     cleaned = cleaned.replace(/\{([^{}]+)\}/g, (match, expr) => {
         // Keep simple text expressions, remove complex ones
         if (expr.includes('(') || expr.includes('.') || expr.includes('[')) {
@@ -262,41 +272,18 @@ function cleanMdxSyntax(content) {
         }
         return expr;
     });
-    
+
+    // Restore code blocks
+    cleaned = cleaned.replace(/___CODE_BLOCK_(\d+)___/g, (match, index) => {
+        return codeBlocks[parseInt(index)];
+    });
+
     // Clean up multiple empty lines
     cleaned = cleaned.replace(/\n\s*\n\s*\n/g, '\n\n');
-    
+
     return cleaned;
 }
 
-/**
- * Generates a title from file path
- * @param {string} filePath - File path
- * @returns {string} Generated title
- */
-function generateTitleFromPath(filePath) {
-    const fileName = path.basename(filePath, path.extname(filePath));
-    
-    // Convert README to parent directory name
-    if (fileName.toLowerCase() === 'readme') {
-        const parentDir = path.basename(path.dirname(filePath));
-        return formatTitle(parentDir);
-    }
-    
-    return formatTitle(fileName);
-}
-
-/**
- * Formats a string into a proper title
- * @param {string} str - String to format
- * @returns {string} Formatted title
- */
-function formatTitle(str) {
-    return str
-        .replace(/[-_]/g, ' ')
-        .replace(/\b\w/g, l => l.toUpperCase())
-        .trim();
-}
 
 /**
  * Generates a relative URL for a documentation file
@@ -306,24 +293,24 @@ function formatTitle(str) {
  */
 function generateRelativeUrl(filePath, baseDir) {
     const relativePath = path.relative(path.join(baseDir, 'docs'), filePath);
-    
+
     // Convert file path to URL format
     let url = relativePath
         .replace(/\\/g, '/') // Convert Windows paths
         .replace(/\.mdx?$/, '') // Remove .md/.mdx extension
         .replace(/\/README$/i, '') // Remove /README from end
         .replace(/\/index$/i, ''); // Remove /index from end
-    
+
     // Add leading slash
     if (!url.startsWith('/')) {
         url = '/' + url;
     }
-    
+
     // Handle empty URL (root README)
     if (url === '/') {
         url = '';
     }
-    
+
     return url;
 }
 
@@ -339,23 +326,23 @@ function generateRelativeUrl(filePath, baseDir) {
 function fixInternalLinks(content, currentFilePath, fileMapping, config, language) {
     // Pattern to match markdown links: [text](link)
     const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-    
+
     return content.replace(linkRegex, (match, text, link) => {
         // Skip external links (http/https/mailto/etc)
         if (link.startsWith('http') || link.startsWith('mailto') || link.startsWith('#')) {
             return match;
         }
-        
+
         // Skip absolute paths starting with /
         if (link.startsWith('/') && !link.startsWith('//')) {
             return match;
         }
-        
+
         // Handle relative links
         if (!link.includes('://')) {
             // Remove any file extensions and anchors
             const cleanLink = link.split('#')[0].replace(/\.(md|mdx)$/, '');
-            
+
             // If it's just a filename without path separators, it's likely a sibling file
             if (!cleanLink.includes('/')) {
                 // Try to resolve using file mapping first
@@ -363,15 +350,15 @@ function fixInternalLinks(content, currentFilePath, fileMapping, config, languag
                     const currentDir = path.dirname(currentFilePath);
                     const possiblePath = path.join(currentDir, cleanLink + '.md');
                     const possibleMdxPath = path.join(currentDir, cleanLink + '.mdx');
-                    
+
                     // Look for the file in the mapping
                     for (const [sourcePath, generatedName] of fileMapping.entries()) {
                         // Check exact path match or basename match
-                        if (sourcePath === possiblePath || 
+                        if (sourcePath === possiblePath ||
                             sourcePath === possibleMdxPath ||
                             path.basename(sourcePath, '.md') === cleanLink ||
                             path.basename(sourcePath, '.mdx') === cleanLink) {
-                            
+
                             // Generate full URL if config and language are provided
                             if (config && language) {
                                 const cleanUrl = config.url.replace(/\/$/, '');
@@ -384,7 +371,7 @@ function fixInternalLinks(content, currentFilePath, fileMapping, config, languag
                         }
                     }
                 }
-                
+
                 // Fallback to simple conversion
                 const safeFileName = cleanLink
                     .toLowerCase()
@@ -394,7 +381,7 @@ function fixInternalLinks(content, currentFilePath, fileMapping, config, languag
                     .replace(/^-|-$/g, '')
                     .substring(0, 50)
                     || 'untitled';
-                
+
                 // Generate full URL if config and language are provided
                 if (config && language) {
                     const cleanUrl = config.url.replace(/\/$/, '');
@@ -406,7 +393,7 @@ function fixInternalLinks(content, currentFilePath, fileMapping, config, languag
                 }
             }
         }
-        
+
         // Return original link if we can't process it
         return match;
     });
@@ -427,15 +414,15 @@ function extractSummary(content, maxLength = 200) {
         .replace(/`(.+?)`/g, '$1') // Remove inline code
         .replace(/\[(.+?)\]\(.+?\)/g, '$1') // Remove links, keep text
         .trim();
-    
+
     // Get first paragraph
     const firstParagraph = summary.split('\n\n')[0];
-    
+
     // Truncate if too long
     if (firstParagraph.length > maxLength) {
         return firstParagraph.substring(0, maxLength).trim() + '...';
     }
-    
+
     return firstParagraph;
 }
 
@@ -445,8 +432,6 @@ module.exports = {
     processFileCodeBlocks,
     loadCodeFile,
     extractSummary,
-    generateTitleFromPath,
-    formatTitle,
     generateRelativeUrl,
     fixInternalLinks,
     shouldIgnoreFileBySection
