@@ -8,6 +8,8 @@ For a detailed explanation of the motivations and architectural decisions behind
 
 ### Code repos for languages
 
+The SDK code for each language are in their own individual repos:
+
 * [Typescript](https://github.com/microsoft/teams.ts)
 * [C#](https://github.com/microsoft/teams.net)
 * [Python](https://github.com/microsoft/teams.py)
