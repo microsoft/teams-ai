@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const FrontmatterParser = require('./frontmatter-parser');
 
 /**
  * Recursively collects all markdown and MDX files from a directory
@@ -122,30 +123,26 @@ function buildHierarchicalStructure(rootPath) {
                 if (fs.existsSync(readmePath)) {
                     try {
                         const readmeContent = fs.readFileSync(readmePath, 'utf8');
-                        const frontmatterMatch = readmeContent.match(/^---\s*\n([\s\S]*?)\n---/);
-                        if (frontmatterMatch) {
-                            const frontmatter = parseFrontmatter(frontmatterMatch[1]);
+                        const { frontmatter, content } = FrontmatterParser.extract(readmeContent);
 
-                            // Skip this entire folder if README is marked to ignore
-                            if (frontmatter.llms === 'ignore' || frontmatter.llms === false) {
-                                continue; // Skip this folder entirely
-                            }
+                        // Skip this entire folder if README is marked to ignore
+                        if (frontmatter.llms === 'ignore' || frontmatter.llms === false) {
+                            continue; // Skip this folder entirely
+                        }
 
-                            // If README is marked ignore-file, skip just the README but process folder
-                            // (folderOrder and folderTitle will use defaults)
+                        // If README is marked ignore-file, skip just the README but process folder
+                        // (folderOrder and folderTitle will use defaults)
 
-                            folderOrder = frontmatter.sidebar_position || 999;
+                        folderOrder = frontmatter.sidebar_position || 999;
 
-                            // Extract title from frontmatter or first # header
-                            if (frontmatter.title || frontmatter.sidebar_label) {
-                                folderTitle = frontmatter.title || frontmatter.sidebar_label;
-                            } else {
-                                // Extract from first # header
-                                const contentWithoutFrontmatter = readmeContent.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
-                                const headerMatch = contentWithoutFrontmatter.match(/^#\s+(.+)$/m);
-                                if (headerMatch) {
-                                    folderTitle = headerMatch[1].trim();
-                                }
+                        // Extract title from frontmatter or first # header
+                        if (frontmatter.title || frontmatter.sidebar_label) {
+                            folderTitle = frontmatter.title || frontmatter.sidebar_label;
+                        } else {
+                            // Extract from first # header
+                            const headerMatch = content.match(/^#\s+(.+)$/m);
+                            if (headerMatch) {
+                                folderTitle = headerMatch[1].trim();
                             }
                         }
                     } catch (error) {
@@ -165,24 +162,18 @@ function buildHierarchicalStructure(rootPath) {
                 let fileTitle = item.name;
 
                 try {
-                    const content = fs.readFileSync(fullPath, 'utf8');
-                    let contentWithoutFrontmatter = content;
+                    const fileContent = fs.readFileSync(fullPath, 'utf8');
+                    const { frontmatter, content } = FrontmatterParser.extract(fileContent);
 
-                    const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
-                    if (frontmatterMatch) {
-                        const frontmatter = parseFrontmatter(frontmatterMatch[1]);
-
-                        // Skip this file if marked to ignore (including ignore-file)
-                        if (frontmatter.llms === 'ignore' || frontmatter.llms === 'ignore-file' || frontmatter.llms === false) {
-                            continue; // Skip this file
-                        }
-
-                        fileOrder = frontmatter.sidebar_position || 999;
-                        contentWithoutFrontmatter = content.replace(frontmatterMatch[0], '');
+                    // Skip this file if marked to ignore (including ignore-file)
+                    if (frontmatter.llms === 'ignore' || frontmatter.llms === 'ignore-file' || frontmatter.llms === false) {
+                        continue; // Skip this file
                     }
 
+                    fileOrder = frontmatter.sidebar_position || 999;
+
                     // Extract title from first # header
-                    const headerMatch = contentWithoutFrontmatter.match(/^#\s+(.+)$/m);
+                    const headerMatch = content.match(/^#\s+(.+)$/m);
                     if (headerMatch) {
                         fileTitle = headerMatch[1].trim();
                     }
@@ -251,45 +242,6 @@ function buildHierarchicalStructure(rootPath) {
     // Return the children (which contain the actual folder structure)
     return tempWrapper.children;
 }
-
-/**
- * Parses simple frontmatter
- * @param {string} frontmatterText - Frontmatter content
- * @returns {Object} Parsed frontmatter
- */
-function parseFrontmatter(frontmatterText) {
-    const frontmatter = {};
-    const lines = frontmatterText.split('\n');
-
-    for (const line of lines) {
-        const match = line.match(/^(\w+):\s*(.+)$/);
-        if (match) {
-            let value = match[2].trim();
-
-            // Remove quotes
-            if ((value.startsWith('"') && value.endsWith('"')) ||
-                (value.startsWith("'") && value.endsWith("'"))) {
-                value = value.slice(1, -1);
-            }
-
-            // Parse boolean values
-            if (value === 'true') {
-                value = true;
-            } else if (value === 'false') {
-                value = false;
-            }
-            // Convert numbers
-            else if (/^\d+$/.test(value)) {
-                value = parseInt(value, 10);
-            }
-
-            frontmatter[match[1]] = value;
-        }
-    }
-
-    return frontmatter;
-}
-
 
 /**
  * Gets priority files for small version generation
