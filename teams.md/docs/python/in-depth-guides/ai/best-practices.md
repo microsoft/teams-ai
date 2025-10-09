@@ -15,7 +15,7 @@ When sending messages using AI, Teams recommends including an indicator that the
 message_to_be_sent = MessageActivityInput(text="Hello!").add_ai_generated()
 ```
 
-![AI Generated Indicator](/screenshots/ai-generated.gif)
+![Screenshot of outgoing agent message to user marked with 'AI generated' badge.](/screenshots/ai-generated.gif)
 
 ## Gather feedback to improve prompts
 
@@ -38,4 +38,4 @@ for i, doc in enumerate(cited_docs):
     message_activity.add_citation(i + 1, CitationAppearance(name=doc["title"], abstract=doc["content"]))
 ```
 
-![AI Generated Indicator](/screenshots/citation.gif)
+![Animated screenshot showing user hovering over a footnote citation in agent response, and a pop-up showing explanatory text.](/screenshots/citation.gif)

@@ -93,7 +93,7 @@ When the application starts, you'll see:
 
 Now, navigate to the devtools server by opening your browser and navigating to [http://localhost:3978/devtools](http://localhost:3978/devtools). You should see a simple interface where you can interact with your agent. Try sending it a message!
 
-![devtools](/screenshots/devtools-echo-chat.png)
+![Screenshot of DevTools showing user prompt 'hello!' and agent response 'you said hello!'.](/screenshots/devtools-echo-chat.png)
 
 ## Next steps
 

@@ -50,7 +50,7 @@ async def handle_message(ctx: ActivityContext[MessageActivity]):
 Streaming is currently only supported in 1:1 conversations, not group chats or channels
 :::
 
-![Streaming Example](/screenshots/streaming-chat.gif)
+![Animated image showing agent response text incrementally appearing in the chat window.](/screenshots/streaming-chat.gif)
 
 ## @Mention
 
