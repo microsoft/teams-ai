@@ -17,45 +17,29 @@ To open a dialog, you need to supply a special type of action as to the Adaptive
 ```python
 from microsoft.teams.api import MessageActivity, MessageActivityInput, TypingActivityInput
 from microsoft.teams.apps import ActivityContext
-from microsoft.teams.cards import (
-    AdaptiveCard,
-    SubmitAction,
-    SubmitActionData,
-    TaskFetchSubmitActionData,
-    TextBlock
-)
+from microsoft.teams.cards import AdaptiveCard, TextBlock, TaskFetchAction
 # ...
 
 @app.on_message
 async def handle_message(ctx: ActivityContext[MessageActivity]):
     await ctx.reply(TypingActivityInput())
 
-    # Create the launcher adaptive card using fluent API
-    # The ms_teams field will serialize to 'msteams' with type 'task/fetch'
-    card = (
-        AdaptiveCard(version="1.4")
-        .with_body([
-            TextBlock(text="Select the examples you want to see!", size="Large", weight="Bolder")
-        ])
-        .with_actions([
-            SubmitAction(title="Webpage Dialog")
-            .with_data(
-                SubmitActionData(opendialogtype="webpage_dialog")
-                .with_ms_teams(TaskFetchSubmitActionData().model_dump())
-            ),
-            SubmitAction(title="Multi-step Form")
-            .with_data(
-                SubmitActionData(opendialogtype="multi_step_form")
-                .with_ms_teams(TaskFetchSubmitActionData().model_dump())
-            ),
-            SubmitAction(title="Mixed Example")
-            .with_data(
-                SubmitActionData(opendialogtype="mixed_example")
-                .with_ms_teams(TaskFetchSubmitActionData().model_dump())
-            ),
-        ])
-    )
-
+    card = AdaptiveCard(
+        schema="http://adaptivecards.io/schemas/adaptive-card.json",
+        body=[
+            TextBlock(
+                text="Select the examples you want to see!",
+                size="Large",
+                weight="Bolder",
+            )
+        ]
+    ).with_actions([
+        # Special type of action to open a dialog
+        TaskFetchAction(value={"OpenDialogType": "webpage_dialog"}).with_title("Webpage Dialog"),
+        # This data will be passed back in an event, so we can handle what to show in the dialog
+        TaskFetchAction(value={"OpenDialogType": "multi_step_form"}).with_title("Multi-step Form"),
+        TaskFetchAction(value={"OpenDialogType": "mixed_example"}).with_title("Mixed Example")
+    ])
     # Send the card as an attachment
     message = MessageActivityInput(text="Enter this form").add_card(card)
     await ctx.send(message)
@@ -98,21 +82,18 @@ from microsoft.teams.cards import AdaptiveCard, TextBlock, TextInput, SubmitActi
 @app.on_dialog_open
 async def handle_dialog_open(ctx: ActivityContext[TaskFetchInvokeActivity]):
     """Handle dialog open events for all dialog types."""
-    # Use with_data() to attach submission metadata
-    # SubmitActionData uses extra="allow" to accept custom fields
-    submission_data = SubmitActionData.model_validate({"submissiondialogtype": "simple_form"})
-
-    # Create dialog card using fluent API
-    dialog_card = (
-        AdaptiveCard(version="1.4")
-        .with_body([
+    # Return an object with the task value that renders a card
+    dialog_card = AdaptiveCard(
+        schema="http://adaptivecards.io/schemas/adaptive-card.json",
+        body=[
             TextBlock(text="This is a simple form", size="Large", weight="Bolder"),
             TextInput().with_label("Name").with_is_required(True).with_id("name").with_placeholder("Enter your name"),
-        ])
-        .with_actions([
-            SubmitAction(title="Submit").with_data(submission_data)
-        ])
+        ],
+        actions=[
+            SubmitAction().with_title("Submit").with_data(SubmitActionData(ms_teams={"SubmissionDialogType": "simple_form"}))
+        ]
     )
+    
 
     # Return an object with the task value that renders a card
     return InvokeResponse(
