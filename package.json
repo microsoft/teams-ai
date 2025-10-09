@@ -10,8 +10,8 @@
     "lint:fix": "npx turbo lint:fix",
     "test": "npx turbo test --concurrency=100%",
     "fmt": "npx prettier --write \"**/*.{js,ts,tsx,md,json}\"",
-    "docs:build": "npm -w teams-md build",
-    "docs:dev": "npm -w teams-md start",
+    "docs:build": "npm -w teams-md run build",
+    "docs:dev": "npm -w teams-md run start",
     "docs:serve": "npm -w teams-md run serve",
     "check:links": "node ./scripts/check-links.js",
     "submodules:sync": "git submodule update --init --recursive --remote"
