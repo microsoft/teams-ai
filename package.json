@@ -13,12 +13,10 @@
     "docs:build": "npm -w teams-md build",
     "docs:dev": "npm -w teams-md start",
     "docs:serve": "npm -w teams-md run serve",
-    "gen:snips": "node ./scripts/generate-snippets.js",
     "check:links": "node ./scripts/check-links.js",
     "submodules:sync": "git submodule update --init --recursive --remote"
   },
   "devDependencies": {
-    "bluehawk": "^1.6.0",
     "prettier": "^3.5.3",
     "turbo": "^2.5.0",
     "typescript": "5.8.2"
