@@ -6,6 +6,12 @@ Teams AI Library v2 represents a fundamental reimagining of how Teams apps and A
 
 For a detailed explanation of the motivations and architectural decisions behind v2, please see our [WHY.md](https://microsoft.github.io/teams-ai/why) document.
 
+### Code repos for languages
+
+* [Typescript](https://github.com/microsoft/teams.ts)
+* [C#](https://github.com/microsoft/teams.net)
+* [Python](https://github.com/microsoft/teams.py)
+
 ### Quick start
 
 The Teams CLI makes it easy to bootstrap your first agent. First, install the CLI via NPM:
