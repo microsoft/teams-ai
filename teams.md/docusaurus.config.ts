@@ -11,7 +11,7 @@ const config: Config = {
     favicon: 'img/msft-logo-48x48.png',
 
     // Set the production url of your site here
-    url: 'http://localhost:3000',
+    url: 'https://microsoft.github.io/',
     // Set the /<baseUrl>/ pathname under which your site is served
     // For GitHub pages deployment, it is often '/<projectName>/'
     baseUrl,
@@ -67,6 +67,7 @@ const config: Config = {
                 sidebarPath: './sidebars.ts',
                 sidebarCollapsed: true,
                 editUrl: 'https://github.com/microsoft/teams-ai/tree/main/teams.md/',
+                exclude: ["**/LLMs.md"],
             } satisfies Partial<DocsPlugin.PluginOptions>,
         ],
         [
