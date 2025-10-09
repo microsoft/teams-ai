@@ -138,8 +138,7 @@ Below is a complete example showing a task management form. Notice how the build
 from datetime import datetime
 from microsoft.teams.api import MessageActivity, TypingActivityInput
 from microsoft.teams.apps import ActivityContext
-from microsoft.teams.cards import AdaptiveCard, TextBlock, ActionSet, ExecuteAction
-from microsoft.teams.cards.core import Choice, ChoiceSetInput, DateInput, TextInput
+from microsoft.teams.cards import AdaptiveCard, TextBlock, ActionSet, ExecuteAction, Choice, ChoiceSetInput, DateInput, TextInput
 # ...
 
 @app.on_message

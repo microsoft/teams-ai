@@ -6,13 +6,29 @@ const { collectFiles, getHierarchicalFiles } = require('./lib/file-collector');
 const { processContent } = require('./lib/content-processor');
 const FrontmatterParser = require('./lib/frontmatter-parser');
 
-const COMMON_OVERALL_SUMMARY = (langName) =>
-    `> Microsoft Teams AI Library (v2) - A comprehensive framework for building AI-powered Teams applications using ${langName}. Using this Library, you can easily build and integrate a variety of features in Microsoft Teams by building Agents or Tools. The documentation here helps by giving background information and code samples on how best to do this.
+const COMMON_OVERALL_SUMMARY = (langName, language) => {
+    const languageSpecificTips = {
+        typescript: [
+            "It's a good idea to build the application using `npm run build` and fix compile time errors to help ensure the app works as expected."
+        ],
+        python: [
+            "It's a good idea to run `uv run typecheck` to make sure the code is correctly typed and fix any type errors."
+        ],
+        csharp: [
+            "It's a good idea to build the application and fix compile time errors to help ensure the app works as expected."
+        ]
+    };
+
+    const tips = languageSpecificTips[language] || [];
+    const formattedTips = tips.map(tip => `- ${tip}`).join('\n');
+
+    return `> Microsoft Teams AI Library (v2) - A comprehensive framework for building AI-powered Teams applications using ${langName}. Using this Library, you can easily build and integrate a variety of features in Microsoft Teams by building Agents or Tools. The documentation here helps by giving background information and code samples on how best to do this.
 
 Things to remember:
 - IMPORTANT: This Library is NOT based off of BotFramework (which the _previous_ version of the Teams AI Library was based on). This Library is a completely new framework.
 - When scaffolding new applications, using the CLI is a lot simpler and preferred than doing it all by yourself.
-- It's a good idea to build the application and fix compile time errors to help ensure the app works as expected.`;
+${formattedTips}`;
+};
 
 /**
  * Reads Docusaurus config to get base URL
@@ -256,7 +272,7 @@ async function generateSmallVersionHierarchical(language, baseDir, config, fileM
     const fullBaseUrl = `${cleanUrl}${cleanBaseUrl}`;
 
     let content = `# Teams AI Library - ${langName} Documentation\n\n`;
-    content += COMMON_OVERALL_SUMMARY(langName) + '\n\n';
+    content += COMMON_OVERALL_SUMMARY(langName, language) + '\n\n';
 
     // Get hierarchical structure
     const hierarchical = getHierarchicalFiles(baseDir, language);
@@ -455,7 +471,7 @@ async function generateFullVersion(language, processedFiles, baseDir) {
     const langName = language === 'typescript' ? 'TypeScript' : 'C#';
 
     let content = `# Teams AI Library - ${langName} Documentation (Complete)\n\n`;
-    content += COMMON_OVERALL_SUMMARY(langName) + '\n\n';
+    content += COMMON_OVERALL_SUMMARY(langName, language) + '\n\n';
 
     // Group files by section
     const sections = groupFilesBySection(processedFiles, baseDir);
