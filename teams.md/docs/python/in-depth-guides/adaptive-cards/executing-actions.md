@@ -106,8 +106,7 @@ profile_card = AdaptiveCard(
 Input Controls provide ways for you to validate. More details can be found on the Adaptive Cards [documentation](https://adaptivecards.microsoft.com/?topic=input-validation).
 
 ```python
-from microsoft.teams.cards import AdaptiveCard, ActionSet, ExecuteAction, NumberInput
-from microsoft.teams.cards.core import TextInput
+from microsoft.teams.cards import AdaptiveCard, ActionSet, ExecuteAction, NumberInput, TextInput
 # ...
 
 def create_profile_card_input_validation():
@@ -142,10 +141,7 @@ def create_profile_card_input_validation():
 Card actions arrive as `card_action` activities in your app. These give you access to the validated input values plus any `data` values you had configured to be sent back to you.
 
 ```python
-from microsoft.teams.api import AdaptiveCardInvokeActivity
-from microsoft.teams.api.models.adaptive_card import AdaptiveCardActionErrorResponse, AdaptiveCardActionMessageResponse
-from microsoft.teams.api.models.error import HttpError, InnerHttpError
-from microsoft.teams.api.models.invoke_response import AdaptiveCardInvokeResponse
+from microsoft.teams.api import AdaptiveCardInvokeActivity, AdaptiveCardActionErrorResponse, AdaptiveCardActionMessageResponse, HttpError, InnerHttpError, AdaptiveCardInvokeResponse
 from microsoft.teams.apps import ActivityContext
 # ...
 

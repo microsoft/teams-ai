@@ -112,8 +112,7 @@ Handle submission when the `createCard` or `getMessageDetails` actions commands 
 
 ```python
 from microsoft.teams.api import AdaptiveCardAttachment, MessageExtensionSubmitActionInvokeActivity, card_attachment
-from microsoft.teams.api.models import AttachmentLayout, MessagingExtensionActionInvokeResponse
-from microsoft.teams.api.models import MessagingExtensionAttachment, MessagingExtensionResult, MessagingExtensionResultType
+from microsoft.teams.api.models import AttachmentLayout, MessagingExtensionActionInvokeResponse, MessagingExtensionAttachment, MessagingExtensionResult, MessagingExtensionResultType
 from microsoft.teams.apps import ActivityContext
 # ...
 
@@ -142,7 +141,7 @@ async def handle_message_ext_submit(ctx: ActivityContext[MessageExtensionSubmitA
 
 `create_card()` method
 
-```python
+```py
 from typing import Dict
 from microsoft.teams.cards import AdaptiveCard
 # ...
@@ -270,7 +269,7 @@ async def handle_message_ext_open(ctx: ActivityContext[MessageExtensionFetchTask
 
 ```python
 from typing import List
-from microsoft.teams.api.models.account import Account
+from microsoft.teams.api import Account
 from microsoft.teams.cards import AdaptiveCard
 # ...
 

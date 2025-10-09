@@ -17,8 +17,7 @@ To open a dialog, you need to supply a special type of action as to the Adaptive
 ```python
 from microsoft.teams.api import MessageActivity, MessageActivityInput, TypingActivityInput
 from microsoft.teams.apps import ActivityContext
-from microsoft.teams.cards import AdaptiveCard, TextBlock
-from microsoft.teams.cards.core import TaskFetchAction
+from microsoft.teams.cards import AdaptiveCard, TextBlock, TaskFetchAction
 # ...
 
 @app.on_message
@@ -78,8 +77,7 @@ You can render an Adaptive Card in a dialog by returning a card response.
 from microsoft.teams.api import AdaptiveCardAttachment, TaskFetchInvokeActivity, InvokeResponse, card_attachment
 from microsoft.teams.api import CardTaskModuleTaskInfo, TaskModuleContinueResponse, TaskModuleResponse
 from microsoft.teams.apps import ActivityContext
-from microsoft.teams.cards import AdaptiveCard, TextBlock
-from microsoft.teams.cards.core import TextInput, SubmitAction, SubmitActionData
+from microsoft.teams.cards import AdaptiveCard, TextBlock, TextInput, SubmitAction, SubmitActionData
 # ...
 
 @app.on_dialog_open
