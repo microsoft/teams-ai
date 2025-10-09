@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const FrontmatterParser = require('./frontmatter-parser');
 
 /**
  * Checks if a file should be ignored based on section-wide README filtering
@@ -17,13 +18,9 @@ function shouldIgnoreFileBySection(filePath) {
         if (fs.existsSync(readmePath)) {
             try {
                 const readmeContent = fs.readFileSync(readmePath, 'utf8');
-                const frontmatterMatch = readmeContent.match(/^---\s*\n([\s\S]*?)\n---\s*\n/);
-                if (frontmatterMatch) {
-                    const frontmatter = parseFrontmatter(frontmatterMatch[1]);
-                    // If this README is marked to ignore, ignore the entire section
-                    if (frontmatter.llms === 'ignore' || frontmatter.llms === false) {
-                        return true;
-                    }
+                // If this README is marked to ignore, ignore the entire section
+                if (FrontmatterParser.shouldIgnore(readmeContent)) {
+                    return true;
                 }
             } catch (error) {
                 // Ignore errors reading README
@@ -55,12 +52,13 @@ async function processContent(filePath, baseDir, includeCodeBlocks = false, file
         }
 
         const rawContent = fs.readFileSync(filePath, 'utf8');
-        const { title, content, frontmatter } = await parseMarkdownContent(rawContent, baseDir, includeCodeBlocks, filePath, fileMapping, config, language);
 
         // Check if this file should be excluded from LLM output
-        if (frontmatter.llms === 'ignore' || frontmatter.llms === 'ignore-file' || frontmatter.llms === false) {
+        if (FrontmatterParser.shouldIgnore(rawContent)) {
             return null; // Return null to indicate this file should be skipped
         }
+
+        const { title, content, frontmatter } = await parseMarkdownContent(rawContent, baseDir, includeCodeBlocks, filePath, fileMapping, config, language);
 
         // Check if this file should be ignored due to section-wide filtering
         if (shouldIgnoreFileBySection(filePath)) {
@@ -93,24 +91,16 @@ async function processContent(filePath, baseDir, includeCodeBlocks = false, file
  * @returns {Promise<Object>} Parsed title, content, and frontmatter
  */
 async function parseMarkdownContent(rawContent, baseDir, includeCodeBlocks, filePath, fileMapping, config, language) {
-    let content = rawContent;
-    let title = '';
-    let frontmatter = {};
-
     // Extract and remove frontmatter
-    const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---\s*\n/);
-    if (frontmatterMatch) {
-        frontmatter = parseFrontmatter(frontmatterMatch[1]);
-        title = frontmatter.title || frontmatter.sidebar_label || '';
-        content = content.replace(frontmatterMatch[0], '');
-    }
+    const { frontmatter, content: contentWithoutFrontmatter } = FrontmatterParser.extract(rawContent);
+    let content = contentWithoutFrontmatter;
 
     // Extract title from first H1 (always required)
     const h1Match = content.match(/^#\s+(.+)$/m);
     if (!h1Match) {
         throw new Error(`No # header found in file: ${filePath}`);
     }
-    title = h1Match[1].trim();
+    const title = h1Match[1].trim();
 
     // Remove import statements
     content = content.replace(/^import\s+.*$/gm, '');
@@ -202,41 +192,6 @@ function parseAttributes(attributeString) {
     }
 
     return attributes;
-}
-
-/**
- * Parses YAML frontmatter into an object
- * @param {string} frontmatterText - Raw frontmatter text
- * @returns {Object} Parsed frontmatter
- */
-function parseFrontmatter(frontmatterText) {
-    const frontmatter = {};
-    const lines = frontmatterText.split('\n');
-
-    for (const line of lines) {
-        const match = line.match(/^(\w+):\s*(.+)$/);
-        if (match) {
-            const key = match[1];
-            let value = match[2].trim();
-
-            // Remove quotes if present
-            if ((value.startsWith('"') && value.endsWith('"')) ||
-                (value.startsWith("'") && value.endsWith("'"))) {
-                value = value.slice(1, -1);
-            }
-
-            // Parse boolean values
-            if (value === 'true') {
-                value = true;
-            } else if (value === 'false') {
-                value = false;
-            }
-
-            frontmatter[key] = value;
-        }
-    }
-
-    return frontmatter;
 }
 
 /**
