@@ -1,4 +1,4 @@
-const fs = require('fs');
+import * as fs from 'fs';
 
 /**
  * Regular expression to match YAML frontmatter at the start of a file
@@ -6,16 +6,26 @@ const fs = require('fs');
  */
 const FRONTMATTER_REGEX = /^---\s*\n([\s\S]*?)\n---/;
 
+interface FrontmatterData {
+    [key: string]: string | number | boolean;
+}
+
+interface ExtractResult {
+    frontmatter: FrontmatterData;
+    content: string;
+    hasFrontmatter: boolean;
+}
+
 /**
  * Parser for YAML frontmatter in markdown/MDX files
  */
-class FrontmatterParser {
+export class FrontmatterParser {
     /**
      * Extracts and parses frontmatter from content
-     * @param {string} content - Raw file content
-     * @returns {Object} Object with parsed frontmatter and content without frontmatter
+     * @param content - Raw file content
+     * @returns Object with parsed frontmatter and content without frontmatter
      */
-    static extract(content) {
+    static extract(content: string): ExtractResult {
         const match = content.match(FRONTMATTER_REGEX);
 
         if (!match) {
@@ -38,11 +48,11 @@ class FrontmatterParser {
 
     /**
      * Parses frontmatter text into an object
-     * @param {string} frontmatterText - Raw frontmatter content (without --- delimiters)
-     * @returns {Object} Parsed frontmatter object
+     * @param frontmatterText - Raw frontmatter content (without --- delimiters)
+     * @returns Parsed frontmatter object
      */
-    static parse(frontmatterText) {
-        const frontmatter = {};
+    static parse(frontmatterText: string): FrontmatterData {
+        const frontmatter: FrontmatterData = {};
         const lines = frontmatterText.split('\n');
 
         for (const line of lines) {
@@ -50,7 +60,7 @@ class FrontmatterParser {
             if (!match) continue;
 
             const key = match[1];
-            let value = match[2].trim();
+            let value: string | number | boolean = match[2].trim();
 
             value = this._parseValue(value);
             frontmatter[key] = value;
@@ -61,10 +71,10 @@ class FrontmatterParser {
 
     /**
      * Extracts frontmatter from a file
-     * @param {string} filePath - Path to the file
-     * @returns {Object|null} Parsed frontmatter or null if file doesn't exist
+     * @param filePath - Path to the file
+     * @returns Parsed frontmatter or null if file doesn't exist
      */
-    static extractFromFile(filePath) {
+    static extractFromFile(filePath: string): ExtractResult | null {
         if (!fs.existsSync(filePath)) {
             return null;
         }
@@ -73,38 +83,49 @@ class FrontmatterParser {
             const content = fs.readFileSync(filePath, 'utf8');
             return this.extract(content);
         } catch (error) {
-            console.warn(`⚠️ Error reading frontmatter from ${filePath}:`, error.message);
+            console.warn(`⚠️ Error reading frontmatter from ${filePath}:`, (error as Error).message);
             return null;
         }
     }
 
     /**
      * Gets a specific property from frontmatter
-     * @param {string} content - File content or path
-     * @param {string} propertyName - Property to extract
-     * @param {*} defaultValue - Default value if property not found
-     * @returns {*} Property value or default
+     * @param content - File content or path
+     * @param propertyName - Property to extract
+     * @param defaultValue - Default value if property not found
+     * @returns Property value or default
      */
-    static getProperty(content, propertyName, defaultValue = undefined) {
-        const { frontmatter } = typeof content === 'string' && fs.existsSync(content)
+    static getProperty<T = any>(content: string, propertyName: string, defaultValue?: T): T | undefined {
+        const result = typeof content === 'string' && fs.existsSync(content)
             ? this.extractFromFile(content)
             : this.extract(content);
 
+        if (!result) {
+            return defaultValue;
+        }
+
+        const { frontmatter } = result;
+
         return frontmatter[propertyName] !== undefined
-            ? frontmatter[propertyName]
+            ? (frontmatter[propertyName] as T)
             : defaultValue;
     }
 
     /**
      * Checks if a file or content should be ignored based on frontmatter
-     * @param {string} content - File content or path
-     * @returns {boolean} True if should be ignored
+     * @param content - File content or path
+     * @returns True if should be ignored
      */
-    static shouldIgnore(content) {
-        const { frontmatter } = typeof content === 'string' && fs.existsSync(content)
+    static shouldIgnore(content: string): boolean {
+        const result = typeof content === 'string' && fs.existsSync(content)
             ? this.extractFromFile(content)
             : this.extract(content);
 
+        if (!result) {
+            return false;
+        }
+
+        const { frontmatter } = result;
         const llmsValue = frontmatter.llms;
         return llmsValue === 'ignore' || llmsValue === 'ignore-file' || llmsValue === false;
     }
@@ -112,10 +133,10 @@ class FrontmatterParser {
     /**
      * Parses a value from frontmatter, converting types as needed
      * @private
-     * @param {string} value - Raw value string
-     * @returns {*} Parsed value (string, number, boolean)
+     * @param value - Raw value string
+     * @returns Parsed value (string, number, boolean)
      */
-    static _parseValue(value) {
+    private static _parseValue(value: string): string | number | boolean {
         // Remove surrounding quotes
         if ((value.startsWith('"') && value.endsWith('"')) ||
             (value.startsWith("'") && value.endsWith("'"))) {
@@ -135,5 +156,3 @@ class FrontmatterParser {
         return value;
     }
 }
-
-module.exports = FrontmatterParser;
