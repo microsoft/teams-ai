@@ -749,7 +749,7 @@ app.on('message.submit.feedback', async ({ activity, log }) => {
 </tr>
 </table>
 
-You can learn more about feedback in Teams AI v2 [here](../../in-depth-guides/feedback.mdx).
+You can learn more about feedback in Teams AI v2 [here](../../in-depth-guides/feedback.md).
 
 ## Incrementally migrating code via botbuilder plugin
 
