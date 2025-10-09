@@ -82,7 +82,7 @@ var card = new AdaptiveCard
 
 ### Raw JSON Alternative
 
-Just like when building cards, if you prefer to work with raw JSON, you can do just that. You get type safety for free in C#.
+Just like when building cards, if you prefer to work with raw JSON, you can do just that. 
 
 ```csharp
 var actionJson = """
@@ -92,6 +92,7 @@ var actionJson = """
   "title": "Learn More"
 }
 """;
+var action = OpenUrlAction.Deserialize(actionJson);
 ```
 
 ---
