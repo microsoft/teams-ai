@@ -76,7 +76,218 @@ This is what the OAuth card looks like in Teams:
 | Conversation scopes (`personal`, `groupChat`, `teams`) | `personal` scope only | `personal` scope only |
 | Azure Configuration differences | Same configuration except `Token Exchange URL` is blank | Same configuration except `Token Exchange URL` is set
 
+## Implementation Examples
 
+### Implementing SSO in Python
+
+Here's a complete example of implementing SSO authentication:
+
+```python
+from teams.app import App
+from teams.activity_context import ActivityContext
+from teams.logging import ConsoleLogger, ConsoleLoggerOptions
+from botbuilder.schema import MessageActivity
+
+# Configure app with SSO
+app = App(
+    default_connection_name="graph",  # OAuth connection name from Azure
+    logger=ConsoleLogger().create_logger("sso-app", options=ConsoleLoggerOptions(level="debug"))
+)
+
+@app.on_message
+async def handle_message(ctx: ActivityContext[MessageActivity]):
+    """Handle all messages with automatic SSO."""
+    if not ctx.is_signed_in:
+        # First time: user will see consent dialog
+        # Subsequent times: silent sign-in via token exchange
+        await ctx.send("Signing you in...")
+        await ctx.sign_in()
+        return
+    
+    # User is authenticated, access their information
+    user = await ctx.user_graph.me.get()
+    await ctx.send(f"Hello {user.display_name}! You're signed in with SSO.")
+
+@app.event("sign_in")
+async def on_sign_in(event: SignInEvent):
+    """Called when SSO completes successfully."""
+    ctx = event.activity_ctx
+    user = await ctx.user_graph.me.get()
+    await ctx.send(f"Welcome {user.display_name}! SSO authentication successful.")
+```
+
+### Implementing OAuth in Python
+
+Here's a complete example of implementing traditional OAuth:
+
+```python
+from teams.app import App
+from teams.activity_context import ActivityContext
+from teams.logging import ConsoleLogger, ConsoleLoggerOptions
+from botbuilder.schema import MessageActivity
+
+# Configure app with OAuth
+app = App(
+    default_connection_name="github",  # OAuth connection for GitHub
+    logger=ConsoleLogger().create_logger("oauth-app", options=ConsoleLoggerOptions(level="debug"))
+)
+
+@app.on_message_pattern("/signin")
+async def handle_signin(ctx: ActivityContext[MessageActivity]):
+    """Prompt user to sign in with OAuth card."""
+    if ctx.is_signed_in:
+        await ctx.send("You are already signed in!")
+        return
+    
+    # Send OAuth card with customized text
+    await ctx.sign_in(
+        card_title="Sign In to GitHub",
+        card_text="Please sign in to access your GitHub repositories",
+        button_text="Sign In"
+    )
+
+@app.event("sign_in")
+async def on_sign_in(event: SignInEvent):
+    """Called when OAuth completes successfully."""
+    ctx = event.activity_ctx
+    token = ctx.token
+    
+    if token:
+        await ctx.send(f"Successfully signed in to {token.connection_name}!")
+        # Use the token to make API calls to the provider
+    else:
+        await ctx.send("Sign-in completed but no token received.")
+
+@app.on_message
+async def handle_message(ctx: ActivityContext[MessageActivity]):
+    """Handle messages from authenticated users."""
+    if not ctx.is_signed_in:
+        await ctx.send("Please type '/signin' to authenticate.")
+        return
+    
+    await ctx.send(f"You said: {ctx.activity.text}")
+```
+
+### Handling Multiple Authentication Methods
+
+You can support both SSO and OAuth in the same app:
+
+```python
+from teams.app import App
+from teams.activity_context import ActivityContext
+
+# Default to SSO for Microsoft Graph
+app = App(default_connection_name="graph")
+
+@app.on_message_pattern("/signin-graph")
+async def signin_graph(ctx: ActivityContext[MessageActivity]):
+    """Sign in with SSO for Microsoft Graph."""
+    await ctx.sign_in()  # Uses default "graph" connection with SSO
+
+@app.on_message_pattern("/signin-github")
+async def signin_github(ctx: ActivityContext[MessageActivity]):
+    """Sign in with OAuth for GitHub."""
+    await ctx.sign_in(
+        connection_name="github",  # Explicit OAuth connection
+        card_text="Sign in to access your GitHub data"
+    )
+
+@app.event("sign_in")
+async def on_sign_in(event: SignInEvent):
+    """Handle sign-in for any connection."""
+    ctx = event.activity_ctx
+    token = ctx.token
+    
+    if token.connection_name == "graph":
+        user = await ctx.user_graph.me.get()
+        await ctx.send(f"Signed in to Microsoft Graph as {user.display_name}")
+    elif token.connection_name == "github":
+        await ctx.send("Signed in to GitHub successfully")
+```
+
+## Decision Guide: Which Authentication Method to Choose?
+
+### Use SSO When:
+- ✅ Your app needs to access Microsoft 365 services (Graph API)
+- ✅ You want the best user experience with minimal friction
+- ✅ You need automatic token refresh
+- ✅ Users are already signed into Teams with Microsoft accounts
+- ✅ You want to leverage existing Teams credentials
+
+### Use OAuth When:
+- ✅ You need to authenticate with third-party services (GitHub, Google, Facebook, etc.)
+- ✅ You need explicit user control over authentication
+- ✅ The identity provider doesn't support SSO token exchange
+- ✅ You want more control over the authentication flow
+- ✅ Your users may not have Microsoft Entra ID accounts
+
+### Use Both When:
+- ✅ Your app integrates with both Microsoft services and third-party APIs
+- ✅ You want to provide flexibility to users
+- ✅ Different features require different identity providers
+
+## Token Lifecycle Management
+
+### SSO Token Lifecycle
+
+```python
+# Token lifecycle with SSO
+@app.on_message
+async def handle_message(ctx: ActivityContext[MessageActivity]):
+    # First time user interacts
+    if not ctx.is_signed_in:
+        await ctx.sign_in()  # User sees consent dialog
+        return
+    
+    # Token is valid - use it
+    # If token expires, Teams automatically exchanges it
+    user = await ctx.user_graph.me.get()  # Works seamlessly
+```
+
+### OAuth Token Lifecycle
+
+```python
+# Token lifecycle with OAuth
+@app.on_message
+async def handle_message(ctx: ActivityContext[MessageActivity]):
+    # User must explicitly sign in
+    if not ctx.is_signed_in:
+        await ctx.send("Your session has expired. Please sign in again.")
+        await ctx.sign_in()  # User sees OAuth card
+        return
+    
+    # Token is valid - use it
+    # When token expires, user must sign in again
+```
+
+## Common Scenarios and Solutions
+
+### Scenario 1: User Profile Access
+**Best Choice**: SSO
+```python
+# Seamless access to user profile
+if ctx.is_signed_in:
+    user = await ctx.user_graph.me.get()
+    await ctx.send(f"Hello {user.display_name}!")
+```
+
+### Scenario 2: Third-Party API Integration
+**Best Choice**: OAuth
+```python
+# Explicit OAuth for third-party services
+await ctx.sign_in(connection_name="github")
+# Use token to call GitHub API
+```
+
+### Scenario 3: Multi-Service Integration
+**Best Choice**: Both
+```python
+# SSO for Microsoft services
+await ctx.sign_in()  # Default graph connection
+
+# OAuth for other services
+await ctx.sign_in(connection_name="github")
+```
 
 ## Resources
 
