@@ -121,13 +121,15 @@ app.on('message.ext.submit', async ({ activity }) => {
   let card: IAdaptiveCard;
 
   if (commandId === 'createCard') {
-    // activity.value.commandContext == "compose"
+    // The activity.value.commandContext == "compose" here because it was from
+    // the compose box
     card = createCard(activity.value.data);
   } else if (
     commandId === 'getMessageDetails' &&
     activity.value.messagePayload
   ) {
-    // activity.value.commandContext == "message"
+    // The activity.value.commandContext == "message" here because it was from
+    // the message context
     card = createMessageDetailsCard(activity.value.messagePayload);
   } else {
     throw new Error(`Unknown commandId: ${commandId}`);
