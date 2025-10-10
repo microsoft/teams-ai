@@ -12,8 +12,7 @@
     "fmt": "npx prettier --write \"**/*.{js,ts,tsx,md,json}\"",
     "docs:build": "npm -w teams-md run build",
     "docs:dev": "npm -w teams-md run start",
-    "docs:serve": "npm -w teams-md run serve",
-    "check:links": "node ./scripts/check-links.js"
+    "docs:serve": "npm -w teams-md run serve"
   },
   "devDependencies": {
     "prettier": "^3.5.3",
