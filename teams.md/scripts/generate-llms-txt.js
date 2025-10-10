@@ -9,10 +9,10 @@ const FrontmatterParser = require('./lib/frontmatter-parser');
 const COMMON_OVERALL_SUMMARY = (langName, language) => {
     const languageSpecificTips = {
         typescript: [
-            "It's a good idea to build the application using `npm run build` and fix compile time errors to help ensure the app works as expected."
+            "Use `npm run build` to check if the app builds and has no type errors."
         ],
         python: [
-            "It's a good idea to run `uv run typecheck` to make sure the code is correctly typed and fix any type errors."
+            "Use `uv run typecheck` to ensure that the app has no type errors."
         ],
         csharp: [
             "It's a good idea to build the application and fix compile time errors to help ensure the app works as expected."
@@ -20,7 +20,7 @@ const COMMON_OVERALL_SUMMARY = (langName, language) => {
     };
 
     const tips = languageSpecificTips[language] || [];
-    const formattedTips = tips.map(tip => `- ${tip}`).join('\n');
+    const formattedTips = tips.map(tip => `- IMPORTANT: ${tip}`).join('\n');
 
     return `> Microsoft Teams AI Library (v2) - A comprehensive framework for building AI-powered Teams applications using ${langName}. Using this Library, you can easily build and integrate a variety of features in Microsoft Teams by building Agents or Tools. The documentation here helps by giving background information and code samples on how best to do this.
 
