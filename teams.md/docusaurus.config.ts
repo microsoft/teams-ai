@@ -79,7 +79,7 @@ const config: Config = {
                 sidebarPath: './sidebars.ts',
                 sidebarCollapsed: true,
                 editUrl: 'https://github.com/microsoft/teams-ai/tree/main/teams.md/',
-                exclude: ["**/observability/*", "**/LLMs.md", "**/ai/mcp/*"]
+                exclude: ["**/observability/*", "**/LLMs.md", "**/ai/mcp/mcp-server.md"]
             } satisfies Partial<DocsPlugin.PluginOptions>,
         ],
         [
