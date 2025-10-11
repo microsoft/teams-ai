@@ -1,13 +1,33 @@
-const fs = require('fs');
-const path = require('path');
-const FrontmatterParser = require('./frontmatter-parser');
+import * as fs from 'fs';
+import * as path from 'path';
+import { FrontmatterParser } from './frontmatter-parser';
+
+interface ProcessedContent {
+    title: string;
+    content: string;
+    frontmatter: { [key: string]: any };
+    filePath: string;
+    sidebarPosition: number;
+    relativeUrl: string;
+}
+
+interface ParsedMarkdown {
+    title: string;
+    content: string;
+    frontmatter: { [key: string]: any };
+}
+
+interface DocusaurusConfig {
+    url: string;
+    baseUrl: string;
+}
 
 /**
  * Checks if a file should be ignored based on section-wide README filtering
- * @param {string} filePath - Path to the file to check
- * @returns {boolean} True if file should be ignored due to section filtering
+ * @param filePath - Path to the file to check
+ * @returns True if file should be ignored due to section filtering
  */
-function shouldIgnoreFileBySection(filePath) {
+export function shouldIgnoreFileBySection(filePath: string): boolean {
     // Get the directory path
     let currentDir = path.dirname(filePath);
 
@@ -36,19 +56,26 @@ function shouldIgnoreFileBySection(filePath) {
 
 /**
  * Processes a markdown/MDX file and extracts its content
- * @param {string} filePath - Path to the file to process
- * @param {string} baseDir - Base directory for resolving relative paths
- * @param {boolean} includeCodeBlocks - Whether to include FileCodeBlock content
- * @param {Map} fileMapping - Optional mapping of source files to generated filenames
- * @param {Object} config - Optional Docusaurus config for full URL generation
- * @param {string} language - Optional language identifier for URL generation
- * @returns {Promise<Object>} Processed content with title, content, and metadata
+ * @param filePath - Path to the file to process
+ * @param baseDir - Base directory for resolving relative paths
+ * @param includeCodeBlocks - Whether to include FileCodeBlock content
+ * @param fileMapping - Optional mapping of source files to generated filenames
+ * @param config - Optional Docusaurus config for full URL generation
+ * @param language - Optional language identifier for URL generation
+ * @returns Processed content with title, content, and metadata
  */
-async function processContent(filePath, baseDir, includeCodeBlocks = false, fileMapping = null, config = null, language = null) {
+export async function processContent(
+    filePath: string,
+    baseDir: string,
+    includeCodeBlocks: boolean = false,
+    fileMapping: Map<string, string> | null = null,
+    config: DocusaurusConfig | null = null,
+    language: string | null = null
+): Promise<ProcessedContent | null> {
     try {
         if (!fs.existsSync(filePath)) {
             console.warn(`⚠️ File not found: ${filePath}`);
-            return { title: '', content: '', frontmatter: {} };
+            return { title: '', content: '', frontmatter: {}, filePath, sidebarPosition: 999, relativeUrl: '' };
         }
 
         const rawContent = fs.readFileSync(filePath, 'utf8');
@@ -70,27 +97,35 @@ async function processContent(filePath, baseDir, includeCodeBlocks = false, file
             content: content || '',
             frontmatter: frontmatter || {},
             filePath,
-            sidebarPosition: frontmatter.sidebar_position || 999,
+            sidebarPosition: (frontmatter.sidebar_position as number) || 999,
             relativeUrl: generateRelativeUrl(filePath, baseDir)
         };
     } catch (error) {
-        console.error(`❌ Error processing file ${filePath}:`, error.message);
+        console.error(`❌ Error processing file ${filePath}:`, (error as Error).message);
         throw error; // Re-throw to fail the build
     }
 }
 
 /**
  * Parses markdown/MDX content and extracts title and content
- * @param {string} rawContent - Raw file content
- * @param {string} baseDir - Base directory for resolving paths
- * @param {boolean} includeCodeBlocks - Whether to process FileCodeBlocks
- * @param {string} filePath - Current file path for resolving relative links
- * @param {Map} fileMapping - Optional mapping of source files to generated filenames
- * @param {Object} config - Optional Docusaurus config for full URL generation
- * @param {string} language - Optional language identifier for URL generation
- * @returns {Promise<Object>} Parsed title, content, and frontmatter
+ * @param rawContent - Raw file content
+ * @param baseDir - Base directory for resolving paths
+ * @param includeCodeBlocks - Whether to process FileCodeBlocks
+ * @param filePath - Current file path for resolving relative links
+ * @param fileMapping - Optional mapping of source files to generated filenames
+ * @param config - Optional Docusaurus config for full URL generation
+ * @param language - Optional language identifier for URL generation
+ * @returns Parsed title, content, and frontmatter
  */
-async function parseMarkdownContent(rawContent, baseDir, includeCodeBlocks, filePath, fileMapping, config, language) {
+async function parseMarkdownContent(
+    rawContent: string,
+    baseDir: string,
+    includeCodeBlocks: boolean,
+    filePath: string,
+    fileMapping: Map<string, string> | null,
+    config: DocusaurusConfig | null,
+    language: string | null
+): Promise<ParsedMarkdown> {
     // Extract and remove frontmatter
     const { frontmatter, content: contentWithoutFrontmatter } = FrontmatterParser.extract(rawContent);
     let content = contentWithoutFrontmatter;
@@ -127,11 +162,11 @@ async function parseMarkdownContent(rawContent, baseDir, includeCodeBlocks, file
 
 /**
  * Processes FileCodeBlock components and includes the referenced code
- * @param {string} content - Content containing FileCodeBlock components
- * @param {string} baseDir - Base directory for resolving paths
- * @returns {Promise<string>} Content with FileCodeBlocks replaced by actual code
+ * @param content - Content containing FileCodeBlock components
+ * @param baseDir - Base directory for resolving paths
+ * @returns Content with FileCodeBlocks replaced by actual code
  */
-async function processFileCodeBlocks(content, baseDir) {
+async function processFileCodeBlocks(content: string, baseDir: string): Promise<string> {
     const fileCodeBlockRegex = /<FileCodeBlock\s+([^>]+)\/>/g;
     let processedContent = content;
     let match;
@@ -146,7 +181,7 @@ async function processFileCodeBlocks(content, baseDir) {
                 const codeBlock = `\`\`\`${lang || 'typescript'}\n${codeContent}\n\`\`\``;
                 processedContent = processedContent.replace(match[0], codeBlock);
             } catch (error) {
-                console.warn(`⚠️ Could not load code file ${src}:`, error.message);
+                console.warn(`⚠️ Could not load code file ${src}:`, (error as Error).message);
                 processedContent = processedContent.replace(match[0], `[Code file not found: ${src}]`);
             }
         }
@@ -157,13 +192,13 @@ async function processFileCodeBlocks(content, baseDir) {
 
 /**
  * Loads code content from a file referenced by FileCodeBlock
- * @param {string} src - Source path from FileCodeBlock (e.g., "/generated-snippets/ts/example.ts")
- * @param {string} baseDir - Base directory
- * @returns {Promise<string>} Code content
+ * @param src - Source path from FileCodeBlock (e.g., "/generated-snippets/ts/example.ts")
+ * @param baseDir - Base directory
+ * @returns Code content
  */
-async function loadCodeFile(src, baseDir) {
+async function loadCodeFile(src: string, baseDir: string): Promise<string> {
     // Convert src path to local file path
-    let filePath;
+    let filePath: string;
     if (src.startsWith('/')) {
         filePath = path.join(baseDir, 'static', src.substring(1));
     } else {
@@ -179,11 +214,11 @@ async function loadCodeFile(src, baseDir) {
 
 /**
  * Parses attributes from JSX-style attribute string
- * @param {string} attributeString - String containing attributes
- * @returns {Object} Parsed attributes
+ * @param attributeString - String containing attributes
+ * @returns Parsed attributes
  */
-function parseAttributes(attributeString) {
-    const attributes = {};
+function parseAttributes(attributeString: string): { [key: string]: string } {
+    const attributes: { [key: string]: string } = {};
     const regex = /(\w+)=["']([^"']+)["']/g;
     let match;
 
@@ -196,10 +231,10 @@ function parseAttributes(attributeString) {
 
 /**
  * Cleans MDX-specific syntax while preserving standard markdown
- * @param {string} content - Content to clean
- * @returns {string} Cleaned content
+ * @param content - Content to clean
+ * @returns Cleaned content
  */
-function cleanMdxSyntax(content) {
+function cleanMdxSyntax(content: string): string {
     let cleaned = content;
 
     // Remove JSX components (except code blocks which are handled separately)
@@ -211,7 +246,7 @@ function cleanMdxSyntax(content) {
     // Remove JSX expressions but keep the content if it's simple text
     // IMPORTANT: Don't process content inside code blocks (```)
     const codeBlockRegex = /```[\s\S]*?```/g;
-    const codeBlocks = [];
+    const codeBlocks: string[] = [];
 
     // Extract code blocks temporarily
     cleaned = cleaned.replace(codeBlockRegex, (match) => {
@@ -242,11 +277,11 @@ function cleanMdxSyntax(content) {
 
 /**
  * Generates a relative URL for a documentation file
- * @param {string} filePath - Full path to the file
- * @param {string} baseDir - Base directory path
- * @returns {string} Relative URL for the file
+ * @param filePath - Full path to the file
+ * @param baseDir - Base directory path
+ * @returns Relative URL for the file
  */
-function generateRelativeUrl(filePath, baseDir) {
+export function generateRelativeUrl(filePath: string, baseDir: string): string {
     const relativePath = path.relative(path.join(baseDir, 'docs'), filePath);
 
     // Convert file path to URL format
@@ -271,14 +306,20 @@ function generateRelativeUrl(filePath, baseDir) {
 
 /**
  * Fixes internal relative links to point to generated .txt files
- * @param {string} content - Content containing markdown links
- * @param {string} currentFilePath - Path of the current file being processed
- * @param {Map} fileMapping - Optional mapping of source files to generated filenames
- * @param {Object} config - Optional Docusaurus config for full URL generation
- * @param {string} language - Optional language identifier for URL generation
- * @returns {string} Content with fixed links
+ * @param content - Content containing markdown links
+ * @param currentFilePath - Path of the current file being processed
+ * @param fileMapping - Optional mapping of source files to generated filenames
+ * @param config - Optional Docusaurus config for full URL generation
+ * @param language - Optional language identifier for URL generation
+ * @returns Content with fixed links
  */
-function fixInternalLinks(content, currentFilePath, fileMapping, config, language) {
+export function fixInternalLinks(
+    content: string,
+    currentFilePath: string,
+    fileMapping: Map<string, string> | null,
+    config: DocusaurusConfig | null,
+    language: string | null
+): string {
     // Pattern to match markdown links: [text](link)
     const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
 
@@ -356,11 +397,11 @@ function fixInternalLinks(content, currentFilePath, fileMapping, config, languag
 
 /**
  * Extracts a summary from content (first paragraph or section)
- * @param {string} content - Content to summarize
- * @param {number} maxLength - Maximum length of summary
- * @returns {string} Content summary
+ * @param content - Content to summarize
+ * @param maxLength - Maximum length of summary
+ * @returns Content summary
  */
-function extractSummary(content, maxLength = 200) {
+export function extractSummary(content: string, maxLength: number = 200): string {
     // Remove markdown formatting for summary
     let summary = content
         .replace(/#+\s*/g, '') // Remove headers
@@ -380,14 +421,3 @@ function extractSummary(content, maxLength = 200) {
 
     return firstParagraph;
 }
-
-module.exports = {
-    processContent,
-    parseMarkdownContent,
-    processFileCodeBlocks,
-    loadCodeFile,
-    extractSummary,
-    generateRelativeUrl,
-    fixInternalLinks,
-    shouldIgnoreFileBySection
-};

@@ -35,7 +35,15 @@ const config: Config = {
     markdown: {
         mermaid: true,
     },
-
+    headTags: [
+        {
+            tagName: 'link',
+            attributes: {
+                rel: 'llms.txt',
+                href: 'https://microsoft.github.io/teams-ai/llm_docs/llms.txt'
+            }
+        }
+    ],
     scripts: [path.join(baseUrl, '/scripts/clarity.js')],
 
     presets: [

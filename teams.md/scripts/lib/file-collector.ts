@@ -1,15 +1,34 @@
-const fs = require('fs');
-const path = require('path');
-const FrontmatterParser = require('./frontmatter-parser');
+import * as fs from 'fs';
+import * as path from 'path';
+import { FrontmatterParser } from './frontmatter-parser';
+
+interface FileInfo {
+    name: string;
+    title: string;
+    path: string;
+    order: number;
+}
+
+interface FolderStructure {
+    title: string;
+    order: number;
+    path: string;
+    files: FileInfo[];
+    children: { [key: string]: FolderStructure };
+}
+
+interface HierarchicalFiles {
+    language: { [key: string]: FolderStructure };
+}
 
 /**
  * Recursively collects all markdown and MDX files from a directory
- * @param {string} dirPath - Directory path to search
- * @param {Array<string>} extensions - File extensions to collect (default: ['.md', '.mdx'])
- * @returns {Array<string>} Array of file paths
+ * @param dirPath - Directory path to search
+ * @param extensions - File extensions to collect (default: ['.md', '.mdx'])
+ * @returns Array of file paths
  */
-function collectFiles(dirPath, extensions = ['.md', '.mdx']) {
-    const files = [];
+export function collectFiles(dirPath: string, extensions: string[] = ['.md', '.mdx']): string[] {
+    const files: string[] = [];
 
     if (!fs.existsSync(dirPath)) {
         console.warn(`⚠️ Directory not found: ${dirPath}`);
@@ -18,9 +37,9 @@ function collectFiles(dirPath, extensions = ['.md', '.mdx']) {
 
     /**
      * Recursively traverse directory
-     * @param {string} currentPath - Current directory path
+     * @param currentPath - Current directory path
      */
-    function traverse(currentPath) {
+    function traverse(currentPath: string): void {
         const items = fs.readdirSync(currentPath, { withFileTypes: true });
 
         for (const item of items) {
@@ -48,10 +67,10 @@ function collectFiles(dirPath, extensions = ['.md', '.mdx']) {
 
 /**
  * Determines if a directory should be skipped during traversal
- * @param {string} dirName - Directory name
- * @returns {boolean} True if directory should be skipped
+ * @param dirName - Directory name
+ * @returns True if directory should be skipped
  */
-function shouldSkipDirectory(dirName) {
+export function shouldSkipDirectory(dirName: string): boolean {
     const skipDirs = [
         'node_modules',
         '.git',
@@ -68,17 +87,14 @@ function shouldSkipDirectory(dirName) {
 
 /**
  * Gets files organized hierarchically based on folder structure and sidebar_position
- * @param {string} basePath - Base documentation path
- * @param {string} language - Language identifier ('typescript' or 'csharp' or 'python')
- * @returns {Object} Hierarchically organized file structure
+ * @param basePath - Base documentation path
+ * @param language - Language identifier ('typescript' or 'csharp' or 'python')
+ * @returns Hierarchically organized file structure
  */
-function getHierarchicalFiles(basePath, language) {
-    const mainPath = path.join(basePath, 'docs', 'main');
+export function getHierarchicalFiles(basePath: string, language: string): HierarchicalFiles {
     const langPath = path.join(basePath, 'docs', language);
 
-    const structure = {
-        // Removing putting "main" in llmstxt since it doesn't help LLMs much
-        // main: buildHierarchicalStructure(mainPath),
+    const structure: HierarchicalFiles = {
         language: buildHierarchicalStructure(langPath)
     };
 
@@ -87,28 +103,28 @@ function getHierarchicalFiles(basePath, language) {
 
 /**
  * Builds hierarchical structure for a directory
- * @param {string} rootPath - Root directory path
- * @returns {Object} Hierarchical structure with folders and files
+ * @param rootPath - Root directory path
+ * @returns Hierarchical structure with folders and files
  */
-function buildHierarchicalStructure(rootPath) {
+export function buildHierarchicalStructure(rootPath: string): { [key: string]: FolderStructure } {
     if (!fs.existsSync(rootPath)) {
         return {};
     }
 
-    const structure = {};
-    const seenTitles = new Map(); // Track titles and their file paths for duplicate detection
+    const structure: { [key: string]: FolderStructure } = {};
+    const seenTitles = new Map<string, string>(); // Track titles and their file paths for duplicate detection
 
     /**
      * Recursively processes a directory
-     * @param {string} dirPath - Current directory path
-     * @param {Object} currentLevel - Current level in the structure
+     * @param dirPath - Current directory path
+     * @param currentLevel - Current level in the structure
      */
-    function processDirectory(dirPath, currentLevel) {
+    function processDirectory(dirPath: string, currentLevel: { files: FileInfo[]; children: { [key: string]: FolderStructure } }): void {
         const items = fs.readdirSync(dirPath, { withFileTypes: true });
 
         // Collect folders and files separately
-        const folders = [];
-        const files = [];
+        const folders: FileInfo[] = [];
+        const files: FileInfo[] = [];
 
         for (const item of items) {
             const fullPath = path.join(dirPath, item.name);
@@ -133,11 +149,11 @@ function buildHierarchicalStructure(rootPath) {
                         // If README is marked ignore-file, skip just the README but process folder
                         // (folderOrder and folderTitle will use defaults)
 
-                        folderOrder = frontmatter.sidebar_position || 999;
+                        folderOrder = (frontmatter.sidebar_position as number) || 999;
 
                         // Extract title from frontmatter or first # header
                         if (frontmatter.title || frontmatter.sidebar_label) {
-                            folderTitle = frontmatter.title || frontmatter.sidebar_label;
+                            folderTitle = (frontmatter.title || frontmatter.sidebar_label) as string;
                         } else {
                             // Extract from first # header
                             const headerMatch = content.match(/^#\s+(.+)$/m);
@@ -170,7 +186,7 @@ function buildHierarchicalStructure(rootPath) {
                         continue; // Skip this file
                     }
 
-                    fileOrder = frontmatter.sidebar_position || 999;
+                    fileOrder = (frontmatter.sidebar_position as number) || 999;
 
                     // Extract title from first # header
                     const headerMatch = content.match(/^#\s+(.+)$/m);
@@ -180,7 +196,7 @@ function buildHierarchicalStructure(rootPath) {
 
                     // Check for duplicate titles
                     if (seenTitles.has(fileTitle)) {
-                        const existingPath = seenTitles.get(fileTitle);
+                        const existingPath = seenTitles.get(fileTitle)!;
                         throw new Error(
                             `Duplicate title found: "${fileTitle}"\n` +
                             `  First occurrence: ${existingPath}\n` +
@@ -236,7 +252,7 @@ function buildHierarchicalStructure(rootPath) {
     }
 
     // Create a temporary wrapper to handle the root properly
-    const tempWrapper = { files: [], children: {} };
+    const tempWrapper: { files: FileInfo[]; children: { [key: string]: FolderStructure } } = { files: [], children: {} };
     processDirectory(rootPath, tempWrapper);
 
     // Return the children (which contain the actual folder structure)
@@ -245,17 +261,17 @@ function buildHierarchicalStructure(rootPath) {
 
 /**
  * Gets priority files for small version generation
- * @param {Object} organized - Organized file structure from getOrganizedFiles
- * @returns {Array<string>} Priority files for small version
+ * @param organized - Organized file structure from getOrganizedFiles
+ * @returns Priority files for small version
  */
-function getPriorityFiles(organized) {
-    const priorityFiles = [];
+export function getPriorityFiles(organized: any): string[] {
+    const priorityFiles: string[] = [];
 
     // Add welcome/overview files
     priorityFiles.push(...organized.main.welcome);
 
     // Add key team concepts
-    const keyTeamFiles = organized.main.teams.filter(file =>
+    const keyTeamFiles = organized.main.teams.filter((file: string) =>
         file.includes('core-concepts') ||
         file.includes('README.md')
     );
@@ -265,7 +281,7 @@ function getPriorityFiles(organized) {
     priorityFiles.push(...organized.language.gettingStarted);
 
     // Add essential README files
-    const essentialReadmes = organized.language.essentials.filter(file =>
+    const essentialReadmes = organized.language.essentials.filter((file: string) =>
         file.includes('README.md') ||
         file.includes('app-basics')
     );
@@ -273,11 +289,3 @@ function getPriorityFiles(organized) {
 
     return priorityFiles;
 }
-
-module.exports = {
-    collectFiles,
-    getHierarchicalFiles,
-    getPriorityFiles,
-    shouldSkipDirectory,
-    buildHierarchicalStructure
-};
