@@ -6,27 +6,29 @@ import { collectFiles, getHierarchicalFiles } from './lib/file-collector';
 import { processContent } from './lib/content-processor';
 import { FrontmatterParser } from './lib/frontmatter-parser';
 
-const COMMON_OVERALL_SUMMARY = (language: string) => {
-    const langNameByLanguage: {
-        typescript: 'Typescript',
-        python: 'Python',
-        csharp: 'dotnet (csharp)'
-    }
+type Language = 'typescript' | 'python' | 'csharp';
 
-    const languageSpecificTips = {
-        typescript: [
-            "It's a good idea to build the application using `npm run build` and fix compile time errors to help ensure the app works as expected."
-        ],
-        python: [
-            "It's a good idea to run `uv run typecheck` to make sure the code is correctly typed and fix any type errors."
-        ],
-        csharp: [
-            "It's a good idea to build the application and fix compile time errors to help ensure the app works as expected."
-        ]
-    };
+const LANG_NAME_BY_LANGUAGE: Record<Language, string> = {
+    typescript: 'Typescript',
+    python: 'Python',
+    csharp: 'Dotnet (C#)'
+};
 
-    const langName = langNameByLanguage[language];
-    const tips = languageSpecificTips[language] || [];
+const LANGUAGE_SPECIFIC_TIPS: Record<Language, string[]> = {
+    typescript: [
+        "It's a good idea to build the application using `npm run build` and fix compile time errors to help ensure the app works as expected."
+    ],
+    python: [
+        "It's a good idea to run `uv run typecheck` to make sure the code is correctly typed and fix any type errors."
+    ],
+    csharp: [
+        "It's a good idea to build the application and fix compile time errors to help ensure the app works as expected."
+    ]
+};
+
+const COMMON_OVERALL_SUMMARY = (language: Language) => {
+    const langName = LANG_NAME_BY_LANGUAGE[language];
+    const tips = LANGUAGE_SPECIFIC_TIPS[language];
     const formattedTips = tips.map(tip => `- ${tip}`).join('\n');
 
     return `> Microsoft Teams AI Library (v2) - A comprehensive framework for building AI-powered Teams applications using ${langName}. Using this Library, you can easily build and integrate a variety of features in Microsoft Teams by building Agents or Tools. The documentation here helps by giving background information and code samples on how best to do this.
@@ -136,12 +138,12 @@ async function generateLlmsTxt(): Promise<void> {
 
 /**
  * Generates llms.txt files for a specific language
- * @param language - 'typescript' or 'csharp'
+ * @param language - 'typescript', 'python', or 'csharp'
  * @param baseDir - Base directory path
  * @param outputDir - Output directory path
  * @param config - Docusaurus config object
  */
-async function generateLanguageFiles(language: string, baseDir: string, outputDir: string, config: DocusaurusConfig): Promise<void> {
+async function generateLanguageFiles(language: Language, baseDir: string, outputDir: string, config: DocusaurusConfig): Promise<void> {
     // Collect all relevant files
     const mainFiles: string[] = [];
     const langFiles = collectFiles(path.join(baseDir, 'docs', language));
@@ -247,7 +249,7 @@ async function processAllFiles(allFiles: string[], baseDir: string): Promise<{ p
 async function generateIndividualTxtFiles(
     processedFiles: ProcessedFile[],
     outputDir: string,
-    language: string,
+    language: Language,
     baseDir: string,
     config: DocusaurusConfig,
     fileMapping: Map<string, string>
@@ -301,8 +303,8 @@ async function generateIndividualTxtFiles(
  * @param fileMapping - Mapping of source files to generated filenames
  * @returns Generated navigation content
  */
-async function generateSmallVersionHierarchical(language: string, baseDir: string, config: DocusaurusConfig, fileMapping: Map<string, string>): Promise<string> {
-    const langName = language === 'typescript' ? 'TypeScript' : 'C#';
+async function generateSmallVersionHierarchical(language: Language, baseDir: string, config: DocusaurusConfig, fileMapping: Map<string, string>): Promise<string> {
+    const langName = LANG_NAME_BY_LANGUAGE[language];
     // Remove trailing slash from URL and ensure baseUrl starts with slash
     const cleanUrl = config.url.replace(/\/$/, '');
     const cleanBaseUrl = config.baseUrl.startsWith('/') ? config.baseUrl : '/' + config.baseUrl;
@@ -329,7 +331,7 @@ async function generateSmallVersionHierarchical(language: string, baseDir: strin
  * @param indentLevel - Current indentation level (0 = section headers, 1+ = bullet points)
  * @returns Rendered content with proper hierarchy
  */
-function renderHierarchicalStructure(structure: { [key: string]: FolderStructure }, baseUrl: string, language: string, fileMapping: Map<string, string>, indentLevel: number = 0): string {
+function renderHierarchicalStructure(structure: { [key: string]: FolderStructure }, baseUrl: string, language: Language, fileMapping: Map<string, string>, indentLevel: number = 0): string {
     let content = '';
 
     // Helper function for folder name formatting
@@ -499,11 +501,10 @@ function extractSummaryFromFile(filePath: string): string {
  * @param baseDir - Base directory path
  * @returns Generated content
  */
-async function generateFullVersion(language: string, processedFiles: ProcessedFile[], baseDir: string): Promise<string> {
-    const langName = language === 'typescript' ? 'TypeScript' : 'C#';
-
+async function generateFullVersion(language: Language, processedFiles: ProcessedFile[], baseDir: string): Promise<string> {
+    const langName = LANG_NAME_BY_LANGUAGE[language]
     let content = `# Teams AI Library - ${langName} Documentation (Complete)\n\n`;
-    content += COMMON_OVERALL_SUMMARY(langName, language) + '\n\n';
+    content += COMMON_OVERALL_SUMMARY(language) + '\n\n';
 
     // Group files by section
     const sections = groupFilesBySection(processedFiles, baseDir);
