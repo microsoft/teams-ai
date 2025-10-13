@@ -139,9 +139,11 @@ Here's the complete example showing how to handle a multi-step form:
 using System.Text.Json;
 using Microsoft.Teams.Api;
 using Microsoft.Teams.Api.TaskModules;
+using Microsoft.Teams.Apps;
 using Microsoft.Teams.Apps.Activities.Invokes;
 using Microsoft.Teams.Apps.Annotations;
 using Microsoft.Teams.Cards;
+using Microsoft.Teams.Common.Logging;
 
 //...
 

@@ -22,7 +22,8 @@ const LANGUAGE_SPECIFIC_TIPS: Record<Language, string[]> = {
         "It's a good idea to run `uv run typecheck` to make sure the code is correctly typed and fix any type errors."
     ],
     csharp: [
-        "It's a good idea to build the application and fix compile time errors to help ensure the app works as expected."
+        "It's a good idea to build the application and fix compile time errors to help ensure the app works as expected.",
+        "It is helpful to inspect NuGet packages folder to get exact types for a given namesapce"
     ]
 };
 

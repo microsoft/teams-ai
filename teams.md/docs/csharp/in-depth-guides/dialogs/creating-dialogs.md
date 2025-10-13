@@ -16,8 +16,10 @@ To open a dialog, you need to supply a special type of action to the Adaptive Ca
 
 ```csharp
 using Microsoft.Teams.Api.Activities;
+using Microsoft.Teams.Apps;
 using Microsoft.Teams.Apps.Annotations;
 using Microsoft.Teams.Cards;
+using Microsoft.Teams.Common.Logging;
 
 //...
 
@@ -69,8 +71,10 @@ Once an action is executed to open a dialog, the Teams client will send an event
 ```csharp
 using System.Text.Json;
 using Microsoft.Teams.Api.TaskModules;
+using Microsoft.Teams.Apps;
 using Microsoft.Teams.Apps.Activities.Invokes;
 using Microsoft.Teams.Apps.Annotations;
+using Microsoft.Teams.Common.Logging;
 
 //...
 

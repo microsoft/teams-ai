@@ -18,8 +18,10 @@ In this example, we show how to handle dialog submissions from an Adaptive Card 
 ```csharp
 using System.Text.Json;
 using Microsoft.Teams.Api.TaskModules;
+using Microsoft.Teams.Apps;
 using Microsoft.Teams.Apps.Activities.Invokes;
 using Microsoft.Teams.Apps.Annotations;
+using Microsoft.Teams.Common.Logging;
 
 //...
 
@@ -84,8 +86,10 @@ Here's the complete example showing how to handle multiple submission types:
 ```csharp
 using System.Text.Json;
 using Microsoft.Teams.Api.TaskModules;
+using Microsoft.Teams.Apps;
 using Microsoft.Teams.Apps.Activities.Invokes;
 using Microsoft.Teams.Apps.Annotations;
+using Microsoft.Teams.Common.Logging;
 
 //...
 
