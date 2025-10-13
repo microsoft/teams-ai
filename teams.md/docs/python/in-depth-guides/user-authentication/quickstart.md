@@ -1,4 +1,11 @@
----
+-First, install the CLI via NPM:
+
+```bash
+npm install -g @microsoft/teams.cli
+```
+
+Next, use the CLI to create your agent:
+--
 sidebar_position: 1
 summary: Create a Teams app with Microsoft Graph authentication using the Agents Toolkit and SSO flow.
 ---
@@ -35,7 +42,7 @@ Use your terminal to run the following command:
 
 
 ```sh
-teams new python oauth-app --template graph
+npx @microsoft/teams.cli new python oauth-app --template graph
 ```
 
 
@@ -50,7 +57,7 @@ Open your terminal with the `oauth-app/` folder set as the current working direc
 
 
 ```sh
-teams config add atk.oauth
+npx @microsoft/teams.cli config add atk.oauth
 ```
 
 
