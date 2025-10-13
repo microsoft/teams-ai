@@ -225,8 +225,14 @@ private static AdaptiveCard CreateProfileCardWithValidation()
 Card actions arrive as `AdaptiveCard.Action` activities in your app. These give you access to the validated input values plus any `data` values you had configured to be sent back to you.
 
 ```csharp
+using System.Text.Json;
+using Microsoft.Teams.Api.Activities.Invokes.AdaptiveCards;
+using Microsoft.Teams.Apps.Annotations;
+
+//...
+
 [Microsoft.Teams.Apps.Activities.Invokes.AdaptiveCard.Action]
-public async Task<ActionResponse> OnCardAction([Context] AdaptiveCards.ActionActivity activity, [Context] IContext.Client client, [Context] Microsoft.Teams.Common.Logging.ILogger log)
+public async Task<ActionResponse> OnCardAction([Context] ActionActivity activity, [Context] IContext.Client client, [Context] ILogger log)
 {
     log.Info("[CARD_ACTION] Card action received");
 
@@ -254,7 +260,7 @@ public async Task<ActionResponse> OnCardAction([Context] AdaptiveCards.ActionAct
     {
         if (data.TryGetValue(key, out var val))
         {
-            if (val is System.Text.Json.JsonElement element)
+            if (val is JsonElement element)
                 return element.GetString();
             return val?.ToString();
         }
