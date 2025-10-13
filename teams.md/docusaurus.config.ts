@@ -120,12 +120,6 @@ const config: Config = {
         colorMode: {
             respectPrefersColorScheme: true,
         },
-        announcementBar: {
-            backgroundColor: '#515cc6',
-            isCloseable: true,
-            textColor: '#fff',
-            content: '🎉️ Teams AI v2 is out! 🥳️',
-        },
         navbar: {
             title: 'Teams AI (v2)',
             hideOnScroll: true,
@@ -148,10 +142,6 @@ const config: Config = {
                     to: 'python',
                     position: 'left',
                     label: 'Python',
-                },
-                {
-                    type: 'localeDropdown',
-                    position: 'right',
                 },
                 {
                     href: 'https://github.com/microsoft/teams-ai/tree/main',
