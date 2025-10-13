@@ -109,6 +109,7 @@ const config: Config = {
         /** @type {import("@easyops-cn/docusaurus-search-local").PluginOptions} */
         ({
             hashed: true,
+            language: ['en'],
             docsRouteBasePath: ['/', '/typescript', '/csharp', '/python'],
             indexDocs: true,
             indexPages: true,
