@@ -35,7 +35,7 @@ Use your terminal to run the following command:
 
 
 ```sh
-teams new python oauth-app --template graph
+npx @microsoft/teams.cli new python oauth-app --template graph
 ```
 
 
@@ -50,7 +50,7 @@ Open your terminal with the `oauth-app/` folder set as the current working direc
 
 
 ```sh
-teams config add atk.oauth
+npx @microsoft/teams.cli config add atk.oauth
 ```
 
 

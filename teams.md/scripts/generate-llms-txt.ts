@@ -1,25 +1,34 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
-const { collectFiles, getHierarchicalFiles } = require('./lib/file-collector');
-const { processContent } = require('./lib/content-processor');
-const FrontmatterParser = require('./lib/frontmatter-parser');
+import * as fs from 'fs';
+import * as path from 'path';
+import { collectFiles, getHierarchicalFiles } from './lib/file-collector';
+import { processContent } from './lib/content-processor';
+import { FrontmatterParser } from './lib/frontmatter-parser';
 
-const COMMON_OVERALL_SUMMARY = (langName, language) => {
-    const languageSpecificTips = {
-        typescript: [
-            "It's a good idea to build the application using `npm run build` and fix compile time errors to help ensure the app works as expected."
-        ],
-        python: [
-            "It's a good idea to run `uv run typecheck` to make sure the code is correctly typed and fix any type errors."
-        ],
-        csharp: [
-            "It's a good idea to build the application and fix compile time errors to help ensure the app works as expected."
-        ]
-    };
+type Language = 'typescript' | 'python' | 'csharp';
 
-    const tips = languageSpecificTips[language] || [];
+const LANG_NAME_BY_LANGUAGE: Record<Language, string> = {
+    typescript: 'Typescript',
+    python: 'Python',
+    csharp: 'Dotnet (C#)'
+};
+
+const LANGUAGE_SPECIFIC_TIPS: Record<Language, string[]> = {
+    typescript: [
+        "It's a good idea to build the application using `npm run build` and fix compile time errors to help ensure the app works as expected."
+    ],
+    python: [
+        "It's a good idea to run `uv run typecheck` to make sure the code is correctly typed and fix any type errors."
+    ],
+    csharp: [
+        "It's a good idea to build the application and fix compile time errors to help ensure the app works as expected."
+    ]
+};
+
+const COMMON_OVERALL_SUMMARY = (language: Language) => {
+    const langName = LANG_NAME_BY_LANGUAGE[language];
+    const tips = LANGUAGE_SPECIFIC_TIPS[language];
     const formattedTips = tips.map(tip => `- ${tip}`).join('\n');
 
     return `> Microsoft Teams AI Library (v2) - A comprehensive framework for building AI-powered Teams applications using ${langName}. Using this Library, you can easily build and integrate a variety of features in Microsoft Teams by building Agents or Tools. The documentation here helps by giving background information and code samples on how best to do this.
@@ -30,12 +39,41 @@ Things to remember:
 ${formattedTips}`;
 };
 
+interface DocusaurusConfig {
+    url: string;
+    baseUrl: string;
+}
+
+interface ProcessedFile {
+    title: string;
+    content: string;
+    frontmatter: { [key: string]: any };
+    filePath: string;
+    sidebarPosition: number;
+    relativeUrl: string;
+}
+
+interface FileInfo {
+    name: string;
+    title: string;
+    path: string;
+    order: number;
+}
+
+interface FolderStructure {
+    title: string;
+    order: number;
+    path: string;
+    files: FileInfo[];
+    children: { [key: string]: FolderStructure };
+}
+
 /**
  * Reads Docusaurus config to get base URL
- * @param {string} baseDir - Base directory path
- * @returns {Object} Config object with url and baseUrl
+ * @param baseDir - Base directory path
+ * @returns Config object with url and baseUrl
  */
-function getDocusaurusConfig(baseDir) {
+function getDocusaurusConfig(baseDir: string): DocusaurusConfig {
     try {
         // Read the docusaurus.config.ts file
         const configPath = path.join(baseDir, 'docusaurus.config.ts');
@@ -61,7 +99,7 @@ function getDocusaurusConfig(baseDir) {
  * Generates llms.txt files for Teams AI documentation
  * Creates both small and full versions for TypeScript and C# docs
  */
-async function generateLlmsTxt() {
+async function generateLlmsTxt(): Promise<void> {
     console.log('🚀 Starting llms.txt generation...');
 
     const baseDir = path.join(__dirname, '..');
@@ -100,15 +138,14 @@ async function generateLlmsTxt() {
 
 /**
  * Generates llms.txt files for a specific language
- * @param {string} language - 'typescript' or 'csharp'
- * @param {string} baseDir - Base directory path
- * @param {string} outputDir - Output directory path
- * @param {Object} config - Docusaurus config object
+ * @param language - 'typescript', 'python', or 'csharp'
+ * @param baseDir - Base directory path
+ * @param outputDir - Output directory path
+ * @param config - Docusaurus config object
  */
-async function generateLanguageFiles(language, baseDir, outputDir, config) {
+async function generateLanguageFiles(language: Language, baseDir: string, outputDir: string, config: DocusaurusConfig): Promise<void> {
     // Collect all relevant files
-    // const mainFiles = collectFiles(path.join(baseDir, 'docs', 'main'));
-    const mainFiles = []
+    const mainFiles: string[] = [];
     const langFiles = collectFiles(path.join(baseDir, 'docs', language));
 
     // Process all files to get metadata and file mapping
@@ -152,21 +189,21 @@ async function generateLanguageFiles(language, baseDir, outputDir, config) {
 
 /**
  * Processes all files and returns structured data
- * @param {Array<string>} allFiles - All file paths to process
- * @param {string} baseDir - Base directory path
- * @returns {Promise<Object>} Object with processedFiles array and fileMapping Map
+ * @param allFiles - All file paths to process
+ * @param baseDir - Base directory path
+ * @returns Object with processedFiles array and fileMapping Map
  */
-async function processAllFiles(allFiles, baseDir) {
-    const processedFiles = [];
+async function processAllFiles(allFiles: string[], baseDir: string): Promise<{ processedFiles: ProcessedFile[]; fileMapping: Map<string, string> }> {
+    const processedFiles: ProcessedFile[] = [];
 
     // First pass: build file mapping
-    const fileMapping = new Map();
+    const fileMapping = new Map<string, string>();
     for (const file of allFiles) {
         // Generate the same filename logic as used in generateIndividualTxtFiles
         const tempProcessed = await processContent(file, baseDir, false); // Quick pass for title
         if (tempProcessed) {
             // Only process files that aren't marked to ignore
-            let fileName;
+            let fileName: string;
             if (path.basename(file) === 'README.md') {
                 const parentDir = path.basename(path.dirname(file));
                 fileName = generateSafeFileName(parentDir);
@@ -202,21 +239,21 @@ async function processAllFiles(allFiles, baseDir) {
 
 /**
  * Generates individual .txt files for each documentation file
- * @param {Array} processedFiles - Array of processed file objects
- * @param {string} outputDir - Output directory path
- * @param {string} language - Language identifier
- * @param {string} baseDir - Base directory path
- * @param {Object} config - Docusaurus config object
- * @param {Map} fileMapping - File mapping for link resolution
+ * @param processedFiles - Array of processed file objects
+ * @param outputDir - Output directory path
+ * @param language - Language identifier
+ * @param baseDir - Base directory path
+ * @param config - Docusaurus config object
+ * @param fileMapping - File mapping for link resolution
  */
 async function generateIndividualTxtFiles(
-    processedFiles,
-    outputDir,
-    language,
-    baseDir,
-    config,
-    fileMapping
-) {
+    processedFiles: ProcessedFile[],
+    outputDir: string,
+    language: Language,
+    baseDir: string,
+    config: DocusaurusConfig,
+    fileMapping: Map<string, string>
+): Promise<void> {
     const docsDir = path.join(outputDir, `docs_${language}`);
 
     // Create docs directory
@@ -237,8 +274,10 @@ async function generateIndividualTxtFiles(
             language
         );
 
+        if (!reprocessed) continue;
+
         // Generate safe filename - use folder name for README.md files
-        let fileName;
+        let fileName: string;
         if (path.basename(file.filePath) === 'README.md') {
             // Use parent folder name for README files
             const parentDir = path.basename(path.dirname(file.filePath));
@@ -258,31 +297,26 @@ async function generateIndividualTxtFiles(
 
 /**
  * Generates the small version of llms.txt (navigation index)
- * @param {string} language - Language identifier
- * @param {string} baseDir - Base directory path
- * @param {Object} config - Docusaurus config object
- * @param {Map} fileMapping - Mapping of source files to generated filenames
- * @returns {string} Generated navigation content
+ * @param language - Language identifier
+ * @param baseDir - Base directory path
+ * @param config - Docusaurus config object
+ * @param fileMapping - Mapping of source files to generated filenames
+ * @returns Generated navigation content
  */
-async function generateSmallVersionHierarchical(language, baseDir, config, fileMapping) {
-    const langName = language === 'typescript' ? 'TypeScript' : language === 'python' ? "Python" : 'C#';
+async function generateSmallVersionHierarchical(language: Language, baseDir: string, config: DocusaurusConfig, fileMapping: Map<string, string>): Promise<string> {
+    const langName = LANG_NAME_BY_LANGUAGE[language];
     // Remove trailing slash from URL and ensure baseUrl starts with slash
     const cleanUrl = config.url.replace(/\/$/, '');
     const cleanBaseUrl = config.baseUrl.startsWith('/') ? config.baseUrl : '/' + config.baseUrl;
     const fullBaseUrl = `${cleanUrl}${cleanBaseUrl}`;
 
     let content = `# Teams AI Library - ${langName} Documentation\n\n`;
-    content += COMMON_OVERALL_SUMMARY(langName, language) + '\n\n';
+    content += COMMON_OVERALL_SUMMARY(language) + '\n\n';
 
     // Get hierarchical structure
     const hierarchical = getHierarchicalFiles(baseDir, language);
 
-    // Add Main Documentation
-    // content += `## Main Documentation\n\n`;
-    // content += renderHierarchicalStructure(hierarchical.main, fullBaseUrl, language, fileMapping, 3);
-
     // Add Language-specific Documentation
-    // content += `## ${langName} Specific Documentation\n\n`;
     content += renderHierarchicalStructure(hierarchical.language, fullBaseUrl, language, fileMapping, 0);
 
     return content;
@@ -290,15 +324,20 @@ async function generateSmallVersionHierarchical(language, baseDir, config, fileM
 
 /**
  * Renders hierarchical structure with proper indentation
- * @param {Object} structure - Hierarchical structure object
- * @param {string} baseUrl - Base URL for links
- * @param {string} language - Language identifier
- * @param {Map} fileMapping - Mapping of source files to generated filenames
- * @param {number} indentLevel - Current indentation level (0 = section headers, 1+ = bullet points)
- * @returns {string} Rendered content with proper hierarchy
+ * @param structure - Hierarchical structure object
+ * @param baseUrl - Base URL for links
+ * @param language - Language identifier
+ * @param fileMapping - Mapping of source files to generated filenames
+ * @param indentLevel - Current indentation level (0 = section headers, 1+ = bullet points)
+ * @returns Rendered content with proper hierarchy
  */
-function renderHierarchicalStructure(structure, baseUrl, language, fileMapping, indentLevel = 0) {
+function renderHierarchicalStructure(structure: { [key: string]: FolderStructure }, baseUrl: string, language: Language, fileMapping: Map<string, string>, indentLevel: number = 0): string {
     let content = '';
+
+    // Helper function for folder name formatting
+    function formatFolderName(name: string): string {
+        return name.replace(/[-_]/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+    }
 
     // Convert structure to sorted array
     const folders = Object.entries(structure)
@@ -329,9 +368,9 @@ function renderHierarchicalStructure(structure, baseUrl, language, fileMapping, 
 
             if (readmeFile) {
                 // Make folder header clickable by linking to the README
-                let folderFileName;
+                let folderFileName: string;
                 if (fileMapping && fileMapping.has(readmeFile.path)) {
-                    folderFileName = fileMapping.get(readmeFile.path);
+                    folderFileName = fileMapping.get(readmeFile.path)!;
                 } else {
                     folderFileName = generateSafeFileName(folder.key);
                 }
@@ -383,9 +422,9 @@ function renderHierarchicalStructure(structure, baseUrl, language, fileMapping, 
 
                 for (const file of sortedFiles) {
                     // Use file mapping to get the correct generated filename
-                    let fileName;
+                    let fileName: string;
                     if (fileMapping && fileMapping.has(file.path)) {
-                        fileName = fileMapping.get(file.path);
+                        fileName = fileMapping.get(file.path)!;
                     } else {
                         fileName = generateSafeFileName(file.title || file.name);
                     }
@@ -414,25 +453,20 @@ function renderHierarchicalStructure(structure, baseUrl, language, fileMapping, 
         }
     }
 
-    // Helper function for folder name formatting
-    function formatFolderName(name) {
-        return name.replace(/[-_]/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
-    }
-
     return content;
 }
 
 /**
  * Extracts summary from a file (cached approach)
- * @param {string} filePath - Path to the file
- * @returns {string} File summary or empty string
+ * @param filePath - Path to the file
+ * @returns File summary or empty string
  */
-function extractSummaryFromFile(filePath) {
+function extractSummaryFromFile(filePath: string): string {
     try {
         const fileContent = fs.readFileSync(filePath, 'utf8');
 
         // First check for summary in frontmatter
-        const summary = FrontmatterParser.getProperty(fileContent, 'summary');
+        const summary = FrontmatterParser.getProperty<string>(fileContent, 'summary');
         if (summary) {
             return summary;
         }
@@ -462,16 +496,15 @@ function extractSummaryFromFile(filePath) {
 
 /**
  * Generates the full version of llms.txt (complete documentation)
- * @param {string} language - Language identifier
- * @param {Array} processedFiles - Array of processed file objects
- * @param {string} baseDir - Base directory path
- * @returns {string} Generated content
+ * @param language - Language identifier
+ * @param processedFiles - Array of processed file objects
+ * @param baseDir - Base directory path
+ * @returns Generated content
  */
-async function generateFullVersion(language, processedFiles, baseDir) {
-    const langName = language === 'typescript' ? 'TypeScript' : 'C#';
-
+async function generateFullVersion(language: Language, processedFiles: ProcessedFile[], baseDir: string): Promise<string> {
+    const langName = LANG_NAME_BY_LANGUAGE[language]
     let content = `# Teams AI Library - ${langName} Documentation (Complete)\n\n`;
-    content += COMMON_OVERALL_SUMMARY(langName, language) + '\n\n';
+    content += COMMON_OVERALL_SUMMARY(language) + '\n\n';
 
     // Group files by section
     const sections = groupFilesBySection(processedFiles, baseDir);
@@ -494,12 +527,12 @@ async function generateFullVersion(language, processedFiles, baseDir) {
 
 /**
  * Groups files by their section based on file path
- * @param {Array} processedFiles - Array of processed file objects
- * @param {string} baseDir - Base directory path
- * @returns {Object} Grouped files by section
+ * @param processedFiles - Array of processed file objects
+ * @param baseDir - Base directory path
+ * @returns Grouped files by section
  */
-function groupFilesBySection(processedFiles, baseDir) {
-    const sections = {
+function groupFilesBySection(processedFiles: ProcessedFile[], baseDir: string): { [key: string]: ProcessedFile[] } {
+    const sections: { [key: string]: ProcessedFile[] } = {
         main: [],
         gettingStarted: [],
         essentials: [],
@@ -552,10 +585,10 @@ function groupFilesBySection(processedFiles, baseDir) {
 
 /**
  * Generates a safe filename from a title
- * @param {string} title - Title to convert to filename
- * @returns {string} Safe filename
+ * @param title - Title to convert to filename
+ * @returns Safe filename
  */
-function generateSafeFileName(title) {
+function generateSafeFileName(title: string): string {
     return (
         title
             .toLowerCase()
@@ -570,11 +603,11 @@ function generateSafeFileName(title) {
 
 /**
  * Formats a section name for display
- * @param {string} sectionName - Section name to format
- * @returns {string} Formatted section name
+ * @param sectionName - Section name to format
+ * @returns Formatted section name
  */
-function formatSectionName(sectionName) {
-    const nameMap = {
+function formatSectionName(sectionName: string): string {
+    const nameMap: { [key: string]: string } = {
         main: 'Main Documentation',
         gettingStarted: 'Getting Started',
         essentials: 'Essentials',
@@ -593,10 +626,10 @@ function formatSectionName(sectionName) {
 
 /**
  * Formats bytes into human-readable format
- * @param {number} bytes - Number of bytes
- * @returns {string} Formatted string
+ * @param bytes - Number of bytes
+ * @returns Formatted string
  */
-function formatBytes(bytes) {
+function formatBytes(bytes: number): string {
     if (bytes === 0) return '0 B';
     const k = 1024;
     const sizes = ['B', 'KB', 'MB'];
@@ -609,4 +642,4 @@ if (require.main === module) {
     generateLlmsTxt();
 }
 
-module.exports = { generateLlmsTxt };
+export { generateLlmsTxt };
