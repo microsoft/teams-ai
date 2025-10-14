@@ -23,7 +23,7 @@ npm install -g @microsoft/teams.cli
 Next, use the CLI to create your agent:
 
 ```sh
-npx @microsoft/teams.cli <typescript | csharp | python> quote-agent --template echo
+npx @microsoft/teams.cli new <typescript | csharp | python> quote-agent --template echo
 ```
 
 For more information, follow our quickstart guide: [C#](http://microsoft.github.io/teams-ai/csharp/getting-started/quickstart), [Typescript](http://microsoft.github.io/teams-ai/typescript/getting-started/quickstart), [Python](http://microsoft.github.io/teams-ai/python/getting-started/quickstart)
