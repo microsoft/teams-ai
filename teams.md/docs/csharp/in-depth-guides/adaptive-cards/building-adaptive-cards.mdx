@@ -62,7 +62,12 @@ Benefits:
 | Re‑use      | Extract snippets to functions or classes and share across cards.              |
 | Safety      | Builders validate every property against the Adaptive Card schema (see next). |
 
-> Source code lives in `Microsoft.Teams.Cards`. Feel free to inspect or extend the helpers for your own needs.
+:::tip Finding Type Definitions
+The builder helpers use strongly-typed interfaces (e.g., `List<CardElement>`, `List<Action>`). If you need to see constructor signatures or property types:
+- **In your IDE**: Use IntelliSense (Ctrl+Space) or "Go to Definition" (F12)
+- **From command line**: Inspect the `Microsoft.Teams.Cards` package source in your NuGet packages folder
+- **For reference**: Source code lives in the `Microsoft.Teams.Cards` namespace
+:::
 
 ---
 
