@@ -38,8 +38,9 @@ export function shouldIgnoreFileBySection(filePath: string): boolean {
         if (fs.existsSync(readmePath)) {
             try {
                 const readmeContent = fs.readFileSync(readmePath, 'utf8');
-                // If this README is marked to ignore, ignore the entire section
-                if (FrontmatterParser.shouldIgnore(readmeContent)) {
+                const readmeFrontmatter = FrontmatterParser.extract(readmeContent).frontmatter;
+                // Only ignore entire section if README has 'llms: ignore' (not 'ignore-file')
+                if (readmeFrontmatter.llms === 'ignore' || readmeFrontmatter.llms === false) {
                     return true;
                 }
             } catch (error) {
