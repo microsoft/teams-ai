@@ -80,7 +80,7 @@ dotnet run
 ```sh
 [INFO] Microsoft.Hosting.Lifetime Now listening on: http://localhost:3978
 [WARN] Echo.Microsoft.Teams.Plugins.AspNetCore.DevTools ⚠️  Devtools are not secure and should not be used production environments ⚠️
-[INFO] Echo.Microsoft.Teams.Plugins.AspNetCore.DevTools Available at http://localhost:3978/devtools
+[INFO] Echo.Microsoft.Teams.Plugins.AspNetCore.DevTools Available at http://localhost:3979/devtools
 [INFO] Microsoft.Hosting.Lifetime Application started. Press Ctrl+C to shut down.
 [INFO] Microsoft.Hosting.Lifetime Hosting environment: Development
 ```
@@ -91,7 +91,7 @@ When the application starts, you'll see:
 1. An HTTP server starting up (on port 3978). This is the main server which handles incoming requests and serves the agent application.
 2. A devtools server starting up. This is a developer server that provides a web interface for debugging and testing your agent quickly, without having to deploy it to Teams.
 
-Now, navigate to the devtools server by opening your browser and navigating to [http://localhost:3978/devtools](http://localhost:3978/devtools). You should see a simple interface where you can interact with your agent. Try sending it a message!
+Now, navigate to the devtools server by opening your browser and navigating to [http://localhost:3979/devtools](http://localhost:3979/devtools). You should see a simple interface where you can interact with your agent. Try sending it a message!
 
 ![Screenshot of DevTools showing user prompt 'hello!' and agent response 'you said hello!'.](/screenshots/devtools-echo-chat.png)
 
