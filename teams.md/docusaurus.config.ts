@@ -40,7 +40,7 @@ const config: Config = {
             tagName: 'link',
             attributes: {
                 rel: 'llms.txt',
-                href: 'https://microsoft.github.io/teams-ai/llm_docs/llms.txt'
+                href: 'https://microsoft.github.io/teams-ai/llms_docs/llms.txt'
             }
         }
     ],

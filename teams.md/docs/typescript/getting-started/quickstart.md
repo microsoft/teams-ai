@@ -36,7 +36,7 @@ Let's begin by creating a simple echo agent that responds to messages. Run:
 
 
 ```sh
-npx @microsoft/teams.cli new typescript quote-agent --template echo
+npx @microsoft/teams.cli@latest new typescript quote-agent --template echo
 ```
 
 

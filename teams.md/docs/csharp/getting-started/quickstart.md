@@ -36,7 +36,7 @@ Let's begin by creating a simple echo agent that responds to messages. Run:
 
 
 ```sh
-npx @microsoft/teams.cli new csharp quote-agent --template echo
+npx @microsoft/teams.cli@latest new csharp quote-agent --template echo
 ```
 
 

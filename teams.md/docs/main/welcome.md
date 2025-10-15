@@ -14,17 +14,17 @@ The Teams CLI makes it easy to bootstrap your first agent. Using `npx @microsoft
 
 **TypeScript:**
 ```bash
-npx @microsoft/teams.cli new typescript quote-agent --template echo
+npx @microsoft/teams.cli@latest new typescript quote-agent --template echo
 ```
 
 **C#:**
 ```bash
-npx @microsoft/teams.cli new csharp quote-agent --template echo
+npx @microsoft/teams.cli@latest new csharp quote-agent --template echo
 ```
 
 **Python:**
 ```bash
-npx @microsoft/teams.cli new python quote-agent --template echo
+npx @microsoft/teams.cli@latest new python quote-agent --template echo
 ```
 
 ## Overview

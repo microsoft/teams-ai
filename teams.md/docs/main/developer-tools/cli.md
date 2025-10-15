@@ -20,7 +20,7 @@ With the CLI, you can enter `npx @microsoft/teams.cli <token-arguments> --help` 
 ## Create an agent with one command line
 
 ```sh
-npx @microsoft/teams.cli new <typscript | csharp | python> <app-name> <optional>
+npx @microsoft/teams.cli@latest new <typscript | csharp | python> <app-name> <optional>
 ```
 
 The `new` token will create a brand new agent with `app-name` applied as the directory name and project name.

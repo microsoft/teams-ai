@@ -16,10 +16,11 @@ const LANG_NAME_BY_LANGUAGE: Record<Language, string> = {
 
 const LANGUAGE_SPECIFIC_TIPS: Record<Language, string[]> = {
     typescript: [
-        "It's a good idea to build the application using `npm run build` and fix compile time errors to help ensure the app works as expected."
+        "It's a good idea to build the application using `npm run build` and fix compile time errors to help ensure the app works as expected.",
+        "The library uses typescript to help you make the right decisions when using the APIs. You may check type definitions and type checkers to make sure your code is correct."
     ],
     python: [
-        "It's a good idea to run `uv run typecheck` to make sure the code is correctly typed and fix any type errors."
+        "It's a good idea to run `uv run typecheck` to make sure the code is correctly typed and fix any type errors.",
     ],
     csharp: [
         "It's a good idea to build the application and fix compile time errors to help ensure the app works as expected.",
@@ -34,10 +35,12 @@ const COMMON_OVERALL_SUMMARY = (language: Language) => {
 
     return `> Microsoft Teams AI Library (v2) - A comprehensive framework for building AI-powered Teams applications using ${langName}. Using this Library, you can easily build and integrate a variety of features in Microsoft Teams by building Agents or Tools. The documentation here helps by giving background information and code samples on how best to do this.
 
-Things to remember:
-- IMPORTANT: This Library is NOT based off of BotFramework (which the _previous_ version of the Teams AI Library was based on). This Library is a completely new framework.
-- When scaffolding new applications, using the CLI is a lot simpler and preferred than doing it all by yourself.
-${formattedTips}`;
+IMPORTANT THINGS TO REMEMBER:
+- This Library is NOT based off of BotFramework (which the _previous_ version of the Teams AI Library was based on). This Library is a completely new framework. Use this guide to find snippets to drive your decisions.
+- When scaffolding new applications, using the CLI is a lot simpler and preferred than doing it all by yourself. See the Quickstart guide for that.
+${formattedTips}
+
+YOU MUST FOLLOW THE AGOVE GUIDANCE.`;
 };
 
 interface DocusaurusConfig {
