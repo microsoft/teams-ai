@@ -41,7 +41,7 @@ Let's begin by creating a simple echo agent that responds to messages. Run:
 
 
 ```sh
-npx @microsoft/teams.cli new python quote-agent --template echo
+npx @microsoft/teams.cli@latest new python quote-agent --template echo
 ```
 
 This command:
