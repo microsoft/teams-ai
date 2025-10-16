@@ -120,21 +120,7 @@ Once you've updated and redeployed your app:
 2. Your app should now be available as an agent option
 3. Interact with your agent through the Copilot interface
 
-## Notes
-
-- The `BOT_ID` must match the bot ID registered in the Azure Bot Service or Bot Framework
-- Ensure your bot endpoint is accessible and properly configured
-- The `copilotAgents` configuration is compatible with manifest version 1.13 and later
-- Your app maintains all its existing functionality in Teams while also being available in Copilot
-
-## Next Steps
-
-- Learn more about [Teams core concepts](/teams/core-concepts)
-- Explore the [Teams manifest schema](https://learn.microsoft.com/microsoft-365/extensibility/schema/)
-- Read about [Microsoft 365 Agents Toolkit](/teams/agents-toolkit)
-
 ## Resources
 
-- [Copilot extensibility documentation](https://learn.microsoft.com/microsoft-365-copilot/extensibility/)
+- [Convert Your Declarative Agent for Microsoft 365 Copilot to a Custom Engine Agent](https://learn.microsoft.com/en-us/microsoft-365-copilot/extensibility/convert-declarative-agent)
 - [Teams app manifest reference](https://learn.microsoft.com/microsoftteams/platform/resources/schema/manifest-schema)
-- [Bot Framework documentation](https://docs.microsoft.com/azure/bot-service/)
