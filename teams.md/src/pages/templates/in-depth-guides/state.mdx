@@ -2,79 +2,34 @@
 sidebar_position: 10
 title: State Management
 sidebar_label: 🗄️ State Management
-summary: Store and retrieve conversation and user state in your Teams bot using the built-in state management in Teams SDK for .NET 2.1.
-languages: ['csharp']
+summary: Store and retrieve conversation and user state across activity turns with the Teams SDK.
+languages: ['typescript', 'python', 'csharp']
 ---
 
 # State Management
 
 :::info[SDK 2.1]
-Built-in state management is a **Teams SDK for .NET 2.1** feature.
+Built-in state management is a **Teams SDK 2.1** feature.
 :::
 
-The Teams SDK provides built-in `ConversationState` and `UserState` for storing per-conversation and per-user data across turns. State is backed by `IDistributedCache` — in-memory by default for local development, and swappable for any distributed cache provider (Redis, SQL, Azure Cache for Redis) for production without changing your handler code.
+<LanguageInclude section="overview" />
 
 ## Setup
 
-Call `UseState()` inside `AddTeamsBotApplication()`:
-
-```csharp title="Program.cs"
-using Microsoft.Teams.Apps;
-
-WebApplicationBuilder builder = WebApplication.CreateSlimBuilder(args);
-builder.Services.AddTeamsBotApplication(options =>
-{
-    options.UseState();
-});
-
-WebApplication app = builder.Build();
-TeamsBotApplication teams = app.UseTeamsBotApplication();
-```
+<LanguageInclude section="setup" />
 
 ## Reading and writing state
 
-Use `context.State.ConversationState` and `context.State.UserState` in any handler:
+<LanguageInclude section="read-write" />
 
-```csharp
-teams.OnMessage(async (context, cancellationToken) =>
-{
-    // Write
-    context.State.ConversationState.Set("lastMessage", context.Activity.Text ?? string.Empty);
-    context.State.UserState.Set("messageCount",
-        (context.State.UserState.Get<int>("messageCount")) + 1);
+Conversation state is shared by everyone in the current conversation. User state is scoped to the current sender **within that conversation** and is unavailable when an activity has no usable sender ID.
 
-    // Read
-    string? last = context.State.ConversationState.Get<string>("lastMessage");
-    int count = context.State.UserState.Get<int>("messageCount");
+Only changed scopes are persisted. After the handler chain finishes, the SDK saves state and seals both scopes. Do not retain turn state for background work; accessing a sealed scope throws an error.
 
-    await context.SendAsync(
-        $"Message #{count}. Last message was: {last}",
-        cancellationToken);
-});
-```
+## Clearing state
 
-`ConversationState` is scoped to the current conversation. `UserState` is scoped to the current user across all conversations.
+<LanguageInclude section="clearing" />
 
 ## Scaling to distributed state
 
-For production or multi-instance deployments, register a distributed cache provider before calling `UseState()`. Your handler code stays exactly the same:
-
-```csharp title="Program.cs"
-using Microsoft.Teams.Apps;
-using StackExchange.Redis;
-
-WebApplicationBuilder builder = WebApplication.CreateSlimBuilder(args);
-
-// Register Redis — UseState() picks this up automatically
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = builder.Configuration["Redis:ConnectionString"];
-});
-
-builder.Services.AddTeamsBotApplication(options =>
-{
-    options.UseState();
-});
-```
-
-Any `IDistributedCache` implementation works — Redis, SQL Server (`AddDistributedSqlServerCache`), or Azure Cache for Redis.
+<LanguageInclude section="distributed-state" />
