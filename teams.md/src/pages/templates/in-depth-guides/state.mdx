@@ -32,7 +32,7 @@ Use <LanguageInclude content={{"typescript": "`ctx.state.conversation` and `ctx.
 
 <LanguageInclude section="read-write-example" />
 
-Use <LanguageInclude content={{"typescript": "`has()`", "python": "`key in scope`", "csharp": "`ContainsKey()`"}} /> to check for a value, <LanguageInclude content={{"typescript": "`delete()`", "python": "`del scope[key]`", "csharp": "`Remove()`"}} /> to remove one, and <LanguageInclude content={{"typescript": "`clear()`", "python": "`clear()`", "csharp": "`Clear()`"}} /> to remove all values. <LanguageInclude content={{"typescript": "If you mutate an object or array returned by `get()`, call `set()` with the updated value so the scope is marked for persistence.", "python": "Changes inside stored lists and dictionaries are detected automatically when the turn is saved.", "csharp": "If you mutate an object or collection returned by `Get<T>(string)`, call `Set()` with the updated value so the scope is marked for persistence."}} />
+<LanguageInclude section="state-operations" />
 
 Conversation state is shared by everyone in the current conversation. User state is scoped to the current sender **within that conversation** and is unavailable when an activity has no usable sender ID.
 
@@ -48,8 +48,8 @@ Values written after <LanguageInclude content={{"typescript": "`delete()`", "pyt
 
 ## Scaling to distributed state
 
-For production or multi-instance deployments, <LanguageInclude content={{"typescript": "implement the Teams SDK's `IStorage<string, string>` contract with a shared, durable backend and pass it through `state.storage`", "python": "implement the Teams SDK's `Storage[str, Any]` contract with a shared, durable backend and pass it through `StateOptions`", "csharp": "register a shared, durable `IDistributedCache` provider, such as Redis, SQL Server, or Azure Cache for Redis, before calling `UseState()`"}} />. The state API used by handlers doesn't change:
+<LanguageInclude section="distributed-intro" />
 
 <LanguageInclude section="distributed-example" />
 
-The SDK serializes each scope as <LanguageInclude content={{"typescript": "a JSON string", "python": "a JSON string", "csharp": "UTF-8 JSON bytes"}} /> and replaces the complete scope on save, so concurrent turns use last-writer-wins semantics. <LanguageInclude content={{"typescript": "Configure expiry, retries, and other storage-specific behavior on your storage implementation.", "python": "Configure expiry, retries, and other storage-specific behavior on your storage implementation.", "csharp": "Configure cache entry expiration and the key prefix through `UseState()`. Configure any provider-specific options when registering the `IDistributedCache` implementation."}} />
+<LanguageInclude section="distributed-details" />

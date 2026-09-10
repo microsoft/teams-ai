@@ -35,11 +35,19 @@ app.on('message', async (ctx) => {
 });
 ```
 
+<!-- state-operations -->
+
+Use `has()` to check for a value, `delete()` to remove one, and `clear()` to remove all values. If you mutate an object or array returned by `get()`, call `set()` with the updated value so the scope is marked for persistence.
+
 <!-- clear-example -->
 
 ```typescript
 await ctx.state.delete();
 ```
+
+<!-- distributed-intro -->
+
+For production or multi-instance deployments, implement the Teams SDK's `IStorage<string, string>` contract with a shared, durable backend and pass it through `state.storage`. The state API used by handlers doesn't change:
 
 <!-- distributed-example -->
 
@@ -56,3 +64,7 @@ function createApp(durableStorage: IStorage<string, string>): App {
   });
 }
 ```
+
+<!-- distributed-details -->
+
+The SDK serializes each scope as a JSON string and replaces the complete scope on save, so concurrent turns use last-writer-wins semantics. Configure expiry, retries, and other storage-specific behavior on your storage implementation.
