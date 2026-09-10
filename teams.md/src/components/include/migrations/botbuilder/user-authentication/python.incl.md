@@ -103,7 +103,9 @@
 
     @app.on_message
     async def on_message(ctx: ActivityContext[MessageActivity]):
-        await flow.sign_in(ctx)
+        token = await flow.sign_in(ctx)
+        if token:
+            await ctx.send("You have been signed in.")
 
     @flow.on_signin
     async def on_signin(event: SignInEvent):

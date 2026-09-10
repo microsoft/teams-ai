@@ -10,7 +10,7 @@ export type LanguageProps = {
 export default function Language({ language, children }: PropsWithChildren<LanguageProps>) {
   const location = useLocation();
 
-  const languages = Array.isArray(language) ? language : [language as Language];
+  const languages = Array.isArray(language) ? language : [language];
 
   // Only render if current path matches one of the languages
   if (!languages.some((lang) => location.pathname.includes(`/${lang}/`))) {

@@ -151,7 +151,8 @@
       });
 
       app.on('message', async (ctx) => {
-        await flow.signIn(ctx);
+        const token = await flow.signIn(ctx);
+        if (token) await ctx.send('You have been signed in.');
       });
 
       flow.onSignInComplete(async (ctx) => {
