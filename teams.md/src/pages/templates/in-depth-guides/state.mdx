@@ -48,8 +48,8 @@ Values written after <LanguageInclude content={{"typescript": "`delete()`", "pyt
 
 ## Scaling to distributed state
 
-For production or multi-instance deployments, <LanguageInclude content={{"typescript": "implement the Teams SDK's `IStorage<string, string>` contract with a shared, durable backend and pass it through `state.storage`", "python": "implement the Teams SDK's `Storage[str, Any]` contract with a shared, durable backend and pass it through `StateOptions`", "csharp": "register an `IDistributedCache` provider before calling `UseState()`"}} />. The state API used by handlers doesn't change:
+For production or multi-instance deployments, <LanguageInclude content={{"typescript": "implement the Teams SDK's `IStorage<string, string>` contract with a shared, durable backend and pass it through `state.storage`", "python": "implement the Teams SDK's `Storage[str, Any]` contract with a shared, durable backend and pass it through `StateOptions`", "csharp": "register a shared, durable `IDistributedCache` provider, such as Redis, SQL Server, or Azure Cache for Redis, before calling `UseState()`"}} />. The state API used by handlers doesn't change:
 
 <LanguageInclude section="distributed-example" />
 
-The SDK serializes each scope as JSON and replaces the complete scope on save, so concurrent turns use last-writer-wins semantics. Configure expiry, retries, and other storage-specific behavior on the selected provider.
+The SDK serializes each scope as <LanguageInclude content={{"typescript": "a JSON string", "python": "a JSON string", "csharp": "UTF-8 JSON bytes"}} /> and replaces the complete scope on save, so concurrent turns use last-writer-wins semantics. <LanguageInclude content={{"typescript": "Configure expiry, retries, and other storage-specific behavior on your storage implementation.", "python": "Configure expiry, retries, and other storage-specific behavior on your storage implementation.", "csharp": "Configure cache entry expiration and the key prefix through `UseState()`. Configure any provider-specific options when registering the `IDistributedCache` implementation."}} />
