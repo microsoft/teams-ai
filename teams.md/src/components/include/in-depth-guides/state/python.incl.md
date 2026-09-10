@@ -14,6 +14,10 @@ app = App(state=True)
 
 State is disabled by default. When it is disabled, `ctx.state` is `None`.
 
+:::note
+Calling `add_oauth_flow()` automatically enables state because OAuth uses it to associate pending sign-ins with the correct flow. Set `state=False` explicitly to opt out.
+:::
+
 <!-- read-write -->
 
 Use `ctx.state.conversation` and `ctx.state.user` in an activity handler. The scopes behave like dictionaries, and values must be JSON-serializable.

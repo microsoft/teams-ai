@@ -16,6 +16,10 @@ const app = new App({
 
 State is disabled by default. When it is disabled, `ctx.state` is `undefined`.
 
+:::note
+Calling `addOAuthFlow()` automatically enables state because OAuth uses it to associate pending sign-ins with the correct flow. Set `state: false` explicitly to opt out.
+:::
+
 <!-- read-write -->
 
 Use `ctx.state.conversation` and `ctx.state.user` in an activity handler. Values must be JSON-serializable.
