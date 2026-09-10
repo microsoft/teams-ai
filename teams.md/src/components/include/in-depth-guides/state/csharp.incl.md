@@ -1,10 +1,4 @@
-<!-- overview -->
-
-The Teams SDK provides built-in `ConversationState` and `UserState` for storing per-conversation and per-user data across turns. State is backed by `IDistributedCache` — in-memory by default for local development, and swappable for any distributed cache provider (Redis, SQL, Azure Cache for Redis) for production without changing your handler code.
-
-<!-- setup -->
-
-Call `UseState()` inside `AddTeamsBotApplication()`:
+<!-- setup-example -->
 
 ```csharp title="Program.cs"
 using Microsoft.Teams.Apps;
@@ -19,9 +13,12 @@ WebApplication app = builder.Build();
 TeamsBotApplication teams = app.UseTeamsBotApplication();
 ```
 
-<!-- read-write -->
+<!-- oauth-note -->
 
-Use `context.State.ConversationState` and `context.State.UserState` in any handler:
+Registering an OAuth flow with `AddOAuthFlow()` automatically enables state so pending sign-ins can be associated with the correct flow.
+
+<!-- read-write-example -->
+
 
 ```csharp
 teams.OnMessage(async (context, cancellationToken) =>
@@ -41,21 +38,13 @@ teams.OnMessage(async (context, cancellationToken) =>
 });
 ```
 
-Use `ContainsKey()`, `Remove()`, and `Clear()` to inspect or remove values. If you mutate an object or collection returned by `Get<T>(string)`, call `Set()` with the updated value so the scope is marked for persistence.
-
-<!-- clearing -->
-
-Remove a value with `Remove()` or clear a scope with `Clear()`. To remove both scopes from the backing store:
+<!-- clear-example -->
 
 ```csharp
 await context.State.DeleteAsync(cancellationToken);
 ```
 
-Values written after `DeleteAsync()` are saved normally at the end of the current turn.
-
-<!-- distributed-state -->
-
-For production or multi-instance deployments, register a distributed cache provider before calling `UseState()`. Your handler code stays exactly the same:
+<!-- distributed-example -->
 
 ```csharp title="Program.cs"
 using Microsoft.Teams.Apps;
@@ -74,5 +63,3 @@ builder.Services.AddTeamsBotApplication(options =>
     options.UseState();
 });
 ```
-
-Any `IDistributedCache` implementation works — Redis, SQL Server (`AddDistributedSqlServerCache`), or Azure Cache for Redis.
