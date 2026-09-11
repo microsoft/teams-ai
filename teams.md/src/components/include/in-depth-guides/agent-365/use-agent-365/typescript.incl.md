@@ -22,7 +22,7 @@ app.on('message', async ({ activity, reply }) => {
 
 ```typescript
 app.on('message', async ({ activity, api }) => {
-  await api.reactions.add(activity.conversation.id, activity.id, 'like');
+  await api.conversations.addReaction(activity.conversation.id, activity.id, 'like');
 });
 ```
 
@@ -40,5 +40,5 @@ await app.send(conversationId, 'Your scheduled update is ready.', {
 
 const api = app.api.forAgenticIdentity(agenticIdentity);
 
-await api.reactions.add(conversationId, activityId, 'like');
+await api.conversations.addReaction(conversationId, activityId, 'like');
 ```

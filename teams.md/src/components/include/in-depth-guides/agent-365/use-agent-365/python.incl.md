@@ -24,7 +24,7 @@ async def handle_message(ctx: ActivityContext[MessageActivity]) -> None:
 ```python
 @app.on_message
 async def react_to_message(ctx: ActivityContext[MessageActivity]) -> None:
-    await ctx.api.reactions.add(
+    await ctx.api.conversations.add_reaction(
         ctx.activity.conversation.id,
         ctx.activity.id,
         "like",
@@ -46,7 +46,7 @@ await app.send(
     agentic_identity=agentic_identity,
 )
 
-api = app.api.from_agentic_identity(agentic_identity)
+api = app.api.for_agentic_identity(agentic_identity)
 
-await api.reactions.add(conversation_id, activity_id, "like")
+await api.conversations.add_reaction(conversation_id, activity_id, "like")
 ```
