@@ -6,8 +6,14 @@ teamsApp.OnMessage(async (context, cancellationToken) =>
     AgenticIdentity? agenticIdentity =
         context.Activity.Recipient?.GetAgenticIdentity();
 
+    if (agenticIdentity?.AgenticUserId is not string agenticUserId)
+    {
+        throw new InvalidOperationException(
+            "The activity is not addressed to an Agentic User.");
+    }
+
     await context.ReplyAsync(
-        $"Hi! I'm an Agentic User, and my user ID is {agenticIdentity?.AgenticUserId}. Nice to meet you!",
+        $"Hi! I'm an Agentic User, and my user ID is {agenticUserId}. Nice to meet you!",
         cancellationToken);
 });
 ```
