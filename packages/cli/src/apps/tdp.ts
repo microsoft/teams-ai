@@ -2,7 +2,6 @@ import type { AadApp } from './graph.js';
 import { apiFetch } from '../utils/http.js';
 import { invalidateAppDetails } from './app-details-cache.js';
 import { getCachedBot, setCachedBot, invalidateBot, type BotResource } from './bot-cache.js';
-import { CliError } from '../utils/errors.js';
 import { logger } from '../utils/logger.js';
 import { ORBIT_BASE_URL, TDP_BASE_URL } from '../utils/tdp-host.js';
 
@@ -58,52 +57,6 @@ interface OrbitAadApplicationResponse extends AadApp {
   signInAudience: SignInAudience;
 }
 
-/** Error body Orbit returns when the downstream Graph call fails. */
-interface OrbitErrorResponse {
-  errorCode?: string;
-  errorMessage?: string;
-}
-
-function parseOrbitError(body: string): OrbitErrorResponse | undefined {
-  try {
-    const parsed: unknown = JSON.parse(body);
-    if (parsed && typeof parsed === 'object') {
-      const { errorCode, errorMessage } = parsed as Record<string, unknown>;
-      return {
-        ...(typeof errorCode === 'string' ? { errorCode } : {}),
-        ...(typeof errorMessage === 'string' ? { errorMessage } : {}),
-      };
-    }
-  } catch {
-    // Non-JSON body; fall back to raw text.
-  }
-  return undefined;
-}
-
-async function toOrbitCreateAadAppError(response: Response): Promise<CliError> {
-  const body = await response.text();
-  const parsed = parseOrbitError(body);
-  const detail = parsed?.errorMessage
-    ? ` ${parsed.errorCode ? `${parsed.errorCode}: ` : ''}${parsed.errorMessage}`
-    : body
-      ? ` ${body}`
-      : '';
-  const message = `Failed to create AAD app: ${response.status}${detail}`;
-
-  if (response.status === 401) {
-    return new CliError('AUTH_TOKEN_FAILED', message, 'Run `teams login` and try again.', 401);
-  }
-  if (response.status === 403) {
-    return new CliError(
-      'API_ERROR',
-      message,
-      'Your account or the Teams CLI may not be permitted to create Microsoft Entra apps in this environment.',
-      403
-    );
-  }
-  return new CliError('API_ERROR', message, undefined, response.status);
-}
-
 // TODO: once TDP ships `v1.0/aadapplications/microsoftTenantBots`, use it for
 // serviceManagementReference so Microsoft-tenant apps also get the caller as owner.
 async function createAadAppViaOrbit(
@@ -123,7 +76,8 @@ async function createAadAppViaOrbit(
   });
 
   if (!response.ok) {
-    throw await toOrbitCreateAadAppError(response);
+    const error = await response.text();
+    throw new Error(`Failed to create AAD app: ${response.status} ${error}`);
   }
 
   const app = (await response.json()) as OrbitAadApplicationResponse;

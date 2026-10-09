@@ -7,7 +7,6 @@ interface RecordedCall {
 }
 
 const calls: RecordedCall[] = [];
-let nextResponse: (() => Response) | undefined;
 
 vi.mock('../src/utils/http.js', () => ({
   apiFetch: vi.fn(async (url: string, init?: RequestInit) => {
@@ -16,7 +15,6 @@ vi.mock('../src/utils/http.js', () => ({
       method: init?.method ?? 'GET',
       body: typeof init?.body === 'string' ? JSON.parse(init.body) : undefined,
     });
-    if (nextResponse) return nextResponse();
     return new Response(
       JSON.stringify({ id: 'obj-id', appId: 'client-id', displayName: 'My Bot' }),
       {
@@ -38,7 +36,6 @@ async function loadWithOrbit(orbitBaseUrl: string | undefined) {
 describe('createAadAppViaTdp', () => {
   beforeEach(() => {
     calls.length = 0;
-    nextResponse = undefined;
     vi.resetModules();
   });
 
@@ -95,42 +92,5 @@ describe('createAadAppViaTdp', () => {
     });
 
     expect(calls.map((c) => c.url)).toEqual(['https://tdp.test/api/aadapp/v2']);
-  });
-
-  it('maps Orbit Graph error body into a CliError', async () => {
-    const { createAadAppViaTdp } = await loadWithOrbit('https://orbit.test');
-    nextResponse = () =>
-      new Response(JSON.stringify({ errorCode: 'Request_BadRequest', errorMessage: 'Bad name' }), {
-        status: 400,
-      });
-
-    await expect(
-      createAadAppViaTdp('t', 'My Bot', {
-        serviceManagementReference: undefined,
-        signInAudience: 'AzureADMultipleOrgs',
-      })
-    ).rejects.toMatchObject({
-      name: 'CliError',
-      code: 'API_ERROR',
-      statusCode: 400,
-      message: 'Failed to create AAD app: 400 Request_BadRequest: Bad name',
-    });
-  });
-
-  it('adds a permission hint for an empty Orbit 403', async () => {
-    const { createAadAppViaTdp } = await loadWithOrbit('https://orbit.test');
-    nextResponse = () => new Response('', { status: 403 });
-
-    await expect(
-      createAadAppViaTdp('t', 'My Bot', {
-        serviceManagementReference: undefined,
-        signInAudience: 'AzureADMultipleOrgs',
-      })
-    ).rejects.toMatchObject({
-      code: 'API_ERROR',
-      statusCode: 403,
-      message: 'Failed to create AAD app: 403',
-      suggestion: expect.stringContaining('not be permitted'),
-    });
   });
 });
