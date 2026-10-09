@@ -20,10 +20,16 @@ export const TDP_HOST = isDevApiEnabled() ? DEV_INT_TDP_HOST : PROD_TDP_HOST;
 export const TDP_BASE_URL = `${TDP_HOST}/api`;
 
 /**
- * Base URL for the bot communication configuration API, or undefined when the
- * API is not available in the selected environment.
- * TODO(prod): set the prod path once TDP ships this API to prod.
+ * Base URL for TDP's new (Orbit) API server, or undefined when it is not
+ * available in the selected environment. Routes are rooted at `/v1.0/...`.
+ * TODO(prod): set the prod path once TDP ships this server to prod.
  */
-export const BOT_COMMUNICATION_BASE_URL: string | undefined = isDevApiEnabled()
+export const ORBIT_BASE_URL: string | undefined = isDevApiEnabled()
   ? `${DEV_INT_TDP_HOST}/cosmictestamer`
   : undefined;
+
+/**
+ * Base URL for the bot communication configuration API, or undefined when the
+ * API is not available in the selected environment.
+ */
+export const BOT_COMMUNICATION_BASE_URL: string | undefined = ORBIT_BASE_URL;

@@ -2,7 +2,9 @@ import type { AadApp } from './graph.js';
 import { apiFetch } from '../utils/http.js';
 import { invalidateAppDetails } from './app-details-cache.js';
 import { getCachedBot, setCachedBot, invalidateBot, type BotResource } from './bot-cache.js';
-import { TDP_BASE_URL } from '../utils/tdp-host.js';
+import { CliError } from '../utils/errors.js';
+import { logger } from '../utils/logger.js';
+import { ORBIT_BASE_URL, TDP_BASE_URL } from '../utils/tdp-host.js';
 
 export type SignInAudience = 'AzureADMyOrg' | 'AzureADMultipleOrgs';
 
@@ -13,12 +15,21 @@ export interface CreateAadAppViaTdpOptions {
 
 /**
  * Create an AAD app via TDP, which also creates the service principal server-side.
+ *
+ * When the Orbit API server is available (TEAMS_DEV_API=1), uses its
+ * `v1.0/aadapplications` endpoint, which also makes the caller an owner of the
+ * app (required by the bot communication API). That endpoint doesn't accept a
+ * serviceManagementReference, so the legacy endpoint is used when one is set.
  */
 export async function createAadAppViaTdp(
   token: string,
   displayName: string,
   options: CreateAadAppViaTdpOptions
 ): Promise<AadApp> {
+  if (ORBIT_BASE_URL && !options.serviceManagementReference) {
+    return createAadAppViaOrbit(token, ORBIT_BASE_URL, displayName, options.signInAudience);
+  }
+
   const response = await apiFetch(`${TDP_BASE_URL}/aadapp/v2`, {
     method: 'POST',
     headers: {
@@ -40,6 +51,83 @@ export async function createAadAppViaTdp(
   }
 
   return response.json();
+}
+
+/** Response from Orbit `POST v1.0/aadapplications` (201). */
+interface OrbitAadApplicationResponse extends AadApp {
+  signInAudience: SignInAudience;
+}
+
+/** Error body Orbit returns when the downstream Graph call fails. */
+interface OrbitErrorResponse {
+  errorCode?: string;
+  errorMessage?: string;
+}
+
+function parseOrbitError(body: string): OrbitErrorResponse | undefined {
+  try {
+    const parsed: unknown = JSON.parse(body);
+    if (parsed && typeof parsed === 'object') {
+      const { errorCode, errorMessage } = parsed as Record<string, unknown>;
+      return {
+        ...(typeof errorCode === 'string' ? { errorCode } : {}),
+        ...(typeof errorMessage === 'string' ? { errorMessage } : {}),
+      };
+    }
+  } catch {
+    // Non-JSON body; fall back to raw text.
+  }
+  return undefined;
+}
+
+async function toOrbitCreateAadAppError(response: Response): Promise<CliError> {
+  const body = await response.text();
+  const parsed = parseOrbitError(body);
+  const detail = parsed?.errorMessage
+    ? ` ${parsed.errorCode ? `${parsed.errorCode}: ` : ''}${parsed.errorMessage}`
+    : body
+      ? ` ${body}`
+      : '';
+  const message = `Failed to create AAD app: ${response.status}${detail}`;
+
+  if (response.status === 401) {
+    return new CliError('AUTH_TOKEN_FAILED', message, 'Run `teams login` and try again.', 401);
+  }
+  if (response.status === 403) {
+    return new CliError(
+      'API_ERROR',
+      message,
+      'Your account or the Teams CLI may not be permitted to create Microsoft Entra apps in this environment.',
+      403
+    );
+  }
+  return new CliError('API_ERROR', message, undefined, response.status);
+}
+
+// TODO: once TDP ships `v1.0/aadapplications/microsoftTenantBots`, use it for
+// serviceManagementReference so Microsoft-tenant apps also get the caller as owner.
+async function createAadAppViaOrbit(
+  token: string,
+  baseUrl: string,
+  displayName: string,
+  signInAudience: SignInAudience
+): Promise<AadApp> {
+  logger.debug('Creating AAD app via Orbit v1.0/aadapplications');
+  const response = await apiFetch(`${baseUrl}/v1.0/aadapplications`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ displayName, signInAudience }),
+  });
+
+  if (!response.ok) {
+    throw await toOrbitCreateAadAppError(response);
+  }
+
+  const app = (await response.json()) as OrbitAadApplicationResponse;
+  return { id: app.id, appId: app.appId, displayName: app.displayName };
 }
 
 export interface ImportedApp {
