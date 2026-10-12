@@ -31,11 +31,7 @@ expressApp.get('/health', (_req, res) => {
   res.json({ status: 'healthy' });
 });
 
-// 2. Wrap your Express app (not the http.Server) in the ExpressAdapter.
-// Passing the http.Server instead would make the adapter attach its own
-// internal Express instance as a second 'request' listener on that same
-// server, causing it to race with expressApp and crash some requests with
-// ERR_HTTP_HEADERS_SENT.
+// 2. Wrap your Express app, not the http.Server (avoids a duplicate listener crash)
 const adapter = new ExpressAdapter(expressApp);
 
 // 3. Create the Teams app with the adapter
