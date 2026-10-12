@@ -95,8 +95,10 @@ const expressApp = express();
 const server = http.createServer(expressApp);
 
 // highlight-start
-// Wrap your server in an adapter and create the Teams app
-const adapter = new ExpressAdapter(server);
+// Wrap your Express app (not the http.Server) in an adapter and create the Teams app.
+// Passing the http.Server instead would make the adapter attach its own internal
+// Express instance as a second 'request' listener on it, racing your own expressApp.
+const adapter = new ExpressAdapter(expressApp);
 const app = new App({ httpServerAdapter: adapter });
 
 app.on('message', async ({ send, activity }) => {
