@@ -36,7 +36,7 @@ const pastedImages = await files.list({ attachmentStyle: 'inlineImage' });
 <!-- reading-download -->
 
 ```typescript
-const file = await files.first();
+const file = await files.first({ attachmentStyle: 'file' });
 
 if (file) {
   const downloaded = await file.download();
@@ -48,7 +48,7 @@ if (file) {
 <!-- reading-text -->
 
 ```typescript
-const file = await files.first();
+const file = await files.first({ attachmentStyle: 'file' });
 
 if (file) {
   const contents = await file.text();

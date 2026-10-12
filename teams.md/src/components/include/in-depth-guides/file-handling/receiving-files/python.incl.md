@@ -35,7 +35,7 @@ pasted_images = await ctx.files.list(attachment_style="inlineImage")
 <!-- reading-download -->
 
 ```python
-file = await ctx.files.first()
+file = await ctx.files.first(attachment_style="file")
 
 if file:
     downloaded = await file.download()
@@ -46,7 +46,7 @@ if file:
 <!-- reading-text -->
 
 ```python
-file = await ctx.files.first()
+file = await ctx.files.first(attachment_style="file")
 
 if file:
     contents = await file.text()

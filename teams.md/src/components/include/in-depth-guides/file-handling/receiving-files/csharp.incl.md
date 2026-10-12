@@ -44,7 +44,9 @@ IList<IncomingFile> pastedImages = await context.Files.ListAsync(
 <!-- reading-download -->
 
 ```csharp
-IncomingFile? file = await context.Files.FirstAsync(cancellationToken);
+IncomingFile? file = await context.Files.FirstAsync(
+    new FileListOptions { AttachmentStyle = AttachmentStyle.File },
+    cancellationToken);
 
 if (file is not null)
 {
@@ -57,7 +59,9 @@ if (file is not null)
 <!-- reading-text -->
 
 ```csharp
-IncomingFile? file = await context.Files.FirstAsync(cancellationToken);
+IncomingFile? file = await context.Files.FirstAsync(
+    new FileListOptions { AttachmentStyle = AttachmentStyle.File },
+    cancellationToken);
 
 if (file is not null)
 {
