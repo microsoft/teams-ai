@@ -4,7 +4,9 @@ import pc from 'picocolors';
 import {
   type BotScope,
   isBotCommunicationApiAvailable,
+  isInstallLinkSupported,
   normalizeAppMetadata,
+  printInstallInstructions,
   validateAppMetadata,
   validateAppMetadataField,
   validateEndpoint,
@@ -441,7 +443,7 @@ async function renderAppCreateResult(
     logger.warn(`  To retry, run: ${pc.cyan(`teams app update ${result.teamsAppId} --messaging-mode socket`)}`);
   }
   logger.info('');
-  printLinkBanner('Install in Teams', result.installLink);
+  printInstallInstructions(result.teamsAppId, result.installLink);
   printLinkBanner('Developer Portal', result.portalLink);
 
   if (!runOptions.suppressCredentialOutput) {
@@ -460,7 +462,7 @@ async function renderAppCreateResult(
       const action = await select({
         message: '',
         choices: [
-          { name: 'Install in Teams', value: 'install' },
+          ...(isInstallLinkSupported() ? [{ name: 'Install in Teams', value: 'install' }] : []),
           { name: 'Open in Developer Portal', value: 'portal' },
           { name: 'Done', value: 'done' },
         ],

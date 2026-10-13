@@ -1,4 +1,7 @@
-import { TDP_HOST } from '../utils/tdp-host.js';
+import pc from 'picocolors';
+import { printLinkBanner } from '../utils/browser.js';
+import { logger } from '../utils/logger.js';
+import { isDevApiEnabled, TDP_HOST } from '../utils/tdp-host.js';
 
 export function installLink(teamsAppId: string, tenantId: string): string {
   return `https://teams.microsoft.com/l/app/${teamsAppId}?installAppPackage=true&appTenantId=${tenantId}`;
@@ -6,4 +9,29 @@ export function installLink(teamsAppId: string, tenantId: string): string {
 
 export function portalLink(teamsAppId: string): string {
   return `${TDP_HOST}/apps/${teamsAppId}`;
+}
+
+/**
+ * The install deep link always opens production Teams, which looks the app up
+ * in production TDP, so it can't find apps created on dev-int.
+ */
+export function isInstallLinkSupported(): boolean {
+  return !isDevApiEnabled();
+}
+
+/** Print the install link, or manual upload steps when the link can't work. */
+export function printInstallInstructions(teamsAppId: string, link: string): void {
+  if (isInstallLinkSupported()) {
+    printLinkBanner('Install in Teams', link);
+    return;
+  }
+  logger.info(
+    `  ${pc.bold('▸ Install in Teams')}    ${pc.dim('(dev-int apps must be uploaded manually)')}`
+  );
+  logger.info(
+    `      1. Download the package: ${pc.cyan(`teams app package download ${teamsAppId}`)}`
+  );
+  logger.info(
+    `      2. In Teams: ${pc.dim('Apps → Manage your apps → Upload an app → Upload a custom app')}`
+  );
 }
