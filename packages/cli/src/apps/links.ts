@@ -21,17 +21,19 @@ export function isInstallLinkSupported(): boolean {
 
 /** Print the install link, or manual upload steps when the link can't work. */
 export function printInstallInstructions(teamsAppId: string, link: string): void {
-  if (isInstallLinkSupported()) {
-    printLinkBanner('Install in Teams', link);
+  if (!isInstallLinkSupported()) {
+    // The install link would open production Teams, which can't find dev-int
+    // apps, so walk the user through uploading the package manually instead.
+    logger.info(
+      `  ${pc.bold('▸ Install in Teams')}    ${pc.dim('(dev-int apps must be uploaded manually)')}`
+    );
+    logger.info(
+      `      1. Download the package: ${pc.cyan(`teams app package download ${teamsAppId}`)}`
+    );
+    logger.info(
+      `      2. In Teams: ${pc.dim('Apps → Manage your apps → Upload an app → Upload a custom app')}`
+    );
     return;
   }
-  logger.info(
-    `  ${pc.bold('▸ Install in Teams')}    ${pc.dim('(dev-int apps must be uploaded manually)')}`
-  );
-  logger.info(
-    `      1. Download the package: ${pc.cyan(`teams app package download ${teamsAppId}`)}`
-  );
-  logger.info(
-    `      2. In Teams: ${pc.dim('Apps → Manage your apps → Upload an app → Upload a custom app')}`
-  );
+  printLinkBanner('Install in Teams', link);
 }
