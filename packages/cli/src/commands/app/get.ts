@@ -7,6 +7,8 @@ import {
   showAppDetail,
   installLink,
   isBotCommunicationApiAvailable,
+  isInstallLinkSupported,
+  printInstallInstructions,
   portalLink,
 } from '../../apps/index.js';
 import { outputJson } from '../../utils/json-output.js';
@@ -107,6 +109,13 @@ export const appGetCommand = new Command('get')
       }
 
       if (options.installLink) {
+        if (!isInstallLinkSupported()) {
+          throw new CliError(
+            'VALIDATION_CONFLICT',
+            'Install links only work with production Teams, not dev-int apps.',
+            `Run \`teams app package download ${app.teamsAppId}\` and upload the package in Teams.`
+          );
+        }
         logger.info(installLink(app.teamsAppId, tenantId));
         return;
       }
@@ -116,7 +125,7 @@ export const appGetCommand = new Command('get')
         const portal = portalLink(app.teamsAppId);
         logger.info(`${pc.dim('App:')} ${app.appName || app.appId}`);
         logger.info('');
-        printLinkBanner('Install in Teams', install);
+        printInstallInstructions(app.teamsAppId, install);
         printLinkBanner('Developer Portal', portal);
         return;
       }

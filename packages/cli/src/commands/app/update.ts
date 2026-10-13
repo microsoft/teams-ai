@@ -25,7 +25,7 @@ import {
 } from '../../apps/index.js';
 import { ensureAz } from '../../utils/az.js';
 import { CliError, wrapAction } from '../../utils/errors.js';
-import { BOT_COMMUNICATION_BASE_URL, DEV_API_ENV_VAR } from '../../utils/tdp-host.js';
+import { DEV_API_ENV_VAR, isTdpV2Enabled } from '../../utils/tdp-host.js';
 import { readAndValidateIcon } from '../../utils/icon.js';
 import { outputJson } from '../../utils/json-output.js';
 import { logger } from '../../utils/logger.js';
@@ -434,7 +434,7 @@ export const appUpdateCommand = new Command('update')
     new Option(
       '--messaging-mode <mode>',
       '[OPTIONAL] Set how Teams delivers messages: socket or http (Teams-managed bots only)'
-    ).hideHelp(BOT_COMMUNICATION_BASE_URL === undefined)
+    ).hideHelp(!isTdpV2Enabled())
   )
   .option('--scopes <scopes>', '[OPTIONAL] Set bot scopes (comma-separated: personal,team,groupChat,copilot)')
   .option('--name <name>', '[OPTIONAL] Set the app short name (max 30 chars)')

@@ -4,7 +4,9 @@ import pc from 'picocolors';
 import {
   type BotScope,
   isBotCommunicationApiAvailable,
+  isInstallLinkSupported,
   normalizeAppMetadata,
+  printInstallInstructions,
   validateAppMetadata,
   validateAppMetadataField,
   validateEndpoint,
@@ -23,7 +25,7 @@ import { getConfig } from '../../utils/config.js';
 import { ensureAz, runAz } from '../../utils/az.js';
 import { resolveSubscription, resolveResourceGroup, ensureTenantMatch } from '../../utils/az-prompts.js';
 import { createSilentSpinner } from '../../utils/spinner.js';
-import { BOT_COMMUNICATION_BASE_URL, DEV_API_ENV_VAR } from '../../utils/tdp-host.js';
+import { DEV_API_ENV_VAR, isTdpV2Enabled } from '../../utils/tdp-host.js';
 import { openInBrowser, printLinkBanner } from '../../utils/browser.js';
 import { parseMessagingMode, promptMessagingMode } from './messaging-mode.js';
 import {
@@ -441,7 +443,7 @@ async function renderAppCreateResult(
     logger.warn(`  To retry, run: ${pc.cyan(`teams app update ${result.teamsAppId} --messaging-mode socket`)}`);
   }
   logger.info('');
-  printLinkBanner('Install in Teams', result.installLink);
+  printInstallInstructions(result.teamsAppId, result.installLink);
   printLinkBanner('Developer Portal', result.portalLink);
 
   if (!runOptions.suppressCredentialOutput) {
@@ -460,7 +462,7 @@ async function renderAppCreateResult(
       const action = await select({
         message: '',
         choices: [
-          { name: 'Install in Teams', value: 'install' },
+          ...(isInstallLinkSupported() ? [{ name: 'Install in Teams', value: 'install' }] : []),
           { name: 'Open in Developer Portal', value: 'portal' },
           { name: 'Done', value: 'done' },
         ],
@@ -482,7 +484,7 @@ export const appCreateCommand = new Command('create')
     new Option(
       '--messaging-mode <mode>',
       '[OPTIONAL] How Teams delivers messages: socket or http (socket requires a Teams-managed bot)'
-    ).hideHelp(BOT_COMMUNICATION_BASE_URL === undefined)
+    ).hideHelp(!isTdpV2Enabled())
   )
   .option('--env <path>', '[OPTIONAL] Path to credentials file (.env or appsettings.json)')
   .option('--env-file <path>', '[OPTIONAL] Alias for --env')
