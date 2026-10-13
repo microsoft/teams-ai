@@ -1,9 +1,9 @@
 import { apiFetch } from '../utils/http.js';
 import { CliError } from '../utils/errors.js';
-import { BOT_COMMUNICATION_BASE_URL, DEV_API_ENV_VAR } from '../utils/tdp-host.js';
+import { DEV_API_ENV_VAR, TDP_V2_BASE_URL, isTdpV2Enabled } from '../utils/tdp-host.js';
 
 export function isBotCommunicationApiAvailable(): boolean {
-  return BOT_COMMUNICATION_BASE_URL !== undefined;
+  return isTdpV2Enabled();
 }
 
 export type MessageNotificationMode = 'atMentionedMessagesOnly' | 'allMessages' | 'unknownFutureValue';
@@ -95,14 +95,14 @@ function toCompleteConfiguration(
 }
 
 function communicationConfigurationUrl(clientId: string): string {
-  if (BOT_COMMUNICATION_BASE_URL === undefined) {
+  if (!isTdpV2Enabled()) {
     throw new CliError(
       'API_ERROR',
       'Bot communication configuration is not available in this environment yet.',
       `Set ${DEV_API_ENV_VAR}=1 to use the dev-int Teams Developer Portal.`
     );
   }
-  return `${BOT_COMMUNICATION_BASE_URL}/v1.0/applications/${encodeURIComponent(clientId)}/bot/communicationConfiguration`;
+  return `${TDP_V2_BASE_URL}/v1.0/applications/${encodeURIComponent(clientId)}/bot/communicationConfiguration`;
 }
 
 async function toApiError(action: string, response: Response): Promise<CliError> {

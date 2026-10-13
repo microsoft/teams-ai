@@ -8,6 +8,7 @@ import { getCachedAppDetails } from './app-details-cache.js';
 import { getCachedBot } from './bot-cache.js';
 import { logger } from '../utils/logger.js';
 import { openInBrowser, printLinkBanner } from '../utils/browser.js';
+import { isInstallLinkSupported, printInstallInstructions } from './links.js';
 import { createSilentSpinner } from '../utils/spinner.js';
 
 export interface AppDetailData {
@@ -113,7 +114,7 @@ export async function showAppDetail(
     logger.info(`${pc.dim('Messaging mode:')} ${socketMode ? 'Sockets' : 'HTTP endpoint'}`);
   }
   logger.info('');
-  printLinkBanner('Install in Teams', installLink);
+  printInstallInstructions(appDetails.teamsAppId, installLink);
   printLinkBanner('Developer Portal', portalLink);
 
   logger.info(
@@ -126,7 +127,7 @@ export async function showAppDetail(
         const action = await select({
           message: '',
           choices: [
-            { name: 'Install in Teams', value: 'install' },
+            ...(isInstallLinkSupported() ? [{ name: 'Install in Teams', value: 'install' }] : []),
             { name: 'Open in Developer Portal', value: 'portal' },
             { name: 'Back', value: 'back' },
           ],
