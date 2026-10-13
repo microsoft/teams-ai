@@ -24,7 +24,7 @@ describe('TDP host selection', () => {
 
     expect(host.isDevApiEnabled()).toBe(false);
     expect(host.TDP_BASE_URL).toBe('https://dev.teams.microsoft.com/api');
-    expect(host.TDP_DEV_API_BASE_URL).toBeUndefined();
+    expect(host.TDP_V2_BASE_URL).toBeUndefined();
     expect(host.BOT_COMMUNICATION_BASE_URL).toBeUndefined();
     expect(auth.teamsDevPortalScopes).toEqual([
       'https://dev.teams.microsoft.com/AppDefinitions.ReadWrite',
@@ -37,7 +37,7 @@ describe('TDP host selection', () => {
 
     expect(host.isDevApiEnabled()).toBe(true);
     expect(host.TDP_BASE_URL).toBe('https://dev-int.teams.microsoft.com/api');
-    expect(host.TDP_DEV_API_BASE_URL).toBe('https://dev-int.teams.microsoft.com/cosmictestamer');
+    expect(host.TDP_V2_BASE_URL).toBe('https://dev-int.teams.microsoft.com/cosmictestamer');
     expect(host.BOT_COMMUNICATION_BASE_URL).toBe(
       'https://dev-int.teams.microsoft.com/cosmictestamer'
     );
@@ -52,7 +52,7 @@ describe('TDP host selection', () => {
 
     expect(host.isDevApiEnabled()).toBe(false);
     expect(host.TDP_BASE_URL).toBe('https://dev.teams.microsoft.com/api');
-    expect(host.TDP_DEV_API_BASE_URL).toBeUndefined();
+    expect(host.TDP_V2_BASE_URL).toBeUndefined();
     expect(host.BOT_COMMUNICATION_BASE_URL).toBeUndefined();
   });
 });

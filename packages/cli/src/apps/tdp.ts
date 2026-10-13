@@ -3,7 +3,7 @@ import { apiFetch } from '../utils/http.js';
 import { invalidateAppDetails } from './app-details-cache.js';
 import { getCachedBot, setCachedBot, invalidateBot, type BotResource } from './bot-cache.js';
 import { logger } from '../utils/logger.js';
-import { TDP_DEV_API_BASE_URL, TDP_BASE_URL } from '../utils/tdp-host.js';
+import { TDP_V2_BASE_URL, TDP_BASE_URL } from '../utils/tdp-host.js';
 
 export type SignInAudience = 'AzureADMyOrg' | 'AzureADMultipleOrgs';
 
@@ -15,7 +15,7 @@ export interface CreateAadAppViaTdpOptions {
 /**
  * Create an AAD app via TDP, which also creates the service principal server-side.
  *
- * When the dev-int TDP API is available (TEAMS_DEV_API=1), uses its
+ * When the TDP v2 API is available (TEAMS_DEV_API=1), uses its
  * `v1.0/aadapplications` endpoint, which also makes the caller an owner of the
  * app (required by the bot communication API). That endpoint doesn't accept a
  * serviceManagementReference, so the legacy endpoint is used when one is set.
@@ -25,8 +25,8 @@ export async function createAadAppViaTdp(
   displayName: string,
   options: CreateAadAppViaTdpOptions
 ): Promise<AadApp> {
-  if (TDP_DEV_API_BASE_URL && !options.serviceManagementReference) {
-    return createAadAppViaDevApi(token, TDP_DEV_API_BASE_URL, displayName, options.signInAudience);
+  if (TDP_V2_BASE_URL && !options.serviceManagementReference) {
+    return createAadAppViaTdpV2(token, TDP_V2_BASE_URL, displayName, options.signInAudience);
   }
 
   const response = await apiFetch(`${TDP_BASE_URL}/aadapp/v2`, {
@@ -52,20 +52,20 @@ export async function createAadAppViaTdp(
   return response.json();
 }
 
-/** Response from dev-int TDP API `POST v1.0/aadapplications` (201). */
-interface DevApiAadApplicationResponse extends AadApp {
+/** Response from TDP v2 API `POST v1.0/aadapplications` (201). */
+interface TdpV2AadApplicationResponse extends AadApp {
   signInAudience: SignInAudience;
 }
 
 // TODO: once TDP ships `v1.0/aadapplications/microsoftTenantBots`, use it for
 // serviceManagementReference so Microsoft-tenant apps also get the caller as owner.
-async function createAadAppViaDevApi(
+async function createAadAppViaTdpV2(
   token: string,
   baseUrl: string,
   displayName: string,
   signInAudience: SignInAudience
 ): Promise<AadApp> {
-  logger.debug('Creating AAD app via dev-int TDP API v1.0/aadapplications');
+  logger.debug('Creating AAD app via TDP v2 API v1.0/aadapplications');
   const response = await apiFetch(`${baseUrl}/v1.0/aadapplications`, {
     method: 'POST',
     headers: {
@@ -80,7 +80,7 @@ async function createAadAppViaDevApi(
     throw new Error(`Failed to create AAD app: ${response.status} ${error}`);
   }
 
-  const app = (await response.json()) as DevApiAadApplicationResponse;
+  const app = (await response.json()) as TdpV2AadApplicationResponse;
   return { id: app.id, appId: app.appId, displayName: app.displayName };
 }
 
