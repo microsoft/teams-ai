@@ -24,11 +24,12 @@ vi.mock('../src/utils/http.js', () => ({
   }),
 }));
 
-async function loadWithTdpV2(tdpV2BaseUrl: string | undefined) {
+async function loadWithTdpV2(enabled: boolean) {
   vi.doMock('../src/utils/tdp-host.js', async (importOriginal) => ({
     ...(await importOriginal<typeof import('../src/utils/tdp-host.js')>()),
     TDP_BASE_URL: 'https://tdp.test/api',
-    TDP_V2_BASE_URL: tdpV2BaseUrl,
+    TDP_V2_BASE_URL: 'https://tdp-v2.test',
+    isTdpV2Enabled: () => enabled,
   }));
   return import('../src/apps/tdp.js');
 }
@@ -45,7 +46,7 @@ describe('createAadAppViaTdp', () => {
   });
 
   it('uses TDP v2 API v1.0/aadapplications when available', async () => {
-    const { createAadAppViaTdp } = await loadWithTdpV2('https://tdp-v2.test');
+    const { createAadAppViaTdp } = await loadWithTdpV2(true);
 
     const app = await createAadAppViaTdp('t', 'My Bot', {
       serviceManagementReference: undefined,
@@ -63,7 +64,7 @@ describe('createAadAppViaTdp', () => {
   });
 
   it('falls back to legacy aadapp/v2 when a serviceManagementReference is set', async () => {
-    const { createAadAppViaTdp } = await loadWithTdpV2('https://tdp-v2.test');
+    const { createAadAppViaTdp } = await loadWithTdpV2(true);
 
     await createAadAppViaTdp('t', 'My Bot', {
       serviceManagementReference: 'smr-id',
@@ -83,8 +84,8 @@ describe('createAadAppViaTdp', () => {
     ]);
   });
 
-  it('uses legacy aadapp/v2 when TDP v2 API is unavailable', async () => {
-    const { createAadAppViaTdp } = await loadWithTdpV2(undefined);
+  it('uses legacy aadapp/v2 when TDP v2 API is disabled', async () => {
+    const { createAadAppViaTdp } = await loadWithTdpV2(false);
 
     await createAadAppViaTdp('t', 'My Bot', {
       serviceManagementReference: undefined,

@@ -3,7 +3,7 @@ import { apiFetch } from '../utils/http.js';
 import { invalidateAppDetails } from './app-details-cache.js';
 import { getCachedBot, setCachedBot, invalidateBot, type BotResource } from './bot-cache.js';
 import { logger } from '../utils/logger.js';
-import { TDP_V2_BASE_URL, TDP_BASE_URL } from '../utils/tdp-host.js';
+import { TDP_BASE_URL, TDP_V2_BASE_URL, isTdpV2Enabled } from '../utils/tdp-host.js';
 
 export type SignInAudience = 'AzureADMyOrg' | 'AzureADMultipleOrgs';
 
@@ -25,8 +25,8 @@ export async function createAadAppViaTdp(
   displayName: string,
   options: CreateAadAppViaTdpOptions
 ): Promise<AadApp> {
-  if (TDP_V2_BASE_URL && !options.serviceManagementReference) {
-    return createAadAppViaTdpV2(token, TDP_V2_BASE_URL, displayName, options.signInAudience);
+  if (isTdpV2Enabled() && !options.serviceManagementReference) {
+    return createAadAppViaTdpV2(token, displayName, options.signInAudience);
   }
 
   const response = await apiFetch(`${TDP_BASE_URL}/aadapp/v2`, {
@@ -61,12 +61,11 @@ interface TdpV2AadApplicationResponse extends AadApp {
 // serviceManagementReference so Microsoft-tenant apps also get the caller as owner.
 async function createAadAppViaTdpV2(
   token: string,
-  baseUrl: string,
   displayName: string,
   signInAudience: SignInAudience
 ): Promise<AadApp> {
   logger.debug('Creating AAD app via TDP v2 API v1.0/aadapplications');
-  const response = await apiFetch(`${baseUrl}/v1.0/aadapplications`, {
+  const response = await apiFetch(`${TDP_V2_BASE_URL}/v1.0/aadapplications`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,

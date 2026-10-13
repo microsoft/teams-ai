@@ -20,16 +20,13 @@ export const TDP_HOST = isDevApiEnabled() ? DEV_INT_TDP_HOST : PROD_TDP_HOST;
 export const TDP_BASE_URL = `${TDP_HOST}/api`;
 
 /**
- * Base URL for the TDP v2 API, or undefined when it is not
- * available in the selected environment. Routes are rooted at `/v1.0/...`.
- * TODO(prod): set the prod path once TDP ships this server to prod.
+ * Whether TDP v2 API features (AAD app creation, bot communication
+ * configuration) can be used. Only dev-int for now.
+ * TODO(prod): enable as each TDP v2 endpoint ships to prod.
  */
-export const TDP_V2_BASE_URL: string | undefined = isDevApiEnabled()
-  ? `${DEV_INT_TDP_HOST}/cosmictestamer`
-  : undefined;
+export function isTdpV2Enabled(): boolean {
+  return isDevApiEnabled();
+}
 
-/**
- * Base URL for the bot communication configuration API, or undefined when the
- * API is not available in the selected environment.
- */
-export const BOT_COMMUNICATION_BASE_URL: string | undefined = TDP_V2_BASE_URL;
+/** Base URL for the TDP v2 API. Routes are rooted at `/v1.0/...`. */
+export const TDP_V2_BASE_URL = `${TDP_HOST}/${isDevApiEnabled() ? 'cosmictestamer' : 'cosmicprodamer'}`;
