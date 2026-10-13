@@ -46,7 +46,7 @@ Teams saves a pasted GIF as a static PNG. It is listed as `.gif` and `image/gif`
 
 ## Formats that cannot be downloaded
 
-Some image formats, such as BMP and AVIF, cannot be converted by the platform, so Teams shows a placeholder, and they cannot be downloaded. Downloading one of these fails with <LanguageInclude content={{"typescript": "`InlineImageTransformationError`", "python": "`InlineImageTransformationError`", "csharp": "`InlineImageTransformationException`"}} />. The same image sent as a file attachment downloads normally, so asking the user to resend it that way is the recovery:
+Some image formats, such as BMP and AVIF, cannot be converted by the Teams service, so Teams shows a placeholder, and they cannot be downloaded. Downloading one of these fails with <LanguageInclude content={{"typescript": "`InlineImageTransformationError`", "python": "`InlineImageTransformationError`", "csharp": "`InlineImageTransformationException`"}} />. The same image sent as a file attachment downloads normally, so asking the user to resend it that way is the recovery:
 
 <LanguageInclude section="errors-handling" />
 
