@@ -24,11 +24,11 @@ vi.mock('../src/utils/http.js', () => ({
   }),
 }));
 
-async function loadWithOrbit(orbitBaseUrl: string | undefined) {
+async function loadWithDevApi(devApiBaseUrl: string | undefined) {
   vi.doMock('../src/utils/tdp-host.js', async (importOriginal) => ({
     ...(await importOriginal<typeof import('../src/utils/tdp-host.js')>()),
     TDP_BASE_URL: 'https://tdp.test/api',
-    ORBIT_BASE_URL: orbitBaseUrl,
+    TDP_DEV_API_BASE_URL: devApiBaseUrl,
   }));
   return import('../src/apps/tdp.js');
 }
@@ -44,8 +44,8 @@ describe('createAadAppViaTdp', () => {
     vi.resetModules();
   });
 
-  it('uses Orbit v1.0/aadapplications when available', async () => {
-    const { createAadAppViaTdp } = await loadWithOrbit('https://orbit.test');
+  it('uses dev-int TDP API v1.0/aadapplications when available', async () => {
+    const { createAadAppViaTdp } = await loadWithDevApi('https://dev-api.test');
 
     const app = await createAadAppViaTdp('t', 'My Bot', {
       serviceManagementReference: undefined,
@@ -55,7 +55,7 @@ describe('createAadAppViaTdp', () => {
     expect(app).toEqual({ id: 'obj-id', appId: 'client-id', displayName: 'My Bot' });
     expect(calls).toEqual([
       {
-        url: 'https://orbit.test/v1.0/aadapplications',
+        url: 'https://dev-api.test/v1.0/aadapplications',
         method: 'POST',
         body: { displayName: 'My Bot', signInAudience: 'AzureADMultipleOrgs' },
       },
@@ -63,7 +63,7 @@ describe('createAadAppViaTdp', () => {
   });
 
   it('falls back to legacy aadapp/v2 when a serviceManagementReference is set', async () => {
-    const { createAadAppViaTdp } = await loadWithOrbit('https://orbit.test');
+    const { createAadAppViaTdp } = await loadWithDevApi('https://dev-api.test');
 
     await createAadAppViaTdp('t', 'My Bot', {
       serviceManagementReference: 'smr-id',
@@ -83,8 +83,8 @@ describe('createAadAppViaTdp', () => {
     ]);
   });
 
-  it('uses legacy aadapp/v2 when Orbit is unavailable', async () => {
-    const { createAadAppViaTdp } = await loadWithOrbit(undefined);
+  it('uses legacy aadapp/v2 when dev-int TDP API is unavailable', async () => {
+    const { createAadAppViaTdp } = await loadWithDevApi(undefined);
 
     await createAadAppViaTdp('t', 'My Bot', {
       serviceManagementReference: undefined,
