@@ -1,22 +1,37 @@
 ---
 title: Agentic Identity
 sidebar_position: 2
-summary: Build Teams agents with Agent 365 identities, lifecycle events, observability, and governance.
+summary: Implement Teams messaging, lifecycle events, and telemetry for Agentic Users.
 suppressLanguageIncludeWarning: true
 ---
 
 # Agentic Identity
 
-[Microsoft Agent 365](https://learn.microsoft.com/microsoft-agent-365/) gives your agent a governed identity in Microsoft 365 through an agent identity blueprint. Teams SDK handles the Activity Protocol and identity-aware messaging that your agent needs in Teams.
-
 <LanguageInclude section="availability-note" />
 
-With Teams SDK, your app can:
+These guides show how to connect a Teams SDK app to an **Agentic User**—an AI teammate represented by its own Microsoft Entra user account.
+
+## Identity model
+
+An Agentic Blueprint defines the shared credentials and baseline permissions for a type of agent. Each instance has its own agent identity, represented in Teams SDK by an **Agentic App Instance ID** (`agenticAppId`). In the AI teammate scenario covered by these guides, the instance also has an associated Agentic User.
+
+```mermaid
+flowchart LR
+  B[Agentic Blueprint ID<br/>shared credentials and permissions]
+  B --> I1[Agentic App Instance A<br/>agent identity]
+  B --> I2[Agentic App Instance B<br/>agent identity]
+  I1 --> U1[Agentic User A]
+  I2 --> U2[Agentic User B]
+```
+
+One blueprint can support multiple independently managed Agentic Users while the same Teams SDK app handles their messages.
+
+For background on blueprints, agent identities, and authentication modes, see [Agent 365 identity](https://learn.microsoft.com/microsoft-agent-365/developer/identity?view=o365-worldwide).
+
+The guides show how to:
 
 - Receive messages addressed to an Agentic User.
 - Reply with the correct Agentic User identity.
 - Send proactive messages with an explicit agent identity.
 - Handle Agentic User lifecycle events.
 - Add Agent 365 identity and correlation context to telemetry.
-
-These guides focus on Teams SDK. For broader platform concepts and administration, use the [Agent 365 documentation](https://learn.microsoft.com/microsoft-agent-365/).
