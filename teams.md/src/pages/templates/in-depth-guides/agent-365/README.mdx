@@ -13,15 +13,13 @@ These guides show how to connect a Teams SDK app to an **Agentic User**—an AI 
 
 ## Identity model
 
-An Agentic Blueprint defines the shared credentials and baseline permissions for a type of agent. Each instance has its own agent identity, represented in Teams SDK by an **Agentic App Instance ID** (`agenticAppId`). In the AI teammate scenario covered by these guides, the instance also has an associated Agentic User.
+An Agentic Blueprint defines the shared credentials and baseline permissions for a type of agent. One blueprint can be used to create multiple Agentic User instances.
 
 ```mermaid
 flowchart LR
   B[Agentic Blueprint ID<br/>shared credentials and permissions]
-  B --> I1[Agentic App Instance A<br/>agent identity]
-  B --> I2[Agentic App Instance B<br/>agent identity]
-  I1 --> U1[Agentic User A]
-  I2 --> U2[Agentic User B]
+  B --> U1[Agentic User instance A]
+  B --> U2[Agentic User instance B]
 ```
 
 One blueprint can support multiple independently managed Agentic Users while the same Teams SDK app handles their messages.
