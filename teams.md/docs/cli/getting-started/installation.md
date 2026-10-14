@@ -2,16 +2,16 @@
 
 ## Prerequisites
 
-- **Node.js** 20 or later
+- **Node.js** 22.12 or later
 - **npm** (comes with Node.js)
 - **Azure CLI** (`az`) — only needed for Azure bot operations (optional)
 
 ## Install
 
-Install the public preview `teams` CLI globally from npm:
+Install `teams` globally from npm:
 
 ```bash
-npm install -g @microsoft/teams.cli@preview
+npm install -g @microsoft/teams.cli
 ```
 
 ## Verify
@@ -22,7 +22,7 @@ teams --version
 
 ## Update
 
-The preview CLI checks the `preview` npm tag for updates automatically once per day. To update manually:
+The CLI checks for updates automatically once per day. To update manually:
 
 ```bash
 teams self-update
