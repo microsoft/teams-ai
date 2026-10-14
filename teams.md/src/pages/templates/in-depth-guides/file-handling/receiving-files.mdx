@@ -47,6 +47,10 @@ Images the user pasted into the message are listed too, with <LanguageInclude co
 
 <LanguageInclude section="filter-by-style" />
 
+:::note
+Starting in 2.2.0, <LanguageInclude content={{"typescript": "`list()`", "python": "`list()`", "csharp": "`ListAsync()`"}} /> and <LanguageInclude content={{"typescript": "`first()`", "python": "`first()`", "csharp": "`FirstAsync()`"}} /> return pasted images when no filter is given. To keep the previous behavior of returning only file attachments, pass <LanguageInclude content={{"typescript": "`'file'`", "python": "`\"file\"`", "csharp": "`AttachmentStyle.File`"}} /> as the filter.
+:::
+
 ### File metadata
 
 Each <LanguageInclude content={{"typescript": "`IIncomingFile`", "python": "`IncomingFile`", "csharp": "`IncomingFile`"}} /> carries metadata describing the file, populated from what the platform reports:
