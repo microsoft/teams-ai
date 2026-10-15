@@ -31,14 +31,6 @@ export interface AgentGeneratedConfig {
 
 export interface A365SetupOptions {
   agentName: string;
-  /** Registers the messaging endpoint for Teams/Copilot agents. */
-  m365: boolean;
-  /**
-   * Creates an Agentic User (AI teammate) instead of an identity-only blueprint
-   * agent. Required for the agent to be installable/usable from Teams or Copilot —
-   * a plain blueprint agent (the default) only registers the identity.
-   */
-  aiteammate?: boolean;
   /** Working directory to run `a365` in; also where the generated config is read from. */
   cwd: string;
   /** Called with raw stdout/stderr chunks as they arrive, for --verbose streaming. */
@@ -86,9 +78,12 @@ export async function installA365Cli(): Promise<void> {
  * CliError('AGENT_SETUP_FAILED', ...) on non-zero exit.
  */
 export async function runA365SetupAll(options: A365SetupOptions): Promise<void> {
-  const args = ['setup', 'all', '--agent-name', options.agentName];
-  if (options.aiteammate) args.push('--aiteammate');
-  if (options.m365) args.push('--m365');
+  // Always create an Agentic User (AI teammate) — a plain blueprint agent only
+  // registers the identity and can never be installed/used from Teams or Copilot.
+  // The messaging endpoint is always deferred (a365 prompts/defers it regardless
+  // of --m365 when no --messaging-endpoint is supplied); set it later via
+  // `teams agent update-endpoint`.
+  const args = ['setup', 'all', '--agent-name', options.agentName, '--aiteammate'];
 
   await new Promise<void>((resolvePromise, reject) => {
     const child = spawn('a365', args, { cwd: options.cwd });

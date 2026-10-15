@@ -521,10 +521,10 @@ export const appCreateCommand = new Command('create')
   .action(
     wrapAction(async (options: CreateOptions) => {
       if (await shouldCreateAgent(options)) {
-        // `app create` is specifically for Teams-usable agents, so always create an
-        // Agentic User (AI teammate) — a plain blueprint agent can't be installed or
-        // used from Teams/Copilot.
-        await runAgentCreate(options.name, { m365: true, aiteammate: true, json: options.json });
+        // runAgentCreate always creates an Agentic User (AI teammate); the
+        // messaging endpoint is deferred by default and set later via
+        // `teams agent update-endpoint`, same as a365's own documented flow.
+        await runAgentCreate(options.name, { json: options.json });
         return;
       }
       await runAppCreate(options);

@@ -18,12 +18,6 @@ import { createSilentSpinner } from '../../utils/spinner.js';
 import { requireAgentAccount, withAgentSpinner } from './shared.js';
 
 export interface AgentCreateOptions {
-  m365?: boolean;
-  /**
-   * Creates an Agentic User (AI teammate) instead of an identity-only blueprint
-   * agent. Required for the agent to be installable/usable from Teams or Copilot.
-   */
-  aiteammate?: boolean;
   json?: boolean;
 }
 
@@ -149,8 +143,6 @@ export async function runAgentCreate(
     () =>
       runA365SetupAll({
         agentName: name,
-        m365: !!options.m365,
-        aiteammate: !!options.aiteammate,
         cwd,
         onOutput: verbose ? (chunk) => process.stdout.write(chunk) : undefined,
       })
@@ -171,11 +163,6 @@ export async function runAgentCreate(
 export const agentCreateCommand = new Command('create')
   .description('Create an Agent 365 agent identity')
   .argument('[name]', 'Agent name')
-  .option('--m365', '[OPTIONAL] Register the messaging endpoint for Teams/Copilot (M365 agent)')
-  .option(
-    '--aiteammate',
-    '[OPTIONAL] Create an Agentic User (AI teammate) so the agent can be installed and used from Teams/Copilot, instead of an identity-only blueprint agent'
-  )
   .option('--json', '[OPTIONAL] Output as JSON')
   .action(
     wrapAction(async (nameArg: string | undefined, options: AgentCreateOptions) => {

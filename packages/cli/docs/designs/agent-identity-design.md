@@ -27,7 +27,9 @@ consistent with our existing UX (spinners, `--json`, `--yes`, `CliError`).
   - `--m365` additionally registers the messaging endpoint via MCP Platform (for
     Teams/Copilot agents).
   - `--aiteammate` switches to AI teammate mode (requires Frontier preview; needs a
-    manually authored `a365.config.json`, unlike plain agent mode).
+    manually authored `a365.config.json`, unlike plain agent mode). `teams agent create`
+    always passes this — a plain blueprint agent can never be installed/used from
+    Teams or Copilot, so there's no reason to offer it as an opt-in flag.
   - Writes `a365.generated.config.json` to the working directory with
     `agentBlueprintId`, `agentBlueprintObjectId`, `agentBlueprintServicePrincipalObjectId`,
     `agentBlueprintClientSecret` (masked/protected), `managedIdentityPrincipalId`,
@@ -79,18 +81,22 @@ consistent with our existing UX (spinners, `--json`, `--yes`, `CliError`).
 ## Proposed command
 
 ```
-teams agent create [name] [--m365] [--azure] [--yes] [--json] [--verbose]
+teams agent create [name] [--azure] [--yes] [--json] [--verbose]
 ```
 
 | Flag | Behavior |
 | --- | --- |
 | `name` (positional) | Agent name. Prompted if omitted and not `--yes`/`--json`; required otherwise. |
-| `--m365` | [OPTIONAL] Registers the messaging endpoint for Teams/Copilot (passes `--m365` to `a365`). Default: off (plain blueprint agent). |
-| `--aiteammate` | [OPTIONAL] Creates an **Agentic User** (AI teammate account) instead of an identity-only blueprint agent. **Required** before the agent can be installed/used from Teams, Copilot, or Copilot Studio — a plain blueprint agent only registers the identity and has no account that any surface can install. `teams app create --agent` always passes this, since it's specifically building a Teams-usable agent. |
 | `--azure` | [OPTIONAL] Reserved placeholder for future custom infra flags (SKU/region); no-op in v1, or omitted entirely from the first cut. |
 | `--yes` / `-y` | Skip confirmation prompts; use defaults (existing global flag). |
 | `--json` | Emit `AgentCreateOutput` instead of human-readable text (existing global flag). |
 | `--verbose` | Stream raw `a365` CLI output instead of suppressing it behind the spinner. |
+
+Messaging endpoint is never registered at creation time: `a365 setup all` defers it
+either way when run non-interactively (no TTY, which is always true when we `spawn`
+it), with or without `--m365` — it only takes effect in combination with
+`--messaging-endpoint`, which we never pass at creation. Set it after deployment with
+`teams agent update-endpoint`.
 
 ### Flow
 1. **Resolve name.** Prompt via `input()` if missing and not auto-confirm/JSON; else
@@ -107,8 +113,8 @@ teams agent create [name] [--m365] [--azure] [--yes] [--json] [--verbose]
    from `src/utils/az-prompts.ts` so a tenant mismatch fails fast, before a multi-minute
    Azure provisioning run starts.
 4. **Run setup (spinner: "Creating agent identity...").**
-   - Shell out: `a365 setup all --agent-name "<name>" [--m365]`, cwd = current working
-     directory (same place `a365.generated.config.json` lands).
+   - Shell out: `a365 setup all --agent-name "<name>" --aiteammate`, cwd = current
+     working directory (same place `a365.generated.config.json` lands).
    - Buffer stdout/stderr; only print live if `--verbose`.
    - Non-zero exit → parse known `a365` failure patterns where possible, else wrap
      raw stderr tail into `CliError("AGENT_SETUP_FAILED", ...)`.
@@ -116,7 +122,7 @@ teams agent create [name] [--m365] [--azure] [--yes] [--json] [--verbose]
    `AgentGeneratedConfig` interface.
 6. **Report.**
    - Human mode: print agent identity essentials (`AGENT_ID`, blueprint ID, messaging
-     endpoint if `--m365`) using existing credential-output styling conventions
+     endpoint if present) using existing credential-output styling conventions
      (`pc.bold(pc.green(...))` for success values, `pc.dim(...)` for labels).
    - If `completed === false` / `resourceConsents` empty → `pc.yellow(...)` block:
      "Admin consent required" + the consent URL `a365` printed, with instructions to
@@ -133,7 +139,7 @@ interface AgentCreateOutput {
   agentBlueprintId: string;
   agentBlueprintObjectId: string;
   managedIdentityPrincipalId: string;
-  messagingEndpoint?: string; // present when --m365
+  messagingEndpoint?: string; // present if already registered via `teams agent update-endpoint`
   consentUrl?: string; // present when status === "pending_admin_consent"
   generatedConfigPath: string; // absolute path to a365.generated.config.json
 }

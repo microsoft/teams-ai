@@ -118,11 +118,11 @@ function createFakeChild(): FakeChildProcess {
 describe('runA365SetupAll', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('resolves when the process exits with code 0', async () => {
+  it('resolves when the process exits with code 0, always passing --aiteammate', async () => {
     const child = createFakeChild();
     mockSpawn.mockReturnValue(child);
 
-    const promise = runA365SetupAll({ agentName: 'my-agent', m365: false, cwd: '/work' });
+    const promise = runA365SetupAll({ agentName: 'my-agent', cwd: '/work' });
 
     const closeHandler = child.on.mock.calls.find(([event]) => event === 'close')?.[1];
     closeHandler?.(0);
@@ -130,44 +130,7 @@ describe('runA365SetupAll', () => {
     await expect(promise).resolves.toBeUndefined();
     expect(mockSpawn).toHaveBeenCalledWith(
       'a365',
-      ['setup', 'all', '--agent-name', 'my-agent'],
-      { cwd: '/work' }
-    );
-  });
-
-  it('passes --m365 when requested', async () => {
-    const child = createFakeChild();
-    mockSpawn.mockReturnValue(child);
-
-    const promise = runA365SetupAll({ agentName: 'my-agent', m365: true, cwd: '/work' });
-    const closeHandler = child.on.mock.calls.find(([event]) => event === 'close')?.[1];
-    closeHandler?.(0);
-    await promise;
-
-    expect(mockSpawn).toHaveBeenCalledWith(
-      'a365',
-      ['setup', 'all', '--agent-name', 'my-agent', '--m365'],
-      { cwd: '/work' }
-    );
-  });
-
-  it('passes --aiteammate when requested', async () => {
-    const child = createFakeChild();
-    mockSpawn.mockReturnValue(child);
-
-    const promise = runA365SetupAll({
-      agentName: 'my-agent',
-      m365: true,
-      aiteammate: true,
-      cwd: '/work',
-    });
-    const closeHandler = child.on.mock.calls.find(([event]) => event === 'close')?.[1];
-    closeHandler?.(0);
-    await promise;
-
-    expect(mockSpawn).toHaveBeenCalledWith(
-      'a365',
-      ['setup', 'all', '--agent-name', 'my-agent', '--aiteammate', '--m365'],
+      ['setup', 'all', '--agent-name', 'my-agent', '--aiteammate'],
       { cwd: '/work' }
     );
   });
@@ -176,7 +139,7 @@ describe('runA365SetupAll', () => {
     const child = createFakeChild();
     mockSpawn.mockReturnValue(child);
 
-    const promise = runA365SetupAll({ agentName: 'my-agent', m365: false, cwd: '/work' });
+    const promise = runA365SetupAll({ agentName: 'my-agent', cwd: '/work' });
 
     const stderrHandler = child.stderr.on.mock.calls.find(([event]) => event === 'data')?.[1];
     stderrHandler?.(Buffer.from('boom'));
@@ -198,7 +161,7 @@ describe('runA365SetupAll', () => {
     const child = createFakeChild();
     mockSpawn.mockReturnValue(child);
 
-    const promise = runA365SetupAll({ agentName: 'my-agent', m365: false, cwd: '/work' });
+    const promise = runA365SetupAll({ agentName: 'my-agent', cwd: '/work' });
     const errorHandler = child.on.mock.calls.find(([event]) => event === 'error')?.[1];
     errorHandler?.(new Error('spawn failed'));
 
@@ -210,7 +173,7 @@ describe('runA365SetupAll', () => {
     mockSpawn.mockReturnValue(child);
     const onOutput = vi.fn();
 
-    const promise = runA365SetupAll({ agentName: 'my-agent', m365: false, cwd: '/work', onOutput });
+    const promise = runA365SetupAll({ agentName: 'my-agent', cwd: '/work', onOutput });
 
     const stdoutHandler = child.stdout.on.mock.calls.find(([event]) => event === 'data')?.[1];
     stdoutHandler?.(Buffer.from('hello'));
