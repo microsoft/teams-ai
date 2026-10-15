@@ -42,6 +42,10 @@ teams
 │   └── auth
 │       └── secret
 │           └── create [appId]     Generate client secret
+├── agent                          Manage Microsoft Agent 365 agent identities
+│   ├── create [name]              Create an Agent 365 agent identity
+│   ├── update-endpoint <url>      Update the messaging endpoint on an existing blueprint
+│   └── update-identifier          Set the bot's identifier URI to the Teams-required format
 ├── project                        Create and configure Teams app projects
 │   └── new                        Create a new Teams app project
 │       ├── typescript <name>      Create a new TypeScript Teams app

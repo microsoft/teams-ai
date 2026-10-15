@@ -57,6 +57,12 @@ export default {
         },
         {
           type: 'category',
+          label: 'agent',
+          collapsed: true,
+          items: ['commands/agent/index', 'commands/agent/create'],
+        },
+        {
+          type: 'category',
           label: 'project',
           collapsed: true,
           items: [
