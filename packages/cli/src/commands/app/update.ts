@@ -41,15 +41,6 @@ import type { BotScope } from '../../apps/manifest.js';
 const VALID_SCOPES: BotScope[] = ['personal', 'team', 'groupChat', 'copilot'];
 
 /**
- * Split a `--scopes` value on commas and/or whitespace.
- * Whitespace is accepted because PowerShell turns unquoted `a,b` into an array
- * that reaches the CLI space-joined as `"a b"`.
- */
-export function parseScopesInput(input: string): string[] {
-  return input.split(/[\s,]+/).filter(Boolean);
-}
-
-/**
  * Build the partial AppDetails update for a scope change.
  * Enforces `personal` when `copilot` is selected, and manages the `copilotAgents` block.
  */
@@ -529,7 +520,8 @@ export const appUpdateCommand = new Command('update')
         }
       }
       if (options.scopes !== undefined) {
-        const parsed = parseScopesInput(options.scopes);
+        // Also split on whitespace: PowerShell passes unquoted `a,b` as "a b"
+        const parsed = options.scopes.split(/[\s,]+/).filter(Boolean);
         const invalid = parsed.filter((s) => !VALID_SCOPES.includes(s as BotScope));
         if (invalid.length > 0) {
           throw new CliError(
@@ -732,7 +724,7 @@ export const appUpdateCommand = new Command('update')
           throw new CliError('NOT_FOUND_BOT', 'This app has no bots.');
         }
 
-        const parsed = parseScopesInput(options.scopes) as BotScope[];
+        const parsed = options.scopes.split(/[\s,]+/).filter(Boolean) as BotScope[];
         const currentDetails = detailsBefore ?? await fetchAppDetailsV2(token, appId);
         const scopeUpdates = buildScopeUpdates(currentDetails, parsed);
         const spinner = createSilentSpinner('Updating scopes...', silent).start();
