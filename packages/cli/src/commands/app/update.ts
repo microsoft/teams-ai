@@ -32,7 +32,7 @@ import { logger } from '../../utils/logger.js';
 import { pickApp } from '../../utils/app-picker.js';
 import { createSilentSpinner } from '../../utils/spinner.js';
 import { bumpPatchVersion, stableStringify } from '../../utils/version.js';
-import { parseMessagingMode, promptMessagingMode } from './messaging-mode.js';
+import { MESSAGING_MODE_RESTART_HINT, parseMessagingMode, promptMessagingMode } from './messaging-mode.js';
 import type { AppSummary, AppDetails } from '../../apps/types.js';
 import type { BotDetails } from '../../apps/tdp.js';
 import type { BotLocation } from '../../apps/bot-location.js';
@@ -285,6 +285,7 @@ export async function showUpdateMenu(app: AppSummary, token: string): Promise<vo
       try {
         await setSocketMode(token, botId, enable);
         modeSpinner.success({ text: enable ? 'Socket mode enabled' : 'Switched to HTTP' });
+        logger.info(pc.yellow(MESSAGING_MODE_RESTART_HINT));
         socketMode = enable;
       } catch (error) {
         modeSpinner.error({ text: 'Failed to update messaging mode' });
@@ -708,6 +709,7 @@ export const appUpdateCommand = new Command('update')
         const { changed } = await setSocketMode(token, modeBotId, enable);
         if (changed) {
           modeSpinner.success({ text: enable ? 'Socket mode enabled' : 'Switched to HTTP' });
+          if (!silent) logger.info(pc.yellow(MESSAGING_MODE_RESTART_HINT));
         } else {
           modeSpinner.success({
             text: enable ? 'Socket mode already enabled' : 'Already using HTTP',
