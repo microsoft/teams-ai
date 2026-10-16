@@ -32,7 +32,7 @@ import { logger } from '../../utils/logger.js';
 import { pickApp } from '../../utils/app-picker.js';
 import { createSilentSpinner } from '../../utils/spinner.js';
 import { bumpPatchVersion, stableStringify } from '../../utils/version.js';
-import { parseMessagingMode, promptMessagingMode } from './messaging-mode.js';
+import { MESSAGING_MODE_RESTART_HINT, parseMessagingMode, promptMessagingMode } from './messaging-mode.js';
 import type { AppSummary, AppDetails } from '../../apps/types.js';
 import type { BotDetails } from '../../apps/tdp.js';
 import type { BotLocation } from '../../apps/bot-location.js';
@@ -101,6 +101,8 @@ interface AppUpdateOutput {
   needsReinstall?: boolean;
   /** HTTP delivery was selected but the bot has no messaging endpoint. */
   needsEndpoint?: boolean;
+  /** Messaging mode changed; the running Teams SDK app must be restarted. */
+  needsRestart?: boolean;
   updated: {
     endpoint?: string;
     socketMode?: boolean;
@@ -285,6 +287,7 @@ export async function showUpdateMenu(app: AppSummary, token: string): Promise<vo
       try {
         await setSocketMode(token, botId, enable);
         modeSpinner.success({ text: enable ? 'Socket mode enabled' : 'Switched to HTTP' });
+        logger.info(pc.yellow(MESSAGING_MODE_RESTART_HINT));
         socketMode = enable;
       } catch (error) {
         modeSpinner.error({ text: 'Failed to update messaging mode' });
@@ -615,6 +618,7 @@ export const appUpdateCommand = new Command('update')
       const wantsModeChange = messagingMode !== undefined;
       let modeBotId: string | undefined;
       let needsEndpoint = false;
+      let needsRestart = false;
       if (wantsModeChange) {
         if (!app.bots || app.bots.length === 0) {
           throw new CliError('NOT_FOUND_BOT', 'This app has no bots.');
@@ -709,6 +713,8 @@ export const appUpdateCommand = new Command('update')
         const { changed } = await setSocketMode(token, modeBotId, enable);
         if (changed) {
           modeSpinner.success({ text: enable ? 'Socket mode enabled' : 'Switched to HTTP' });
+          needsRestart = true;
+          if (!silent) logger.info(pc.yellow(MESSAGING_MODE_RESTART_HINT));
         } else {
           modeSpinner.success({
             text: enable ? 'Socket mode already enabled' : 'Already using HTTP',
@@ -815,6 +821,7 @@ export const appUpdateCommand = new Command('update')
           updated: allUpdates,
           ...(versionBumped ? { needsReinstall: true } : {}),
           ...(needsEndpoint ? { needsEndpoint: true } : {}),
+          ...(needsRestart ? { needsRestart: true } : {}),
         };
         outputJson(result);
       }
