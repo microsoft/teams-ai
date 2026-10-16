@@ -101,6 +101,8 @@ interface AppUpdateOutput {
   needsReinstall?: boolean;
   /** HTTP delivery was selected but the bot has no messaging endpoint. */
   needsEndpoint?: boolean;
+  /** Messaging mode changed; the running Teams SDK app must be restarted. */
+  needsRestart?: boolean;
   updated: {
     endpoint?: string;
     socketMode?: boolean;
@@ -615,6 +617,7 @@ export const appUpdateCommand = new Command('update')
       const wantsModeChange = messagingMode !== undefined;
       let modeBotId: string | undefined;
       let needsEndpoint = false;
+      let needsRestart = false;
       if (wantsModeChange) {
         if (!app.bots || app.bots.length === 0) {
           throw new CliError('NOT_FOUND_BOT', 'This app has no bots.');
@@ -709,6 +712,7 @@ export const appUpdateCommand = new Command('update')
         const { changed } = await setSocketMode(token, modeBotId, enable);
         if (changed) {
           modeSpinner.success({ text: enable ? 'Socket mode enabled' : 'Switched to HTTP' });
+          needsRestart = true;
           if (!silent) logger.info(pc.yellow(MESSAGING_MODE_RESTART_HINT));
         } else {
           modeSpinner.success({
@@ -816,6 +820,7 @@ export const appUpdateCommand = new Command('update')
           updated: allUpdates,
           ...(versionBumped ? { needsReinstall: true } : {}),
           ...(needsEndpoint ? { needsEndpoint: true } : {}),
+          ...(needsRestart ? { needsRestart: true } : {}),
         };
         outputJson(result);
       }
