@@ -523,7 +523,8 @@ export const appUpdateCommand = new Command('update')
         }
       }
       if (options.scopes !== undefined) {
-        const parsed = options.scopes.split(',').map((s) => s.trim()).filter(Boolean);
+        // Also split on whitespace: PowerShell passes unquoted `a,b` as "a b"
+        const parsed = options.scopes.split(/[\s,]+/).filter(Boolean);
         const invalid = parsed.filter((s) => !VALID_SCOPES.includes(s as BotScope));
         if (invalid.length > 0) {
           throw new CliError(
@@ -729,7 +730,7 @@ export const appUpdateCommand = new Command('update')
           throw new CliError('NOT_FOUND_BOT', 'This app has no bots.');
         }
 
-        const parsed = options.scopes.split(',').map((s) => s.trim()).filter(Boolean) as BotScope[];
+        const parsed = options.scopes.split(/[\s,]+/).filter(Boolean) as BotScope[];
         const currentDetails = detailsBefore ?? await fetchAppDetailsV2(token, appId);
         const scopeUpdates = buildScopeUpdates(currentDetails, parsed);
         const spinner = createSilentSpinner('Updating scopes...', silent).start();
