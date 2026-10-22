@@ -154,10 +154,10 @@ await app.send(conversation_id, public_message)
 ```python
 @app.on_message
 async def handle_message(ctx: ActivityContext[MessageActivity]):
-    # Send in the same thread, no quote
+    # Send reactively without quoting, matching the threading level of the inbound message
     await ctx.send("Acknowledged")
 
-    # Send in the same thread with a visual quote of the inbound message
+    # Send a reactive, quoted reply, matching the threading level of the inbound message
     await ctx.reply("Got it!")
 ```
 

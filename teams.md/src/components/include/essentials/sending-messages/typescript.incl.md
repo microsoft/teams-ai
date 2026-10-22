@@ -151,10 +151,10 @@ await app.send(conversationId, publicMessage);
 
 ```typescript
 app.on('message', async ({ send, reply }) => {
-  // Send in the same thread, no quote
+  // Send reactively without quoting, matching the threading level of the inbound message
   await send('Acknowledged');
 
-  // Send in the same thread with a visual quote of the inbound message
+  // Send a reactive, quoted reply, matching the threading level of the inbound message
   await reply('Got it!');
 });
 ```

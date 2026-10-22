@@ -113,10 +113,6 @@ public static async Task SendTargetedNotification(
 
 `app.Reply()`
 
-<!-- to-thread-id-method-name -->
-
-`Conversation.ToThreadedConversationId()`
-
 <!-- app-send-method-name -->
 
 `app.Send()` (SDK 2.0) / `app.SendAsync()` (SDK 2.1)
@@ -127,48 +123,51 @@ public static async Task SendTargetedNotification(
   <TabItem value="legacy" label="SDK 2.0 (Legacy)">
 
 ```csharp
-// Send to a specific thread proactively
-await app.Reply(conversationId, messageId, "Thread update!");
-
-// Send to a flat conversation (1:1, group chat)
-await app.Reply(conversationId, "Hello!");
+// SDK 2.0 builds the thread address from a channel id and the numeric id of the root message
+await app.Reply(channelId, messageId, "Thread update!");
 ```
 
   </TabItem>
-  <TabItem value="core" label="SDK 2.1 (current)" default>
+  <TabItem value="core" label="SDK 2.2" default>
 
 ```csharp
-// Send to a specific thread proactively
-await app.ReplyAsync(conversationId, messageId, "Thread update!", cancellationToken: cancellationToken);
-
-// Send to a flat conversation (1:1, group chat)
-await app.ReplyAsync(conversationId, "Hello!", cancellationToken: cancellationToken);
+// chatOrChannelId is channelData.chat.id or channelData.channel.id
+// replyChainId is channelData.replyChain.id
+await app.ReplyAsync(chatOrChannelId, replyChainId, "Thread update!", cancellationToken: cancellationToken);
 ```
 
   </TabItem>
 </Tabs>
 
-<!-- threading-helper-example -->
+<!-- threading-top-level-example -->
 
 <Tabs groupId="csharp-sdk-version" defaultValue="core">
   <TabItem value="legacy" label="SDK 2.0 (Legacy)">
 
 ```csharp
-using Microsoft.Teams.Api;
-
-var threadId = Conversation.ToThreadedConversationId(conversationId, messageId);
-await app.Send(threadId, "Sent via helper");
+// Send a new top-level message to a channel
+await app.Send(channelId, "Hello!");
 ```
 
   </TabItem>
-  <TabItem value="core" label="SDK 2.1 (current)" default>
+  <TabItem value="core" label="SDK 2.2" default>
 
 ```csharp
-using Microsoft.Teams.Core.Schema;
-
-var threadId = ConversationExtensions.ToThreadedConversationId(conversationId, messageId);
-await app.SendAsync(threadId, "Sent via helper", cancellationToken: cancellationToken);
+// Send a new top-level message to the chat or channel
+await app.SendAsync(chatOrChannelId, "Hello!", cancellationToken: cancellationToken);
 ```
 
   </TabItem>
 </Tabs>
+
+<!-- threading-agentic-example -->
+
+```csharp
+// SDK 2.2 and later. AgenticIdentity is null unless the recipient is an agentic user
+await app.ReplyAsync(
+    chatOrChannelId,
+    replyChainId,
+    "Thread update!",
+    agenticIdentity: context.Activity.Recipient?.GetAgenticIdentity(),
+    cancellationToken: cancellationToken);
+```

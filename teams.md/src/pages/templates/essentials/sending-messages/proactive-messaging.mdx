@@ -31,18 +31,20 @@ When sending targeted messages proactively, you must explicitly specify the reci
 
 ## Proactive Threading
 
-Threads are only rendered visibly in Teams channels. In 1:1 chats, group chats, and meetings, messages appear flat; passing a thread root message ID has no visible effect in those scopes.
+Threads (reply chains) are rendered visibly in Teams channels and 1:1 bot chats. Where threads are not shown, messages appear flat, and passing a reply chain id has no visible effect.
 
-To proactively send a message as a reply to a thread, use <LanguageInclude section="app-reply-method-name" /> with the conversation ID and thread root message ID. The SDK constructs the threaded conversation ID for you.
+To proactively send a message as a reply in a thread, use <LanguageInclude section="app-reply-method-name" /> with the id of the chat or channel and the id of the message that roots the reply chain.
+Take both from `channelData` on the inbound activity.
+Use `channelData.chat.id` in a 1:1 chat or `channelData.channel.id` in a channel, and `channelData.replyChain.id`, the id of the message at the root of the reply chain.
 
 <LanguageInclude section="threading-proactive-example" />
 
-You can also pass just a conversation ID to <LanguageInclude section="app-reply-method-name" /> for non-threaded conversations such as 1:1 chats and group chats. To target a specific thread, include the thread root message ID as shown above.
+To send a new top-level (non-threaded) message instead, send to the id of the chat or channel with <LanguageInclude section="app-send-method-name" />.
+
+<LanguageInclude section="threading-top-level-example" />
+
+A proactive call has no inbound activity to take an identity from. When the recipient is an agentic user, pass its identity from the inbound activity's recipient. Without it, the call uses the app's own credentials instead of the agentic user's. An agentic app cannot get an app-only token, so the call fails with an authentication error (`AADSTS82001`) and nothing is sent.
+
+<LanguageInclude section="threading-agentic-example" />
 
 For reactive threading (within a handler), see [Threading](./#threading).
-
-### Thread ID Helper
-
-For advanced scenarios, the <LanguageInclude section="to-thread-id-method-name" /> helper constructs the threaded conversation ID directly. Use it with <LanguageInclude section="app-send-method-name" /> when you need full control.
-
-<LanguageInclude section="threading-helper-example" />

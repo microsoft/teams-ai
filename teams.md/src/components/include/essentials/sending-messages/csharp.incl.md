@@ -339,16 +339,16 @@ app.OnMessage(async (context, cancellationToken) =>
 ```
 
   </TabItem>
-  <TabItem value="core" label="SDK 2.1 (current)" default>
+  <TabItem value="core" label="SDK 2.2" default>
 
 ```csharp
 teams.OnMessage(async (context, cancellationToken) =>
 {
-    // Send in the same thread, no quote
+    // Send reactively without quoting, matching the threading level of the inbound message
     await context.SendAsync("Acknowledged", cancellationToken);
 
-    // Send in the same thread with a visual quote of the inbound message
-    await context.Reply("Got it!", cancellationToken);
+    // Send a reactive, quoted reply, matching the threading level of the inbound message
+    await context.ReplyAsync("Got it!", cancellationToken);
 });
 ```
 

@@ -117,11 +117,11 @@ Reactions allow your agent to add or remove emoji reactions on messages in a con
 
 ## Threading
 
-In Teams channels, messages can be organized into threads. The SDK provides helpers to simplify working with threads.
+In Teams channels and 1:1 bot chats, messages can be organized into threads, or reply chains. The SDK provides helpers to simplify working with threads.
 
 ### Reactive Threading (Within a Handler)
 
-When your agent receives a message in a thread, the conversation context already carries the thread ID. Use <LanguageInclude section="context-send-method-name" /> to send a message in the same thread without quoting, or <LanguageInclude section="context-reply-method-name" /> to send with a visual quote of the inbound message.
+When your agent receives a message in a reply chain (thread), the context sends into that same reply chain. In a channel, replying to a top-level post also sends into that post's thread. In a chat, a response to a top-level message is also top-level, and a thread is started explicitly with a proactive reply (see below). Use <LanguageInclude section="context-send-method-name" /> to send reactively without quoting, or <LanguageInclude section="context-reply-method-name" /> to send a reactive, quoted reply. Both match the threading level of the inbound message.
 
 <LanguageInclude section="threading-reactive-example" />
 

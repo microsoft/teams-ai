@@ -58,10 +58,6 @@ const sendTargetedNotification = async (conversationId: string, recipient: Accou
 
 `app.reply()`
 
-<!-- to-thread-id-method-name -->
-
-`toThreadedConversationId()`
-
 <!-- app-send-method-name -->
 
 `app.send()`
@@ -69,18 +65,24 @@ const sendTargetedNotification = async (conversationId: string, recipient: Accou
 <!-- threading-proactive-example -->
 
 ```typescript
-// Send to a specific thread proactively
-await app.reply(conversationId, messageId, 'Thread update!');
-
-// Send to a flat conversation (1:1, group chat)
-await app.reply(conversationId, 'Hello!');
+// chatOrChannelId is channelData.chat.id or channelData.channel.id
+// replyChainId is channelData.replyChain.id
+await app.reply(chatOrChannelId, replyChainId, 'Thread update!');
 ```
 
-<!-- threading-helper-example -->
+<!-- threading-top-level-example -->
 
 ```typescript
-import { toThreadedConversationId } from '@microsoft/teams.apps';
+// Send a new top-level message to the chat or channel
+await app.send(chatOrChannelId, 'Hello!');
+```
 
-const threadId = toThreadedConversationId(conversationId, messageId);
-await app.send(threadId, 'Sent via helper');
+<!-- threading-agentic-example -->
+
+```typescript
+const { agenticAppId, agenticUserId, tenantId } = context.activity.recipient;
+const agenticIdentity = agenticAppId
+  ? app.getAgenticIdentity({ agenticAppId, agenticUserId, tenantId })
+  : undefined;
+await app.reply(chatOrChannelId, replyChainId, 'Thread update!', { agenticIdentity });
 ```
