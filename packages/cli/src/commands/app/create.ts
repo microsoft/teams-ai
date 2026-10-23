@@ -161,13 +161,6 @@ async function prepareAppCreate(
         `Set ${DEV_API_ENV_VAR}=1 to use the dev-int Teams Developer Portal.`
       );
     }
-    if (location === 'azure') {
-      throw new CliError(
-        'VALIDATION_CONFLICT',
-        'Socket mode is only supported for Teams-managed bots.',
-        'Use --teams-managed.'
-      );
-    }
   }
 
   const serviceManagementReference = options.serviceManagementReference?.trim();
@@ -203,7 +196,6 @@ async function prepareAppCreate(
     options.endpoint === undefined &&
     interactive &&
     !hasFlags &&
-    location === 'tm' &&
     isBotCommunicationApiAvailable()
   ) {
     socketMode = (await promptMessagingMode()) === 'socket';
@@ -483,7 +475,7 @@ export const appCreateCommand = new Command('create')
   .addOption(
     new Option(
       '--messaging-mode <mode>',
-      '[OPTIONAL] How Teams delivers messages: socket or http (socket requires a Teams-managed bot)'
+      '[OPTIONAL] How Teams delivers messages: socket or http'
     ).hideHelp(!isTdpV2Enabled())
   )
   .option('--env <path>', '[OPTIONAL] Path to credentials file (.env or appsettings.json)')

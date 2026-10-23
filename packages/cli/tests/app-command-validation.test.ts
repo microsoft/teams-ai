@@ -445,15 +445,21 @@ describe('app create --messaging-mode', () => {
     expect(mockGetAccount).not.toHaveBeenCalled();
   });
 
-  it('rejects --messaging-mode socket with --azure before auth', async () => {
+  it('creates an Azure bot without an endpoint and enables socket mode', async () => {
+    const { resolveSubscription, resolveResourceGroup } = await import('../src/utils/az-prompts.js');
+    vi.mocked(resolveSubscription).mockResolvedValue('sub');
+    vi.mocked(resolveResourceGroup).mockResolvedValue('rg');
     const command = await freshCreateCommand();
 
-    await expect(
-      command.parseAsync(['--name', 'Bot', '--messaging-mode', 'socket', '--azure', '--json'], { from: 'user' })
-    ).rejects.toThrow('process.exit(1)');
+    await command.parseAsync(
+      ['--name', 'Socket Bot', '--messaging-mode', 'socket', '--azure', '--resource-group', 'rg', '--json'],
+      { from: 'user' }
+    );
 
-    expect(jsonOutput).toMatchObject({ ok: false, error: { code: 'VALIDATION_CONFLICT' } });
-    expect(mockGetAccount).not.toHaveBeenCalled();
+    expect(mockSetSocketMode).toHaveBeenCalledWith('fake-token', 'fake-client-id', true);
+    expect(jsonOutput).toEqual(
+      expect.objectContaining({ botLocation: 'azure', endpoint: null, socketMode: true })
+    );
   });
 
   it('rejects --messaging-mode socket when the API is unavailable (TEAMS_DEV_API unset)', async () => {
