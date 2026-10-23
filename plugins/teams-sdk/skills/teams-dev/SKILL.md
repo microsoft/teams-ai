@@ -42,6 +42,12 @@ Based on the user's request, route to the appropriate guide or handle directly:
 - Read the **[Troubleshooting guide](references/troubleshooting.md)**
 - Covers: Sideloading issues, auth errors, SSO problems, migration issues
 
+**Porting a Slack Bolt bot to the Teams SDK:**
+
+- Read and follow the **[Slack Bolt Migration guide](references/guide-migrate-slack-bolt.md)**
+- This covers: App construction, message/command handlers, Block Kit → Adaptive Cards, user authentication (Graph/external services), and what needs manual judgment vs. mechanical porting
+- This is a direct code-editing task you perform yourself (read source, apply mappings, present a diff) — not a CLI command
+
 ### Simple Operations (Handle Directly)
 
 For simple queries and updates, handle directly using the commands below:
