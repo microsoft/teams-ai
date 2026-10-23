@@ -10,6 +10,7 @@ const mockConfirmAction = vi.fn();
 const mockIsAutoConfirm = vi.fn();
 const mockIsInteractive = vi.fn();
 const mockRunAppCreate = vi.fn();
+const mockRunAgentCreate = vi.fn();
 const mockListTemplates = vi.fn();
 const mockScaffoldProject = vi.fn();
 
@@ -27,6 +28,10 @@ vi.mock('../src/utils/interactive.js', () => ({
 
 vi.mock('../src/commands/app/create.js', () => ({
   runAppCreate: mockRunAppCreate,
+}));
+
+vi.mock('../src/commands/agent/create.js', () => ({
+  runAgentCreate: mockRunAgentCreate,
 }));
 
 vi.mock('../src/project/scaffold.js', () => ({
@@ -58,6 +63,14 @@ const appCreateResult = {
   },
 };
 
+const agentCreateResult = {
+  status: 'completed' as const,
+  agentBlueprintId: 'agent-blueprint-id',
+  agentBlueprintObjectId: 'agent-blueprint-object-id',
+  managedIdentityPrincipalId: 'managed-identity-principal-id',
+  generatedConfigPath: 'a365.generated.config.json',
+};
+
 describe('project new app provisioning', () => {
   let originalCwd: string;
   let tempDir: string;
@@ -85,6 +98,7 @@ describe('project new app provisioning', () => {
     mockInput.mockResolvedValueOnce('PM Agent');
     mockSelect.mockResolvedValueOnce('typescript');
     mockConfirm.mockResolvedValueOnce(true);
+    mockSelect.mockResolvedValueOnce('bot');
     mockRunAppCreate.mockResolvedValueOnce(appCreateResult);
 
     const { projectNewCommand } = await import('../src/commands/project/new/index.js');
@@ -99,7 +113,7 @@ describe('project new app provisioning', () => {
       })
     );
     expect(mockConfirm).toHaveBeenCalledWith({
-      message: 'Provision an app now?',
+      message: 'Provision an app or agentic user now?',
       default: true,
     });
     expect(mockScaffoldProject.mock.invocationCallOrder[0]).toBeLessThan(
@@ -118,6 +132,7 @@ describe('project new app provisioning', () => {
     mockInput.mockResolvedValueOnce('PM Agent');
     mockSelect.mockResolvedValueOnce('python');
     mockConfirm.mockResolvedValueOnce(true);
+    mockSelect.mockResolvedValueOnce('bot');
     mockRunAppCreate.mockResolvedValueOnce({
       ...appCreateResult,
       appName: 'Renamed Agent',
@@ -140,6 +155,27 @@ describe('project new app provisioning', () => {
         skipPostCreateActions: true,
       }
     );
+  });
+
+  it('routes to agent create when the agentic user choice is selected', async () => {
+    mockInput.mockResolvedValueOnce('PM Agent');
+    mockSelect.mockResolvedValueOnce('typescript');
+    mockConfirm.mockResolvedValueOnce(true);
+    mockSelect.mockResolvedValueOnce('agent');
+    mockInput.mockResolvedValueOnce('PM Agent Blueprint');
+    mockRunAgentCreate.mockResolvedValueOnce(agentCreateResult);
+
+    const { projectNewCommand } = await import('../src/commands/project/new/index.js');
+
+    await projectNewCommand.parseAsync([], { from: 'user' });
+
+    expect(mockRunAppCreate).not.toHaveBeenCalled();
+    expect(mockInput).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Agentic blueprint name:', default: 'PM Agent' })
+    );
+    expect(mockRunAgentCreate).toHaveBeenCalledWith('PM Agent Blueprint', {
+      cwd: path.join(tempDir, 'pm-agent'),
+    });
   });
 
   it('shows app-create guidance when app provisioning is skipped', async () => {
@@ -176,6 +212,7 @@ describe('project new app provisioning', () => {
 
   it('routes direct project new ts through app create after scaffolding when provisioning is accepted', async () => {
     mockConfirm.mockResolvedValueOnce(true);
+    mockSelect.mockResolvedValueOnce('bot');
     mockRunAppCreate.mockResolvedValueOnce(appCreateResult);
 
     const { projectNewTypescriptCommand } = await import('../src/commands/project/new/typescript.js');
@@ -203,6 +240,7 @@ describe('project new app provisioning', () => {
 
   it('runs app create with the C# appsettings path after provisioning', async () => {
     mockConfirm.mockResolvedValueOnce(true);
+    mockSelect.mockResolvedValueOnce('bot');
     mockRunAppCreate.mockResolvedValueOnce(appCreateResult);
 
     const { createCsharpProject } = await import('../src/commands/project/new/csharp.js');
