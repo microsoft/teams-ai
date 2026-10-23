@@ -25,14 +25,14 @@ import {
 } from '../../apps/index.js';
 import { ensureAz } from '../../utils/az.js';
 import { CliError, wrapAction } from '../../utils/errors.js';
-import { BOT_COMMUNICATION_BASE_URL, DEV_API_ENV_VAR } from '../../utils/tdp-host.js';
+import { DEV_API_ENV_VAR, isTdpV2Enabled } from '../../utils/tdp-host.js';
 import { readAndValidateIcon } from '../../utils/icon.js';
 import { outputJson } from '../../utils/json-output.js';
 import { logger } from '../../utils/logger.js';
 import { pickApp } from '../../utils/app-picker.js';
 import { createSilentSpinner } from '../../utils/spinner.js';
 import { bumpPatchVersion, stableStringify } from '../../utils/version.js';
-import { parseMessagingMode, promptMessagingMode } from './messaging-mode.js';
+import { MESSAGING_MODE_RESTART_HINT, parseMessagingMode, promptMessagingMode } from './messaging-mode.js';
 import type { AppSummary, AppDetails } from '../../apps/types.js';
 import type { BotDetails } from '../../apps/tdp.js';
 import type { BotLocation } from '../../apps/bot-location.js';
@@ -101,6 +101,8 @@ interface AppUpdateOutput {
   needsReinstall?: boolean;
   /** HTTP delivery was selected but the bot has no messaging endpoint. */
   needsEndpoint?: boolean;
+  /** Messaging mode changed; the running Teams SDK app must be restarted. */
+  needsRestart?: boolean;
   updated: {
     endpoint?: string;
     socketMode?: boolean;
@@ -285,6 +287,7 @@ export async function showUpdateMenu(app: AppSummary, token: string): Promise<vo
       try {
         await setSocketMode(token, botId, enable);
         modeSpinner.success({ text: enable ? 'Socket mode enabled' : 'Switched to HTTP' });
+        logger.info(pc.yellow(MESSAGING_MODE_RESTART_HINT));
         socketMode = enable;
       } catch (error) {
         modeSpinner.error({ text: 'Failed to update messaging mode' });
@@ -434,7 +437,7 @@ export const appUpdateCommand = new Command('update')
     new Option(
       '--messaging-mode <mode>',
       '[OPTIONAL] Set how Teams delivers messages: socket or http (Teams-managed bots only)'
-    ).hideHelp(BOT_COMMUNICATION_BASE_URL === undefined)
+    ).hideHelp(!isTdpV2Enabled())
   )
   .option('--scopes <scopes>', '[OPTIONAL] Set bot scopes (comma-separated: personal,team,groupChat,copilot)')
   .option('--name <name>', '[OPTIONAL] Set the app short name (max 30 chars)')
@@ -520,7 +523,8 @@ export const appUpdateCommand = new Command('update')
         }
       }
       if (options.scopes !== undefined) {
-        const parsed = options.scopes.split(',').map((s) => s.trim()).filter(Boolean);
+        // Also split on whitespace: PowerShell passes unquoted `a,b` as "a b"
+        const parsed = options.scopes.split(/[\s,]+/).filter(Boolean);
         const invalid = parsed.filter((s) => !VALID_SCOPES.includes(s as BotScope));
         if (invalid.length > 0) {
           throw new CliError(
@@ -614,6 +618,7 @@ export const appUpdateCommand = new Command('update')
       const wantsModeChange = messagingMode !== undefined;
       let modeBotId: string | undefined;
       let needsEndpoint = false;
+      let needsRestart = false;
       if (wantsModeChange) {
         if (!app.bots || app.bots.length === 0) {
           throw new CliError('NOT_FOUND_BOT', 'This app has no bots.');
@@ -708,6 +713,8 @@ export const appUpdateCommand = new Command('update')
         const { changed } = await setSocketMode(token, modeBotId, enable);
         if (changed) {
           modeSpinner.success({ text: enable ? 'Socket mode enabled' : 'Switched to HTTP' });
+          needsRestart = true;
+          if (!silent) logger.info(pc.yellow(MESSAGING_MODE_RESTART_HINT));
         } else {
           modeSpinner.success({
             text: enable ? 'Socket mode already enabled' : 'Already using HTTP',
@@ -723,7 +730,7 @@ export const appUpdateCommand = new Command('update')
           throw new CliError('NOT_FOUND_BOT', 'This app has no bots.');
         }
 
-        const parsed = options.scopes.split(',').map((s) => s.trim()).filter(Boolean) as BotScope[];
+        const parsed = options.scopes.split(/[\s,]+/).filter(Boolean) as BotScope[];
         const currentDetails = detailsBefore ?? await fetchAppDetailsV2(token, appId);
         const scopeUpdates = buildScopeUpdates(currentDetails, parsed);
         const spinner = createSilentSpinner('Updating scopes...', silent).start();
@@ -814,6 +821,7 @@ export const appUpdateCommand = new Command('update')
           updated: allUpdates,
           ...(versionBumped ? { needsReinstall: true } : {}),
           ...(needsEndpoint ? { needsEndpoint: true } : {}),
+          ...(needsRestart ? { needsRestart: true } : {}),
         };
         outputJson(result);
       }
