@@ -14,7 +14,6 @@ import {
   type BotLocation,
 } from '../../apps/index.js';
 import { getAccount } from '../../auth/index.js';
-import { runAgentCreate } from '../agent/create.js';
 import { outputCredentials, writeCredentials } from '../../utils/env.js';
 import { resolveCredentialDestination } from '../../utils/credential-destination.js';
 import { CliError, wrapAction } from '../../utils/errors.js';
@@ -78,23 +77,7 @@ export interface CreateOptions {
   resourceGroup?: string;
   createResourceGroup?: boolean;
   region?: string;
-  agent?: boolean;
   json?: boolean;
-}
-
-export async function shouldCreateAgent(options: CreateOptions): Promise<boolean> {
-  if (options.agent) return true;
-  if (options.azure || options.teamsManaged) return false;
-  if (!isInteractive() || options.json) return false;
-
-  const choice = await select({
-    message: 'What do you want to create?',
-    choices: [
-      { name: 'Bot', value: 'bot' as const },
-      { name: 'Agentic user (Agent 365 identity)', value: 'agent' as const },
-    ],
-  });
-  return choice === 'agent';
 }
 
 export interface AppCreateRunOptions {
@@ -494,7 +477,7 @@ async function renderAppCreateResult(
 }
 
 export const appCreateCommand = new Command('create')
-  .description('Create a new Teams app with a bot or an Agent 365 agentic identity')
+  .description('Create a new Teams app with a bot')
   .option('-n, --name <name>', 'App/bot name')
   .option('-e, --endpoint <url>', '[OPTIONAL] Messaging endpoint URL')
   .addOption(
@@ -508,7 +491,6 @@ export const appCreateCommand = new Command('create')
   .option('--no-secret', '[OPTIONAL] Skip client secret generation (for managed identity or federated credentials)')
   .option('--azure', '[OPTIONAL] Create bot in Azure (requires az CLI)')
   .option('--teams-managed', '[OPTIONAL] Create bot managed by Teams (default)')
-  .option('--agent', '[OPTIONAL] Create an Agent 365 agentic identity instead of a bot')
   .option('--service-management-reference <id>', '[OPTIONAL] ServiceTree service ID for Microsoft Entra app attribution')
   .option('--sign-in-audience <audience>', '[OPTIONAL] Microsoft Entra sign-in audience: myOrg or multipleOrgs')
   .option('--subscription <id>', '[OPTIONAL] Azure subscription ID (defaults to az CLI default)')
@@ -520,13 +502,6 @@ export const appCreateCommand = new Command('create')
   .option('--json', '[OPTIONAL] Output as JSON')
   .action(
     wrapAction(async (options: CreateOptions) => {
-      if (await shouldCreateAgent(options)) {
-        // runAgentCreate always creates an Agentic User (AI teammate); the
-        // messaging endpoint is deferred by default and set later via
-        // `teams agent update-endpoint`, same as a365's own documented flow.
-        await runAgentCreate(options.name, { json: options.json });
-        return;
-      }
       await runAppCreate(options);
     })
   );

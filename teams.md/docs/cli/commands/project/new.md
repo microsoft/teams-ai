@@ -17,8 +17,20 @@ teams project new
 
 ## App credentials
 
-Interactive project creation scaffolds the project first, then can route you through `teams app create` with the app name and credentials file pre-filled. In non-interactive usage, create the project first, then run:
+Interactive project creation scaffolds the project first, then asks "Provision an app now?" If you accept, you're asked what to create:
+
+- **Bot** — routes you through `teams app create` with the app name and credentials file pre-filled.
+- **Agentic user (Agent 365 identity)** — routes you through [`teams agent create`](../agent/create) to register an Agent 365 agent blueprint instead of a classic bot.
+
+In non-interactive usage, create the project first, then run either:
 
 ```bash
 teams app create --name "<app name>" --env <project credentials file>
 ```
+
+or, for an agentic identity:
+
+```bash
+teams agent create "<agent name>"
+```
+

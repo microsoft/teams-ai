@@ -96,7 +96,7 @@ Messaging endpoint is never registered at creation time: `a365 setup all` defers
 either way when run non-interactively (no TTY, which is always true when we `spawn`
 it), with or without `--m365` — it only takes effect in combination with
 `--messaging-endpoint`, which we never pass at creation. Set it after deployment with
-`teams agent update-endpoint`.
+`teams agent endpoint`.
 
 ### Flow
 1. **Resolve name.** Prompt via `input()` if missing and not auto-confirm/JSON; else
@@ -139,7 +139,7 @@ interface AgentCreateOutput {
   agentBlueprintId: string;
   agentBlueprintObjectId: string;
   managedIdentityPrincipalId: string;
-  messagingEndpoint?: string; // present if already registered via `teams agent update-endpoint`
+  messagingEndpoint?: string; // present if already registered via `teams agent endpoint`
   consentUrl?: string; // present when status === "pending_admin_consent"
   generatedConfigPath: string; // absolute path to a365.generated.config.json
 }

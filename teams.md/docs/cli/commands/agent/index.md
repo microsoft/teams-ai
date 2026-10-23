@@ -21,4 +21,4 @@ Commands for creating [Microsoft Agent 365](https://learn.microsoft.com/microsof
 
 These commands wrap the official [Agent 365 CLI (`a365`)](https://learn.microsoft.com/microsoft-agent-365/developer/agent-365-cli) .NET global tool rather than reimplementing its Entra/Azure provisioning logic. The `teams` CLI detects and installs `a365` for you, then drives it to a single outcome.
 
-See [`teams agent create`](./create) to get started, [`teams agent update-endpoint`](./update-endpoint) to re-point an existing blueprint's messaging endpoint, and [`teams agent update-identifier`](./update-identifier) to fix up the bot's SSO identifier URI.
+See [`teams agent create`](./create) to get started and [`teams agent update-endpoint`](./update-endpoint) to re-point an existing blueprint's messaging endpoint.
